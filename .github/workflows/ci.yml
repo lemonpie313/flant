@@ -15,7 +15,7 @@ jobs:
   # 실행 할 작업 이름 지정 "ci-test"
   ci-test:
     # 작업을 실행 할 VM의 OS 지정
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
 
     # 작업 내의 단위 작업(step)을 정의
     steps:
