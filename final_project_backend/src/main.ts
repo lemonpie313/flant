@@ -29,7 +29,7 @@ async function bootstrap() {
   // Swagger 설정
   const config = new DocumentBuilder()
     .setTitle('SPARTA FINAL PROJECT: FAN COMMUNITY')
-    .setDescription('API description of Sparta Final Project')
+    .setDescription('API description of Sparta Final Project!!')
     .setVersion('1.0')
     .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' })
     .build();
