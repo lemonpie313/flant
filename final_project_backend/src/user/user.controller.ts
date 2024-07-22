@@ -1,34 +1,31 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  UseGuards,
+  Request,
+  HttpStatus,
+} from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+  /**
+   * 내정보조회
+   * @param req
+   * @returns
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/me')
+  async findOne(@Request() req) {
+    const data = await this.userService.findMe(req.user.id);
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.userService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+    return {
+      statusCode: HttpStatus.OK,
+      message: `내 정보 조회에 성공했습니다.`,
+      data,
+    };
   }
 }
