@@ -23,7 +23,7 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
-    })
+    }),
   );
 
   // Swagger 설정
