@@ -46,6 +46,8 @@ export class AuthService {
 
     return user;
   }
+
+  // 로그인
   signIn(userId: number) {
     const payload = { id: userId };
     const accessToken = this.jwtService.sign(payload);
