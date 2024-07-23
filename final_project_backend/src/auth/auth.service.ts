@@ -23,6 +23,11 @@ export class AuthService {
     name,
     profile_image,
   }: SignUpDto) {
+    // 기존 이메일로 가입된 이력이 있을 경우 False
+    const existedEmail = await this.userRepository.findOneBy({ email });
+    if (existedEmail)
+      throw new BadRequestException('이미 가입된 이메일이 있습니다.');
+
     // 비밀번호와 비밀번호 확인이랑 일치하는 지
     const isPasswordMatched = password === passwordConfirm;
     if (!isPasswordMatched) {
