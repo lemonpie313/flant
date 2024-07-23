@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateUserDto } from './dto/update-user.dto';
 import bcrypt from 'bcrypt';
+
 @Injectable()
 export class UserService {
   constructor(

@@ -14,11 +14,11 @@ import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 @Injectable()
 export class RolesGuard extends AuthGuard('jwt') implements CanActivate {
-  @InjectRepository(User) private readonly userResitory: Repository<User>;
+  @InjectRepository(User) private readonly userRepository: Repository<User>;
   constructor(private reflector: Reflector) {
     super();
   } // reflector로 인해 role을 가져옴
-  async anActivate(context: ExecutionContext): Promise<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     // 먼저 jwt인증이 잘되는지 확인
     const authenticated = await super.canActivate(context);
     if (!authenticated)
@@ -31,9 +31,9 @@ export class RolesGuard extends AuthGuard('jwt') implements CanActivate {
     if (!requiredRoles) {
       return true;
     }
-    const { req } = context.switchToHttp().getRequest();
+    const req = context.switchToHttp().getRequest();
     const userId = req.user.id;
-    const user = await this.userResitory.findOneBy({ user_id: userId });
+    const user = await this.userRepository.findOneBy({ user_id: userId });
 
     const hasPermission = requiredRoles.some((role) => role === user.role);
     if (!hasPermission) throw new ForbiddenException('권한이 없습니다.');
