@@ -42,8 +42,6 @@ export class AuthService {
       profile_image,
     });
 
-    delete user.password;
-
     return user;
   }
 
