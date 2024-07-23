@@ -109,6 +109,7 @@ export class UserService {
       where: { user_id: userId },
       select: { password: true },
     });
+    console.log(user.password);
     const isPasswordMatched = bcrypt.compareSync(
       password,
       user?.password ?? '',

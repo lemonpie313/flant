@@ -7,6 +7,7 @@ import {
   Param,
   Body,
   Patch,
+  Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth } from '@nestjs/swagger';
@@ -83,11 +84,12 @@ export class UserController {
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Patch('/:userId')
+  @Delete('/:userId')
   async deleteUser(
     @Param() userId: SearchUserParamsDto,
     @Body() deleteUserDto: DeleteUserDto,
   ) {
+    console.log('hello');
     await this.userService.deleteUser(userId.userId, deleteUserDto.password);
 
     return {
