@@ -23,7 +23,7 @@ export class RolesGuard extends AuthGuard('jwt') implements CanActivate {
     const authenticated = await super.canActivate(context);
     if (!authenticated)
       throw new UnauthorizedException('인증 정보가 잘못되었습니다.');
-
+    // 현재 요구하는 user의 Role이 뭔지 파악
     const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(
       ROLES_KEY,
       [context.getHandler(), context.getClass()],
@@ -31,10 +31,11 @@ export class RolesGuard extends AuthGuard('jwt') implements CanActivate {
     if (!requiredRoles) {
       return true;
     }
+    //Request를 통해 유저의 아이디를 통해 유저 정보를 불러오기
     const req = context.switchToHttp().getRequest();
     const userId = req.user.id;
     const user = await this.userRepository.findOneBy({ user_id: userId });
-
+    // 요구하는 user의 role과 일치한지 확인하기
     const hasPermission = requiredRoles.some((role) => role === user.role);
     if (!hasPermission) throw new ForbiddenException('권한이 없습니다.');
     return hasPermission;
