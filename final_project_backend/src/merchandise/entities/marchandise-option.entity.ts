@@ -7,13 +7,11 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { MerchandisePost } from './merchandise-post.entity';
 
-import { ProductPost } from './product.post.entity';
-
-@Entity('options')
-export class Option {
+@Entity('merchandise_option')
+export class MerchandiseOption {
   @PrimaryGeneratedColumn({ unsigned: true })
-  @Column()
   optionId: number;
 
   /**
@@ -41,6 +39,9 @@ export class Option {
   updatedAt: Date;
 
   //상품 연결
-  @ManyToOne(() => ProductPost, (productPost) => productPost.option)
-  productPost: ProductPost[];
+  @ManyToOne(
+    () => MerchandisePost,
+    (merchandisePost) => merchandisePost.merchandiseOption,
+  )
+  merchandisePost: MerchandisePost[];
 }

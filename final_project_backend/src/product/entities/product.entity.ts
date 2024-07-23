@@ -3,34 +3,32 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ProductImage } from './product.image.entity';
-import { ProductPost } from './product.post.entity';
 import { ProductCategory } from './product.category.entity';
+import { MerchandiseImage } from 'src/merchandise/entities/merchandise-image.entity';
+import { MerchandisePost } from '../../merchandise/entities/merchandise-post.entity';
 
 @Entity('products')
 export class Product {
   @PrimaryGeneratedColumn({ unsigned: true })
-  @Column()
-  shopId: number;
+  id: number;
 
   /**
-   * 상품 코드
+   * 상점 코드
    * @example "ABCDEFGHI11"
    */
   //코드가 자동생성되는건지 확인 필요
-  @IsNotEmpty({ message: '상품 코드를 입력해주세요' })
+  @IsNotEmpty({ message: '상점 코드를 입력해주세요' })
   @IsString()
   @Column()
   productCode: string;
 
   /**
-   * 상품명
-   * @example "상품명"
+   * 상점명
+   * @example "상점명"
    */
   @IsNotEmpty({ message: '상품명을 입력해주세요' })
   @IsString()
@@ -39,7 +37,7 @@ export class Product {
 
   /**
    * 상세정보
-   * @example "이 상품의 정보를 입력해주세요 "
+   * @example "이 상점의 정보를 입력해주세요 "
    */
   @IsNotEmpty({ message: '상세정보를 입력해주세요' })
   @IsString()
@@ -61,21 +59,26 @@ export class Product {
   /**
    * 상품 이미지
    */
-  @OneToMany(() => ProductImage, (productImage) => productImage.product)
-  productImage: ProductImage[];
+  @OneToMany(
+    () => MerchandiseImage,
+    (merchandiseImage) => merchandiseImage.products,
+  )
+  merchandiseImage: MerchandiseImage[];
 
   /**
    * 상품 게시물
    */
-  @OneToMany(() => ProductPost, (productPost) => productPost.product)
-  productPost: ProductPost[];
-
+  @OneToMany(
+    () => MerchandisePost,
+    (merchandisePost) => merchandisePost.product,
+  )
+  merchandisePosts: MerchandisePost[];
   /**
    * 카테고리
    */
   @OneToMany(
     () => ProductCategory,
-    (productCategory) => productCategory.product,
+    (productCategory) => productCategory.products,
   )
-  productCategory: ProductCategory[];
+  productCategorys: ProductCategory[];
 }

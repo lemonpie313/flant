@@ -1,5 +1,6 @@
 import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { ProductPost } from 'src/product/entities/product.post.entity';
+import { MerchandisePost } from '../../merchandise/entities/merchandise-post.entity';
+
 import {
   Column,
   CreateDateColumn,
@@ -18,8 +19,11 @@ export class CartItem {
   @ManyToOne(() => Cart, (cart) => cart.cartItem)
   cart: Cart;
 
-  @ManyToOne(() => ProductPost, (productPost) => productPost.cartItem)
-  productPost: ProductPost;
+  @ManyToOne(
+    () => MerchandisePost,
+    (merchandisePost) => merchandisePost.cartItems,
+  )
+  merchandisePost: MerchandisePost[];
 
   @Column()
   quantity: number;

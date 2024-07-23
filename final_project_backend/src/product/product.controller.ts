@@ -23,11 +23,23 @@ export class ProductController {
    * @returns
    */
   @Post()
-  async create(@Body() createProductDto: CreateProductDto) {
-    const data = await this.productService.create(createProductDto);
+  async productCreate(@Body() createProductDto: CreateProductDto) {
+    const data = await this.productService.productCreate(createProductDto);
     return data;
   }
 
+  /**
+   * 상품 생성
+   * @param createProductDto
+   * @returns
+   */
+  @Post()
+  async productPostCreate(@Body() createProductDto: CreateProductDto) {
+    const data = await this.productService.productPostCreate(createProductDto);
+    return data;
+  }
+
+  /** */
   @Get()
   findAll() {
     return this.productService.findAll();

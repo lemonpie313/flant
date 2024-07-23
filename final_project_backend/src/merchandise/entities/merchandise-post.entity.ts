@@ -3,22 +3,22 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Product } from './product.entity';
-import { ProductImage } from './product.image.entity';
-import { Order } from 'src/order/entities/order.entity';
-import { Option } from './option.entity';
+import { Product } from '../../product/entities/product.entity';
+
+import { MerchandiseOption } from './marchandise-option.entity';
+import { MerchandiseImage } from './merchandise-image.entity';
 import { CartItem } from 'src/order/entities/cart.item.entity';
 
-@Entity('product_posts')
-export class ProductPost {
+@Entity('merchandise_post')
+export class MerchandisePost {
   @PrimaryGeneratedColumn({ unsigned: true })
-  @Column()
   goodsId: number;
 
   /**
@@ -45,7 +45,7 @@ export class ProductPost {
   @IsNotEmpty({ message: '상품판매명을 입력해주세요' })
   @IsString()
   @Column()
-  productSalesName: string;
+  salesName: string;
 
   /**
    * 내용
@@ -72,18 +72,25 @@ export class ProductPost {
   updatedAt: Date;
 
   // 굿즈샵 연결
-  @ManyToOne(() => Product, (product) => product.productPost)
-  product: Product[];
+  @ManyToOne(() => Product, (product) => product.merchandisePosts)
+  @JoinColumn({ name: 'product_id' })
+  product: Product;
 
   // 상품 이미지 연결
-  @OneToMany(() => ProductImage, (productImage) => productImage.productPost)
-  productImage: ProductImage[];
+  @OneToMany(
+    () => MerchandiseImage,
+    (merchandiseImage) => merchandiseImage.merchandisePost,
+  )
+  merchandiseImage: MerchandiseImage[];
 
   // 주문 연결
-  @OneToMany(() => CartItem, (cartItem) => cartItem.productPost)
-  cartItem: CartItem[];
+  @OneToMany(() => CartItem, (cartItem) => cartItem.merchandisePost)
+  cartItems: CartItem[];
 
   // 옵션 연결
-  @OneToMany(() => Option, (option) => option.productPost)
-  option: Option[];
+  @OneToMany(
+    () => MerchandiseOption,
+    (merchandiseOption) => merchandiseOption.merchandisePost,
+  )
+  merchandiseOption: MerchandiseOption[];
 }

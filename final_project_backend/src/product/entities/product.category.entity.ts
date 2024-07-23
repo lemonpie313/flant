@@ -12,7 +12,6 @@ import { Product } from './product.entity';
 @Entity('product_categorys')
 export class ProductCategory {
   @PrimaryGeneratedColumn({ unsigned: true })
-  @Column()
   categoryId: number;
 
   /**
@@ -34,6 +33,6 @@ export class ProductCategory {
   /**
    * 굿즈샵 연결
    */
-  @ManyToOne(() => Product, (Product) => Product.productCategory)
-  product: Product[];
+  @ManyToOne(() => Product, (Product) => Product.productCategorys)
+  products: Product[];
 }

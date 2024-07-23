@@ -6,14 +6,14 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Product } from './product.entity';
-import { ProductPost } from './product.post.entity';
-import { IsNotEmpty, IsString } from 'class-validator';
 
-@Entity('product_images')
-export class ProductImage {
+import { IsNotEmpty, IsString } from 'class-validator';
+import { Product } from 'src/product/entities/product.entity';
+import { MerchandisePost } from './merchandise-post.entity';
+
+@Entity('merchandise_image')
+export class MerchandiseImage {
   @PrimaryGeneratedColumn({ unsigned: true })
-  @Column()
   goodsImageId: number;
 
   /**
@@ -32,10 +32,13 @@ export class ProductImage {
   updatedAt: Date;
 
   // 굿즈샵 연결
-  @ManyToOne(() => Product, (product) => product.productImage)
-  product: Product[];
+  @ManyToOne(() => Product, (product) => product.merchandiseImage)
+  products: Product[];
 
   // 상품게시물 연결
-  @ManyToOne(() => ProductPost, (productPost) => productPost.productImage)
-  productPost: ProductPost[];
+  @ManyToOne(
+    () => MerchandisePost,
+    (merchandisePost) => merchandisePost.merchandiseImage,
+  )
+  merchandisePost: MerchandisePost[];
 }

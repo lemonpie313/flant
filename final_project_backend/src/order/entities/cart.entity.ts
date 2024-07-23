@@ -1,5 +1,4 @@
 import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { ProductPost } from 'src/product/entities/product.post.entity';
 import {
   Column,
   CreateDateColumn,
