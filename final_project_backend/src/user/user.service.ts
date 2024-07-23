@@ -67,11 +67,12 @@ export class UserService {
       password,
       user?.password ?? '',
     );
+
     if (!isPasswordMatched)
       throw new BadRequestException('기존 비밀번호와 일치하지 않습니다.');
 
     // 새로운 비밀번호와 확인이 일치한지 확인
-    if (!newPassword) {
+    if (newPassword) {
       const isNewPasswordMatched = newPassword === newPasswordConfirm;
       if (!isNewPasswordMatched) {
         throw new BadRequestException(
@@ -79,6 +80,10 @@ export class UserService {
         );
       }
     }
+    // 비밀번호 뭉개기
+    const hashRounds = this.configService.get<number>('PASSWORD_HASH');
+    const hashedPassword = bcrypt.hashSync(newPassword, hashRounds);
+    console.log(hashedPassword);
 
     // 회원 정보 수정 로직
     // update 조건
@@ -86,7 +91,7 @@ export class UserService {
     // update 내용
     const whereContent = {
       ...(name && { name }),
-      ...(newPassword && { password: newPassword }),
+      ...(newPassword && { password: hashedPassword }),
       ...(profile_image && { profile_image }),
     };
     const updateUser = await this.userRepository.update(
