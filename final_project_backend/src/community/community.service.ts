@@ -1,29 +1,46 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateCommunityDto } from './dto/create-community.dto';
 import { UpdateCommunityDto } from './dto/update-community.dto';
 import { Community } from './entities/community.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CommunityUser } from './entities/communityUser.entity';
 
 @Injectable()
 export class CommunityService {
   constructor(
     @InjectRepository(Community)
     private readonly communityRepository: Repository<Community>,
+    @InjectRepository(CommunityUser)
+    private readonly communityUserRepository: Repository<CommunityUser>,
   ) {}
 
   create(createCommunityDto: CreateCommunityDto) {
-    return 'This action adds a new community';
+    return createCommunityDto;
   }
 
-  findAll(myCommunities: number | null) {
-    if (!myCommunities) {
-      const allCommunities = await this.communityRepository.find();
+  async assignCommunity(userId: number, communityId: number, nickName: string) {
+    const assignData = await this.communityUserRepository.save({
+      userId: userId,
+      communityId: communityId,
+      nickName: nickName,
+    });
+    const assignedName = assignData.nickName;
+    const findCommunity = await this.communityRepository.findOne({
+      where: { communityId: communityId },
+    });
+    const communityName = findCommunity.communityName;
+
+    const Data = { assignedName, communityName };
+    return {
+      status: HttpStatus.OK,
+      message: '커뮤니티 가입에 성공했습니다.',
+      data: Data,
     };
-    else {
-      const signedCommunities = await this.communityRepository.find({ where: })
-    }
-    return `This action returns all community`;
+  }
+
+  async findAll(myCommunities: number | null) {
+    return myCommunities;
   }
 
   findOne(id: number) {
@@ -31,7 +48,7 @@ export class CommunityService {
   }
 
   update(id: number, updateCommunityDto: UpdateCommunityDto) {
-    return `This action updates a #${id} community`;
+    return `This action updates a #${updateCommunityDto} community`;
   }
 
   remove(id: number) {

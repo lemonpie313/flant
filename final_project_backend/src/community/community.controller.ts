@@ -7,13 +7,18 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { CommunityService } from './community.service';
 import { CreateCommunityDto } from './dto/create-community.dto';
 import { UpdateCommunityDto } from './dto/update-community.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('communities')
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'))
 @Controller('v1/community')
 export class CommunityController {
   constructor(private readonly communityService: CommunityService) {}
@@ -21,6 +26,15 @@ export class CommunityController {
   @Post()
   create(@Body() createCommunityDto: CreateCommunityDto) {
     return this.communityService.create(createCommunityDto);
+  }
+
+  @Post(':communityId/assign')
+  assignCommunity(
+    @Request() userId: number,
+    @Param('communityId') communityId: number,
+    @Body() nickName: string,
+  ) {
+    return this.communityService.assignCommunity(userId, communityId, nickName);
   }
 
   @Get()
