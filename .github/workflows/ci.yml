@@ -29,14 +29,16 @@ jobs:
         with:
           node-version: 20 # 설치 할 Node.js 버전 지정
           cache: 'npm' # npm 사용 시 'npm'
+          cache-dependency-path: 'final_project_backend/package-lock.json'
 
       # 의존성 패키지 설치하기
       - name: Install dependencies # step의 이름 지정 (선택 사항)
         run: |
-          # package-lock.json 파일에 저장 된 버전 정보와 동일하게 설치
+          cd final_project_backend
           npm ci
 
       # 테스트 코드 실행
       - name: Run test # step의 이름 지정 (선택 사항)
         run: |
+          cd final_project_backend
           npm run test
