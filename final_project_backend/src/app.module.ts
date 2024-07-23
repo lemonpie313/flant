@@ -5,6 +5,8 @@ import { ConfigModule } from '@nestjs/config';
 import { configModuleValidationSchema } from './configs/env-validation.config';
 import { typeOrmModuleOptions } from './configs/database.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ProductModule } from './product/product.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       envFilePath: '.env',
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
+    ProductModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],
