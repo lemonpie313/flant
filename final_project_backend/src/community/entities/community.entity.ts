@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, IsUrl } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -39,6 +39,15 @@ export class Community {
   @IsUrl()
   @Column()
   communityCoverImage: string;
+
+  /**
+   * 유료 멤버쉽 가입 금액
+   * @example 20000
+   */
+  @IsNotEmpty()
+  @IsNumber()
+  @Column({ unsigned: true })
+  membershipPrice: number;
 
   @CreateDateColumn()
   createdAt: Date;

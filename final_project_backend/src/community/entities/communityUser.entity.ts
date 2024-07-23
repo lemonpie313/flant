@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -29,6 +29,10 @@ export class CommunityUser {
   @IsNotEmpty()
   @Column()
   nickName: string;
+
+  @IsBoolean()
+  @Column({ default: false })
+  membership: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
