@@ -23,13 +23,13 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
-    })
+    }),
   );
 
   // Swagger 설정
   const config = new DocumentBuilder()
-    .setTitle('Trello Clone')
-    .setDescription('API description of Trello project')
+    .setTitle('SPARTA FINAL PROJECT: FAN COMMUNITY')
+    .setDescription('API description of Sparta Final Project - Fan Community')
     .setVersion('1.0')
     .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' })
     .build();

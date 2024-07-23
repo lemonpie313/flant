@@ -7,6 +7,8 @@ import { typeOrmModuleOptions } from './configs/database.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { OrderModule } from './order/order.module';
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     ProductModule,
     OrderModule,
+    AuthModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
