@@ -13,6 +13,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { SearchUserParamsDto } from './dto/search-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { DeleteUserDto } from './dto/delete-user.dto';
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -66,14 +67,32 @@ export class UserController {
     @Param() userId: SearchUserParamsDto,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    const data = await this.userService.updateUser(
-      userId.userId,
-      updateUserDto,
-    );
+    await this.userService.updateUser(userId.userId, updateUserDto);
 
     return {
       statusCode: HttpStatus.OK,
       message: `정보 수정에 성공했습니다.`,
+    };
+  }
+
+  /**
+   * 회원 탈퇴
+   * @param userId
+   * @param deleteUserDto
+   * @returns
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('/:userId')
+  async deleteUser(
+    @Param() userId: SearchUserParamsDto,
+    @Body() deleteUserDto: DeleteUserDto,
+  ) {
+    await this.userService.deleteUser(userId.userId, deleteUserDto.password);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: `회원 탈퇴에 성공했습니다.`,
     };
   }
 }

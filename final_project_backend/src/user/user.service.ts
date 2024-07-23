@@ -101,4 +101,25 @@ export class UserService {
 
     return updateUser;
   }
+
+  // 회원 탈퇴
+  async deleteUser(userId: number, password: string) {
+    // 비밀번호 일치한지 확인
+    const user = await this.userRepository.findOne({
+      where: { user_id: userId },
+      select: { password: true },
+    });
+    const isPasswordMatched = bcrypt.compareSync(
+      password,
+      user?.password ?? '',
+    );
+
+    if (!isPasswordMatched)
+      throw new BadRequestException('기존 비밀번호와 일치하지 않습니다.');
+
+    // 회원 삭제 로직
+    await this.userRepository.delete({ user_id: userId });
+
+    return true;
+  }
 }
