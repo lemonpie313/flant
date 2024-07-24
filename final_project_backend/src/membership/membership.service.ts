@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Community } from 'src/community/entities/community.entity';
 import { CommunityUser } from 'src/community/entities/communityUser.entity';
@@ -30,7 +30,6 @@ export class MembershipService {
       },
       // relations: ['community'], >> relation 안돼있음...ㅠㅠ
     });
-    console.log('ㅇㅇㅇㅇ');
     if (_.isNil(communityUser)) {
       throw new NotFoundException({
         status: 404,
@@ -105,5 +104,99 @@ export class MembershipService {
       };
     });
     return memberships;
+  }
+
+  async findMembership(membershipPaymentId: number) {
+    // 유저아이디, 멤버십 가입 여부 바탕으로 커뮤니티 유저 조회
+    const communityUser = await this.communityUserRepository.findOne({
+      where: {
+        membership: true,
+        membershipPayment: {
+          membershipPaymentId,
+        },
+      },
+      relations: {
+        membershipPayment: true,
+        // community: true,
+      },
+    });
+    if (_.isNil(communityUser)) {
+      throw new NotFoundException({
+        status: 404,
+        message: '해당 멤버십 정보가 없습니다.',
+      });
+    }
+
+    const membership = {
+      communityUserId: communityUser.communityUserId,
+      nickname: communityUser.nickName,
+      // 커뮤니티(그룹) 정보 추가...
+      membershipPaymentId: communityUser.membershipPayment.membershipPaymentId,
+      createdAt: communityUser.membershipPayment.createdAt,
+      expiration: communityUser.membershipPayment.expiration,
+    };
+
+    return membership;
+  }
+
+  async extendMembership(userId: number, membershipPaymentId: number) {
+    const membership = await this.membershipPaymentRepository.findOne({
+      where: {
+        membershipPaymentId,
+      },
+    });
+
+    if (_.isNil(membership)) {
+      throw new NotFoundException({
+        status: 404,
+        message: '해당 멤버십 정보가 없습니다.',
+      });
+    }
+
+    const today = new Date();
+    const remaining =
+      (membership.expiration.getTime() - today.getTime()) /
+      (1000 * 60 * 60 * 24);
+
+    if (remaining > 7) {
+      throw new BadRequestException({
+        status: 400,
+        message: '멤버십 연장은 기간 만료 일주일 전부터 가능합니다.',
+      });
+    }
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction('READ UNCOMMITTED');
+
+    try {
+      let expiration = membership.expiration;
+      expiration.setFullYear(expiration.getFullYear() + 1);
+      // 커뮤니티유저 ID > 결제내역 저장
+      await queryRunner.manager.update(MembershipPayment, membershipPaymentId, {
+        expiration,
+      });
+
+      // 유저ID > 포인트 깎기
+      await queryRunner.manager.decrement(User, { userId }, 'points', 20000);
+      const user = await this.userRepository.findOne({
+        where: {
+          user_id: userId,
+        },
+      });
+      await queryRunner.commitTransaction();
+
+      return {
+        //아 정리가 안된다...........
+        membershipPaymentId: membership.membershipPaymentId,
+        price: 20000,
+        accountBalance: user.point,
+      };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
   }
 }

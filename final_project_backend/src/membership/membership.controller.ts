@@ -20,6 +20,13 @@ import { MembershipService } from './membership.service';
 export class MembershipController {
   constructor(private readonly membershipService: MembershipService) {}
 
+  /**
+   * 멤버십 가입
+   *
+   * @returns
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @Post('/')
   async createMembership(
     @Request() req,
@@ -36,6 +43,13 @@ export class MembershipController {
     };
   }
 
+  /**
+   * 멤버십 가입내역 전체조회
+   *
+   * @returns
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @Get('/')
   async findAllMembership(@Request() req) {
     const memberships = await this.membershipService.findAllMembership(
@@ -45,6 +59,50 @@ export class MembershipController {
       status: HttpStatus.OK,
       message: '멤버십 가입 내역 조회가 완료되었습니다.',
       data: memberships,
+    };
+  }
+
+  /**
+   * 멤버십 가입내역 상세조회
+   *
+   * @returns
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/:membershipPaymentId')
+  async findMembership(
+    @Request() req,
+    @Param('membershipPaymentId') membershipPaymentId: number,
+  ) {
+    const membership =
+      await this.membershipService.findMembership(membershipPaymentId);
+    return {
+      status: HttpStatus.OK,
+      message: '멤버십 가입 내역 상세조회가 완료되었습니다.',
+      data: membership,
+    };
+  }
+
+  /**
+   * 멤버십 연장
+   *
+   * @returns
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/:membershipPaymentId')
+  async extendMembership(
+    @Request() req,
+    @Param('membershipPaymentId') membershipPaymentId: number,
+  ) {
+    const membership = await this.membershipService.extendMembership(
+      req.userId,
+      membershipPaymentId,
+    );
+    return {
+      status: HttpStatus.CREATED,
+      message: '멤버십 기한 연장이 완료되었습니다.',
+      data: membership,
     };
   }
 }
