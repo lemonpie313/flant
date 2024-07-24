@@ -15,9 +15,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { SearchUserParamsDto } from './dto/search-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
-import { Roles } from 'src/auth/decorators/roles.decorator';
-import { UserRole } from './types/user-role.type';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
+
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
