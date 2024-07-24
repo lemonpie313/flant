@@ -21,7 +21,7 @@ export class AuthService {
     password,
     passwordConfirm,
     name,
-    profile_image,
+    profileImage,
   }: SignUpDto) {
     // 기존 이메일로 가입된 이력이 있을 경우 False
     const existedEmail = await this.userRepository.findOneBy({ email });
@@ -44,7 +44,7 @@ export class AuthService {
       email,
       password: hashedPassword,
       name,
-      profile_image,
+      profileImage,
     });
 
     return user;
@@ -61,7 +61,7 @@ export class AuthService {
   async validateUser({ email, password }: SignInDto) {
     const user = await this.userRepository.findOne({
       where: { email },
-      select: { user_id: true, password: true },
+      select: { userId: true, password: true },
     });
     const isPasswordMatched = bcrypt.compareSync(
       password,
@@ -72,6 +72,6 @@ export class AuthService {
       return null;
     }
 
-    return { id: user.user_id };
+    return { id: user.userId };
   }
 }
