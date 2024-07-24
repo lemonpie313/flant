@@ -19,7 +19,7 @@ import { UserRole } from '../types/user-role.type';
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
-  user_id: number;
+  userId: number;
 
   /**
    * 이름
@@ -59,7 +59,7 @@ export class User {
   @IsNotEmpty({ message: '이미지 URL을 입력해 주세요.' })
   @IsString()
   @Column()
-  profile_image: string;
+  profileImage: string;
 
   @CreateDateColumn()
   createdAt: Date;

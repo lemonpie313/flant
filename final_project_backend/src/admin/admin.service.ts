@@ -32,7 +32,7 @@ export class AdminService {
       throw new NotFoundException('해당 커뮤니티가 존재하지 않습니다.');
     //만약 해당 유저가 없다면 false 반환
     const existedUser = await this.userRepository.findOneBy({
-      user_id: userId,
+      userId,
     });
     if (!existedUser)
       throw new NotFoundException('해당 유저가 존재하지 않습니다.');
@@ -74,7 +74,7 @@ export class AdminService {
       throw new NotFoundException('해당 커뮤니티가 존재하지 않습니다.');
     //만약 해당 유저가 없다면 false 반환
     const existedUser = await this.userRepository.findOneBy({
-      user_id: userId,
+      userId,
     });
     if (!existedUser)
       throw new NotFoundException('해당 유저가 존재하지 않습니다.');
