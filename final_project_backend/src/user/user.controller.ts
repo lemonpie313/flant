@@ -10,14 +10,13 @@ import {
   Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { SearchUserParamsDto } from './dto/search-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
-import { Roles } from 'src/auth/decorators/roles.decorator';
-import { UserRole } from './types/user-role.type';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
+
+@ApiTags('유저')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -45,8 +44,7 @@ export class UserController {
    * @returns
    */
   @ApiBearerAuth()
-  @Roles(UserRole.Admin)
-  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard('jwt'))
   @Get('/:userId')
   async findUser(@Param() userId: SearchUserParamsDto) {
     const data = await this.userService.findUser(userId.userId);
