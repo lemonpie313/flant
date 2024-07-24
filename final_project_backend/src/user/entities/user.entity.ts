@@ -1,5 +1,7 @@
 import {
   IsEmail,
+  IsEnum,
+  IsInt,
   IsNotEmpty,
   IsString,
   IsStrongPassword,
@@ -13,7 +15,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-
+import { UserRole } from '../types/user-role.type';
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
@@ -68,6 +70,11 @@ export class User {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @Column({ default: 'user' }) //enum 타입으로 바꿀 예정
-  role: string;
+  @IsEnum(UserRole)
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.User }) //enum 타입으로 바꿀 예정
+  role: UserRole;
+
+  @IsInt()
+  @Column({ default: 1000000 })
+  point: number;
 }
