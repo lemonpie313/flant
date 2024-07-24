@@ -45,8 +45,7 @@ export class UserController {
    * @returns
    */
   @ApiBearerAuth()
-  @Roles(UserRole.Admin)
-  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard('jwt'))
   @Get('/:userId')
   async findUser(@Param() userId: SearchUserParamsDto) {
     const data = await this.userService.findUser(userId.userId);
