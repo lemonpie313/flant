@@ -1,6 +1,7 @@
 import {
   IsEmail,
   IsEnum,
+  IsInt,
   IsNotEmpty,
   IsString,
   IsStrongPassword,
@@ -72,4 +73,8 @@ export class User {
   @IsEnum(UserRole)
   @Column({ type: 'enum', enum: UserRole, default: UserRole.User }) //enum 타입으로 바꿀 예정
   role: UserRole;
+
+  @IsInt()
+  @Column({ default: 1000000 })
+  point: number;
 }
