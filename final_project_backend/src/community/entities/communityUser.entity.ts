@@ -1,8 +1,10 @@
 import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
+import { MembershipPayment } from 'src/membership/entities/membership.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -18,8 +20,8 @@ export class CommunityUser {
   @Column({ unsigned: true })
   communityId: number;
 
-  @Column({ unsigned: true })
-  groupMembershipId: number | null;
+  // @Column({ unsigned: true })
+  // groupMembershipId: number | null;
 
   /**
    * 커뮤니티에서 사용할 닉네임
@@ -39,4 +41,7 @@ export class CommunityUser {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToOne(() => MembershipPayment, (membershipPayment) => membershipPayment.communityUser, { cascade: true })
+  membershipPayment?: MembershipPayment;
 }
