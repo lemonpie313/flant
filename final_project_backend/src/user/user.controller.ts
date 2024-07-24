@@ -10,12 +10,13 @@ import {
   Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { SearchUserParamsDto } from './dto/search-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
 
+@ApiTags('유저')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}

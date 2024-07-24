@@ -9,11 +9,12 @@ import {
 import { AdminService } from './admin.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { CreateManagerDto } from './dto/create-manager.dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRole } from 'src/user/types/user-role.type';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 
+@ApiTags('어드민')
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
