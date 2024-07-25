@@ -1,12 +1,15 @@
-import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 import { User } from '../../user/entities/user.entity';
+import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { Membership } from '../../membership/entities/membership.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity('community_users')
@@ -20,8 +23,8 @@ export class CommunityUser {
   @Column({ unsigned: true })
   communityId: number;
 
-  @Column({ unsigned: true })
-  groupMembershipId: number | null;
+  // @Column({ unsigned: true })
+  // groupMembershipId: number | null;
 
   /**
    * 커뮤니티에서 사용할 닉네임
@@ -32,9 +35,9 @@ export class CommunityUser {
   @Column()
   nickName: string;
 
-  @IsBoolean()
+  @IsNumber()
   @Column({ default: false })
-  membership: boolean;
+  membershipId: number;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -44,4 +47,7 @@ export class CommunityUser {
 
   @ManyToOne((type) => User, (user) => user.communityUser)
   user: User;
+
+  @OneToOne(() => Membership, (membership) => membership.communityUser, { cascade: true })
+  membership?: Membership;
 }
