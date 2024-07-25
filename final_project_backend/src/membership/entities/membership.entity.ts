@@ -36,7 +36,7 @@ export class Membership {
   @OneToOne(() => CommunityUser, (communityUser) => communityUser.membership, {
     onDelete: 'CASCADE',
   })
-  //@JoinColumn({ name: 'community_user_id' }) -> error
+  @JoinColumn({ name: 'community_user_id' })
   communityUser: CommunityUser;
 
   @OneToMany(
