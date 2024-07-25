@@ -8,6 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { CommunityModule } from './community/community.module';
+import { CommentModule } from './comment/comment.module'; // CommentModule 추가
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { CommunityModule } from './community/community.module';
     AuthModule,
     UserModule,
     CommunityModule,
+    CommentModule, // CommentModule 추가
   ],
   controllers: [AppController],
   providers: [AppService],
