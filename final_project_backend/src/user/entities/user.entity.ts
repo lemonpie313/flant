@@ -12,15 +12,17 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  OneToMany,
 } from 'typeorm';
 import { UserRole } from '../types/user-role.type';
 import { CommunityUser } from './../../community/entities/communityUser.entity';
+import { MembershipPayment } from '../../membership/entities/membership-payment.entity';
+
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ unsigned: true })
   userId: number;
 
   /**
@@ -82,4 +84,11 @@ export class User {
 
   @OneToMany((type) => CommunityUser, (communityUser) => communityUser.user)
   communityUser: CommunityUser[];
+
+  @OneToMany(
+    () => MembershipPayment,
+    (membershipPayment) => membershipPayment.user,
+    { cascade: true },
+  )
+  membershipPayment: MembershipPayment;
 }
