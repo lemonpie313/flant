@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateUserDto } from './dto/update-user.dto';
 import bcrypt from 'bcrypt';
+
 @Injectable()
 export class UserService {
   constructor(
@@ -19,7 +20,7 @@ export class UserService {
   // 내 정보 조회
   async findMe(userId: number) {
     const user = await this.userRepository.findOne({
-      where: { user_id: userId },
+      where: { userId: userId },
     });
 
     if (!user) {
@@ -27,10 +28,10 @@ export class UserService {
     }
 
     const response = {
-      id: user.user_id,
+      id: user.userId,
       email: user.email,
       name: user.name,
-      profile_image: user.profile_image,
+      profile_image: user.profileImage,
       role: user.role,
     };
 
@@ -40,13 +41,13 @@ export class UserService {
   // 다른 사람 정보 조회
   async findUser(userId: number) {
     const user = await this.userRepository.findOneBy({
-      user_id: userId,
+      userId: userId,
     });
     const response = {
-      id: user.user_id,
+      id: user.userId,
       email: user.email,
       name: user.name,
-      profile_image: user.profile_image,
+      profile_image: user.profileImage,
       role: user.role,
     };
 
@@ -58,7 +59,7 @@ export class UserService {
     const { password, name, newPassword, newPasswordConfirm, profile_image } =
       updateUserDto;
     const user = await this.userRepository.findOne({
-      where: { user_id: userId },
+      where: { userId: userId },
       select: { password: true },
     });
 
@@ -106,7 +107,7 @@ export class UserService {
   async deleteUser(userId: number, password: string) {
     // 비밀번호 일치한지 확인
     const user = await this.userRepository.findOne({
-      where: { user_id: userId },
+      where: { userId: userId },
       select: { password: true },
     });
     console.log(user.password);
@@ -119,7 +120,7 @@ export class UserService {
       throw new BadRequestException('기존 비밀번호와 일치하지 않습니다.');
 
     // 회원 삭제 로직
-    await this.userRepository.delete({ user_id: userId });
+    await this.userRepository.delete({ userId: userId });
 
     return true;
   }

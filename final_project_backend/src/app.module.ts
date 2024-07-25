@@ -8,7 +8,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { CommunityModule } from './community/community.module';
-import { CommentModule } from './comment/comment.module'; // CommentModule 추가
+import { AdminModule } from './admin/admin.module';
+import { MembershipModule } from './membership/membership.module';
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import { CommentModule } from './comment/comment.module'; // CommentModule 추�
     AuthModule,
     UserModule,
     CommunityModule,
-    CommentModule, // CommentModule 추가
+    AdminModule,
+    MembershipModule,
   ],
   controllers: [AppController],
   providers: [AppService],

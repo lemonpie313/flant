@@ -10,11 +10,13 @@ import {
   Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { SearchUserParamsDto } from './dto/search-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
+
+@ApiTags('유저')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -46,7 +48,6 @@ export class UserController {
   @Get('/:userId')
   async findUser(@Param() userId: SearchUserParamsDto) {
     const data = await this.userService.findUser(userId.userId);
-
     return {
       statusCode: HttpStatus.OK,
       message: `${data.name}님 정보 조회에 성공했습니다.`,
