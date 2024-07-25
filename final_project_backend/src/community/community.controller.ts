@@ -30,11 +30,11 @@ export class CommunityController {
 
   @Post(':communityId/assign')
   assignCommunity(
-    @Request() userId: number,
+    @Request() req,
     @Param('communityId') communityId: number,
-    @Body() nickName: string,
+    @Body() nickName: any,
   ) {
-    return this.communityService.assignCommunity(userId, communityId, nickName);
+    return this.communityService.assignCommunity(req.user.userId, communityId, nickName.nickName);
   }
 
   @Get()

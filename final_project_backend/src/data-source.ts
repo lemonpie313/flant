@@ -7,6 +7,7 @@ import { User } from './user/entities/user.entity';
 import AdminSeeder from './database/seeds/admin.seeder';
 import { CommunityUser } from './community/entities/communityUser.entity';
 import { MembershipPayment } from './membership/entities/membership-payment.entity';
+import { Membership } from './membership/entities/membership.entity';
 config();
 const configService = new ConfigService();
 const options: DataSourceOptions & SeederOptions = {
@@ -16,7 +17,7 @@ const options: DataSourceOptions & SeederOptions = {
   username: configService.get('DB_USERNAME'),
   password: configService.get('DB_PASSWORD'),
   database: configService.get('DB_NAME'),
-  entities: [User, CommunityUser, MembershipPayment],
+  entities: [User, CommunityUser, MembershipPayment, Membership],
   seedTracking: true, // seed데이터가 이미 있다면 삽입 x. 중복 삽입 방지
   seeds: [AdminSeeder],
 };

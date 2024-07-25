@@ -20,13 +20,12 @@ export class CommunityService {
   }
 
   async assignCommunity(userId: number, communityId: number, nickName: string) {
-    console.log("----------");
     const assignData = await this.communityUserRepository.save({
       userId,
       communityId,
-      nickName,
+      nickName: '와',
     });
-    console.log("000")
+    console.log("------------")
     const assignedName = assignData.nickName;
     const findCommunity = await this.communityRepository.findOne({
       where: { communityId: communityId },

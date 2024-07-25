@@ -15,7 +15,6 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  OneToMany,
 } from 'typeorm';
 import { UserRole } from '../types/user-role.type';
 import { CommunityUser } from './../../community/entities/communityUser.entity';

@@ -113,7 +113,7 @@ export class MembershipService {
       where: {
         userId,
         //membership: true,
-        membership: Not(null),
+        membershipId: Not(null),
       },
       relations: {
         membership: true,

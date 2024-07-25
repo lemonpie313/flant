@@ -40,5 +40,4 @@ export class Membership {
   @OneToMany(() => MembershipPayment, (membershipPayment) => membershipPayment.membership)
   membershipPayment: MembershipPayment;
 
-
 }

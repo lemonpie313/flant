@@ -33,7 +33,7 @@ export class MembershipController {
     @Query('communityId') communityId: number,
   ) {
     const membership = await this.membershipService.createMembership(
-      req.userId,
+      req.user.id,
       communityId,
     );
     return {
@@ -53,7 +53,7 @@ export class MembershipController {
   @Get('/')
   async findAllMembership(@Request() req) {
     const memberships = await this.membershipService.findAllMembership(
-      req.userId,
+      req.user.id,
     );
     return {
       status: HttpStatus.OK,
@@ -96,7 +96,7 @@ export class MembershipController {
     @Param('membershipPaymentId') membershipPaymentId: number,
   ) {
     const membership = await this.membershipService.extendMembership(
-      req.userId,
+      req.user.id,
       membershipPaymentId,
     );
     return {
