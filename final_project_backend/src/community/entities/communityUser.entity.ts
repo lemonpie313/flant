@@ -1,3 +1,4 @@
+import { User } from '../../user/entities/user.entity';
 import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { Membership } from '../../membership/entities/membership.entity';
 import {
@@ -7,6 +8,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 
 @Entity('community_users')
@@ -41,6 +43,9 @@ export class CommunityUser {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToOne((type) => User, (user) => user.communityUser)
+  user: User;
 
   @OneToOne(() => Membership, (membership) => membership.communityUser, { cascade: true })
   membership?: Membership;
