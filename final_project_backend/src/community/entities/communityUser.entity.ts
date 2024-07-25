@@ -1,10 +1,12 @@
 import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
+import { User } from '../../user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 
 @Entity('community_users')
@@ -39,4 +41,7 @@ export class CommunityUser {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToOne((type) => User, (user) => user.communityUser)
+  user: User;
 }

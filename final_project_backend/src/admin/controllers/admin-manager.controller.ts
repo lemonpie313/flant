@@ -30,7 +30,7 @@ export class AdminManagerController {
   async createManager(@Body() createManagerDto: CreateManagerDto) {
     const data = await this.adminManagerService.createManager(createManagerDto);
     return {
-      statusCode: HttpStatus.OK,
+      statusCode: HttpStatus.CREATED,
       message: `매니저 생성에 성공했습니다.`,
       data,
     };

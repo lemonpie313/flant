@@ -47,7 +47,7 @@ export class AdminArtistController {
   async deleteArtist(@Param('artistId') artistId: number) {
     await this.adminArtistService.deleteArtist(artistId);
     return {
-      statusCode: HttpStatus.CREATED,
+      statusCode: HttpStatus.OK,
       message: `아티스트 삭제 성공했습니다.`,
     };
   }

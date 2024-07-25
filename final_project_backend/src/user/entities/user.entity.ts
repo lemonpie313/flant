@@ -14,8 +14,10 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { UserRole } from '../types/user-role.type';
+import { CommunityUser } from './../../community/entities/communityUser.entity';
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
@@ -77,4 +79,7 @@ export class User {
   @IsInt()
   @Column({ default: 1000000 })
   point: number;
+
+  @OneToMany((type) => CommunityUser, (communityUser) => communityUser.user)
+  communityUser: CommunityUser[];
 }
