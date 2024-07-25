@@ -4,9 +4,11 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { CommunityUser } from './communityUser.entity';
 
 @Entity('communities')
 export class Community {
@@ -33,7 +35,7 @@ export class Community {
 
   /**
    * 커버 이미지 Url
-   * @example https://www.kasi.re.kr/file/205101983193671.jpg
+   * @example 'https://www.kasi.re.kr/file/205101983193671.jpg'
    */
   @IsNotEmpty()
   @IsUrl()
@@ -57,4 +59,11 @@ export class Community {
 
   @DeleteDateColumn()
   deletedAt: Date | null;
+
+  @OneToMany(
+    () => CommunityUser,
+    (communityUser) => communityUser.communities,
+    { onDelete: 'CASCADE' },
+  )
+  communityUsers: CommunityUser;
 }
