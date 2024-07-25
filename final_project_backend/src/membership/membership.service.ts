@@ -48,15 +48,14 @@ export class MembershipService {
     if (communityUser.membership) {
       throw new ConflictException({
         status: 409,
-        message:
-          '이미 가입된 멤버십입니다.',
+        message: '이미 가입된 멤버십입니다.',
       });
     }
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('READ UNCOMMITTED');
     try {
-      let expiration = new Date();
+      const expiration = new Date();
       expiration.setFullYear(expiration.getFullYear() + 1);
       // 커뮤니티유저 ID > 커뮤니티유저 멤버쉽여부 수정
       // await queryRunner.manager.update(
@@ -191,7 +190,7 @@ export class MembershipService {
     await queryRunner.startTransaction('READ UNCOMMITTED');
 
     try {
-      let expiration = membership.expiration;
+      const expiration = membership.expiration;
       expiration.setFullYear(expiration.getFullYear() + 1);
       // 커뮤니티유저 ID > 결제내역 저장
       await queryRunner.manager.update(Membership, membershipId, {

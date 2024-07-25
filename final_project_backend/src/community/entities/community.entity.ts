@@ -60,6 +60,10 @@ export class Community {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
-  @OneToMany(() => CommunityUser, (communityUser) => communityUser.communities)
+  @OneToMany(
+    () => CommunityUser,
+    (communityUser) => communityUser.communities,
+    { onDelete: 'CASCADE' },
+  )
   communityUsers: CommunityUser;
 }

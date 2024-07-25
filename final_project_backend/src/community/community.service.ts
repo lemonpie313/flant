@@ -13,6 +13,7 @@ import { CommunityUser } from './entities/communityUser.entity';
 import { CommunityAssignDto } from './dto/community-assign.dto';
 import { User } from 'src/user/entities/user.entity';
 import _ from 'lodash';
+import { Manager } from 'src/admin/entities/manager.entity';
 
 @Injectable()
 export class CommunityService {
@@ -23,13 +24,15 @@ export class CommunityService {
     private readonly communityUserRepository: Repository<CommunityUser>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Manager)
+    private readonly managerRepository: Repository<Manager>,
   ) {}
 
   async create(userId: number, createCommunityDto: CreateCommunityDto) {
     const userRole = await this.userRepository.findOne({
-      where: { user_id: +userId },
+      where: { userId: +userId },
     });
-    if (userRole.role != 'admin') {
+    if (userRole.role != 'Admin') {
       throw new BadRequestException('커뮤니티 생성 권한이 없습니다.');
     }
     const createCommunity =
@@ -51,7 +54,6 @@ export class CommunityService {
       communityId: communityId,
       nickName: nickName.nickName,
     });
-    console.log("------------")
     const assignedName = assignData.nickName;
     const findCommunity = await this.communityRepository.findOne({
       where: { communityId: communityId },
@@ -100,11 +102,15 @@ export class CommunityService {
       throw new BadRequestException('입력된 수정 사항이 없습니다.');
     }
     //매니저 이외의 접근일 경우
-    const userRole = await this.userRepository.findOne({
-      where: { user_id: +userId },
+    const isManager = await this.managerRepository.findOne({
+      where: { userId: userId },
     });
-    if (userRole.role != 'manager') {
+    if (!isManager) {
       throw new UnauthorizedException('커뮤니티 수정 권한이 없습니다');
+    }
+    //매니저이지만 해당 커뮤니티 매니저가 아닌 경우
+    if (isManager.communityId != communityId) {
+      throw new BadRequestException('해당 커뮤니티의 매니저가 아닙니다.');
     }
     await this.communityRepository.update(
       { communityId: communityId },
@@ -127,18 +133,17 @@ export class CommunityService {
 
   async removeCommunity(userId: number, communityId: number) {
     //매니저 이외의 접근일 경우
-    const userRole = await this.userRepository.findOne({
-      where: { user_id: +userId },
+    const isManager = await this.managerRepository.findOne({
+      where: { userId: userId },
     });
-    if (userRole.role != 'manager') {
-      throw new UnauthorizedException('커뮤니티 수정 권한이 없습니다.');
+    if (!isManager) {
+      throw new UnauthorizedException('커뮤니티 수정 권한이 없습니다');
     }
-    //매니저에게 해당 커뮤니티 관리 권한이 있는지
-    /*
-    const targetCommunity = await this.communityRepository.findOne({
-      where: { communityId: communityId },
-    });
-    */
+    //매니저이지만 해당 커뮤니티 매니저가 아닌 경우
+    if (isManager.communityId != communityId) {
+      throw new BadRequestException('해당 커뮤니티의 매니저가 아닙니다.');
+    }
+
     await this.communityRepository.delete(communityId);
 
     return {

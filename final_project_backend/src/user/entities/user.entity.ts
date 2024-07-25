@@ -6,8 +6,6 @@ import {
   IsString,
   IsStrongPassword,
 } from 'class-validator';
-import { CommunityUser } from 'src/community/entities/communityUser.entity';
-
 import {
   Column,
   CreateDateColumn,

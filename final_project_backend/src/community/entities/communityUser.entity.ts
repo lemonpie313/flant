@@ -1,5 +1,4 @@
-import { User } from '../../user/entities/user.entity';
-import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { Membership } from '../../membership/entities/membership.entity';
 import {
   Column,
@@ -8,8 +7,6 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
   OneToOne,
 } from 'typeorm';
 import { Community } from './community.entity';
@@ -31,7 +28,7 @@ export class CommunityUser {
    * @example '별하늘인간 팬'
    */
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: '커뮤니티에서 사용할 닉네임을 입력해주세요.' })
   @Column()
   nickName: string;
 
@@ -45,7 +42,9 @@ export class CommunityUser {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => Community, (community) => community.communityUsers)
+  @ManyToOne(() => Community, (community) => community.communityUsers, {
+    onDelete: 'CASCADE',
+  })
   communities: Community;
 
   @ManyToOne(() => User, (user) => user.communityUsers)
