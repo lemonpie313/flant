@@ -11,7 +11,7 @@ import { DataSource, Not, Repository } from 'typeorm';
 import { Membership } from './entities/membership.entity';
 import _ from 'lodash';
 import { User } from 'src/user/entities/user.entity';
-import { MembershipPayment } from './entities/membership_payment.entity';
+import { MembershipPayment } from './entities/membership-payment.entity';
 
 @Injectable()
 export class MembershipService {
@@ -87,7 +87,7 @@ export class MembershipService {
       await queryRunner.manager.decrement(User, { userId }, 'points', 20000);
       const user = await this.userRepository.findOne({
         where: {
-          user_id: userId,
+          userId,
         },
       });
       await queryRunner.commitTransaction();
@@ -202,7 +202,7 @@ export class MembershipService {
       await queryRunner.manager.decrement(User, { userId }, 'points', 20000);
       const user = await this.userRepository.findOne({
         where: {
-          user_id: userId,
+          userId,
         },
       });
       await queryRunner.commitTransaction();

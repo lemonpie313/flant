@@ -17,10 +17,11 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { UserRole } from '../types/user-role.type';
-import { MembershipPayment } from 'src/membership/entities/membership_payment.entity';
+import { MembershipPayment } from '../../membership/entities/membership-payment.entity';
+
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ unsigned: true })
   userId: number;
 
   /**
@@ -80,6 +81,10 @@ export class User {
   @Column({ default: 1000000 })
   point: number;
 
-  @OneToMany(() => MembershipPayment, (membershipPayment) => membershipPayment.user, { cascade: true })
+  @OneToMany(
+    () => MembershipPayment,
+    (membershipPayment) => membershipPayment.user,
+    { cascade: true },
+  )
   membershipPayment: MembershipPayment;
 }

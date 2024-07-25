@@ -1,5 +1,5 @@
 import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { Membership } from 'src/membership/entities/membership.entity';
+import { Membership } from '../../membership/entities/membership.entity';
 import {
   Column,
   CreateDateColumn,

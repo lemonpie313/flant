@@ -5,6 +5,7 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { SeederOptions } from 'typeorm-extension';
 import { User } from './user/entities/user.entity';
 import AdminSeeder from './database/seeds/admin.seeder';
+import { MembershipPayment } from './membership/entities/membership-payment.entity';
 config();
 const configService = new ConfigService();
 const options: DataSourceOptions & SeederOptions = {
@@ -14,7 +15,7 @@ const options: DataSourceOptions & SeederOptions = {
   username: configService.get('DB_USERNAME'),
   password: configService.get('DB_PASSWORD'),
   database: configService.get('DB_NAME'),
-  entities: [User],
+  entities: [User, MembershipPayment],
   seedTracking: true, // seed데이터가 이미 있다면 삽입 x. 중복 삽입 방지
   seeds: [AdminSeeder],
 };

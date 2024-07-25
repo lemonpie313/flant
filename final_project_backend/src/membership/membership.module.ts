@@ -4,11 +4,12 @@ import { MembershipService } from './membership.service';
 import { Community } from 'src/community/entities/community.entity';
 import { CommunityUser } from 'src/community/entities/communityUser.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MembershipPayment } from './entities/membership.entity';
+import { Membership } from './entities/membership.entity';
 import { User } from 'src/user/entities/user.entity';
+import { MembershipPayment } from './entities/membership-payment.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Community, CommunityUser, MembershipPayment, User])],
+  imports: [TypeOrmModule.forFeature([Community, CommunityUser, Membership, MembershipPayment, User])],
   controllers: [MembershipController],
   providers: [MembershipService]
 })

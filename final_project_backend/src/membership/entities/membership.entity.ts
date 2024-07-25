@@ -11,7 +11,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { CommunityUser } from '../../community/entities/communityUser.entity';
-import { MembershipPayment } from './membership_payment.entity';
+import { MembershipPayment } from './membership-payment.entity';
 
 @Entity('membership')
 export class Membership {
