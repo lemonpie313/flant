@@ -12,10 +12,12 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { UserRole } from '../types/user-role.type';
+import { MembershipPayment } from 'src/membership/entities/membership_payment.entity';
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
@@ -77,4 +79,7 @@ export class User {
   @IsInt()
   @Column({ default: 1000000 })
   point: number;
+
+  @OneToMany(() => MembershipPayment, (membershipPayment) => membershipPayment.user, { cascade: true })
+  membershipPayment: MembershipPayment;
 }

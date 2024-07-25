@@ -1,5 +1,5 @@
-import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
-import { MembershipPayment } from 'src/membership/entities/membership.entity';
+import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { Membership } from 'src/membership/entities/membership.entity';
 import {
   Column,
   CreateDateColumn,
@@ -32,9 +32,9 @@ export class CommunityUser {
   @Column()
   nickName: string;
 
-  @IsBoolean()
+  @IsNumber()
   @Column({ default: false })
-  membership: boolean;
+  membershipId: number;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -42,6 +42,6 @@ export class CommunityUser {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToOne(() => MembershipPayment, (membershipPayment) => membershipPayment.communityUser, { cascade: true })
-  membershipPayment?: MembershipPayment;
+  @OneToOne(() => Membership, (membership) => membership.communityUser, { cascade: true })
+  membership?: Membership;
 }

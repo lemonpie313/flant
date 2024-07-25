@@ -1,11 +1,17 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Community } from 'src/community/entities/community.entity';
 import { CommunityUser } from 'src/community/entities/communityUser.entity';
-import { DataSource, Repository } from 'typeorm';
-import { MembershipPayment } from './entities/membership.entity';
+import { DataSource, Not, Repository } from 'typeorm';
+import { Membership } from './entities/membership.entity';
 import _ from 'lodash';
 import { User } from 'src/user/entities/user.entity';
+import { MembershipPayment } from './entities/membership_payment.entity';
 
 @Injectable()
 export class MembershipService {
@@ -14,10 +20,12 @@ export class MembershipService {
     private readonly communityRepository: Repository<Community>,
     @InjectRepository(CommunityUser)
     private readonly communityUserRepository: Repository<CommunityUser>,
-    @InjectRepository(MembershipPayment)
-    private readonly membershipPaymentRepository: Repository<MembershipPayment>,
+    @InjectRepository(Membership)
+    private readonly membershipRepository: Repository<Membership>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(MembershipPayment)
+    private readonly membershipPaymentRepository: Repository<MembershipPayment>,
     private dataSource: DataSource,
   ) {}
 
@@ -37,6 +45,13 @@ export class MembershipService {
           '커뮤니티 가입 정보가 없습니다. 커뮤니티 가입을 먼저 진행해주세요.',
       });
     }
+    if (communityUser.membership) {
+      throw new ConflictException({
+        status: 409,
+        message:
+          '이미 가입된 멤버십입니다.',
+      });
+    }
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('READ UNCOMMITTED');
@@ -44,19 +59,27 @@ export class MembershipService {
       let expiration = new Date();
       expiration.setFullYear(expiration.getFullYear() + 1);
       // 커뮤니티유저 ID > 커뮤니티유저 멤버쉽여부 수정
-      await queryRunner.manager.update(
-        CommunityUser,
-        {
-          communityUserId: communityUser.communityUserId,
-        },
-        {
-          membership: true,
-        },
-      );
-      // 커뮤니티유저 ID > 결제내역 저장
-      const membershipPayment = this.membershipPaymentRepository.create({
+      // await queryRunner.manager.update(
+      //   CommunityUser,
+      //   {
+      //     communityUserId: communityUser.communityUserId,
+      //   },
+      //   {
+      //     membership: true,
+      //   },
+      // );
+
+      // 커뮤니티유저 ID > 멤버쉽 추가
+      const membership = this.membershipRepository.create({
         communityUserId: communityUser.communityUserId,
         expiration,
+      });
+      await queryRunner.manager.save(Membership, membership);
+
+      // 결제내역 저장
+      const membershipPayment = this.membershipPaymentRepository.create({
+        userId,
+        price: 20000, // 원래 커뮤니티에서 조회한 결과를 넣어야댐...
       });
       await queryRunner.manager.save(MembershipPayment, membershipPayment);
 
@@ -89,34 +112,32 @@ export class MembershipService {
     const communityUser = await this.communityUserRepository.find({
       where: {
         userId,
-        membership: true,
+        //membership: true,
+        membership: Not(null),
       },
       relations: {
-        membershipPayment: true,
+        membership: true,
         // community: true,
       },
     });
     const memberships = communityUser.map((cur) => {
       return {
-        membershipPaymentId: cur.membershipPayment.membershipPaymentId,
-        createdAt: cur.membershipPayment.createdAt,
-        expiration: cur.membershipPayment.expiration,
+        membershipPaymentId: cur.membership.membershipId,
+        createdAt: cur.membership.createdAt,
+        expiration: cur.membership.expiration,
       };
     });
     return memberships;
   }
 
-  async findMembership(membershipPaymentId: number) {
+  async findMembership(membershipId: number) {
     // 유저아이디, 멤버십 가입 여부 바탕으로 커뮤니티 유저 조회
     const communityUser = await this.communityUserRepository.findOne({
       where: {
-        membership: true,
-        membershipPayment: {
-          membershipPaymentId,
-        },
+        membershipId,
       },
       relations: {
-        membershipPayment: true,
+        membership: true,
         // community: true,
       },
     });
@@ -131,18 +152,18 @@ export class MembershipService {
       communityUserId: communityUser.communityUserId,
       nickname: communityUser.nickName,
       // 커뮤니티(그룹) 정보 추가...
-      membershipPaymentId: communityUser.membershipPayment.membershipPaymentId,
-      createdAt: communityUser.membershipPayment.createdAt,
-      expiration: communityUser.membershipPayment.expiration,
+      membershipPaymentId: communityUser.membership.membershipId,
+      createdAt: communityUser.membership.createdAt,
+      expiration: communityUser.membership.expiration,
     };
 
     return membership;
   }
 
-  async extendMembership(userId: number, membershipPaymentId: number) {
-    const membership = await this.membershipPaymentRepository.findOne({
+  async extendMembership(userId: number, membershipId: number) {
+    const membership = await this.membershipRepository.findOne({
       where: {
-        membershipPaymentId,
+        membershipId,
       },
     });
 
@@ -173,7 +194,7 @@ export class MembershipService {
       let expiration = membership.expiration;
       expiration.setFullYear(expiration.getFullYear() + 1);
       // 커뮤니티유저 ID > 결제내역 저장
-      await queryRunner.manager.update(MembershipPayment, membershipPaymentId, {
+      await queryRunner.manager.update(Membership, membershipId, {
         expiration,
       });
 
@@ -188,7 +209,7 @@ export class MembershipService {
 
       return {
         //아 정리가 안된다...........
-        membershipPaymentId: membership.membershipPaymentId,
+        membershipPaymentId: membership.membershipId,
         price: 20000,
         accountBalance: user.point,
       };

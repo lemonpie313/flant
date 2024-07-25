@@ -5,16 +5,18 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { CommunityUser } from '../../community/entities/communityUser.entity';
+import { MembershipPayment } from './membership_payment.entity';
 
-@Entity('membership_payment')
-export class MembershipPayment {
+@Entity('membership')
+export class Membership {
   @PrimaryGeneratedColumn({ unsigned: true })
-  membershipPaymentId: number;
+  membershipId: number;
 
   @Column({ unsigned: true })
   communityUserId: number;
@@ -31,7 +33,12 @@ export class MembershipPayment {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @OneToOne(() => CommunityUser, (communityUser) => communityUser.membershipPayment, { onDelete: 'CASCADE'})
+  @OneToOne(() => CommunityUser, (communityUser) => communityUser.membership, { onDelete: 'CASCADE'})
   @JoinColumn({name: 'community_user_id'})
   communityUser: CommunityUser;
+
+  @OneToMany(() => MembershipPayment, (membershipPayment) => membershipPayment.membership)
+  membershipPayment: MembershipPayment;
+
+
 }
