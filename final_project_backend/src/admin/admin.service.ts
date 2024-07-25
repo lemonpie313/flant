@@ -8,7 +8,7 @@ import { Artist } from './entities/artist.entity';
 import { Manager } from './entities/manager.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
-import { Community } from 'src/community/entities/community.entity';
+import { Community } from './../community/entities/community.entity';
 @Injectable()
 export class AdminService {
   constructor(
@@ -32,7 +32,7 @@ export class AdminService {
       throw new NotFoundException('해당 커뮤니티가 존재하지 않습니다.');
     //만약 해당 유저가 없다면 false 반환
     const existedUser = await this.userRepository.findOneBy({
-      user_id: userId,
+      userId,
     });
     if (!existedUser)
       throw new NotFoundException('해당 유저가 존재하지 않습니다.');
@@ -41,6 +41,14 @@ export class AdminService {
       artistNickname,
     });
     if (existedArtist) throw new ConflictException('이미 가입된 유저 입니다.');
+
+    const artist = await this.artistRepository.save({
+      communityId,
+      userId,
+      artistNickname,
+    });
+
+    return artist;
   }
 
   // 아티스트 삭제
@@ -66,7 +74,7 @@ export class AdminService {
       throw new NotFoundException('해당 커뮤니티가 존재하지 않습니다.');
     //만약 해당 유저가 없다면 false 반환
     const existedUser = await this.userRepository.findOneBy({
-      user_id: userId,
+      userId,
     });
     if (!existedUser)
       throw new NotFoundException('해당 유저가 존재하지 않습니다.');
@@ -75,6 +83,14 @@ export class AdminService {
       managerNickname,
     });
     if (exsitedManager) throw new ConflictException('이미 가입된 유저 입니다.');
+
+    const manager = await this.managerRepository.save({
+      communityId,
+      userId,
+      managerNickname,
+    });
+
+    return manager;
   }
 
   // 매니저 삭제

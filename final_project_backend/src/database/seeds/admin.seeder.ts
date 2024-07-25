@@ -15,7 +15,7 @@ export default class AdminSeeder implements Seeder {
         email: configService.get('ADMIN_EMAIL'),
         password: await hash(configService.get('ADMIN_PASSWORD'), hashRound),
         role: UserRole.Admin,
-        profile_image: 'sparta.png',
+        profileImage: 'sparta.png',
         createdAt: new Date(),
         updatedAt: new Date(),
         deletedAt: null,
