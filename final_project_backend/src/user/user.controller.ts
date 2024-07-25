@@ -30,7 +30,6 @@ export class UserController {
   @Get('/me')
   async findOne(@Request() req) {
     const data = await this.userService.findMe(req.user.id);
-
     return {
       statusCode: HttpStatus.OK,
       message: `내 정보 조회에 성공했습니다.`,
@@ -90,7 +89,6 @@ export class UserController {
     @Param() userId: SearchUserParamsDto,
     @Body() deleteUserDto: DeleteUserDto,
   ) {
-    console.log('hello');
     await this.userService.deleteUser(userId.userId, deleteUserDto.password);
 
     return {

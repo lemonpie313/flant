@@ -10,7 +10,7 @@ import {
   OneToOne,
 } from 'typeorm';
 import { Community } from './community.entity';
-import { User } from 'src/user/entities/user.entity';
+import { User } from '../../user/entities/user.entity';
 
 @Entity('community_users')
 export class CommunityUser {

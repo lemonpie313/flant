@@ -30,8 +30,10 @@ export class MembershipPayment {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => User, (user) => user.membershipPayment, { onDelete: 'CASCADE'})
-  @JoinColumn({name: 'user_id'})
+  @ManyToOne(() => User, (user) => user.membershipPayment, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
   @ManyToOne(() => Membership, (membership) => membership.membershipPayment)
