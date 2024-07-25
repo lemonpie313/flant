@@ -1,4 +1,6 @@
-import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
+import { User } from '../../user/entities/user.entity';
+import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { Membership } from '../../membership/entities/membership.entity';
 import {
   Column,
   CreateDateColumn,
@@ -6,6 +8,9 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  OneToOne,
 } from 'typeorm';
 import { Community } from './community.entity';
 import { User } from 'src/user/entities/user.entity';
@@ -30,9 +35,9 @@ export class CommunityUser {
   @Column()
   nickName: string;
 
-  @IsBoolean()
+  @IsNumber()
   @Column({ default: false })
-  membership: boolean;
+  membershipId: number;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -45,4 +50,9 @@ export class CommunityUser {
 
   @ManyToOne(() => User, (user) => user.communityUsers)
   users: User;
+
+  @OneToOne(() => Membership, (membership) => membership.communityUser, {
+    cascade: true,
+  })
+  membership?: Membership;
 }
