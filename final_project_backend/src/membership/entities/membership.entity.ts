@@ -33,11 +33,15 @@ export class Membership {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @OneToOne(() => CommunityUser, (communityUser) => communityUser.membership, { onDelete: 'CASCADE'})
-  @JoinColumn({name: 'community_user_id'})
+  @OneToOne(() => CommunityUser, (communityUser) => communityUser.membership, {
+    onDelete: 'CASCADE',
+  })
+  //@JoinColumn({ name: 'community_user_id' }) -> error
   communityUser: CommunityUser;
 
-  @OneToMany(() => MembershipPayment, (membershipPayment) => membershipPayment.membership)
+  @OneToMany(
+    () => MembershipPayment,
+    (membershipPayment) => membershipPayment.membership,
+  )
   membershipPayment: MembershipPayment;
-
 }

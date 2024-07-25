@@ -48,6 +48,8 @@ export class CommunityUser {
   @ManyToOne((type) => User, (user) => user.communityUser)
   user: User;
 
-  @OneToOne(() => Membership, (membership) => membership.communityUser, { cascade: true })
+  @OneToOne(() => Membership, (membership) => membership.communityUser, {
+    cascade: true,
+  })
   membership?: Membership;
 }
