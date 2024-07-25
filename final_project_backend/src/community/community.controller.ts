@@ -16,11 +16,17 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { CommunityAssignDto } from './dto/community-assign.dto';
 
-@ApiTags('communities')
+@ApiTags('커뮤니티')
 @Controller('v1/community')
 export class CommunityController {
   constructor(private readonly communityService: CommunityService) {}
 
+  /**
+   * 커뮤니티 생성
+   * @param req
+   * @param createCommunityDto
+   * @returns
+   */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Post()
@@ -29,6 +35,13 @@ export class CommunityController {
     return await this.communityService.create(+userId, createCommunityDto);
   }
 
+  /**
+   * 커뮤니티 가입
+   * @param userId
+   * @param communityId
+   * @param nickName
+   * @returns
+   */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Post(':communityId/assign')
@@ -44,11 +57,20 @@ export class CommunityController {
     );
   }
 
+  /**
+   * 전체 커뮤니티 조회(권한 불필요)
+   * @returns
+   */
   @Get()
   async findAll() {
     return await this.communityService.findAll();
   }
 
+  /**
+   * 내가 가입한 커뮤니티 조회
+   * @param req
+   * @returns
+   */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Get('my')
@@ -57,6 +79,13 @@ export class CommunityController {
     return await this.communityService.findMy(userId);
   }
 
+  /**
+   * 커뮤니티 수정
+   * @param req
+   * @param communityId
+   * @param updateCommunityDto
+   * @returns
+   */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Patch(':communityId')
@@ -73,6 +102,12 @@ export class CommunityController {
     );
   }
 
+  /**
+   * 커뮤니티 삭제
+   * @param req
+   * @param communityId
+   * @returns
+   */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Delete(':communityId')
