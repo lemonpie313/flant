@@ -45,7 +45,7 @@ export class CommunityUser {
   @ManyToOne(() => Community, (community) => community.communityUsers, {
     onDelete: 'CASCADE',
   })
-  communities: Community;
+  community: Community;
 
   @ManyToOne(() => User, (user) => user.communityUsers)
   users: User;

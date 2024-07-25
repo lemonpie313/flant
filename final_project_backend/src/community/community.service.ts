@@ -14,6 +14,7 @@ import { CommunityAssignDto } from './dto/community-assign.dto';
 import { User } from 'src/user/entities/user.entity';
 import _ from 'lodash';
 import { Manager } from 'src/admin/entities/manager.entity';
+//import { Artist } from 'src/admin/entities/artist.entity';
 
 @Injectable()
 export class CommunityService {
@@ -26,6 +27,10 @@ export class CommunityService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Manager)
     private readonly managerRepository: Repository<Manager>,
+    /*
+    @InjectRepository(Artist)
+    private readonly artistRepository: Repository<Artist>,
+    */
   ) {}
 
   async create(userId: number, createCommunityDto: CreateCommunityDto) {
@@ -80,15 +85,31 @@ export class CommunityService {
   }
 
   async findMy(userId: number) {
+    /*
+    const isUser = await this.communityUserRepository.findOne({
+      where: { userId: userId },
+    });
+    const isManager = await this.managerRepository.findOne({
+      where: { userId: userId },
+    });
+    const isArtist = await this.artistRepository.findOne({
+      where: { userId: userId },
+    });
+    */
+
     const myCommunities = await this.communityUserRepository.find({
       where: { userId: userId },
-      relations: ['communities'],
+      relations: ['community'],
     });
+
+    const myData = myCommunities.map(
+      (communityUser) => communityUser.community,
+    );
 
     return {
       status: HttpStatus.OK,
       message: '내 커뮤니티 조회에 성공했습니다.',
-      data: myCommunities,
+      data: myData,
     };
   }
 
