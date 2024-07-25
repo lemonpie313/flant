@@ -4,12 +4,14 @@ import {
   IsString,
   IsStrongPassword,
 } from 'class-validator';
+import { CommunityUser } from 'src/community/entities/communityUser.entity';
 
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -70,4 +72,7 @@ export class User {
 
   @Column({ default: 'user' }) //enum 타입으로 바꿀 예정
   role: string;
+
+  @OneToMany(() => CommunityUser, (communityUser) => communityUser.users)
+  communityUsers: CommunityUser;
 }

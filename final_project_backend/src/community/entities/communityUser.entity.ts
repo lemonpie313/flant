@@ -3,9 +3,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Community } from './community.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Entity('community_users')
 export class CommunityUser {
@@ -18,12 +21,9 @@ export class CommunityUser {
   @Column({ unsigned: true })
   communityId: number;
 
-  @Column({ unsigned: true })
-  groupMembershipId: number | null;
-
   /**
    * 커뮤니티에서 사용할 닉네임
-   * @example 별하늘인간 팬
+   * @example '별하늘인간 팬'
    */
   @IsString()
   @IsNotEmpty()
@@ -39,4 +39,10 @@ export class CommunityUser {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToOne(() => Community, (community) => community.communityUsers)
+  communities: Community;
+
+  @ManyToOne(() => User, (user) => user.communityUsers)
+  users: User;
 }

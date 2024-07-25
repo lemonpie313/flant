@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  Query,
   UseGuards,
   Request,
 } from '@nestjs/common';
@@ -15,48 +14,70 @@ import { CreateCommunityDto } from './dto/create-community.dto';
 import { UpdateCommunityDto } from './dto/update-community.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { CommunityAssignDto } from './dto/community-assign.dto';
 
 @ApiTags('communities')
-@ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
 @Controller('v1/community')
 export class CommunityController {
   constructor(private readonly communityService: CommunityService) {}
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @Post()
-  create(@Body() createCommunityDto: CreateCommunityDto) {
-    return this.communityService.create(createCommunityDto);
+  async create(@Request() req, @Body() createCommunityDto: CreateCommunityDto) {
+    const userId = req.user.id;
+    return await this.communityService.create(+userId, createCommunityDto);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @Post(':communityId/assign')
-  assignCommunity(
+  async assignCommunity(
     @Request() userId: number,
     @Param('communityId') communityId: number,
-    @Body() nickName: string,
+    @Body() nickName: CommunityAssignDto,
   ) {
-    return this.communityService.assignCommunity(userId, communityId, nickName);
+    return await this.communityService.assignCommunity(
+      userId,
+      communityId,
+      nickName,
+    );
   }
 
   @Get()
-  findAll(@Query('myCommunities') myCommunities: number | null) {
-    return this.communityService.findAll(myCommunities);
+  async findAll() {
+    return await this.communityService.findAll();
   }
 
-  @Get(':communityId')
-  findOne(@Param('communityId') communityId: number) {
-    return this.communityService.findOne(+communityId);
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Get('my')
+  async findMy(@Request() req) {
+    const userId = req.user.id;
+    return await this.communityService.findMy(userId);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Patch(':communityId')
+  async updateCommunity(
+    @Request() req,
+    @Param('communityId') communityId: number,
     @Body() updateCommunityDto: UpdateCommunityDto,
   ) {
-    return this.communityService.update(+id, updateCommunityDto);
+    const userId = req.user.id;
+    return await this.communityService.updateCommunity(
+      +userId,
+      +communityId,
+      updateCommunityDto,
+    );
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.communityService.remove(+id);
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Delete(':communityId')
+  remove(@Request() req, @Param('communityId') communityId: number) {
+    const userId = req.user.id;
+    return this.communityService.removeCommunity(+userId, +communityId);
   }
 }
