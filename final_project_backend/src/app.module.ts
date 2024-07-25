@@ -10,6 +10,7 @@ import { UserModule } from './user/user.module';
 import { CommunityModule } from './community/community.module';
 import { AdminModule } from './admin/admin.module';
 import { MembershipModule } from './membership/membership.module';
+import { CommentModule } from './comment/comment.module'; // CommentModule 추가
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { MembershipModule } from './membership/membership.module';
     CommunityModule,
     AdminModule,
     MembershipModule,
+    CommentModule, // CommentModule 추가
   ],
   controllers: [AppController],
   providers: [AppService],
