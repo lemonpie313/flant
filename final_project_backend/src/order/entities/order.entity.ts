@@ -15,7 +15,7 @@ import { Cart } from './cart.entity';
 @Entity('orders')
 export class Order {
   @PrimaryGeneratedColumn({ unsigned: true })
-  orderId: number;
+  id: number;
 
   /**
    * 주문번호

@@ -57,15 +57,6 @@ export class Product {
   //   manager: Manager[];
 
   /**
-   * 상품 이미지
-   */
-  @OneToMany(
-    () => MerchandiseImage,
-    (merchandiseImage) => merchandiseImage.products,
-  )
-  merchandiseImage: MerchandiseImage[];
-
-  /**
    * 상품 게시물
    */
   @OneToMany(
@@ -73,6 +64,7 @@ export class Product {
     (merchandisePost) => merchandisePost.product,
   )
   merchandisePosts: MerchandisePost[];
+
   /**
    * 카테고리
    */

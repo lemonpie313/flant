@@ -19,11 +19,11 @@ import { CartItem } from 'src/order/entities/cart.item.entity';
 @Entity('merchandise_post')
 export class MerchandisePost {
   @PrimaryGeneratedColumn({ unsigned: true })
-  goodsId: number;
+  id: number;
 
   /**
    * 제목
-   * @example "제목"
+   * @example "상품 제목"
    */
   @IsNotEmpty({ message: '제목을 입력해주세요' })
   @IsString()
@@ -32,6 +32,7 @@ export class MerchandisePost {
 
   /**
    * 썸네일
+   * @example "thunbnail.jpg"
    */
   @IsNotEmpty({ message: '썸네일 URL을 입력해주세요' })
   @IsString()
@@ -72,7 +73,9 @@ export class MerchandisePost {
   updatedAt: Date;
 
   // 굿즈샵 연결
-  @ManyToOne(() => Product, (product) => product.merchandisePosts)
+  @ManyToOne(() => Product, (product) => product.merchandisePosts, {
+    cascade: true,
+  })
   @JoinColumn({ name: 'product_id' })
   product: Product;
 
@@ -80,17 +83,19 @@ export class MerchandisePost {
   @OneToMany(
     () => MerchandiseImage,
     (merchandiseImage) => merchandiseImage.merchandisePost,
+    { cascade: true },
   )
   merchandiseImage: MerchandiseImage[];
-
-  // 주문 연결
-  @OneToMany(() => CartItem, (cartItem) => cartItem.merchandisePost)
-  cartItems: CartItem[];
 
   // 옵션 연결
   @OneToMany(
     () => MerchandiseOption,
     (merchandiseOption) => merchandiseOption.merchandisePost,
+    { cascade: true },
   )
   merchandiseOption: MerchandiseOption[];
+
+  // 주문 연결
+  @OneToMany(() => CartItem, (cartItem) => cartItem.merchandisePost)
+  cartItems: CartItem[];
 }

@@ -2,28 +2,23 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsString } from 'class-validator';
 import { Product } from 'src/product/entities/product.entity';
 import { MerchandisePost } from './merchandise-post.entity';
 
 @Entity('merchandise_image')
 export class MerchandiseImage {
   @PrimaryGeneratedColumn({ unsigned: true })
-  goodsImageId: number;
+  id: number;
 
-  /**
-   * 이미지 URL
-   * @example "abcdf.jpg"
-   */
-  @IsNotEmpty({ message: '이미지 URL을 입력해주세요' })
-  @IsString()
   @Column()
-  imageUrl: string;
+  url: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -31,14 +26,12 @@ export class MerchandiseImage {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  // 굿즈샵 연결
-  @ManyToOne(() => Product, (product) => product.merchandiseImage)
-  products: Product[];
-
   // 상품게시물 연결
   @ManyToOne(
     () => MerchandisePost,
     (merchandisePost) => merchandisePost.merchandiseImage,
+    { onDelete: 'CASCADE' },
   )
-  merchandisePost: MerchandisePost[];
+  @JoinColumn({ name: 'merchandisePost_id' })
+  merchandisePost: MerchandisePost;
 }

@@ -12,7 +12,7 @@ import { Product } from './product.entity';
 @Entity('product_categorys')
 export class ProductCategory {
   @PrimaryGeneratedColumn({ unsigned: true })
-  categoryId: number;
+  id: number;
 
   /**
    * 카테고리명

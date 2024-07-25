@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -12,25 +13,13 @@ import { MerchandisePost } from './merchandise-post.entity';
 @Entity('merchandise_option')
 export class MerchandiseOption {
   @PrimaryGeneratedColumn({ unsigned: true })
-  optionId: number;
+  id: number;
 
-  /**
-   * 옵션
-   * @example "옵션 입력"
-   */
-  //enum 진행 체크
-  @IsNotEmpty({ message: '옵션을 입력해주세요' })
-  @IsString()
   @Column()
-  optioName: string;
+  optionName: string;
 
-  /**
-   * 가격
-   * @example 50000
-   */
-  @IsNumber()
   @Column()
-  price: number;
+  optionPrice: number;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -42,6 +31,8 @@ export class MerchandiseOption {
   @ManyToOne(
     () => MerchandisePost,
     (merchandisePost) => merchandisePost.merchandiseOption,
+    { onDelete: 'CASCADE' },
   )
-  merchandisePost: MerchandisePost[];
+  @JoinColumn({ name: 'merchandisePost_id' })
+  merchandisePost: MerchandisePost;
 }

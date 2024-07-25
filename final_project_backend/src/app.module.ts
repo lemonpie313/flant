@@ -10,6 +10,7 @@ import { OrderModule } from './order/order.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { MerchandiseModule } from './merchandise/merchandise.module';
+import { FormModule } from './form/form.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { MerchandiseModule } from './merchandise/merchandise.module';
     AuthModule,
     UserModule,
     MerchandiseModule,
+    FormModule,
   ],
   controllers: [AppController],
   providers: [AppService],
