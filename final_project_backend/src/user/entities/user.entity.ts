@@ -6,7 +6,6 @@ import {
   IsString,
   IsStrongPassword,
 } from 'class-validator';
-
 import {
   Column,
   CreateDateColumn,
@@ -82,8 +81,8 @@ export class User {
   @Column({ default: 1000000 })
   point: number;
 
-  @OneToMany((type) => CommunityUser, (communityUser) => communityUser.user)
-  communityUser: CommunityUser[];
+  @OneToMany(() => CommunityUser, (communityUser) => communityUser.users)
+  communityUsers: CommunityUser;
 
   @OneToMany(
     () => MembershipPayment,

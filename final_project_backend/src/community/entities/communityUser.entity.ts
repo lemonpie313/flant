@@ -1,16 +1,16 @@
-import { User } from '../../user/entities/user.entity';
-import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { Membership } from '../../membership/entities/membership.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToOne,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
+  OneToOne,
 } from 'typeorm';
+import { Community } from './community.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Entity('community_users')
 export class CommunityUser {
@@ -23,15 +23,12 @@ export class CommunityUser {
   @Column({ unsigned: true })
   communityId: number;
 
-  // @Column({ unsigned: true })
-  // groupMembershipId: number | null;
-
   /**
    * 커뮤니티에서 사용할 닉네임
-   * @example 별하늘인간 팬
+   * @example '별하늘인간 팬'
    */
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: '커뮤니티에서 사용할 닉네임을 입력해주세요.' })
   @Column()
   nickName: string;
 
@@ -45,9 +42,16 @@ export class CommunityUser {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne((type) => User, (user) => user.communityUser)
-  user: User;
+  @ManyToOne(() => Community, (community) => community.communityUsers, {
+    onDelete: 'CASCADE',
+  })
+  communities: Community;
 
-  @OneToOne(() => Membership, (membership) => membership.communityUser, { cascade: true })
+  @ManyToOne(() => User, (user) => user.communityUsers)
+  users: User;
+
+  @OneToOne(() => Membership, (membership) => membership.communityUser, {
+    cascade: true,
+  })
   membership?: Membership;
 }
