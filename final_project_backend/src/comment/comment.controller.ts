@@ -8,7 +8,7 @@ export class CommentController {
 
   @Post()
   async create(@Body() commentData: Partial<Comment>): Promise<Comment> {
-    return this.commentService.create(commentData);
+    return this.commentService.createComment(commentData);
   }
 
   @Get()
@@ -32,5 +32,15 @@ export class CommentController {
   @Delete(':id')
   async remove(@Param('id') id: number): Promise<void> {
     return this.commentService.remove(id);
+  }
+
+  @Get('post/:postId')
+  async findCommentsByPost(@Param('postId') postId: number): Promise<Comment[]> {
+    return this.commentService.findCommentsByPost(postId);
+  }
+
+  @Get('reply/:commentId')
+  async findRepliesByComment(@Param('commentId') commentId: number): Promise<Comment[]> {
+    return this.commentService.findRepliesByComment(commentId);
   }
 }
