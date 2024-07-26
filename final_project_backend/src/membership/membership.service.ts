@@ -87,7 +87,11 @@ export class MembershipService {
     await queryRunner.startTransaction('READ UNCOMMITTED');
     try {
       const expiration = new Date();
-      //expiration.setFullYear(expiration.getFullYear() + 1); // 배포용
+      // expiration.setFullYear(expiration.getFullYear() + 1); // 배포용
+      // expiration.setHours(9);
+      // expiration.setMilliseconds(0);
+      // expiration.setSeconds(0);
+      // expiration.setMinutes(0);
       expiration.setMinutes(expiration.getMinutes() + 3); // 테스트용, 3분 간격으로
 
       // 커뮤니티유저 ID > 멤버쉽 추가
