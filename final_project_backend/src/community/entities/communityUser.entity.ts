@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { Membership } from '../../membership/entities/membership.entity';
 import {
   Column,
@@ -7,7 +7,6 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  OneToOne,
   JoinColumn,
   OneToMany,
 } from 'typeorm';
