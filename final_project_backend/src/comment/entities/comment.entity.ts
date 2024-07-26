@@ -1,42 +1,42 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl } from 'class-validator';
 import {
+  Entity,
+  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  UpdateDateColumn,
   DeleteDateColumn,
-  Entity,
   ManyToOne,
   OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
+import { CommunityUser } from '../../community/entities/communityUser.entity';
+import { Artist } from '../../admin/entities/artist.entity';
 
 @Entity('comments')
 export class Comment {
   @PrimaryGeneratedColumn({ unsigned: true })
   commentId: number;
 
-  @IsNotEmpty()
-  @IsNumber()
   @Column({ unsigned: true })
   postId: number;
 
-  @IsNotEmpty()
-  @IsNumber()
+  @ManyToOne(() => Post, (post) => post.comments)
+  post: Post;
+
   @Column({ unsigned: true })
   communityUserId: number;
 
-  @IsOptional()
-  @IsNumber()
+  @ManyToOne(() => CommunityUser, (user) => user.comments, { onDelete: 'CASCADE' })
+  communityUser: CommunityUser;
+
   @Column({ unsigned: true, nullable: true })
   artistId: number | null;
 
-  @IsNotEmpty()
-  @IsString()
+  @ManyToOne(() => Artist, (artist) => artist.comments, { nullable: true, onDelete: 'SET NULL' })
+  artist: Artist | null;
+
   @Column('text')
   comment: string;
 
-  @IsOptional()
-  @IsUrl()
   @Column({ nullable: true })
   imageUrl: string | null;
 
@@ -49,14 +49,9 @@ export class Comment {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
-  @IsOptional()
-  @IsNumber()
-  @Column({ unsigned: true, nullable: true })
-  parentCommentId: number | null;
+  @OneToMany(() => Comment, (comment) => comment.parent)
+  replies: Comment[];
 
-  @ManyToOne(() => Comment, (comment) => comment.childComments, { nullable: true })
-  parentComment: Comment;
-
-  @OneToMany(() => Comment, (comment) => comment.parentComment)
-  childComments: Comment[];
+  @ManyToOne(() => Comment, (comment) => comment.replies, { nullable: true, onDelete: 'CASCADE' })
+  parent: Comment | null;
 }

@@ -1,10 +1,12 @@
 import { IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { Comment } from '../../comment/entities/comment.entity'; 
 
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -43,4 +45,7 @@ export class Artist {
 
   @DeleteDateColumn()
   deletedAt: Date;
+
+  @OneToMany(() => Comment, (comment) => comment.artist)
+  comments: Comment[];  // 아티스트와 댓글 관계
 }
