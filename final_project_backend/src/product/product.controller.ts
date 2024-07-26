@@ -53,7 +53,7 @@ export class ProductController {
   }
 
   /**
-   * 상점 수정
+   * 상점 수정 (작성하였던 매니저만)
    * @param productId
    * @param updateProductDto
    * @returns
@@ -68,13 +68,13 @@ export class ProductController {
   }
 
   /**
-   * 상품삭제
+   * 상품삭제 (작성하였던 매니저만)
    * @param productId
    * @returns
    */
   @Delete('/:productId')
   remove(@Param('productId') productId: string) {
-    //유저아이디 추가하여 검증 필요
+    //매니저아이디 추가하여 검증 필요
     return this.productService.remove(+productId);
   }
 }
