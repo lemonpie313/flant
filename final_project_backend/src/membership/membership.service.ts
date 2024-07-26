@@ -7,11 +7,12 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Community } from 'src/community/entities/community.entity';
 import { CommunityUser } from 'src/community/entities/communityUser.entity';
-import { DataSource, IsNull, Not, Repository } from 'typeorm';
+import { DataSource, IsNull, LessThan, Not, Repository } from 'typeorm';
 import { Membership } from './entities/membership.entity';
 import _ from 'lodash';
 import { User } from 'src/user/entities/user.entity';
 import { MembershipPayment } from './entities/membership-payment.entity';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class MembershipService {
@@ -28,6 +29,36 @@ export class MembershipService {
     private readonly membershipPaymentRepository: Repository<MembershipPayment>,
     private dataSource: DataSource,
   ) {}
+
+  // 기간 만료된 멤버십 자동 삭제
+  // @Cron('0 0 0 * * *') // 프로덕션 환경에서 코드
+  @Cron('*/30 * * * * *')
+  async handleCron() {
+    const date = new Date();
+    const memberships = await this.membershipRepository.find({
+      where: {
+        expiration: LessThan(date),
+      },
+    });
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction('READ UNCOMMITTED');
+    try {
+      for (let membership of memberships) {
+        await queryRunner.manager.softDelete(Membership, {
+          membershipId: membership.membershipId,
+        });
+      }
+
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
 
   async createMembership(userId: number, communityId: number) {
     // 유저아이디, 커뮤니티아이디 바탕으로 커뮤니티유저 조회
@@ -56,7 +87,8 @@ export class MembershipService {
     await queryRunner.startTransaction('READ UNCOMMITTED');
     try {
       const expiration = new Date();
-      expiration.setFullYear(expiration.getFullYear() + 1);
+      //expiration.setFullYear(expiration.getFullYear() + 1); // 배포용
+      expiration.setMinutes(expiration.getMinutes() + 3); // 테스트용, 3분 간격으로
 
       // 커뮤니티유저 ID > 멤버쉽 추가
       const membership = this.membershipRepository.create({
