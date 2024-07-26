@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { Comment } from './entities/comment.entity';
-import { Comment } from './dto/create-comment.dto';
+import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreateReplyDto } from './dto/create-reply.dto';
 
 @Controller('comments')
