@@ -7,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Community } from 'src/community/entities/community.entity';
 import { CommunityUser } from 'src/community/entities/communityUser.entity';
-import { DataSource, Not, Repository } from 'typeorm';
+import { DataSource, IsNull, Not, Repository } from 'typeorm';
 import { Membership } from './entities/membership.entity';
 import _ from 'lodash';
 import { User } from 'src/user/entities/user.entity';
@@ -36,7 +36,7 @@ export class MembershipService {
         userId,
         communityId,
       },
-      // relations: ['community'], >> relation 안돼있음...ㅠㅠ
+      relations: ['community', 'membership'],
     });
     if (_.isNil(communityUser)) {
       throw new NotFoundException({
@@ -57,33 +57,30 @@ export class MembershipService {
     try {
       const expiration = new Date();
       expiration.setFullYear(expiration.getFullYear() + 1);
-      // 커뮤니티유저 ID > 커뮤니티유저 멤버쉽여부 수정
-      // await queryRunner.manager.update(
-      //   CommunityUser,
-      //   {
-      //     communityUserId: communityUser.communityUserId,
-      //   },
-      //   {
-      //     membership: true,
-      //   },
-      // );
 
       // 커뮤니티유저 ID > 멤버쉽 추가
       const membership = this.membershipRepository.create({
         communityUserId: communityUser.communityUserId,
         expiration,
       });
+
       await queryRunner.manager.save(Membership, membership);
 
       // 결제내역 저장
       const membershipPayment = this.membershipPaymentRepository.create({
         userId,
-        price: 20000, // 원래 커뮤니티에서 조회한 결과를 넣어야댐...
+        membershipId: membership.membershipId,
+        price: communityUser.community.membershipPrice, // 원래 커뮤니티에서 조회한 결과를 넣어야댐...
       });
       await queryRunner.manager.save(MembershipPayment, membershipPayment);
 
       // 유저ID > 포인트 깎기
-      await queryRunner.manager.decrement(User, { userId }, 'points', 20000);
+      await queryRunner.manager.decrement(
+        User,
+        { userId },
+        'point',
+        communityUser.community.membershipPrice,
+      );
       const user = await this.userRepository.findOne({
         where: {
           userId,
@@ -92,11 +89,12 @@ export class MembershipService {
       await queryRunner.commitTransaction();
 
       return {
-        //커뮤니티 정보를 넣어야되는데..연결이안돼서 일단 보류
         communityUserId: communityUser.communityUserId,
         nickname: communityUser.nickName,
-        price: 20000,
+        price: communityUser.community.membershipPrice,
         accountBalance: user.point,
+        createdAt: membership.createdAt,
+        expiresAt: membership.expiration,
       };
     } catch (err) {
       await queryRunner.rollbackTransaction();
@@ -111,17 +109,17 @@ export class MembershipService {
     const communityUser = await this.communityUserRepository.find({
       where: {
         userId,
-        //membership: true,
-        membershipId: Not(null),
+        membership: {
+          membershipId: Not(IsNull()),
+        },
       },
-      relations: {
-        membership: true,
-        // community: true,
-      },
+      relations: ['membership', 'community'],
     });
+    console.log('-------');
     const memberships = communityUser.map((cur) => {
       return {
-        membershipPaymentId: cur.membership.membershipId,
+        membershipId: cur.membership.membershipId,
+        group: cur.community.communityName,
         createdAt: cur.membership.createdAt,
         expiration: cur.membership.expiration,
       };
@@ -133,12 +131,11 @@ export class MembershipService {
     // 유저아이디, 멤버십 가입 여부 바탕으로 커뮤니티 유저 조회
     const communityUser = await this.communityUserRepository.findOne({
       where: {
-        membershipId,
+        membership: {
+          membershipId,
+        },
       },
-      relations: {
-        membership: true,
-        // community: true,
-      },
+      relations: ['membership', 'community'],
     });
     if (_.isNil(communityUser)) {
       throw new NotFoundException({
@@ -149,9 +146,9 @@ export class MembershipService {
 
     const membership = {
       communityUserId: communityUser.communityUserId,
-      nickname: communityUser.nickName,
-      // 커뮤니티(그룹) 정보 추가...
+      communityId: communityUser.community.communityId,
       membershipPaymentId: communityUser.membership.membershipId,
+      nickname: communityUser.nickName,
       createdAt: communityUser.membership.createdAt,
       expiration: communityUser.membership.expiration,
     };
@@ -160,13 +157,16 @@ export class MembershipService {
   }
 
   async extendMembership(userId: number, membershipId: number) {
-    const membership = await this.membershipRepository.findOne({
+    // 유저아이디, 멤버십 가입 여부 바탕으로 커뮤니티 유저 조회
+    const communityUser = await this.communityUserRepository.findOne({
       where: {
-        membershipId,
+        membership: {
+          membershipId,
+        },
       },
+      relations: ['membership', 'community'],
     });
-
-    if (_.isNil(membership)) {
+    if (_.isNil(communityUser)) {
       throw new NotFoundException({
         status: 404,
         message: '해당 멤버십 정보가 없습니다.',
@@ -175,7 +175,7 @@ export class MembershipService {
 
     const today = new Date();
     const remaining =
-      (membership.expiration.getTime() - today.getTime()) /
+      (communityUser.membership.expiration.getTime() - today.getTime()) /
       (1000 * 60 * 60 * 24);
 
     if (remaining > 7) {
@@ -190,15 +190,23 @@ export class MembershipService {
     await queryRunner.startTransaction('READ UNCOMMITTED');
 
     try {
-      const expiration = membership.expiration;
+      const expiration = communityUser.membership.expiration;
       expiration.setFullYear(expiration.getFullYear() + 1);
-      // 커뮤니티유저 ID > 결제내역 저장
-      await queryRunner.manager.update(Membership, membershipId, {
-        expiration,
+      // 결제내역 저장
+      const membershipPayment = this.membershipPaymentRepository.create({
+        userId,
+        membershipId: communityUser.membership.membershipId,
+        price: communityUser.community.membershipPrice, // 원래 커뮤니티에서 조회한 결과를 넣어야댐...
       });
+      await queryRunner.manager.save(MembershipPayment, membershipPayment);
 
       // 유저ID > 포인트 깎기
-      await queryRunner.manager.decrement(User, { userId }, 'points', 20000);
+      await queryRunner.manager.decrement(
+        User,
+        { userId },
+        'point',
+        communityUser.community.membershipPrice,
+      );
       const user = await this.userRepository.findOne({
         where: {
           userId,
@@ -207,10 +215,13 @@ export class MembershipService {
       await queryRunner.commitTransaction();
 
       return {
-        //아 정리가 안된다...........
-        membershipPaymentId: membership.membershipId,
-        price: 20000,
+        communityUserId: communityUser.communityUserId,
+        nickname: communityUser.nickName,
+        price: communityUser.community.membershipPrice,
         accountBalance: user.point,
+        createdAt: communityUser.membership.createdAt,
+        updatedAt: communityUser.membership.updatedAt,
+        expiresAt: communityUser.membership.expiration,
       };
     } catch (err) {
       await queryRunner.rollbackTransaction();
