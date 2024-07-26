@@ -11,6 +11,7 @@ import { CommunityModule } from './community/community.module';
 import { AdminModule } from './admin/admin.module';
 import { MembershipModule } from './membership/membership.module';
 import { CommentModule } from './comment/comment.module'; // CommentModule 추가
+import { PostModule } from './post/post.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { CommentModule } from './comment/comment.module'; // CommentModule 추�
     CommunityModule,
     AdminModule,
     MembershipModule,
-    CommentModule, // CommentModule 추가
+    CommentModule,
+    PostModule, // CommentModule 추가
   ],
   controllers: [AppController],
   providers: [AppService],

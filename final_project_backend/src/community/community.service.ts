@@ -82,7 +82,7 @@ export class CommunityService {
   async findMy(userId: number) {
     const myCommunities = await this.communityUserRepository.find({
       where: { userId: userId },
-      relations: ['communities'],
+      relations: ['community'],
     });
 
     return {
