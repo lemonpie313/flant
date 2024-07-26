@@ -14,7 +14,6 @@ import { CommunityAssignDto } from './dto/community-assign.dto';
 import { User } from 'src/user/entities/user.entity';
 import _ from 'lodash';
 import { Manager } from 'src/admin/entities/manager.entity';
-//import { Artist } from 'src/admin/entities/artist.entity';
 
 @Injectable()
 export class CommunityService {
@@ -27,19 +26,9 @@ export class CommunityService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Manager)
     private readonly managerRepository: Repository<Manager>,
-    /*
-    @InjectRepository(Artist)
-    private readonly artistRepository: Repository<Artist>,
-    */
   ) {}
 
   async create(userId: number, createCommunityDto: CreateCommunityDto) {
-    const userRole = await this.userRepository.findOne({
-      where: { userId: +userId },
-    });
-    if (userRole.role != 'Admin') {
-      throw new BadRequestException('커뮤니티 생성 권한이 없습니다.');
-    }
     const createCommunity =
       await this.communityRepository.save(createCommunityDto);
     return {
@@ -85,18 +74,6 @@ export class CommunityService {
   }
 
   async findMy(userId: number) {
-    /*
-    const isUser = await this.communityUserRepository.findOne({
-      where: { userId: userId },
-    });
-    const isManager = await this.managerRepository.findOne({
-      where: { userId: userId },
-    });
-    const isArtist = await this.artistRepository.findOne({
-      where: { userId: userId },
-    });
-    */
-
     const myCommunities = await this.communityUserRepository.find({
       where: { userId: userId },
       relations: ['community'],
