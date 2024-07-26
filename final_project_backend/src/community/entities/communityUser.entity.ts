@@ -56,6 +56,9 @@ export class CommunityUser {
   })
   membership: Membership[];
 
-  @OneToMany(() => Comment, (comment) => comment.communityUser) // 댓글과의 관계 추가
-  comments: Comment[];  // 커뮤니티와의 댓글 관계
+  @OneToMany(
+    () => Comment,
+    (comment) => comment.communityUser,
+  )
+  comments: Comment[];  // 커뮤니티와 댓글 관계
 }
