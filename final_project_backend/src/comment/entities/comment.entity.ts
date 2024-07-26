@@ -26,7 +26,7 @@ export class Comment {
   @Column({ unsigned: true })
   communityUserId: number;
 
-  @ManyToOne(() => CommunityUser, (communityUser) => communityUser.comments, { onDelete: 'CASCADE' })
+  @ManyToOne(() => CommunityUser, (user) => user.comments, { onDelete: 'CASCADE' })
   communityUser: CommunityUser;
 
   @Column({ unsigned: true, nullable: true })
