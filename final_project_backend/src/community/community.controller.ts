@@ -50,12 +50,13 @@ export class CommunityController {
   @UseGuards(AuthGuard('jwt'))
   @Post(':communityId/assign')
   async assignCommunity(
-    @Request() userId: number,
+    @Request() req,
     @Param('communityId') communityId: number,
     @Body() nickName: CommunityAssignDto,
   ) {
+    console.log(req.user);
     return await this.communityService.assignCommunity(
-      userId,
+      req.user.id,
       communityId,
       nickName,
     );
