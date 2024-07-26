@@ -19,8 +19,8 @@ export class Comment {
   @Column({ unsigned: true })
   postId: number;
 
-  @ManyToOne(() => Post, (post) => post.comments)
-  post: Post;
+  // @ManyToOne(() => Post, (post) => post.comments)
+  // post: Post;
 
   @Column({ unsigned: true })
   communityUserId: number;
