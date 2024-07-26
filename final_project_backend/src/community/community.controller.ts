@@ -15,6 +15,9 @@ import { UpdateCommunityDto } from './dto/update-community.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { CommunityAssignDto } from './dto/community-assign.dto';
+import { UserRole } from 'src/user/types/user-role.type';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @ApiTags('커뮤니티')
 @Controller('v1/community')
@@ -28,7 +31,8 @@ export class CommunityController {
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @Roles(UserRole.Admin)
+  @UseGuards(RolesGuard)
   @Post()
   async create(@Request() req, @Body() createCommunityDto: CreateCommunityDto) {
     const userId = req.user.id;
@@ -46,12 +50,13 @@ export class CommunityController {
   @UseGuards(AuthGuard('jwt'))
   @Post(':communityId/assign')
   async assignCommunity(
-    @Request() userId: number,
+    @Request() req,
     @Param('communityId') communityId: number,
     @Body() nickName: CommunityAssignDto,
   ) {
+    console.log(req.user);
     return await this.communityService.assignCommunity(
-      userId,
+      req.user.id,
       communityId,
       nickName,
     );

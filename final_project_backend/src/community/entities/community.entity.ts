@@ -9,7 +9,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { CommunityUser } from './communityUser.entity';
-import { Comment } from '../../comment/entities/comment.entity';
 
 @Entity('communities')
 export class Community {
@@ -61,17 +60,6 @@ export class Community {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
-  @OneToMany(
-    () => CommunityUser,
-    (communityUser) => communityUser.communities,
-    { onDelete: 'CASCADE' },
-  )
-  communityUsers: CommunityUser;
-
-  @OneToMany(
-    () => Comment,
-    (comment) => comment.post,
-  )
-  comments: Comment[];  // 커뮤니티와 댓글 관계
-  
+  @OneToMany(() => CommunityUser, (communityUser) => communityUser.community)
+  communityUsers: CommunityUser[];
 }

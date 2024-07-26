@@ -8,10 +8,11 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   OneToOne,
+  JoinColumn,
   OneToMany,
 } from 'typeorm';
 import { Community } from './community.entity';
-import { User } from 'src/user/entities/user.entity';
+import { User } from '../../user/entities/user.entity';
 import { Comment } from '../../comment/entities/comment.entity';
 
 @Entity('community_users')
@@ -34,10 +35,6 @@ export class CommunityUser {
   @Column()
   nickName: string;
 
-  @IsNumber()
-  @Column({ default: false })
-  membershipId: number;
-
   @CreateDateColumn()
   createdAt: Date;
 
@@ -47,19 +44,18 @@ export class CommunityUser {
   @ManyToOne(() => Community, (community) => community.communityUsers, {
     onDelete: 'CASCADE',
   })
-  communities: Community;
+  @JoinColumn({name: 'community_id'})
+  community: Community;
 
   @ManyToOne(() => User, (user) => user.communityUsers)
+  @JoinColumn({name: 'user_id'})
   users: User;
 
-  @OneToOne(() => Membership, (membership) => membership.communityUser, {
+  @OneToMany(() => Membership, (membership) => membership.communityUser, {
     cascade: true,
   })
-  membership?: Membership;
+  membership: Membership[];
 
-  @OneToMany(
-    () => Comment,
-    (comment) => comment.communityUser,
-  )
-  comments: Comment[];  // 커뮤니티와 댓글 관계
+  @OneToMany(() => Comment, (comment) => comment.community) // 댓글과의 관계 추가
+  comments: Comment[];  // 커뮤니티와의 댓글 관계
 }

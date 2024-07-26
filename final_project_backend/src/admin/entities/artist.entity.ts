@@ -1,13 +1,14 @@
 import { IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { Comment } from '../../comment/entities/comment.entity'; 
 
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Comment } from '../../comment/entities/comment.entity'; 
 
 @Entity('artists')
 export class Artist {
