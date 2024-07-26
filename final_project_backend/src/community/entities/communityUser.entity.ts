@@ -8,6 +8,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   OneToOne,
+  JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Community } from './community.entity';
 import { User } from '../../user/entities/user.entity';
@@ -32,10 +34,6 @@ export class CommunityUser {
   @Column()
   nickName: string;
 
-  @IsNumber()
-  @Column({ default: false })
-  membershipId: number;
-
   @CreateDateColumn()
   createdAt: Date;
 
@@ -45,13 +43,15 @@ export class CommunityUser {
   @ManyToOne(() => Community, (community) => community.communityUsers, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({name: 'community_id'})
   community: Community;
 
   @ManyToOne(() => User, (user) => user.communityUsers)
+  @JoinColumn({name: 'user_id'})
   users: User;
 
-  @OneToOne(() => Membership, (membership) => membership.communityUser, {
+  @OneToMany(() => Membership, (membership) => membership.communityUser, {
     cascade: true,
   })
-  membership?: Membership;
+  membership: Membership[];
 }
