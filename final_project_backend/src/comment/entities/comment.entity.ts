@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { CommunityUser } from '../../community/entities/communityUser.entity';
 import { Artist } from '../../admin/entities/artist.entity';
-import { Post } from '../../post/entities/post.entity';
+// import { Post } from '../../post/entities/post.entity';
 
 @Entity('comments')
 export class Comment {
@@ -20,8 +20,8 @@ export class Comment {
   @Column({ unsigned: true })
   postId: number;
 
-  @ManyToOne(() => Post, (post) => post.comments)
-  post: Post;
+  // @ManyToOne(() => Post, (post) => post.comments)
+  // post: Post;
 
   @Column({ unsigned: true })
   communityUserId: number;
