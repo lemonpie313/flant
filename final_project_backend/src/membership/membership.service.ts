@@ -76,7 +76,10 @@ export class MembershipService {
           '커뮤니티 가입 정보가 없습니다. 커뮤니티 가입을 먼저 진행해주세요.',
       });
     }
-    if (communityUser.membership) {
+    const existMembership = communityUser.membership.find((cur) => {
+      return cur.deletedAt == null
+    })
+    if (existMembership) {
       throw new ConflictException({
         status: 409,
         message: '이미 가입된 멤버십입니다.',
@@ -151,13 +154,15 @@ export class MembershipService {
       },
       relations: ['membership', 'community'],
     });
-    console.log('-------');
     const memberships = communityUser.map((cur) => {
+      const membership = cur.membership.find((cur) => {
+        return cur.deletedAt == null
+      })
       return {
-        membershipId: cur.membership.membershipId,
+        membershipId: membership.membershipId,
         group: cur.community.communityName,
-        createdAt: cur.membership.createdAt,
-        expiration: cur.membership.expiration,
+        createdAt: membership.createdAt,
+        expiration: membership.expiration,
       };
     });
     return memberships;
@@ -179,17 +184,19 @@ export class MembershipService {
         message: '해당 멤버십 정보가 없습니다.',
       });
     }
-
-    const membership = {
+    const membership = communityUser.membership.find((cur) => {
+      return cur.deletedAt == null
+    })
+    const membershipInfo = {
       communityUserId: communityUser.communityUserId,
       communityId: communityUser.community.communityId,
-      membershipPaymentId: communityUser.membership.membershipId,
+      membershipPaymentId: membership.membershipId,
       nickname: communityUser.nickName,
-      createdAt: communityUser.membership.createdAt,
-      expiration: communityUser.membership.expiration,
+      createdAt: membership.createdAt,
+      expiration: membership.expiration,
     };
 
-    return membership;
+    return membershipInfo;
   }
 
   async extendMembership(userId: number, membershipId: number) {
@@ -208,10 +215,12 @@ export class MembershipService {
         message: '해당 멤버십 정보가 없습니다.',
       });
     }
-
+    const membership = communityUser.membership.find((cur) => {
+      return cur.deletedAt == null
+    })
     const today = new Date();
     const remaining =
-      (communityUser.membership.expiration.getTime() - today.getTime()) /
+      (membership.expiration.getTime() - today.getTime()) /
       (1000 * 60 * 60 * 24);
 
     if (remaining > 7) {
@@ -226,12 +235,12 @@ export class MembershipService {
     await queryRunner.startTransaction('READ UNCOMMITTED');
 
     try {
-      const expiration = communityUser.membership.expiration;
+      const expiration = membership.expiration;
       expiration.setFullYear(expiration.getFullYear() + 1);
       // 결제내역 저장
       const membershipPayment = this.membershipPaymentRepository.create({
         userId,
-        membershipId: communityUser.membership.membershipId,
+        membershipId: membership.membershipId,
         price: communityUser.community.membershipPrice, // 원래 커뮤니티에서 조회한 결과를 넣어야댐...
       });
       await queryRunner.manager.save(MembershipPayment, membershipPayment);
@@ -255,9 +264,9 @@ export class MembershipService {
         nickname: communityUser.nickName,
         price: communityUser.community.membershipPrice,
         accountBalance: user.point,
-        createdAt: communityUser.membership.createdAt,
-        updatedAt: communityUser.membership.updatedAt,
-        expiresAt: communityUser.membership.expiration,
+        createdAt: membership.createdAt,
+        updatedAt: membership.updatedAt,
+        expiresAt: membership.expiration,
       };
     } catch (err) {
       await queryRunner.rollbackTransaction();

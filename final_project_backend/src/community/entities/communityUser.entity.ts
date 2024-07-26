@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Community } from './community.entity';
 import { User } from '../../user/entities/user.entity';
@@ -49,8 +50,8 @@ export class CommunityUser {
   @JoinColumn({name: 'user_id'})
   users: User;
 
-  @OneToOne(() => Membership, (membership) => membership.communityUser, {
+  @OneToMany(() => Membership, (membership) => membership.communityUser, {
     cascade: true,
   })
-  membership?: Membership;
+  membership: Membership[];
 }
