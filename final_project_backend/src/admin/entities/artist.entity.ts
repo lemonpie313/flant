@@ -7,6 +7,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Comment } from '../../comment/entities/comment.entity'; 
 
 @Entity('artists')
 export class Artist {
@@ -43,4 +44,7 @@ export class Artist {
 
   @DeleteDateColumn()
   deletedAt: Date;
+
+  @OneToMany(() => Comment, (comment) => comment.artist)
+  comments: Comment[];  // 아티스트와 댓글 관계
 }

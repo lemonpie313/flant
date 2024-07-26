@@ -8,9 +8,11 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   OneToOne,
+  OneToMany,
 } from 'typeorm';
 import { Community } from './community.entity';
 import { User } from 'src/user/entities/user.entity';
+import { Comment } from '../../comment/entities/comment.entity';
 
 @Entity('community_users')
 export class CommunityUser {
@@ -54,4 +56,10 @@ export class CommunityUser {
     cascade: true,
   })
   membership?: Membership;
+
+  @OneToMany(
+    () => Comment,
+    (comment) => comment.communityUser,
+  )
+  comments: Comment[];  // 커뮤니티와 댓글 관계
 }
