@@ -29,12 +29,6 @@ export class CommunityService {
   ) {}
 
   async create(userId: number, createCommunityDto: CreateCommunityDto) {
-    const userRole = await this.userRepository.findOne({
-      where: { userId: +userId },
-    });
-    if (userRole.role != 'Admin') {
-      throw new BadRequestException('커뮤니티 생성 권한이 없습니다.');
-    }
     const createCommunity =
       await this.communityRepository.save(createCommunityDto);
     return {
@@ -82,13 +76,17 @@ export class CommunityService {
   async findMy(userId: number) {
     const myCommunities = await this.communityUserRepository.find({
       where: { userId: userId },
-      relations: ['communities'],
+      relations: ['community'],
     });
+
+    const myData = myCommunities.map(
+      (communityUser) => communityUser.community,
+    );
 
     return {
       status: HttpStatus.OK,
       message: '내 커뮤니티 조회에 성공했습니다.',
-      data: myCommunities,
+      data: myData,
     };
   }
 

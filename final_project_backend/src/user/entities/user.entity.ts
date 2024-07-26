@@ -82,7 +82,7 @@ export class User {
   point: number;
 
   @OneToMany(() => CommunityUser, (communityUser) => communityUser.users)
-  communityUsers: CommunityUser;
+  communityUsers: CommunityUser[];
 
   @OneToMany(
     () => MembershipPayment,
