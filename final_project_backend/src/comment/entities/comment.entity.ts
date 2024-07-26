@@ -10,7 +10,6 @@ import {
 } from 'typeorm';
 import { CommunityUser } from '../../community/entities/communityUser.entity';
 import { Artist } from '../../admin/entities/artist.entity';
-import { Post } from '../../post/entities/post.entity';
 
 @Entity('comments')
 export class Comment {
@@ -26,7 +25,7 @@ export class Comment {
   @Column({ unsigned: true })
   communityUserId: number;
 
-  @ManyToOne(() => CommunityUser, (communityUser) => communityUser.comments, {
+  @ManyToOne(() => CommunityUser, (user) => user.comments, {
     onDelete: 'CASCADE',
   })
   communityUser: CommunityUser;
