@@ -21,8 +21,13 @@ export class AuthService {
     password,
     passwordConfirm,
     name,
-    profile_image,
+    profileImage,
   }: SignUpDto) {
+    // 기존 이메일로 가입된 이력이 있을 경우 False
+    const existedEmail = await this.userRepository.findOneBy({ email });
+    if (existedEmail)
+      throw new BadRequestException('이미 가입된 이메일이 있습니다.');
+
     // 비밀번호와 비밀번호 확인이랑 일치하는 지
     const isPasswordMatched = password === passwordConfirm;
     if (!isPasswordMatched) {
@@ -39,13 +44,13 @@ export class AuthService {
       email,
       password: hashedPassword,
       name,
-      profile_image,
+      profileImage,
     });
-
-    delete user.password;
 
     return user;
   }
+
+  // 로그인
   signIn(userId: number) {
     const payload = { id: userId };
     const accessToken = this.jwtService.sign(payload);
@@ -56,7 +61,7 @@ export class AuthService {
   async validateUser({ email, password }: SignInDto) {
     const user = await this.userRepository.findOne({
       where: { email },
-      select: { user_id: true, password: true },
+      select: { userId: true, password: true },
     });
     const isPasswordMatched = bcrypt.compareSync(
       password,
@@ -67,6 +72,6 @@ export class AuthService {
       return null;
     }
 
-    return { id: user.user_id };
+    return { id: user.userId };
   }
 }

@@ -1,23 +1,28 @@
 import {
   IsEmail,
+  IsEnum,
+  IsInt,
   IsNotEmpty,
   IsString,
   IsStrongPassword,
 } from 'class-validator';
-
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { UserRole } from '../types/user-role.type';
+import { CommunityUser } from './../../community/entities/communityUser.entity';
+import { MembershipPayment } from '../../membership/entities/membership-payment.entity';
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn()
-  user_id: number;
+  @PrimaryGeneratedColumn({ unsigned: true })
+  userId: number;
 
   /**
    * 이름
@@ -57,7 +62,7 @@ export class User {
   @IsNotEmpty({ message: '이미지 URL을 입력해 주세요.' })
   @IsString()
   @Column()
-  profile_image: string;
+  profileImage: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -68,6 +73,21 @@ export class User {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @Column({ default: 'user' }) //enum 타입으로 바꿀 예정
-  role: string;
+  @IsEnum(UserRole)
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.User }) //enum 타입으로 바꿀 예정
+  role: UserRole;
+
+  @IsInt()
+  @Column({ default: 1000000 })
+  point: number;
+
+  @OneToMany(() => CommunityUser, (communityUser) => communityUser.users)
+  communityUsers: CommunityUser[];
+
+  @OneToMany(
+    () => MembershipPayment,
+    (membershipPayment) => membershipPayment.user,
+    { cascade: true },
+  )
+  membershipPayment: MembershipPayment;
 }
