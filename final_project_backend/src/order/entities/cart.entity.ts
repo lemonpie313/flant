@@ -19,7 +19,7 @@ export class Cart {
   @OneToMany(() => CartItem, (cartItem) => cartItem.cart)
   cartItem: CartItem;
 
-  @OneToMany(() => Order, (order) => order.cart)
+  @OneToMany(() => Order, (order) => order.cart, { onDelete: 'CASCADE' })
   order: Order;
 
   //   //유저연결

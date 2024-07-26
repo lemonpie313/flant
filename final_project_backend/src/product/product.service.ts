@@ -1,12 +1,13 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { stat } from 'fs';
 import { ProductCategory } from './entities/product.category.entity';
 import { Console } from 'console';
+import { FindAllProductDto } from './dto/find-product.dto';
 
 @Injectable()
 export class ProductService {
@@ -19,41 +20,181 @@ export class ProductService {
 
   //상점 생성
   async productCreate(createProductDto: CreateProductDto) {
-    const saveProduct = await this.productRepository.save(createProductDto);
-    //카테고리 생성 로직 확인 필요
+    //매니저 검증 필요
+
+    const { artist, categoryName, detailInfo, name, productCode } =
+      createProductDto;
+
+    // 매니저일시 상점 생성
+    const saveProduct = await this.productRepository.save({
+      artist,
+      name,
+      productCode,
+      detailInfo,
+    });
+
+    const saveCategory = await this.categoryRepository.save({
+      name: categoryName,
+      product: saveProduct,
+    });
 
     return {
       status: HttpStatus.CREATED,
       message: '상점 생성에 성공하셨습니다.',
-      saveProduct,
+      data: {
+        shopId: saveProduct.id,
+        //매니저 아이디 추가
+        name: saveProduct.name,
+        artist: saveProduct.artist,
+        productCode: saveProduct.productCode,
+        detailInfo: saveProduct.detailInfo,
+        categoryName: saveCategory.name,
+        createdAt: saveProduct.createdAt,
+        updatedAt: saveProduct.updatedAt,
+      },
     };
   }
 
-  //상점 내 상품 생성
-  async productPostCreate(createProductDto: CreateProductDto) {
-    const saveProduct = await this.productRepository.save(createProductDto);
-    //카테고리 생성 로직 확인 필요
+  async findAll(findAllProductDto: FindAllProductDto) {
+    const { name, artist } = findAllProductDto;
+
+    let product;
+
+    if (!name && !artist) {
+      product = await this.productRepository.find({
+        relations: ['productCategory'],
+      });
+    } else if (name && artist) {
+      product = await this.productRepository.find({
+        where: [{ name: Like(`%${name}%`), artist: Like(`%${artist}%`) }],
+        relations: ['productCategory'],
+      });
+    } else if (artist) {
+      product = await this.productRepository.find({
+        where: { artist: Like(`%${artist}%`) },
+        relations: ['productCategory'],
+      });
+    } else if (name) {
+      product = await this.productRepository.find({
+        where: { name: Like(`%${name}%`) },
+        relations: ['productCategory'],
+      });
+    }
+
+    const data = product.map((products) => ({
+      id: products.id,
+      name: products.name,
+      artist: products.artist,
+      category: products.productCategory,
+      // 카테고리 이름만 가져오는 방법은 없을까?
+      productCode: products.productCode,
+      detailInfo: products.detailInfo,
+      createdAt: products.createdAt,
+      updatedAt: products.updatedAt,
+    }));
 
     return {
-      status: HttpStatus.CREATED,
-      message: '상점 생성에 성공하셨습니다.',
-      saveProduct,
+      status: HttpStatus.OK,
+      message: `상점명 : ${name} / 아티스트 : ${artist} 상품 전체 조회가 완료되었습니다`,
+      data,
     };
   }
 
-  findAll() {
-    return `This action returns all product`;
+  async findOne(productId: number) {
+    // 상품 유효 체크
+    const product = await this.productRepository.findOne({
+      where: { id: productId },
+      relations: ['productCategory'],
+    });
+
+    if (!product) {
+      throw new NotFoundException('존재하지 않는 상점입니다.');
+    }
+
+    return {
+      status: HttpStatus.OK,
+      message: '상점 상세 조회에 성공하였습니다.',
+      data: {
+        shopId: product.id,
+        //매니저 아이디 추가
+        name: product.name,
+        artist: product.artist,
+        productCode: product.productCode,
+        detailInfo: product.detailInfo,
+        categoryName: product.productCategory[0].name,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt,
+      },
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  //상점 수정
+  async update(id: number, updateProductDto: UpdateProductDto) {
+    const { name, artist, productCode, detailInfo, categoryName } =
+      updateProductDto;
+
+    //상점 유효성 체크
+    const product = await this.productRepository.findOne({
+      where: { id },
+      relations: ['productCategory'],
+    });
+
+    if (!product) {
+      throw new NotFoundException('존재하지 않는 상점입니다.');
+    }
+
+    //작성한 유저 id 일치한지 확인 로직 추가 필요
+
+    if (name !== undefined) {
+      product.name = name;
+    }
+    if (artist !== undefined) {
+      product.artist = artist;
+    }
+    if (productCode !== undefined) {
+      product.productCode = productCode;
+    }
+    if (detailInfo !== undefined) {
+      product.detailInfo = detailInfo;
+    }
+    if (categoryName !== undefined) {
+      product.productCategory[0].name = categoryName;
+    }
+
+    await this.productRepository.save(product);
+
+    return {
+      status: HttpStatus.OK,
+      message: '수정 완료되었습니다.',
+      product,
+    };
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
-  }
+  async remove(id: number) {
+    const product = await this.productRepository.findOne({
+      where: { id },
+      relations: ['productCategory'],
+    });
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+    if (!product) {
+      throw new NotFoundException('존재하지 않는 상점입니다.');
+    }
+
+    //작성 유저인지 확인
+    // if (merchandise.product.user.Id !== userId) {
+    //   throw new ForbiddenException('권한이 없습니다');
+    // }
+
+    await this.categoryRepository.delete({
+      product: { id }, //
+    });
+
+    await this.productRepository.delete(id);
+
+    return {
+      status: HttpStatus.OK,
+      message: '상품 삭제에 성공하였습니다.',
+      data: { id },
+    };
   }
 }

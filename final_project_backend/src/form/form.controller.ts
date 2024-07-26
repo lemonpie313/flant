@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  NotFoundException,
 } from '@nestjs/common';
 import { FormService } from './form.service';
 import { CreateFormDto } from './dto/create-form.dto';
@@ -13,7 +14,7 @@ import { UpdateFormDto } from './dto/update-form.dto';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Forms')
-@Controller('forms')
+@Controller('v1/forms')
 export class FormController {
   constructor(private readonly formService: FormService) {}
 
@@ -31,27 +32,37 @@ export class FormController {
 
   /**
    * 폼 상세 조회
-   * @param id
+   * @param formId
    * @returns
    */
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return await this.formService.findOne(+id);
+  @Get('/:formId')
+  async findOne(@Param('formId') formId: string) {
+    return await this.formService.findOne(+formId);
   }
 
   /**
    * 폼 수정
-   * @param id
+   * @param formId
    * @param updateFormDto
    * @returns
    */
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFormDto: UpdateFormDto) {
-    return this.formService.update(+id, updateFormDto);
+  @Patch('/:formId')
+  async update(
+    @Param('formId') formId: string,
+    @Body() updateFormDto: UpdateFormDto,
+    /* 작성자 id 추가 필요 */
+  ) {
+    return await this.formService.update(+formId, updateFormDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.formService.remove(+id);
+  /**
+   * 폼 삭제
+   * @param formId
+   * @returns
+   */
+  @Delete('/:formId')
+  async remove(@Param('formId') formId: string) {
+    //사용자 id도 추가하여 전달 필요
+    return await this.formService.remove(+formId);
   }
 }

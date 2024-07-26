@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -33,6 +34,7 @@ export class ProductCategory {
   /**
    * 굿즈샵 연결
    */
-  @ManyToOne(() => Product, (Product) => Product.productCategorys)
-  products: Product[];
+  @ManyToOne(() => Product, (Product) => Product.productCategory)
+  @JoinColumn({ name: 'product_id' })
+  product: Product;
 }

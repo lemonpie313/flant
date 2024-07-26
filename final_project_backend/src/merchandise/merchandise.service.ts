@@ -246,7 +246,11 @@ export class MerchandiseService {
       );
     }
 
-    return merchandise;
+    return {
+      status: HttpStatus.OK,
+      message: '수정 완료되었습니다.',
+      merchandise,
+    };
   }
 
   //상품 삭제 API

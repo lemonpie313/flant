@@ -16,33 +16,17 @@ export class Product {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
-  /**
-   * 상점 코드
-   * @example "ABCDEFGHI11"
-   */
-  //코드가 자동생성되는건지 확인 필요
-  @IsNotEmpty({ message: '상점 코드를 입력해주세요' })
-  @IsString()
   @Column()
   productCode: string;
 
-  /**
-   * 상점명
-   * @example "상점명"
-   */
-  @IsNotEmpty({ message: '상품명을 입력해주세요' })
-  @IsString()
   @Column()
   name: string;
 
-  /**
-   * 상세정보
-   * @example "이 상점의 정보를 입력해주세요 "
-   */
-  @IsNotEmpty({ message: '상세정보를 입력해주세요' })
-  @IsString()
   @Column()
   detailInfo: string;
+
+  @Column()
+  artist: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -62,6 +46,10 @@ export class Product {
   @OneToMany(
     () => MerchandisePost,
     (merchandisePost) => merchandisePost.product,
+    {
+      cascade: true,
+      onDelete: 'CASCADE',
+    },
   )
   merchandisePosts: MerchandisePost[];
 
@@ -70,7 +58,11 @@ export class Product {
    */
   @OneToMany(
     () => ProductCategory,
-    (productCategory) => productCategory.products,
+    (productCategory) => productCategory.product,
+    {
+      cascade: true,
+      onDelete: 'CASCADE',
+    },
   )
-  productCategorys: ProductCategory[];
+  productCategory: ProductCategory[];
 }

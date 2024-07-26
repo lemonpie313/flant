@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { FormItem } from './form.item';
 import { IsNotEmpty, IsString } from 'class-validator';
+import { Exclude } from 'class-transformer';
 
 @Entity('form')
 export class Form {
@@ -41,11 +42,13 @@ export class Form {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @DeleteDateColumn()
+  @DeleteDateColumn({ nullable: true })
   deletedAt: Date;
 
   //form-item 연결
-  @OneToMany(() => FormItem, (formItem) => formItem.form, { cascade: true })
+  @OneToMany(() => FormItem, (formItem) => formItem.form, {
+    onDelete: 'CASCADE',
+  })
   formItem: FormItem[];
 
   //   // 매니저 연결

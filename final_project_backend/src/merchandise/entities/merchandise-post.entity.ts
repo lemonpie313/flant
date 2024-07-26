@@ -73,9 +73,7 @@ export class MerchandisePost {
   updatedAt: Date;
 
   // 굿즈샵 연결
-  @ManyToOne(() => Product, (product) => product.merchandisePosts, {
-    cascade: true,
-  })
+  @ManyToOne(() => Product, (product) => product.merchandisePosts)
   @JoinColumn({ name: 'product_id' })
   product: Product;
 
@@ -83,7 +81,7 @@ export class MerchandisePost {
   @OneToMany(
     () => MerchandiseImage,
     (merchandiseImage) => merchandiseImage.merchandisePost,
-    { cascade: true },
+    { onDelete: 'CASCADE' },
   )
   merchandiseImage: MerchandiseImage[];
 
@@ -91,11 +89,13 @@ export class MerchandisePost {
   @OneToMany(
     () => MerchandiseOption,
     (merchandiseOption) => merchandiseOption.merchandisePost,
-    { cascade: true },
+    { onDelete: 'CASCADE' },
   )
   merchandiseOption: MerchandiseOption[];
 
   // 주문 연결
-  @OneToMany(() => CartItem, (cartItem) => cartItem.merchandisePost)
+  @OneToMany(() => CartItem, (cartItem) => cartItem.merchandisePost, {
+    onDelete: 'CASCADE',
+  })
   cartItems: CartItem[];
 }

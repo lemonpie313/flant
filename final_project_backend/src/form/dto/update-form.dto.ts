@@ -5,7 +5,7 @@ import { FromItemType } from '../types/form-item.enum';
 export class UpdateFormDto {
   /**
    * 제목
-   *  @example "Form 제목"
+   *  @example "Form 수정 제목"
    */
   @IsOptional()
   @IsString()
@@ -13,7 +13,7 @@ export class UpdateFormDto {
 
   /**
    * 내용
-   * @example "Form 내용"
+   * @example "Form 수정 내용"
    */
   @IsOptional()
   @IsString()

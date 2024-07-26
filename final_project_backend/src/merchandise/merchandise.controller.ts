@@ -48,29 +48,29 @@ export class MerchandiseController {
 
   /**
    * 상품 상세 조회
-   * @param id
+   * @param merchandiseId
    * @returns
    */
-  @Get('/:merchandise_id')
-  async findOne(@Param('merchandise_id') id: string) {
-    const data = await this.merchandiseService.findOne(+id);
+  @Get('/:merchandiseId')
+  async findOne(@Param('merchandiseId') merchandiseId: string) {
+    const data = await this.merchandiseService.findOne(+merchandiseId);
     return data;
   }
 
   /**
    * 상품 수정
-   * @param id
+   * @param merchandiseId
    * @param updateMerchandiseDto
    * @returns
    */
-  @Patch('/:merchandise_id')
+  @Patch('/:merchandiseId')
   async update(
-    @Param('merchandise_id') id: string,
+    @Param('merchandiseId') merchandiseId: string,
     @Body() updateMerchandiseDto: UpdateMerchandiseDto,
   ) {
     //유저도 포함하여 전달 필요
     const data = await this.merchandiseService.update(
-      +id,
+      +merchandiseId,
       updateMerchandiseDto,
     );
     return data;
@@ -78,13 +78,15 @@ export class MerchandiseController {
 
   /**
    * 상품 삭제
-   * @param id
+   * @param merchandiseId
    * @returns
    */
-  @Delete('/:merchandise_id')
+  @Delete('/:merchandiseId')
   remove(
-    @Param('merchandise_id') id: string /* @UserInfo() user: User 추가에정 */,
+    @Param('merchandiseId')
+    merchandiseId: string /* @UserInfo() user: User 추가에정 */,
   ) {
-    return this.merchandiseService.remove(+id);
+    //유저아이디 추가하여 검증 필요
+    return this.merchandiseService.remove(+merchandiseId);
   }
 }

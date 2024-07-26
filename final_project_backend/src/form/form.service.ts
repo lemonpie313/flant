@@ -34,6 +34,7 @@ export class FormService {
       throw new BadRequestException('이미 존재하는 제목입니다.');
     }
 
+    //폼 생성
     const createForm = await this.formRepository.save({
       title,
       content,
@@ -56,27 +57,94 @@ export class FormService {
   //폼 상세 조회
   async findOne(formId: number) {
     //폼 유효성 체크
+
     const form = await this.formRepository.findOne({
       where: { id: formId },
       relations: ['formItem'],
+    });
+    console.log('test2');
+    if (!form) {
+      throw new NotFoundException('폼이 존재하지 않습니다.');
+    }
+
+    //deletedAt 제외
+    const { deletedAt, ...result } = form;
+
+    return {
+      status: HttpStatus.OK,
+      message: '폼 상세 조회에 성공하였습니다.',
+      data: result,
+    };
+  }
+
+  async update(formId: number, updateFormDto: UpdateFormDto) {
+    // 사용자 검증
+
+    // 폼 유효성 체크
+    const form = await this.formRepository.findOne({
+      where: { id: formId },
     });
 
     if (!form) {
       throw new NotFoundException('폼이 존재하지 않습니다.');
     }
 
+    // form id가 있을 경우 formItem도 가져오기
+    const formItem = await this.formItemRepository.findOne({
+      where: { id: formId },
+    });
+
+    const { title, content, formItemContent, formItemType } = updateFormDto;
+
+    if (title !== undefined) {
+      form.title = title;
+    }
+    if (content !== undefined) {
+      form.content = content;
+    }
+    if (formItemContent !== undefined) {
+      formItem.content = formItemContent;
+    }
+    if (formItemType !== undefined) {
+      formItem.type = formItemType;
+    }
+
+    //변경사항 저장
+    await this.formRepository.save(form);
+    await this.formItemRepository.save(formItem);
+
     return {
       status: HttpStatus.OK,
-      message: '폼 상세 조회에 성공하였습니다.',
-      data: form,
+      message: '폼 수정 성공하였습니다.',
+      data: {
+        formTitle: form.title,
+        formContent: form.content,
+        formItemContent: formItem.content,
+        formItemType: formItem.type,
+        createdAt: form.createdAt,
+        updatedAt: form.updatedAt,
+      },
     };
   }
 
-  update(id: number, updateFormDto: UpdateFormDto) {
-    return `This action updates a #${id} form`;
-  }
+  async remove(formId: number) {
+    // 사용자 검증
 
-  remove(id: number) {
-    return `This action removes a #${id} form`;
+    // 폼 유효성 체크
+    const form = await this.formRepository.findOne({
+      where: { id: formId },
+    });
+
+    if (!form) {
+      throw new NotFoundException('폼이 존재하지 않습니다.');
+    }
+
+    await this.formRepository.softDelete(formId);
+
+    return {
+      status: HttpStatus.OK,
+      message: '폼 삭제 성공하였습니다.',
+      data: formId,
+    };
   }
 }

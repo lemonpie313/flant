@@ -1,13 +1,9 @@
 import {
   Column,
-  CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 import { FromItemType } from '../types/form-item.enum';
 import { Form } from './form.entity';
@@ -24,9 +20,7 @@ export class FormItem {
   type: FromItemType;
 
   // form 연결
-  @ManyToOne(() => Form, (form) => form.formItem, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'manager_id' })
+  @ManyToOne(() => Form, (form) => form.formItem)
+  @JoinColumn({ name: 'form_id' })
   form: Form;
 }
