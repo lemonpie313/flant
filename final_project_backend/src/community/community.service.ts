@@ -51,7 +51,6 @@ export class CommunityService {
       communityId,
       nickName: nickName.nickName,
     });
-    console.log('--------');
     const assignedName = assignData.nickName;
     const findCommunity = await this.communityRepository.findOne({
       where: { communityId: communityId },

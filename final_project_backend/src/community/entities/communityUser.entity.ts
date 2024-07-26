@@ -47,7 +47,7 @@ export class CommunityUser {
   community: Community;
 
   @ManyToOne(() => User, (user) => user.communityUsers)
-  @JoinColumn({name: 'user_id'})
+  @JoinColumn({ name: 'user_id' })
   users: User;
 
   @OneToMany(() => Membership, (membership) => membership.communityUser, {
@@ -56,5 +56,5 @@ export class CommunityUser {
   membership: Membership[];
 
   @OneToMany(() => Comment, (comment) => comment.community) // 댓글과의 관계 추가
-  comments: Comment[];  // 커뮤니티와의 댓글 관계
+  comments: Comment[]; // 커뮤니티와의 댓글 관계
 }
