@@ -18,6 +18,7 @@ import {
 import { UserRole } from '../types/user-role.type';
 import { CommunityUser } from './../../community/entities/communityUser.entity';
 import { MembershipPayment } from '../../membership/entities/membership-payment.entity';
+import { UserProvider } from '../types/user-provider.type';
 
 @Entity('users')
 export class User {
@@ -52,7 +53,7 @@ export class User {
       message: `비밀번호는 영문 알파벳 대,소문자, 숫자, 특수문자(!@#$%^&*)를 포함해서 8자리 이상으로 입력해야 합니다.`,
     },
   )
-  @Column({ select: false })
+  @Column({ select: false, nullable: true })
   password: string;
 
   /**
@@ -80,6 +81,10 @@ export class User {
   @IsInt()
   @Column({ default: 1000000 })
   point: number;
+
+  @IsEnum(UserProvider)
+  @Column({ type: 'enum', enum: UserProvider, default: UserProvider.Email }) //enum 타입으로 바꿀 예정
+  provider: UserProvider;
 
   @OneToMany(() => CommunityUser, (communityUser) => communityUser.users)
   communityUsers: CommunityUser[];
