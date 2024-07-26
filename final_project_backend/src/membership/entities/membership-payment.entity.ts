@@ -37,5 +37,6 @@ export class MembershipPayment {
   user: User;
 
   @ManyToOne(() => Membership, (membership) => membership.membershipPayment)
+  @JoinColumn({ name: 'membership_id' })
   membership: Membership;
 }

@@ -29,12 +29,6 @@ export class CommunityService {
   ) {}
 
   async create(userId: number, createCommunityDto: CreateCommunityDto) {
-    const userRole = await this.userRepository.findOne({
-      where: { userId: +userId },
-    });
-    if (userRole.role != 'Admin') {
-      throw new BadRequestException('커뮤니티 생성 권한이 없습니다.');
-    }
     const createCommunity =
       await this.communityRepository.save(createCommunityDto);
     return {
@@ -49,11 +43,15 @@ export class CommunityService {
     communityId: number,
     nickName: CommunityAssignDto,
   ) {
+    console.log(nickName.nickName);
+    console.log(userId);
+    console.log(communityId);
     const assignData = await this.communityUserRepository.save({
-      userId: userId,
-      communityId: communityId,
+      userId,
+      communityId,
       nickName: nickName.nickName,
     });
+    console.log('--------');
     const assignedName = assignData.nickName;
     const findCommunity = await this.communityRepository.findOne({
       where: { communityId: communityId },
@@ -85,10 +83,14 @@ export class CommunityService {
       relations: ['community'],
     });
 
+    const myData = myCommunities.map(
+      (communityUser) => communityUser.community,
+    );
+
     return {
       status: HttpStatus.OK,
       message: '내 커뮤니티 조회에 성공했습니다.',
-      data: myCommunities,
+      data: myData,
     };
   }
 
