@@ -77,8 +77,8 @@ export class MembershipService {
       });
     }
     const existMembership = communityUser.membership.find((cur) => {
-      return cur.deletedAt == null
-    })
+      return cur.deletedAt == null;
+    });
     if (existMembership) {
       throw new ConflictException({
         status: 409,
@@ -156,8 +156,8 @@ export class MembershipService {
     });
     const memberships = communityUser.map((cur) => {
       const membership = cur.membership.find((cur) => {
-        return cur.deletedAt == null
-      })
+        return cur.deletedAt == null;
+      });
       return {
         membershipId: membership.membershipId,
         group: cur.community.communityName,
@@ -185,8 +185,8 @@ export class MembershipService {
       });
     }
     const membership = communityUser.membership.find((cur) => {
-      return cur.deletedAt == null
-    })
+      return cur.deletedAt == null;
+    });
     const membershipInfo = {
       communityUserId: communityUser.communityUserId,
       communityId: communityUser.community.communityId,
@@ -216,8 +216,8 @@ export class MembershipService {
       });
     }
     const membership = communityUser.membership.find((cur) => {
-      return cur.deletedAt == null
-    })
+      return cur.deletedAt == null;
+    });
     const today = new Date();
     const remaining =
       (membership.expiration.getTime() - today.getTime()) /

@@ -1,6 +1,15 @@
 // src/comments/comment.controller.ts
 
-import { Controller, Get, Post, Body, Param, Patch, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { Comment } from './entities/comment.entity';
 import { Comment } from './dto/create-comment.dto';
@@ -52,13 +61,17 @@ export class CommentController {
 
   // 특정 게시물의 댓글들 조회
   @Get('post/:postId')
-  async findCommentsByPost(@Param('postId', ParseIntPipe) postId: number): Promise<Comment[]> {
+  async findCommentsByPost(
+    @Param('postId', ParseIntPipe) postId: number,
+  ): Promise<Comment[]> {
     return this.commentService.findCommentsByPost(postId);
   }
 
   // 특정 댓글의 대댓글들 조회
   @Get('reply/:commentId')
-  async findRepliesByComment(@Param('commentId', ParseIntPipe) commentId: number): Promise<Comment[]> {
+  async findRepliesByComment(
+    @Param('commentId', ParseIntPipe) commentId: number,
+  ): Promise<Comment[]> {
     return this.commentService.findRepliesByComment(commentId);
   }
 }
