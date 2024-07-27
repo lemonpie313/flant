@@ -8,10 +8,8 @@
       {
         "name": "@nestjs/swagger",
         "options": {
-          "classValidatorShim": true,
-          "introspectComments": true,
-          "dtoKeyOfComment": "description",
-          "controllerKeyOfComment": "summary"
+          "classValidatorShim": false,
+          "introspectComments": true
         }
       }
     ]
