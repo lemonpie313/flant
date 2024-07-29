@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        // 로그아웃 처리 함수
+        function logout() {
+            localStorage.removeItem('authToken');
+            window.location.href = 'http://localhost:3000/login'; // 로그인 페이지로 리다이렉트
+        }
+
+        // 페이지 이동한다면 토큰이 계속 유효하는지
+        function move() {
+            window.location.href = 'http://localhost:3000/move.html'; // 로그인 페이지로 리다이렉트
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Welcome!</h1>
+    <button onclick="logout()">Logout</button>
+    <button onclick="move()">move</button>
+</body>
+
+</html>
