@@ -11,8 +11,9 @@ import { CommunityModule } from './community/community.module';
 import { AdminModule } from './admin/admin.module';
 import { MembershipModule } from './membership/membership.module';
 import { CommentModule } from './comment/comment.module'; // CommentModule 추가
-import { GoogleModule } from './google/google.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -22,6 +23,9 @@ import { ScheduleModule } from '@nestjs/schedule';
       validationSchema: configModuleValidationSchema,
       envFilePath: '.env',
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../..', 'final_project_frontend'),
+    }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     AuthModule,
     UserModule,
@@ -29,7 +33,6 @@ import { ScheduleModule } from '@nestjs/schedule';
     AdminModule,
     MembershipModule,
     CommentModule,
-    GoogleModule, // CommentModule 추가
   ],
   controllers: [AppController],
   providers: [AppService],

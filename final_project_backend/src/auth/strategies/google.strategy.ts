@@ -12,7 +12,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     super({
       clientID: configService.get('GOOGLE_CLIENT_ID'),
       clientSecret: configService.get('GOOGLE_SECRET'),
-      callbackURL: 'http://localhost:3000/api/google/redirect',
+      callbackURL: 'http://localhost:3000/api/auth/google/redirect',
       // Google이 사용자를 인증한 후 제어권을 반환하는 앱의 특정 엔드포인트
       scope: ['email', 'profile'],
     });

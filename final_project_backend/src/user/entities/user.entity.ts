@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsInt,
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsStrongPassword,
 } from 'class-validator';
@@ -46,7 +47,7 @@ export class User {
    * 비밀번호
    * @example "Example1!"
    */
-  @IsNotEmpty({ message: '비밀번호를 입력해 주세요.' })
+  @IsOptional()
   @IsStrongPassword(
     { minLength: 8 },
     {
@@ -54,7 +55,7 @@ export class User {
     },
   )
   @Column({ select: false, nullable: true })
-  password: string;
+  password?: string;
 
   /**
    * 이미지URL
