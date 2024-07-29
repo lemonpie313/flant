@@ -90,6 +90,15 @@ export class AuthService {
     if (!req.user) {
       return 'No user from google';
     }
+    // 만약 유저테이블에서 같은 이메일이 있다면 false반환
+    const existedUser = await this.userRepository.findOneBy({
+      email: req.user.email,
+    });
+    if (existedUser)
+      throw new BadRequestException(
+        '이미 회원가입된 계정입니다. 다른 방법으로 로그인해주세요.',
+      );
+
     // 이곳에 유저테이블과 연결지어서 생성
     const user = await this.userRepository.save({
       name: req.user.firstName + req.user.lastName,
