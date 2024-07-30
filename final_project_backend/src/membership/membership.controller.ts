@@ -9,23 +9,48 @@ import {
   Get,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { MembershipService } from './membership.service';
+import { UserRole } from 'src/user/types/user-role.type';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @ApiTags('membership_payments')
-@ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
 @Controller('v1/membership')
 export class MembershipController {
   constructor(private readonly membershipService: MembershipService) {}
-
   /**
-   * 멤버십 가입
-   *
+   * 멤버십 결제내역 전체조회 - 어드민
+   * @param req
+   * @param communityId
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @Roles(UserRole.Admin)
+  @UseGuards(RolesGuard)
+  @ApiQuery({ name: 'communityId', required: false, type: Number })
+  @Get('/payments')
+  async findMembershipPayments(
+    @Request() req,
+    @Query('communityId') communityId?: number,
+  ) {
+    const payments =
+      await this.membershipService.findMembershipPayments(communityId);
+    return {
+      status: HttpStatus.OK,
+      message: '멤버십 결제내역 전체조회가 완료되었습니다.',
+      data: payments,
+    };
+  }
+
+  /**
+   * 멤버십 가입
+   * @param req
+   * @returns
+   */
+  @ApiBearerAuth()
+  @Roles(UserRole.User)
+  @UseGuards(RolesGuard)
   @Post('/')
   async createMembership(
     @Request() req,
@@ -44,11 +69,12 @@ export class MembershipController {
 
   /**
    * 멤버십 가입내역 전체조회
-   *
+   * @param req
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @Roles(UserRole.User)
+  @UseGuards(RolesGuard)
   @Get('/')
   async findAllMembership(@Request() req) {
     const memberships = await this.membershipService.findAllMembership(
@@ -63,11 +89,12 @@ export class MembershipController {
 
   /**
    * 멤버십 가입내역 상세조회
-   *
+   * @param req
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @Roles(UserRole.User)
+  @UseGuards(RolesGuard)
   @Get('/:membershipPaymentId')
   async findMembership(
     @Request() req,
@@ -84,11 +111,12 @@ export class MembershipController {
 
   /**
    * 멤버십 연장
-   *
+   * @param req
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @Roles(UserRole.User)
+  @UseGuards(RolesGuard)
   @Post('/:membershipPaymentId')
   async extendMembership(
     @Request() req,
