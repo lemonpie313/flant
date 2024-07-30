@@ -1,11 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Google Login Token Test</title>
+    <script>
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', function () {
+            // URL에서 토큰 추출
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+
+            if (token) {
+                // 토큰을 로컬 스토리지에 저장
+                localStorage.setItem('authToken', token);
+                console.log('Token saved to localStorage:', token);
+
+                // 토큰을 사용하여 API 호출
+                fetchData(token);
+                window.location.href = 'http://localhost:3000/main.html'; // 메인 페이지로 리다이렉트
+            } else {
+                console.log('No token found in URL');
+            }
+        });
+
+        // API 호출 함수
+        function fetchData(token) {
+            fetch(`http://localhost:3000/api/users/me`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`, // JWT 토큰을 Authorization 헤더에 포함
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('API response:', data);
+                    // 여기에 API 응답 데이터를 처리하는 코드 추가
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+
+    </script>
 </head>
+
 <body>
-    frontend 폴더
+    <h1>Loading!</h1>
+    <h1>Loading!</h1>
+    <h1>Loading!</h1>
+    <h1>Loading!</h1>
+    <h1>Loading!</h1>
+
 </body>
+
 </html>
