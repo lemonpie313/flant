@@ -10,4 +10,6 @@ export const configModuleValidationSchema = Joi.object({
   DB_SYNC: Joi.boolean().required(),
   PASSWORD_HASH: Joi.number().required(),
   JWT_SECRET: Joi.string().required(),
+  GOOGLE_CLIENT_ID: Joi.string().required(),
+  GOOGLE_SECRET: Joi.string().required(),
 });

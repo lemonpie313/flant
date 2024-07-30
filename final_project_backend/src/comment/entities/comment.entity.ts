@@ -25,13 +25,18 @@ export class Comment {
   @Column({ unsigned: true })
   communityUserId: number;
 
-  @ManyToOne(() => CommunityUser, (user) => user.comments, { onDelete: 'CASCADE' })
+  @ManyToOne(() => CommunityUser, (user) => user.comments, {
+    onDelete: 'CASCADE',
+  })
   communityUser: CommunityUser;
 
   @Column({ unsigned: true, nullable: true })
   artistId: number | null;
 
-  @ManyToOne(() => Artist, (artist) => artist.comments, { nullable: true, onDelete: 'SET NULL' })
+  @ManyToOne(() => Artist, (artist) => artist.comments, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
   artist: Artist | null;
 
   @Column('text')
@@ -52,6 +57,9 @@ export class Comment {
   @OneToMany(() => Comment, (comment) => comment.parent)
   replies: Comment[];
 
-  @ManyToOne(() => Comment, (comment) => comment.replies, { nullable: true, onDelete: 'CASCADE' })
+  @ManyToOne(() => Comment, (comment) => comment.replies, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
   parent: Comment | null;
 }
