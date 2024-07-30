@@ -11,6 +11,8 @@ import {
   Request,
   UploadedFiles,
   UseInterceptors,
+  Put,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -18,11 +20,22 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { UserInfo } from 'src/util/user-info.decorator';
+import { User } from 'src/user/entities/user.entity';
+import { CreateLikeDto } from 'src/like/dto/create-like.dto';
+import { ApiResponse } from 'src/util/api-response.interface';
+import { Like } from 'src/like/entities/like.entity';
+import { ItemType } from 'src/like/types/itemType.types';
+import { LikeService } from 'src/like/like.service';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @ApiTags('게시물')
 @Controller('v1/post')
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(
+    private readonly postService: PostService,
+    private readonly likeService: LikeService,
+  ) {}
 
   /**
    * 게시글 작성
@@ -42,7 +55,7 @@ export class PostController {
     @Query('communityId') communityId: number,
     @Body() createPostDto: CreatePostDto,
   ) {
-    const imageUrl = files.map((file) => file.location);
+    const imageUrl = files?.map((file) => file.location);
     createPostDto.postImageUrl = JSON.stringify(imageUrl);
     const userId = req.userId;
     return await this.postService.create(+userId, +communityId, createPostDto);
@@ -103,5 +116,21 @@ export class PostController {
   remove(@Request() req, @Param('postId') postId: number) {
     const userId = req.user.id;
     return this.postService.remove(+userId, +postId);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Put(':id/likes')
+  async updateLikeStatus(
+    @UserInfo() user,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() createLikeDto: CreateLikeDto,
+  ): Promise<ApiResponse<Like>> {
+    return this.likeService.updateLikeStatus(
+      user.id,
+      id,
+      createLikeDto,
+      ItemType.POST,
+    );
   }
 }

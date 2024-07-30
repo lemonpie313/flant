@@ -39,6 +39,7 @@ export class PostService {
     communityId: number,
     createPostDto: CreatePostDto,
   ) {
+    console.log(CreatePostDto);
     const isCommunityUser = await this.communityUserRepository.findOne({
       where: { userId: userId, communityId: communityId },
     });
@@ -53,6 +54,7 @@ export class PostService {
     }
 
     const saveData = await this.postRepository.save(createPostDto);
+    console.log(CreatePostDto);
     if (createPostDto.postImageUrl) {
       const postImageData = {
         postId: saveData.postId,
@@ -94,8 +96,8 @@ export class PostService {
       where: { postId: postId },
       relations: ['postImages'],
     });
-    if(!data){
-      throw new NotFoundException('게시글이 존재하지 않습니다.')
+    if (!data) {
+      throw new NotFoundException('게시글이 존재하지 않습니다.');
     }
     return {
       status: HttpStatus.OK,
