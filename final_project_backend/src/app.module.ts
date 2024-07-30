@@ -18,6 +18,7 @@ import { CommentModule } from './comment/comment.module'; // CommentModule 추�
 import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { PostModule } from './post/post.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { join } from 'path';
     AdminModule,
     MembershipModule,
     CommentModule,
+    PostModule, // CommentModule 추가
   ],
   controllers: [AppController],
   providers: [AppService],
