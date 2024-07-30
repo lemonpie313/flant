@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { CommunityUser } from '../../community/entities/communityUser.entity';
 import { Artist } from '../../admin/entities/artist.entity';
+// import { Post } from '../../post/entities/post.entity';
 
 @Entity('comments')
 export class Comment {
