@@ -287,16 +287,27 @@ export class MembershipService {
     }
   }
 
-  async findPayments(communityId: number) {
-    const payments = await this.membershipPaymentRepository.find({
-      where: {
-        communityId,
-      },
-      relations: {
-        user: true,
-        community: true,
-      }
-    });
+  async findMembershipPayments(communityId?: number) {
+    let payments;
+    if (communityId) {
+      payments = await this.membershipPaymentRepository.find({
+        where: {
+          communityId,
+        },
+        relations: {
+          user: true,
+          community: true,
+        }
+      });
+    } else {
+      payments = await this.membershipPaymentRepository.find({
+        relations: {
+          user: true,
+          community: true,
+        }
+      });
+    }
+    
     return payments.map((payment) => {
       return {
         membershipPaymentId: payment.membershipPaymentId,

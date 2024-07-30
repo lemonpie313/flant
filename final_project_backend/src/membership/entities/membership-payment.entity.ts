@@ -2,13 +2,10 @@ import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Membership } from './membership.entity';
@@ -32,7 +29,7 @@ export class MembershipPayment {
   @Column({ unsigned: true })
   price: number;
 
-  @Column({ unsigned: true })
+  @Column()
   type: MembershipPaymentType;
 
   @CreateDateColumn()

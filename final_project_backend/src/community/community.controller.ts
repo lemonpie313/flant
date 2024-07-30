@@ -105,7 +105,7 @@ export class CommunityController {
       +communityId,
       updateCommunityDto,
     );
-  }
+  } 
 
   /**
    * 커뮤니티 삭제
