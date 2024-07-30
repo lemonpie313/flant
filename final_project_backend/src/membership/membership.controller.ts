@@ -35,7 +35,7 @@ export class MembershipController {
     @Query('communityId') communityId?: number,
   ) {
     const payments =
-      await this.membershipService.findMembershipPayments(communityId ?? 0);
+      await this.membershipService.findMembershipPayments(communityId);
     return {
       status: HttpStatus.OK,
       message: '멤버십 결제내역 전체조회가 완료되었습니다.',
