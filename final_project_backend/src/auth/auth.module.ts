@@ -8,9 +8,15 @@ import { User } from 'src/user/entities/user.entity';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { GoogleStrategy } from './strategies/google.strategy';
+import { configModuleGoogleValidationSchema } from './../configs/google-env-validation.config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: configModuleGoogleValidationSchema,
+    }),
     TypeOrmModule.forFeature([User]),
     PassportModule,
     JwtModule.registerAsync({
@@ -25,7 +31,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy],
   exports: [TypeOrmModule.forFeature([User])],
 })
 export class AuthModule {}

@@ -16,6 +16,8 @@ import { AdminModule } from './admin/admin.module';
 import { MembershipModule } from './membership/membership.module';
 import { CommentModule } from './comment/comment.module'; // CommentModule 추가
 import { ScheduleModule } from '@nestjs/schedule';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -24,6 +26,9 @@ import { ScheduleModule } from '@nestjs/schedule';
       isGlobal: true,
       validationSchema: configModuleValidationSchema,
       envFilePath: '.env',
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../..', 'final_project_frontend'),
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     ProductModule,
@@ -35,7 +40,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     CommunityModule,
     AdminModule,
     MembershipModule,
-    CommentModule, // CommentModule 추가
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
