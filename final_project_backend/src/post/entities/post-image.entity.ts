@@ -25,6 +25,6 @@ export class PostImage {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => Post, (post) => post.postImages)
+  @ManyToOne(() => Post, (post) => post.postImages, { onDelete: 'CASCADE' })
   post: Post;
 }
