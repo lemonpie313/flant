@@ -2,6 +2,7 @@ import {
   BadRequestException,
   HttpStatus,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -93,6 +94,9 @@ export class PostService {
       where: { postId: postId },
       relations: ['postImages'],
     });
+    if(!data){
+      throw new NotFoundException('게시글이 존재하지 않습니다.')
+    }
     return {
       status: HttpStatus.OK,
       message: '게시글 조회에 성공했습니다.',
