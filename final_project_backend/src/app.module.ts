@@ -19,6 +19,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PostModule } from './post/post.module';
+import { LikeModule } from './like/like.module';
 import { NoticeModule } from './notice/notice.module';
 
 @Module({
@@ -44,6 +45,7 @@ import { NoticeModule } from './notice/notice.module';
     MembershipModule,
     CommentModule,
     PostModule,
+    LikeModule,
     NoticeModule, // CommentModule 추가
   ],
   controllers: [AppController],
