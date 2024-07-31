@@ -18,4 +18,4 @@ import { MediaService } from './media.service';
   controllers: [MediaController],
   providers: [MediaService],
 })
-export class NoticeModule {}
+export class MediaModule {}
