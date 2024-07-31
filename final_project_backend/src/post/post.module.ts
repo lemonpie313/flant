@@ -10,6 +10,7 @@ import { CommunityUser } from 'src/community/entities/communityUser.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { postImageUploadFactory } from '../factory/post-image-upload.factory';
 import { Manager } from 'src/admin/entities/manager.entity';
+import { LikeModule } from 'src/like/like.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { Manager } from 'src/admin/entities/manager.entity';
       CommunityUser,
       Manager,
     ]),
+    LikeModule,
   ],
   controllers: [PostController],
   providers: [PostService],

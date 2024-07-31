@@ -7,7 +7,7 @@ import { Comment } from './entities/comment.entity';
 export class CommentService {
   constructor(
     @InjectRepository(Comment)
-    private commentRepository: Repository<Comment>,  // Comment 엔티티에 대한 Repository 주입
+    private commentRepository: Repository<Comment>, // Comment 엔티티에 대한 Repository 주입
   ) {}
 
   /**
@@ -16,8 +16,8 @@ export class CommentService {
    * @returns 생성된 댓글
    */
   async createComment(commentData: Partial<Comment>): Promise<Comment> {
-    const comment = this.commentRepository.create(commentData);  // 댓글 엔티티 인스턴스 생성
-    return this.commentRepository.save(comment);  // 댓글을 데이터베이스에 저장
+    const comment = this.commentRepository.create(commentData); // 댓글 엔티티 인스턴스 생성
+    return this.commentRepository.save(comment); // 댓글을 데이터베이스에 저장
   }
 
   /**
@@ -25,7 +25,7 @@ export class CommentService {
    * @returns 댓글 배열
    */
   async findAll(): Promise<Comment[]> {
-    return this.commentRepository.find();  // 데이터베이스에서 모든 댓글 조회
+    return this.commentRepository.find(); // 데이터베이스에서 모든 댓글 조회
   }
 
   /**
@@ -34,16 +34,16 @@ export class CommentService {
    * @returns 조회된 댓글
    */
   async findOne(id: number): Promise<Comment> {
-    return this.commentRepository.findOne({ where: { commentId: id } });  // ID로 댓글 조회
+    return this.commentRepository.findOne({ where: { commentId: id } }); // ID로 댓글 조회
   }
 
   /**
-   * 주어진 ID의 댓글을 업데이트합니다. 
+   * 주어진 ID의 댓글을 업데이트합니다.
    * @param id - 업데이트할 댓글의 ID
    * @param commentData - 업데이트할 데이터
    */
   async update(id: number, commentData: Partial<Comment>): Promise<void> {
-    await this.commentRepository.update(id, commentData);  // ID로 댓글을 찾아 업데이트
+    await this.commentRepository.update(id, commentData); // ID로 댓글을 찾아 업데이트
   }
 
   /**
@@ -51,7 +51,7 @@ export class CommentService {
    * @param id - 삭제할 댓글의 ID
    */
   async remove(id: number): Promise<void> {
-    await this.commentRepository.delete(id);  // ID로 댓글을 삭제
+    await this.commentRepository.delete(id); // ID로 댓글을 삭제
   }
 
   /**
@@ -60,7 +60,7 @@ export class CommentService {
    * @returns 해당 게시물의 댓글 배열
    */
   async findCommentsByPost(postId: number): Promise<Comment[]> {
-    return this.commentRepository.find({ where: { postId } });  // 게시물 ID로 댓글 조회
+    return this.commentRepository.find({ where: { postId } }); // 게시물 ID로 댓글 조회
   }
 
   /**
@@ -69,6 +69,6 @@ export class CommentService {
    * @returns 해당 댓글에 대한 대댓글 배열
    */
   async findRepliesByComment(commentId: number): Promise<Comment[]> {
-    return this.commentRepository.find({ where: { postId: commentId } });  // 부모 댓글 ID로 대댓글 조회
+    return this.commentRepository.find({ where: { postId: commentId } }); // 부모 댓글 ID로 대댓글 조회
   }
 }
