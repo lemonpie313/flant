@@ -13,11 +13,19 @@ export class Notice {
     @Column({ unsigned: true })
     managerId: number;
 
+    /**
+     * 공지 제목
+     * @example '별하늘인간이 드리는 안내 말씀'
+     */
     @Column()
     @IsString()
     @IsNotEmpty()
     title: string;
 
+    /**
+     * 공지 내용
+     * @example '별하늘인간 커뮤니티가 개설되었습니다. 환영합니다.'
+     */
     @Column()
     @IsString()
     @IsNotEmpty()
