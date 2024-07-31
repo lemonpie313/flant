@@ -17,6 +17,10 @@ import { MembershipModule } from './membership/membership.module';
 import { CommentModule } from './comment/comment.module'; // CommentModule 추가
 import { ScheduleModule } from '@nestjs/schedule';
 import { ChatModule } from './chat/chat.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { PostModule } from './post/post.module';
+import { LikeModule } from './like/like.module';
 
 @Module({
   imports: [
@@ -25,6 +29,9 @@ import { ChatModule } from './chat/chat.module';
       isGlobal: true,
       validationSchema: configModuleValidationSchema,
       envFilePath: '.env',
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../..', 'final_project_frontend'),
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     ProductModule,
@@ -36,8 +43,7 @@ import { ChatModule } from './chat/chat.module';
     CommunityModule,
     AdminModule,
     MembershipModule,
-    CommentModule,
-    ChatModule, // CommentModule 추가
+    CommentModule, // CommentModule 추가
   ],
   controllers: [AppController],
   providers: [AppService],

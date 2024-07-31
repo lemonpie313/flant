@@ -1,5 +1,5 @@
 import { IsInt, IsNotEmpty, IsString } from 'class-validator';
-import { Comment } from '../../comment/entities/comment.entity'; 
+import { Comment } from '../../comment/entities/comment.entity';
 
 import {
   Column,
@@ -47,5 +47,5 @@ export class Artist {
   deletedAt: Date;
 
   @OneToMany(() => Comment, (comment) => comment.artist)
-  comments: Comment[];  // 아티스트와 댓글 관계
+  comments: Comment[]; // 아티스트와 댓글 관계
 }

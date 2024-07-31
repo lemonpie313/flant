@@ -13,6 +13,7 @@ import _ from 'lodash';
 import { User } from 'src/user/entities/user.entity';
 import { MembershipPayment } from './entities/membership-payment.entity';
 import { Cron } from '@nestjs/schedule';
+import { MembershipPaymentType } from './entities/types/membership-payment-type.enum';
 
 @Injectable()
 export class MembershipService {
@@ -77,8 +78,8 @@ export class MembershipService {
       });
     }
     const existMembership = communityUser.membership.find((cur) => {
-      return cur.deletedAt == null
-    })
+      return cur.deletedAt == null;
+    });
     if (existMembership) {
       throw new ConflictException({
         status: 409,
@@ -109,7 +110,9 @@ export class MembershipService {
       const membershipPayment = this.membershipPaymentRepository.create({
         userId,
         membershipId: membership.membershipId,
-        price: communityUser.community.membershipPrice, // 원래 커뮤니티에서 조회한 결과를 넣어야댐...
+        communityId: communityUser.communityId,
+        price: communityUser.community.membershipPrice,
+        type: MembershipPaymentType.New,
       });
       await queryRunner.manager.save(MembershipPayment, membershipPayment);
 
@@ -156,8 +159,8 @@ export class MembershipService {
     });
     const memberships = communityUser.map((cur) => {
       const membership = cur.membership.find((cur) => {
-        return cur.deletedAt == null
-      })
+        return cur.deletedAt == null;
+      });
       return {
         membershipId: membership.membershipId,
         group: cur.community.communityName,
@@ -185,8 +188,13 @@ export class MembershipService {
       });
     }
     const membership = communityUser.membership.find((cur) => {
-      return cur.deletedAt == null
-    })
+      return cur.deletedAt == null;
+    });
+    const membershipPayment = await this.membershipPaymentRepository.find({
+      where: {
+        membershipId: membership.membershipId,
+      },
+    });
     const membershipInfo = {
       communityUserId: communityUser.communityUserId,
       communityId: communityUser.community.communityId,
@@ -194,6 +202,7 @@ export class MembershipService {
       nickname: communityUser.nickName,
       createdAt: membership.createdAt,
       expiration: membership.expiration,
+      membershipPayment,
     };
 
     return membershipInfo;
@@ -216,8 +225,8 @@ export class MembershipService {
       });
     }
     const membership = communityUser.membership.find((cur) => {
-      return cur.deletedAt == null
-    })
+      return cur.deletedAt == null;
+    });
     const today = new Date();
     const remaining =
       (membership.expiration.getTime() - today.getTime()) /
@@ -241,7 +250,9 @@ export class MembershipService {
       const membershipPayment = this.membershipPaymentRepository.create({
         userId,
         membershipId: membership.membershipId,
-        price: communityUser.community.membershipPrice, // 원래 커뮤니티에서 조회한 결과를 넣어야댐...
+        communityId: communityUser.communityId,
+        price: communityUser.community.membershipPrice,
+        type: MembershipPaymentType.Extension,
       });
       await queryRunner.manager.save(MembershipPayment, membershipPayment);
 
@@ -274,5 +285,41 @@ export class MembershipService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async findMembershipPayments(communityId?: number) {
+    let payments;
+    if (communityId) {
+      payments = await this.membershipPaymentRepository.find({
+        where: {
+          communityId,
+        },
+        relations: {
+          user: true,
+          community: true,
+        }
+      });
+    } else {
+      payments = await this.membershipPaymentRepository.find({
+        relations: {
+          user: true,
+          community: true,
+        }
+      });
+    }
+    
+    return payments.map((payment) => {
+      return {
+        membershipPaymentId: payment.membershipPaymentId,
+        userId: payment.user.userId,
+        name: payment.user.name,
+        email: payment.user.email,
+        communityId: payment.community.communityId,
+        communityName: payment.community.communityName,
+        paymentType: payment.type,
+        createdAt: payment.createdAt,
+      }
+    })
+    
   }
 }

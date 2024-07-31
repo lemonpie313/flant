@@ -9,6 +9,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { CommunityUser } from './communityUser.entity';
+import { Post } from 'src/post/entities/post.entity';
+import { MembershipPayment } from 'src/membership/entities/membership-payment.entity';
 
 @Entity('communities')
 export class Community {
@@ -62,4 +64,10 @@ export class Community {
 
   @OneToMany(() => CommunityUser, (communityUser) => communityUser.community)
   communityUsers: CommunityUser[];
+
+  @OneToMany(() => Post, (post) => post.community)
+  posts: Post;
+
+  @OneToMany(() => MembershipPayment, (membershipPayment) => membershipPayment.community)
+  membershipPayment: MembershipPayment[];
 }

@@ -6,12 +6,16 @@ import {
   HttpCode,
   UseGuards,
   Request,
+  Get,
+  Req,
+  Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/sign-up.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { SignInDto } from './dto/sign-in.dto';
+import { Response } from 'express';
 @ApiTags('인증')
 @Controller('auth')
 export class AuthController {
@@ -39,6 +43,7 @@ export class AuthController {
    * @param signInDto
    * @returns
    */
+
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard('local'))
   @Post('/sign-in')
@@ -50,5 +55,22 @@ export class AuthController {
       message: '로그인에 성공했습니다.',
       data,
     };
+  }
+
+  /**
+   * 구글 로그인
+   * @param req
+   * @returns
+   */
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth(@Req() req) {}
+
+  @Get('google/redirect')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(@Req() req, @Res() res: Response) {
+    const accessToken = await this.authService.googleLogin(req);
+
+    res.redirect(`http://localhost:3000/index.html?token=${accessToken}`);
   }
 }

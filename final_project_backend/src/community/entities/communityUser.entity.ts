@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { Membership } from '../../membership/entities/membership.entity';
 import {
   Column,
@@ -7,7 +7,6 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  OneToOne,
   JoinColumn,
   OneToMany,
 } from 'typeorm';
@@ -44,11 +43,11 @@ export class CommunityUser {
   @ManyToOne(() => Community, (community) => community.communityUsers, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({name: 'community_id'})
+  @JoinColumn({ name: 'community_id' })
   community: Community;
 
   @ManyToOne(() => User, (user) => user.communityUsers)
-  @JoinColumn({name: 'user_id'})
+  @JoinColumn({ name: 'user_id' })
   users: User;
 
   @OneToMany(() => Membership, (membership) => membership.communityUser, {
@@ -56,9 +55,6 @@ export class CommunityUser {
   })
   membership: Membership[];
 
-  @OneToMany(
-    () => Comment,
-    (comment) => comment.communityUser,
-  )
-  comments: Comment[];  // 커뮤니티와 댓글 관계
+  @OneToMany(() => Comment, (comment) => comment.communityUser)
+  comments: Comment[]; // 커뮤니티와 댓글 관계
 }

@@ -35,7 +35,7 @@ export class CommunityController {
   @UseGuards(RolesGuard)
   @Post()
   async create(@Request() req, @Body() createCommunityDto: CreateCommunityDto) {
-    const userId = req.user.id;
+    const userId = req.userId;
     return await this.communityService.create(+userId, createCommunityDto);
   }
 
@@ -54,10 +54,10 @@ export class CommunityController {
     @Param('communityId') communityId: number,
     @Body() nickName: CommunityAssignDto,
   ) {
-    console.log(req.user);
+    const userId = req.user.id;
     return await this.communityService.assignCommunity(
-      req.user.id,
-      communityId,
+      +userId,
+      +communityId,
       nickName,
     );
   }
@@ -81,7 +81,7 @@ export class CommunityController {
   @Get('my')
   async findMy(@Request() req) {
     const userId = req.user.id;
-    return await this.communityService.findMy(userId);
+    return await this.communityService.findMy(+userId);
   }
 
   /**
@@ -105,7 +105,7 @@ export class CommunityController {
       +communityId,
       updateCommunityDto,
     );
-  }
+  } 
 
   /**
    * 커뮤니티 삭제

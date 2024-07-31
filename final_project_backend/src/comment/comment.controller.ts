@@ -1,14 +1,29 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, ParseIntPipe } from '@nestjs/common';
+// src/comments/comment.controller.ts
+
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Delete,
+  ParseIntPipe,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { Comment } from './entities/comment.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { ApiTags, ApiOperation, ApiParam, ApiBody } from '@nestjs/swagger';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 
-@ApiTags('comments') // Swagger 태그 지정
-@Controller('comments') // 'comments' 경로로 접근할 수 있는 컨트롤러
+@Controller('comments')
 export class CommentController {
-  constructor(private readonly commentService: CommentService) {}
+  constructor(
+    private readonly commentService: CommentService,
+    private readonly likeService: LikeService,
+  ) {}
 
   @Post() // POST 요청을 처리하여 댓글을 생성
   @ApiOperation({ summary: 'Create a comment' }) // Swagger 문서화
@@ -48,17 +63,29 @@ export class CommentController {
     return this.commentService.remove(id);
   }
 
-  @Get('post/:postId') // 특정 포스트의 모든 댓글을 조회
-  @ApiOperation({ summary: 'Get comments by post ID' }) // Swagger 문서화
-  @ApiParam({ name: 'postId', type: Number })
+  // 특정 게시물의 댓글들 조회
+  @Get('post/:postId')
   async findCommentsByPost(@Param('postId', ParseIntPipe) postId: number): Promise<Comment[]> {
     return this.commentService.findCommentsByPost(postId);
   }
 
-  @Get('reply/:commentId') // 특정 댓글의 모든 대댓글을 조회
-  @ApiOperation({ summary: 'Get replies by comment ID' }) // Swagger 문서화
-  @ApiParam({ name: 'commentId', type: Number })
+  // 특정 댓글의 대댓글들 조회
+  @Get('reply/:commentId')
   async findRepliesByComment(@Param('commentId', ParseIntPipe) commentId: number): Promise<Comment[]> {
     return this.commentService.findRepliesByComment(commentId);
+  }
+
+  @Put(':id/likes')
+  async updateLikeStatus(
+    @UserInfo() user,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() createLikeDto: CreateLikeDto,
+  ): Promise<ApiResponse<Like>> {
+    return this.likeService.updateLikeStatus(
+      user.id,
+      id,
+      createLikeDto,
+      ItemType.COMMENT,
+    );
   }
 }
