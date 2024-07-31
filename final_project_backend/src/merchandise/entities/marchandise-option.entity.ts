@@ -5,10 +5,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { MerchandisePost } from './merchandise-post.entity';
+import { CartItem } from 'src/cart/entities/cart.item.entity';
 
 @Entity('merchandise_option')
 export class MerchandiseOption {
@@ -35,4 +37,10 @@ export class MerchandiseOption {
   )
   @JoinColumn({ name: 'merchandisePost_id' })
   merchandisePost: MerchandisePost;
+
+  // 주문 연결
+  @OneToMany(() => CartItem, (cartItem) => cartItem.merchandiseOption, {
+    onDelete: 'CASCADE',
+  })
+  cartItem: CartItem[];
 }

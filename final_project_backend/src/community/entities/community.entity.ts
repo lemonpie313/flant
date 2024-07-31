@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { CommunityUser } from './communityUser.entity';
+import { Form } from 'src/form/entities/form.entity';
 
 @Entity('communities')
 export class Community {
@@ -62,4 +63,7 @@ export class Community {
 
   @OneToMany(() => CommunityUser, (communityUser) => communityUser.community)
   communityUsers: CommunityUser[];
+
+  @OneToMany(() => Form, (form) => form.community, {})
+  form: Form[];
 }

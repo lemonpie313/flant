@@ -4,13 +4,15 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { ProgressTypes } from '../types/progress.types';
-import { Cart } from './cart.entity';
+import { Cart } from '../../cart/entities/cart.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Entity('orders')
 export class Order {
@@ -31,17 +33,20 @@ export class Order {
   @Column({ type: 'enum', enum: ProgressTypes, default: 'ready' })
   progress: ProgressTypes;
 
+  @Column()
+  totalPrice: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
 
-  // //유저연결
-  // @ManyToOne(() => User, (user) => user.order)
-  // user: User;
+  //유저연결
+  @ManyToOne(() => User, (user) => user.order)
+  user: User;
 
   //카트연결
-  @ManyToOne(() => Cart, (cart) => cart.order)
+  @OneToOne(() => Cart, (cart) => cart.order)
   cart: Cart;
 }

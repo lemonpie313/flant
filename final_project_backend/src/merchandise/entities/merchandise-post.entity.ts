@@ -14,7 +14,8 @@ import { Product } from '../../product/entities/product.entity';
 
 import { MerchandiseOption } from './marchandise-option.entity';
 import { MerchandiseImage } from './merchandise-image.entity';
-import { CartItem } from 'src/order/entities/cart.item.entity';
+import { CartItem } from 'src/cart/entities/cart.item.entity';
+import { Manager } from 'src/admin/entities/manager.entity';
 
 @Entity('merchandise_post')
 export class MerchandisePost {
@@ -98,4 +99,8 @@ export class MerchandisePost {
     onDelete: 'CASCADE',
   })
   cartItems: CartItem[];
+
+  //매니저 연결
+  @ManyToOne(() => Manager, (manager) => manager.merchandisePost)
+  manager: Manager;
 }

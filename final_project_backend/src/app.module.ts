@@ -16,6 +16,7 @@ import { AdminModule } from './admin/admin.module';
 import { MembershipModule } from './membership/membership.module';
 import { CommentModule } from './comment/comment.module'; // CommentModule 추가
 import { ScheduleModule } from '@nestjs/schedule';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -35,7 +36,8 @@ import { ScheduleModule } from '@nestjs/schedule';
     CommunityModule,
     AdminModule,
     MembershipModule,
-    CommentModule, // CommentModule 추가
+    CommentModule,
+    CartModule, // CommentModule 추가
   ],
   controllers: [AppController],
   providers: [AppService],

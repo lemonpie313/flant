@@ -5,7 +5,6 @@ export class CreateProductDto {
    * 상점 코드
    * @example "ABCDEFGHI11"
    */
-  //코드가 자동생성되는건지 확인 필요
   @IsNotEmpty({ message: '상점 코드를 입력해주세요' })
   @IsString()
   productCode: string;

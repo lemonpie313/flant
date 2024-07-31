@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -10,6 +11,7 @@ import {
 import { ProductCategory } from './product.category.entity';
 import { MerchandiseImage } from 'src/merchandise/entities/merchandise-image.entity';
 import { MerchandisePost } from '../../merchandise/entities/merchandise-post.entity';
+import { Manager } from 'src/admin/entities/manager.entity';
 
 @Entity('products')
 export class Product {
@@ -34,15 +36,11 @@ export class Product {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  //   /**
-  //    * 매니저
-  //    */
-  //   @ManyToOne(() => Manager, (manager) => manager.products)
-  //   manager: Manager[];
+  //매니저 연결
+  @ManyToOne(() => Manager, (manager) => manager.product)
+  manager: Manager;
 
-  /**
-   * 상품 게시물
-   */
+  //상품 게시물 연결
   @OneToMany(
     () => MerchandisePost,
     (merchandisePost) => merchandisePost.product,
@@ -53,9 +51,8 @@ export class Product {
   )
   merchandisePosts: MerchandisePost[];
 
-  /**
-   * 카테고리
-   */
+  //카테고리 연결
+
   @OneToMany(
     () => ProductCategory,
     (productCategory) => productCategory.product,
