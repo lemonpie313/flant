@@ -56,7 +56,7 @@ export class Post {
   deletedAt: Date;
 
   @OneToMany(() => PostImage, (postImage) => postImage.post)
-  postImages: PostImage;
+  postImages: PostImage[];
 
   @ManyToOne(() => Community, (community) => community.posts, {
     onDelete: 'CASCADE',

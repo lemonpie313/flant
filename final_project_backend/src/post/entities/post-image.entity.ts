@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Post } from './post.entity';
+import { IsOptional } from 'class-validator';
 
 @Entity()
 export class PostImage {
@@ -16,6 +17,7 @@ export class PostImage {
   @Column()
   postId: number;
 
+  @IsOptional()
   @Column()
   postImageUrl: string;
 
