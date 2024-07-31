@@ -21,7 +21,7 @@ import {
   
     @Column()
     noticeImageUrl: string;
-  
+    
     @CreateDateColumn()
     createdAt: Date;
   

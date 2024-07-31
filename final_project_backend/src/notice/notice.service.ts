@@ -90,6 +90,7 @@ export class NoticeService {
       { title: updateNoticeDto.title,
         content: updateNoticeDto.content
       })
+
     const updatedData = await this.noticeRepository.findOne({where: { noticeId: noticeId }})
     return {
       status: HttpStatus.ACCEPTED,

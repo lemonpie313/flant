@@ -20,7 +20,7 @@ import { Media } from './media.entity';
     managerId: number;
   
     @Column()
-    noticeImageUrl: string;
+    mediaFileUrl: string;
   
     @CreateDateColumn()
     createdAt: Date;

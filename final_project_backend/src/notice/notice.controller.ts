@@ -11,6 +11,14 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 export class NoticeController {
   constructor(private readonly noticeService: NoticeService) {}
 
+  /**
+   * 공지 등록
+   * @param files 
+   * @param req 
+   * @param communityId 
+   * @param createNoticeDto 
+   * @returns 
+   */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(FileFieldsInterceptor([{ name: 'noticeImage', maxCount: 3 }]))
