@@ -6,10 +6,10 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
   } from 'typeorm';
-  import { Notice } from './notice.entity';
+import { Media } from './media.entity';
   
-  @Entity('notice_images')
-  export class NoticeImage {
+  @Entity('media_files')
+  export class MediaFile {
     @PrimaryGeneratedColumn({ unsigned: true })
     postImageId: number;
   
@@ -28,6 +28,6 @@ import {
     @UpdateDateColumn()
     updatedAt: Date;
   
-    @ManyToOne(() => Notice, (notice) => notice.noticeImages, { onDelete: 'CASCADE' })
-    notice: Notice;
+    @ManyToOne(() => Media, (media) => media.mediaFiles, { onDelete: 'CASCADE' })
+    media: Media;
   }

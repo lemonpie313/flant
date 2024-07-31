@@ -21,6 +21,7 @@ import { join } from 'path';
 import { PostModule } from './post/post.module';
 import { LikeModule } from './like/like.module';
 import { NoticeModule } from './notice/notice.module';
+import { MediaModule } from './media/media.module';
 
 @Module({
   imports: [
@@ -46,7 +47,8 @@ import { NoticeModule } from './notice/notice.module';
     CommentModule,
     PostModule,
     LikeModule,
-    NoticeModule, // CommentModule 추가
+    NoticeModule,
+    MediaModule, // CommentModule 추가
   ],
   controllers: [AppController],
   providers: [AppService],

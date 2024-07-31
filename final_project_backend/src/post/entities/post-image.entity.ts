@@ -9,7 +9,7 @@ import {
 import { Post } from './post.entity';
 import { IsOptional } from 'class-validator';
 
-@Entity()
+@Entity('post_images')
 export class PostImage {
   @PrimaryGeneratedColumn({ unsigned: true })
   postImageId: number;
