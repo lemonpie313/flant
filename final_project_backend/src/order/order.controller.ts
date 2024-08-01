@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -17,7 +18,7 @@ import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('order')
 @ApiBearerAuth()
-@Controller('v1/order')
+@Controller('v1/orders')
 @UseGuards(AuthGuard('jwt'))
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
@@ -30,8 +31,7 @@ export class OrderController {
   @Post()
   async create(@Req() req) {
     const userId = req.user.id;
-
-    return await this.orderService.create(userId);
+    return await this.orderService.create(+userId);
   }
 
   @Get()

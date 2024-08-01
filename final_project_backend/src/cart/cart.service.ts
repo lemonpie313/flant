@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MerchandisePost } from 'src/merchandise/entities/merchandise-post.entity';
 import { MerchandiseOption } from 'src/merchandise/entities/marchandise-option.entity';
+import { stat } from 'fs';
 
 @Injectable()
 export class CartService {
@@ -24,6 +25,7 @@ export class CartService {
     private readonly merchandiseOptionRepository: Repository<MerchandiseOption>,
   ) {}
 
+  // 카트 생성
   async create(createCartDto: CreateCartDto, userId: number) {
     const { merchandiseId, merchandiseOptionId, quantity } = createCartDto;
 
@@ -32,19 +34,22 @@ export class CartService {
       where: { id: merchandiseId },
     });
 
-    // 입력한 상품이 없을 경우 반환
+    // 추가하려는 상품이 없을 경우 반환
     if (!merchandise) {
       throw new NotFoundException('상품이 존재하지 않습니다.');
     }
 
-    //상품 옵션 체크 가져오기
+    //상품 옵션 가져오기
     const merchandiseOption = await this.merchandiseOptionRepository.findOne({
       where: { id: merchandiseOptionId },
       relations: ['merchandisePost'],
     });
 
     //상품 id 안에 있는 옵션 id가 맞는지 유효성 체크
-    if (merchandiseOption.merchandisePost.id !== merchandise.id) {
+    if (
+      !merchandiseOption ||
+      merchandiseOption.merchandisePost.id !== merchandise.id
+    ) {
       throw new NotFoundException('해당 상품 내 옵션이 존재하지 않습니다.');
     }
 
@@ -58,7 +63,7 @@ export class CartService {
       relations: ['user'],
     });
 
-    //유저 카트가 없다면 생성
+    //유저 카트가 없다면 생성, 있다면 해당 카트에 저장
     let userCart;
     if (!cart) {
       userCart = await this.cartRepository.save({
@@ -70,48 +75,81 @@ export class CartService {
         quantity,
         cart: userCart,
       });
-      return userCart;
+    } else {
+      userCart = await this.cartItemRepository.save({
+        merchandisePost: merchandise,
+        merchandiseOption,
+        quantity,
+        cart,
+      });
     }
-
-    //카트가 있다면 해당 카트에 추가 저장
-    userCart = await this.cartItemRepository.save({
-      merchandisePost: merchandise,
-      merchandiseOption,
-      quantity,
-      cart,
-    });
-
-    return userCart;
-  }
-
-  findAll() {
-    return `This action returns all cart`;
-  }
-
-  async findOne(cartId: number) {
-    const cart = await this.cartRepository.findOne({
-      where: { id: cartId },
-      relations: ['cartItem'],
-    });
-
-    if (!cart) {
-      // 카트가 없을 경우 생성하여 반환
-    }
-
-    //카트가 있다면 있던 카트를 반환, 없었다면 생성된 카트를 반환하
 
     return {
       status: HttpStatus.OK,
-      message: '카트 조회에 성공하였습니다.',
-      data: cart,
+      message: '카트 저장에 성공했습니다.',
+      data: {
+        merchandisePostId: userCart.merchandisePost.id,
+        merchandiseTitle: userCart.merchandisePost.title,
+        merchandiseOption: userCart.merchandiseOption.optionName,
+        merchandiseOptionPrice: userCart.merchandiseOption.optionPrice,
+      },
     };
   }
 
-  update(id: number, updateCartDto: UpdateCartDto) {
-    return `This action updates a #${id} cart`;
+  // 카트 전체 조회
+  async findAll(userId: number) {
+    // UserId로 갖고 있는 카트 조회
+    const cart = await this.cartRepository.findOne({
+      where: { user: { userId } },
+    });
+
+    if (!cart) {
+      throw new NotFoundException('카트가 존재하지 않습니다.');
+    }
+
+    const cartItem = await this.cartItemRepository.find({
+      where: { cart }, // cartId로 CartItem을 조회
+      relations: ['merchandisePost', 'merchandiseOption'],
+    });
+
+    const cartItems = cartItem.map((cartItem) => ({
+      cartItemId: cartItem.id,
+      merchandiseId: cartItem.merchandisePost.id,
+      merchandiseTitle: cartItem.merchandisePost.title,
+      merchandiseOptionName: cartItem.merchandiseOption.optionName,
+      merchandiseOptionPrice: cartItem.merchandiseOption.optionPrice,
+    }));
+
+    return {
+      status: HttpStatus.OK,
+      message: '카트 전체 조회에 성공하셨습니다.',
+      data: cartItems,
+    };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} cart`;
+  async remove(cartItemId: number, userId: number) {
+    // UserId로 갖고 있는 카트 조회
+    const cart = await this.cartRepository.findOne({
+      where: { user: { userId } },
+    });
+    if (!cart) {
+      throw new NotFoundException('카트가 존재하지 않습니다.');
+    }
+
+    // 조회된 cart와 입력한 cartId를 통해 CartItem을 조회
+    let cartItem = await this.cartItemRepository.findOne({
+      where: { cart, id: cartItemId },
+      relations: ['merchandisePost', 'merchandiseOption'],
+    });
+    if (!cartItem) {
+      throw new NotFoundException('해당 카트아이템은 존재하지 않습니다.');
+    }
+
+    await this.cartItemRepository.delete(cartItemId);
+    return {
+      status: HttpStatus.OK,
+      message: '카트 아이템 삭제에 성공하였습니다',
+      data: { cartItemId },
+    };
   }
 }

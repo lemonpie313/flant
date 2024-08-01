@@ -8,6 +8,7 @@ import {
   Delete,
   Req,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CreateCartDto } from './dto/create-cart.dto';
@@ -35,23 +36,24 @@ export class CartController {
     return await this.cartService.create(createCartDto, userId);
   }
 
+  /**
+   *
+   * @returns 카트 전체 조회
+   */
   @Get()
-  findAll() {
-    return this.cartService.findAll();
+  async findAll(@Req() req) {
+    const userId = req.user.id;
+    return await this.cartService.findAll(userId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.cartService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCartDto: UpdateCartDto) {
-    return this.cartService.update(+id, updateCartDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cartService.remove(+id);
+  /**
+   * 카트 item 삭제
+   * @param cartItemId
+   * @returns
+   */
+  @Delete()
+  remove(@Query('cartItemId') cartItemId: string, @Req() req) {
+    const userId = req.user.id;
+    return this.cartService.remove(+cartItemId, userId);
   }
 }

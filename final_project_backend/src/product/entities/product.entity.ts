@@ -37,7 +37,9 @@ export class Product {
   updatedAt: Date;
 
   //매니저 연결
-  @ManyToOne(() => Manager, (manager) => manager.product)
+  @ManyToOne(() => Manager, (manager) => manager.product, {
+    onDelete: 'CASCADE',
+  })
   manager: Manager;
 
   //상품 게시물 연결
@@ -46,7 +48,6 @@ export class Product {
     (merchandisePost) => merchandisePost.product,
     {
       cascade: true,
-      onDelete: 'CASCADE',
     },
   )
   merchandisePosts: MerchandisePost[];
@@ -58,7 +59,6 @@ export class Product {
     (productCategory) => productCategory.product,
     {
       cascade: true,
-      onDelete: 'CASCADE',
     },
   )
   productCategory: ProductCategory[];

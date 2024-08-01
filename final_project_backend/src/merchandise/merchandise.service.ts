@@ -54,6 +54,13 @@ export class MerchandiseService {
       );
     }
 
+    // 상품 이름 중복 체크
+    const merchandiseNameCheck = await this.merchandiseRepository.findOne({
+      where: { title: createMerchandiseDto.title },
+    });
+    if (merchandiseNameCheck) {
+      throw new BadRequestException('이미 존재하는 상품 이름입니다.');
+    }
     //매니저 정보 가져오기
     const manager = await this.managerRepository.findOne({
       where: { userId },

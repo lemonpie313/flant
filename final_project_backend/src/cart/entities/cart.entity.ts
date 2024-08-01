@@ -16,11 +16,16 @@ import { User } from 'src/user/entities/user.entity';
 
 @Entity('carts')
 export class Cart {
+  map(cart: Cart) {
+    throw new Error('Method not implemented.');
+  }
   @PrimaryGeneratedColumn()
   id: number;
 
   // 카트아이템 연결
-  @OneToMany(() => CartItem, (cartItem) => cartItem.cart, { cascade: true })
+  @OneToMany(() => CartItem, (cartItem) => cartItem.cart, {
+    onDelete: 'CASCADE',
+  })
   cartItem: CartItem[];
 
   //주문 연결

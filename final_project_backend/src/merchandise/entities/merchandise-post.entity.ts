@@ -101,6 +101,8 @@ export class MerchandisePost {
   cartItems: CartItem[];
 
   //매니저 연결
-  @ManyToOne(() => Manager, (manager) => manager.merchandisePost)
+  @ManyToOne(() => Manager, (manager) => manager.merchandisePost, {
+    onDelete: 'CASCADE',
+  })
   manager: Manager;
 }

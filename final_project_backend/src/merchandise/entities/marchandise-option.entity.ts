@@ -14,6 +14,9 @@ import { CartItem } from 'src/cart/entities/cart.item.entity';
 
 @Entity('merchandise_option')
 export class MerchandiseOption {
+  forEach(arg0: (option: any) => void) {
+    throw new Error('Method not implemented.');
+  }
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 

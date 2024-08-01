@@ -19,22 +19,34 @@ export class Order {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
-  /**
-   * 주문번호
-   */
-  @IsString()
-  @Column()
-  orderNumber: string;
+  // /**
+  //  * 주문번호
+  //  */
+  // @IsString()
+  // @Column()
+  // orderNumber: string;
 
+  @IsNumber()
+  @Column()
+  merchandisePostId: number;
+
+  @IsNumber()
+  @Column()
+  merchandiseOption: number;
+
+  @IsNumber()
+  @Column()
+  totalPrice: number;
+
+  @IsNumber()
+  @Column()
+  quantity: number;
   /**
    * 진행상태
    */
   @IsEnum(ProgressTypes)
   @Column({ type: 'enum', enum: ProgressTypes, default: 'ready' })
   progress: ProgressTypes;
-
-  @Column()
-  totalPrice: number;
 
   @CreateDateColumn()
   createdAt: Date;
