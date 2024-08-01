@@ -20,8 +20,6 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PostModule } from './post/post.module';
 import { LikeModule } from './like/like.module';
-import { NoticeModule } from './notice/notice.module';
-import { MediaModule } from './media/media.module';
 
 @Module({
   imports: [
@@ -47,8 +45,6 @@ import { MediaModule } from './media/media.module';
     CommentModule,
     PostModule,
     LikeModule,
-    NoticeModule,
-    MediaModule, // CommentModule 추가
   ],
   controllers: [AppController],
   providers: [AppService],
