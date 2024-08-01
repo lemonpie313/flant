@@ -16,6 +16,7 @@ import { AdminModule } from './admin/admin.module';
 import { MembershipModule } from './membership/membership.module';
 import { CommentModule } from './comment/comment.module'; // CommentModule 추가
 import { ScheduleModule } from '@nestjs/schedule';
+import { CartModule } from './cart/cart.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PostModule } from './post/post.module';
@@ -43,6 +44,7 @@ import { LikeModule } from './like/like.module';
     AdminModule,
     MembershipModule,
     CommentModule,
+    CartModule, // CommentModule 추가
     PostModule,
     LikeModule,
   ],

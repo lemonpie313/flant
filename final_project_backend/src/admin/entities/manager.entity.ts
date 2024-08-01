@@ -1,10 +1,14 @@
 import { IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { Form } from 'src/form/entities/form.entity';
+import { MerchandisePost } from 'src/merchandise/entities/merchandise-post.entity';
+import { Product } from 'src/product/entities/product.entity';
 
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -43,4 +47,16 @@ export class Manager {
 
   @DeleteDateColumn()
   deletedAt: Date;
+
+  @OneToMany(() => Form, (form) => form.manager)
+  form: Form[];
+
+  @OneToMany(() => Product, (product) => product.manager)
+  product: Product[];
+
+  @OneToMany(
+    () => MerchandisePost,
+    (merchandisePost) => merchandisePost.manager,
+  )
+  merchandisePost: MerchandisePost[];
 }

@@ -12,6 +12,8 @@ import {
 import { FormItem } from './form.item';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { Exclude } from 'class-transformer';
+import { Manager } from 'src/admin/entities/manager.entity';
+import { Community } from 'src/community/entities/community.entity';
 
 @Entity('form')
 export class Form {
@@ -51,17 +53,17 @@ export class Form {
   })
   formItem: FormItem[];
 
-  //   // 매니저 연결
-  //   @ManyToOne(() => Manager, (manager) => manager.form, {
-  //     onDelete: 'CASCADE',
-  //   })
-  //   @JoinColumn({ name: 'manager_id' })
-  //   manager: Manager;
+  // 매니저 연결
+  @ManyToOne(() => Manager, (manager) => manager.form, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'manager_id' })
+  manager: Manager;
 
-  //   //커뮤니티 연결
-  //   @ManyToOne(() => Community, (community) => community.form, {
-  //     onDelete: 'CASCADE',
-  //   })
-  //   @JoinColumn({ name: 'community_id' })
-  //   community: Community;
+  //커뮤니티 연결
+  @ManyToOne(() => Community, (community) => community.form, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'community_id' })
+  community: Community;
 }
