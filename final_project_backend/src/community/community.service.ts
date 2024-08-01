@@ -38,12 +38,12 @@ export class CommunityService {
   async assignCommunity(
     userId: number,
     communityId: number,
-    nickName: CommunityAssignDto,
+    communityAssignDto: CommunityAssignDto,
   ) {
     const assignData = await this.communityUserRepository.save({
       userId: userId,
       communityId: communityId,
-      nickName: nickName.nickName,
+      nickName: communityAssignDto.nickName,
     });
     const assignedName = assignData.nickName;
     const findCommunity = await this.communityRepository.findOne({
@@ -116,21 +116,26 @@ export class CommunityService {
     if (!isManager) {
       throw new UnauthorizedException('커뮤니티 수정 권한이 없습니다');
     }
-
+    //수정된 사항만 반영
+    const existData = await this.communityRepository.findOne({ where: { communityId: communityId }})
+    if(updateCommunityDto.communityName == undefined){
+      updateCommunityDto.communityName = existData.communityName
+    }
+    if(updateCommunityDto.membershipPrice == undefined){
+      updateCommunityDto.membershipPrice = existData.membershipPrice
+    }
+    //수정 진행
     await this.communityRepository.update(
       { communityId: communityId },
-      {
-        communityName: updateCommunityDto.communityName,
-        membershipPrice: updateCommunityDto.membershipPrice,
-      },
+      updateCommunityDto,
     );
-    const updateData = await this.communityRepository.findOne({
+    const updatedData = await this.communityRepository.findOne({
       where: { communityId: +communityId },
     });
     return {
       status: HttpStatus.ACCEPTED,
       message: '커뮤니티 수정에 성공했습니다.',
-      data: updateData,
+      data: updatedData,
     };
   }
 
@@ -140,7 +145,7 @@ export class CommunityService {
       where: { userId: userId, communityId: communityId },
     });
     if (!isManager) {
-      throw new UnauthorizedException('커뮤니티 수정 권한이 없습니다');
+      throw new UnauthorizedException('커뮤니티 삭제 권한이 없습니다');
     }
 
     await this.communityRepository.delete(communityId);

@@ -55,10 +55,13 @@ export class Community {
    * 유료 멤버쉽 가입 금액
    * @example 20000
    */
-  @IsNotEmpty()
+  @ApiPropertyOptional({
+    example: 20000,
+  })
+  @IsOptional()
   @IsNumber()
   @Column({ unsigned: true })
-  membershipPrice: number;
+  membershipPrice: number | null;
 
   @CreateDateColumn()
   createdAt: Date;
