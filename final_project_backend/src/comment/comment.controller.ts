@@ -1,14 +1,41 @@
 // src/comments/comment.controller.ts
 
-import { Controller, Get, Post, Body, Param, Patch, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Delete,
+  ParseIntPipe,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { Comment } from './entities/comment.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreateReplyDto } from './dto/create-reply.dto';
 
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { UserInfo } from 'src/util/user-info.decorator';
+import { Like } from 'src/like/entities/like.entity';
+import { CreateLikeDto } from 'src/like/dto/create-like.dto';
+import { LikeService } from 'src/like/like.service';
+import { User } from 'src/user/entities/user.entity';
+import { ItemType } from 'src/like/types/itemType.types';
+import { ApiResponse } from 'src/util/api-response.interface';
+
+@ApiTags('댓글')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('comments')
 export class CommentController {
-  constructor(private readonly commentService: CommentService) {}
+  constructor(
+    private readonly commentService: CommentService,
+    private readonly likeService: LikeService,
+  ) {}
 
   // 댓글 생성
   @Post()
@@ -52,13 +79,31 @@ export class CommentController {
 
   // 특정 게시물의 댓글들 조회
   @Get('post/:postId')
-  async findCommentsByPost(@Param('postId', ParseIntPipe) postId: number): Promise<Comment[]> {
+  async findCommentsByPost(
+    @Param('postId', ParseIntPipe) postId: number,
+  ): Promise<Comment[]> {
     return this.commentService.findCommentsByPost(postId);
   }
 
   // 특정 댓글의 대댓글들 조회
   @Get('reply/:commentId')
-  async findRepliesByComment(@Param('commentId', ParseIntPipe) commentId: number): Promise<Comment[]> {
+  async findRepliesByComment(
+    @Param('commentId', ParseIntPipe) commentId: number,
+  ): Promise<Comment[]> {
     return this.commentService.findRepliesByComment(commentId);
+  }
+
+  @Put(':id/likes')
+  async updateLikeStatus(
+    @UserInfo() user,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() createLikeDto: CreateLikeDto,
+  ): Promise<ApiResponse<Like>> {
+    return this.likeService.updateLikeStatus(
+      user.id,
+      id,
+      createLikeDto,
+      ItemType.COMMENT,
+    );
   }
 }

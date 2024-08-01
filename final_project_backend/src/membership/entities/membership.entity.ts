@@ -16,8 +16,9 @@ import { CommunityUser } from '../../community/entities/communityUser.entity';
 import { MembershipPayment } from './membership-payment.entity';
 
 @Entity('membership')
-@Index('unique_active_column', ['communityUserId'], { where: '"deletedAt" IS NULL' })
-
+@Index('unique_active_column', ['communityUserId'], {
+  where: '"deletedAt" IS NULL',
+})
 export class Membership {
   @PrimaryGeneratedColumn({ unsigned: true })
   membershipId: number;

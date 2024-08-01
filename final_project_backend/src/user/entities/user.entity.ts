@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsInt,
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsStrongPassword,
 } from 'class-validator';
@@ -22,6 +23,7 @@ import { CommunityUser } from './../../community/entities/communityUser.entity';
 import { MembershipPayment } from '../../membership/entities/membership-payment.entity';
 import { Cart } from 'src/cart/entities/cart.entity';
 import { Order } from 'src/order/entities/order.entity';
+import { UserProvider } from '../types/user-provider.type';
 
 @Entity('users')
 export class User {
@@ -49,15 +51,15 @@ export class User {
    * 비밀번호
    * @example "Example1!"
    */
-  @IsNotEmpty({ message: '비밀번호를 입력해 주세요.' })
+  @IsOptional()
   @IsStrongPassword(
     { minLength: 8 },
     {
       message: `비밀번호는 영문 알파벳 대,소문자, 숫자, 특수문자(!@#$%^&*)를 포함해서 8자리 이상으로 입력해야 합니다.`,
     },
   )
-  @Column({ select: false })
-  password: string;
+  @Column({ select: false, nullable: true })
+  password?: string;
 
   /**
    * 이미지URL
@@ -84,6 +86,10 @@ export class User {
   @IsInt()
   @Column({ default: 1000000 })
   point: number;
+
+  @IsEnum(UserProvider)
+  @Column({ type: 'enum', enum: UserProvider, default: UserProvider.Email }) //enum 타입으로 바꿀 예정
+  provider: UserProvider;
 
   @OneToMany(() => CommunityUser, (communityUser) => communityUser.users)
   communityUsers: CommunityUser[];

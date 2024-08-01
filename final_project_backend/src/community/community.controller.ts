@@ -8,6 +8,8 @@ import {
   Delete,
   UseGuards,
   Request,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { CommunityService } from './community.service';
 import { CreateCommunityDto } from './dto/create-community.dto';
@@ -18,6 +20,8 @@ import { CommunityAssignDto } from './dto/community-assign.dto';
 import { UserRole } from 'src/user/types/user-role.type';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { coverImageUploadFactory, logoImageUploadFactory } from 'src/factory/community-image-upload.factory';
+import { ApiFile } from 'src/util/api-file.decorator';
 
 @ApiTags('커뮤니티')
 @Controller('v1/community')
@@ -34,9 +38,8 @@ export class CommunityController {
   @Roles(UserRole.Admin)
   @UseGuards(RolesGuard)
   @Post()
-  async create(@Request() req, @Body() createCommunityDto: CreateCommunityDto) {
-    const userId = req.user.id;
-    return await this.communityService.create(+userId, createCommunityDto);
+  async create(@Body() createCommunityDto: CreateCommunityDto) {
+    return await this.communityService.create(createCommunityDto);
   }
 
   /**
@@ -54,10 +57,10 @@ export class CommunityController {
     @Param('communityId') communityId: number,
     @Body() nickName: CommunityAssignDto,
   ) {
-    console.log(req.user);
+    const userId = req.user.id;
     return await this.communityService.assignCommunity(
-      req.user.id,
-      communityId,
+      +userId,
+      +communityId,
       nickName,
     );
   }
@@ -81,7 +84,58 @@ export class CommunityController {
   @Get('my')
   async findMy(@Request() req) {
     const userId = req.user.id;
-    return await this.communityService.findMy(userId);
+    return await this.communityService.findMy(+userId);
+  }
+
+    /**
+   * 단일 커뮤니티 조회
+   * @returns 
+   */
+    @Get(':communityId')
+    async findOne(@Param('communityId') communityId: number) {
+      return await this.communityService.findOne(communityId);
+    }
+
+  /**
+   * 로고 이미지 수정
+   * @param req 
+   * @param communityId 
+   * @param File 
+   * @returns 
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiFile('logoImage', logoImageUploadFactory())
+  @Patch(':communityId/logo')
+  async updateLogo(
+    @Request() req,
+    @Param('communityId') communityId: number,
+    @UploadedFile() File: Express.MulterS3.File,
+  ){
+    const userId = req.user.id;
+    const imageUrl = File.location;
+    return await this.communityService.updateLogo(+userId, +communityId, imageUrl)
+  }
+
+  /**
+   * 커버 이미지 수정
+   * @param req 
+   * @param communityId 
+   * @param File 
+   * @returns 
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiFile('coverImage', coverImageUploadFactory())
+  @Patch(':communityId/cover')
+  async updateCover(
+    @Request() req,
+    @Param('communityId') communityId: number,
+    @UploadedFile() File: Express.MulterS3.File,
+  ){
+    const userId = req.user.id;
+    const imageUrl = File.location;
+    return await this.communityService.updateCover(+userId, +communityId, imageUrl)
   }
 
   /**
@@ -105,7 +159,7 @@ export class CommunityController {
       +communityId,
       updateCommunityDto,
     );
-  }
+  } 
 
   /**
    * 커뮤니티 삭제

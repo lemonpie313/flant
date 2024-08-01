@@ -8,6 +8,7 @@ import { Artist } from '../entities/artist.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Community } from './../../community/entities/community.entity';
+import { CommunityUser } from 'src/community/entities/communityUser.entity';
 @Injectable()
 export class AdminArtistService {
   constructor(
@@ -17,6 +18,8 @@ export class AdminArtistService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Community)
     private readonly communityRepository: Repository<Community>,
+    @InjectRepository(CommunityUser)
+    private readonly communityUserRepository: Repository<CommunityUser>,
   ) {}
   // 아티스트 생성
   async createArtist(createArtistDto) {
@@ -43,6 +46,13 @@ export class AdminArtistService {
       communityId,
       userId,
       artistNickname,
+    });
+
+    // 아티스트가 해당 그룹의 커뮤니티 가입
+    const communityUser = await this.communityUserRepository.save({
+      userId,
+      communityId,
+      nickName: artistNickname,
     });
 
     return artist;
