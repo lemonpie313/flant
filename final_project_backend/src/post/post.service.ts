@@ -39,7 +39,6 @@ export class PostService {
     communityId: number,
     createPostDto: CreatePostDto,
   ) {
-    console.log(CreatePostDto);
     const isCommunityUser = await this.communityUserRepository.findOne({
       where: { userId: userId, communityId: communityId },
     });
