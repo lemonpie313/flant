@@ -11,7 +11,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CommunityUser } from './entities/communityUser.entity';
 import { CommunityAssignDto } from './dto/community-assign.dto';
-import { User } from 'src/user/entities/user.entity';
 import _ from 'lodash';
 import { Manager } from 'src/admin/entities/manager.entity';
 
@@ -22,13 +21,11 @@ export class CommunityService {
     private readonly communityRepository: Repository<Community>,
     @InjectRepository(CommunityUser)
     private readonly communityUserRepository: Repository<CommunityUser>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
     @InjectRepository(Manager)
     private readonly managerRepository: Repository<Manager>,
   ) {}
 
-  async create(userId: number, createCommunityDto: CreateCommunityDto) {
+  async create(createCommunityDto: CreateCommunityDto) {
     const createCommunity =
       await this.communityRepository.save(createCommunityDto);
     return {
@@ -44,8 +41,8 @@ export class CommunityService {
     nickName: CommunityAssignDto,
   ) {
     const assignData = await this.communityUserRepository.save({
-      userId,
-      communityId,
+      userId: userId,
+      communityId: communityId,
       nickName: nickName.nickName,
     });
     const assignedName = assignData.nickName;
@@ -114,8 +111,6 @@ export class CommunityService {
       { communityId: communityId },
       {
         communityName: updateCommunityDto.communityName,
-        communityCoverImage: updateCommunityDto.communityCoverImage,
-        communityLogoImage: updateCommunityDto.communityLogoImage,
         membershipPrice: updateCommunityDto.membershipPrice,
       },
     );

@@ -34,9 +34,8 @@ export class CommunityController {
   @Roles(UserRole.Admin)
   @UseGuards(RolesGuard)
   @Post()
-  async create(@Request() req, @Body() createCommunityDto: CreateCommunityDto) {
-    const userId = req.userId;
-    return await this.communityService.create(+userId, createCommunityDto);
+  async create(@Body() createCommunityDto: CreateCommunityDto) {
+    return await this.communityService.create(createCommunityDto);
   }
 
   /**
