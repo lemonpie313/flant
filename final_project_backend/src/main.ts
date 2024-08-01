@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { nodeMediaServer } from './configs/node-media-server';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -41,6 +42,9 @@ async function bootstrap() {
       operationsSorter: 'alpha', // API 그룹내에서도 정렬 알파벳순
     },
   });
+
+  // 라이브 서버는 항상 열려있도록?
+  nodeMediaServer.run();
 
   await app.listen(port);
 }

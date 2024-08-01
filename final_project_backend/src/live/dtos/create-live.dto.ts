@@ -1,12 +1,4 @@
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { LiveTypes } from '../types/live-types.enum';
+import { PickType } from '@nestjs/swagger';
+import { Live } from '../entities/live.entity';
 
-export class CreateLiveDto {
-  @IsString()
-  @IsNotEmpty()
- title: string;
-
-  @IsEnum(LiveTypes)
-  @IsNotEmpty()
-  type: LiveTypes;
-}
+export class CreateLiveDto extends PickType(Live, ['title', 'liveType']) {}

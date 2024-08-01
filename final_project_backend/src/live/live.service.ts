@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import NodeMediaServer from 'node-media-server';
 import { LiveTypes } from './types/live-types.enum';
 import Crypto from 'crypto';
@@ -7,6 +7,10 @@ import { Repository } from 'typeorm';
 import { Community } from 'src/community/entities/community.entity';
 import { CommunityUser } from 'src/community/entities/communityUser.entity';
 import { User } from 'src/user/entities/user.entity';
+import { Artist } from 'src/admin/entities/artist.entity';
+import _ from 'lodash';
+import { Live } from './entities/live.entity';
+import { LiveRecordings } from './entities/live-recordings.entity';
 
 @Injectable()
 export class LiveService {
@@ -17,57 +21,73 @@ export class LiveService {
     private readonly communityUserRepository: Repository<CommunityUser>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Artist)
+    private readonly artistsRepository: Repository<Artist>,
+    @InjectRepository(Live)
+    private readonly liveRepository: Repository<Live>,
+    @InjectRepository(LiveRecordings)
+    private readonly liveRecordingRepository: Repository<LiveRecordings>,
   ) {}
 
-  private config = {
-    rtmp: {
-      port: 1935,
-      chunk_size: 60000,
-      gop_cache: true,
-      ping: 30,
-      ping_timeout: 60,
-    },
-    http: {
-      port: 8000,
-      mediaroot: '../media',
-      allow_origin: '*',
-    },
-    trans: {
-      ffmpeg:
-        '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
-      tasks: [
-        {
-          app: 'live',
-          hls: true,
-          hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
-          hlsKeep: true, // to prevent hls file delete after end the stream
-        },
-      ],
-    },
-  };
-
-  runLiveServer() {
-    const nodeMediaServer = new NodeMediaServer(this.config);
-    nodeMediaServer.run();
-    return '미디어서버 실행';
-  }
-
-  async createLive(userId: number, title: string, type: LiveTypes) {
+  async createLive(userId: number, title: string, liveType: LiveTypes) {
     // userId로 커뮤니티아티인지 확인 + 어느 커뮤니티인지 조회
-    const communityUser = await this.communityUserRepository.findOne({
+    // 원래 이건데 엔티티 변경이 안됐음
+    // const communityUser = await this.communityUserRepository.findOne({
+    //   where: {
+    //     userId,
+    //   },
+    //   relations: {
+    //     community: true,
+    //     artists: true,
+    //   },
+    // });
+    const artist = await this.artistsRepository.findOne({
       where: {
         userId,
       },
-      relations: {
-        community: true,
-      },
     });
+    if (_.isNil(artist)) {
+      throw new NotFoundException({
+        // 아닌가 unauthorized 에러를 보내야되나
+        status: 404,
+        message: '아티스트 회원 정보를 찾을 수 없습니다.',
+      });
+    }
     // 키는 어떻게 발급할지? 랜덤키?
-    const urlKey = Crypto.randomBytes(32).toString('base64');
-    console.log(urlKey);
+    const liveUrlKey = Crypto.randomBytes(32).toString('base64');
+    const live = await this.liveRepository.save({
+      communityId: artist.communityId,
+      artistId: artist.artistId,
+      title,
+      liveType,
+      liveUrlKey,
+    });
     // 커뮤니티ID, 아티스트(회원?)ID, 제목, 키 저장하는 테이블 필요할듯
     return {
-      urlKey,
+      live,
     };
   }
+
+  async findAllLives(communityId: number) {
+    const lives = await this.liveRepository.find({
+        where: {
+            communityId,
+        }
+    })
+    return lives;
+  }
+
+  async watchLive(liveId: number) {
+    return '..????'
+  }
+
+  async watchRecordedLive(liveId: number) {
+    const liveRecording = await this.liveRecordingRepository.findOne({
+        where: {
+            liveId,
+        }
+    })
+    return '..????'
+  }
+
 }
