@@ -14,13 +14,12 @@ import {
 import { CommunityService } from './community.service';
 import { CreateCommunityDto } from './dto/create-community.dto';
 import { UpdateCommunityDto } from './dto/update-community.dto';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { CommunityAssignDto } from './dto/community-assign.dto';
 import { UserRole } from 'src/user/types/user-role.type';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { coverImageUploadFactory, logoImageUploadFactory } from 'src/factory/community-image-upload.factory';
 import { ApiFile } from 'src/util/api-file.decorator';
 
