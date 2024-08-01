@@ -13,6 +13,7 @@ import { CommunityUser } from './entities/communityUser.entity';
 import { CommunityAssignDto } from './dto/community-assign.dto';
 import _ from 'lodash';
 import { Manager } from 'src/admin/entities/manager.entity';
+import { NotificationService } from './../notification/notification.service';
 
 @Injectable()
 export class CommunityService {
@@ -23,6 +24,7 @@ export class CommunityService {
     private readonly communityUserRepository: Repository<CommunityUser>,
     @InjectRepository(Manager)
     private readonly managerRepository: Repository<Manager>,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async create(createCommunityDto: CreateCommunityDto) {
@@ -50,8 +52,8 @@ export class CommunityService {
       where: { communityId: communityId },
     });
     const communityName = findCommunity.communityName;
-
     const Data = { assignedName, communityName };
+    this.notificationService.emitCardChangeEvent(userId);
     return {
       status: HttpStatus.OK,
       message: '커뮤니티 가입에 성공했습니다.',
