@@ -19,6 +19,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PostModule } from './post/post.module';
+import { LikeModule } from './like/like.module';
+import { NoticeModule } from './notice/notice.module';
+import { MediaModule } from './media/media.module';
 import { LiveModule } from './live/live.module';
 
 @Module({
@@ -43,6 +46,10 @@ import { LiveModule } from './live/live.module';
     AdminModule,
     MembershipModule,
     CommentModule,
+    PostModule,
+    LikeModule,
+    NoticeModule,
+    MediaModule, // CommentModule 추가
     PostModule,
     LiveModule, // CommentModule 추가
   ],

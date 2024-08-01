@@ -10,7 +10,7 @@ import { MembershipPayment } from './membership/entities/membership-payment.enti
 import { Membership } from './membership/entities/membership.entity';
 import { Community } from './community/entities/community.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import { Comment } from './comment/entities/comment.entity'
+import { Comment } from './comment/entities/comment.entity';
 import { Manager } from './admin/entities/manager.entity';
 import { Artist } from './admin/entities/artist.entity';
 config();
@@ -23,7 +23,16 @@ const options: DataSourceOptions & SeederOptions = {
   username: configService.get('DB_USERNAME'),
   password: configService.get('DB_PASSWORD'),
   database: configService.get('DB_NAME'),
-  entities: [User, CommunityUser, MembershipPayment, Membership, Community, Comment, Artist, Manager],
+  entities: [
+    User,
+    CommunityUser,
+    MembershipPayment,
+    Membership,
+    Community,
+    Comment,
+    Artist,
+    Manager,
+  ],
   seedTracking: true, // seed데이터가 이미 있다면 삽입 x. 중복 삽입 방지
   seeds: [AdminSeeder],
 };

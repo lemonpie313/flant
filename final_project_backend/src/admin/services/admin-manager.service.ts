@@ -8,6 +8,7 @@ import { Manager } from '../entities/manager.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Community } from './../../community/entities/community.entity';
+import { CommunityUser } from 'src/community/entities/communityUser.entity';
 @Injectable()
 export class AdminManagerService {
   constructor(
@@ -17,6 +18,8 @@ export class AdminManagerService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Community)
     private readonly communityRepository: Repository<Community>,
+    @InjectRepository(CommunityUser)
+    private readonly communityUserRepository: Repository<CommunityUser>,
   ) {}
 
   // 매니저 생성
@@ -44,6 +47,11 @@ export class AdminManagerService {
       communityId,
       userId,
       managerNickname,
+    });
+    const communityUser = await this.communityUserRepository.save({
+      userId,
+      communityId,
+      nickName: managerNickname,
     });
 
     return manager;

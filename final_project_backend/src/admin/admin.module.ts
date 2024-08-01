@@ -10,9 +10,10 @@ import { AdminArtistController } from './controllers/admin-artist.controller';
 import { AdminManagerController } from './controllers/admin-manager.controller';
 import { AdminArtistService } from './services/admin-artist.service';
 import { AdminManagerService } from './services/admin-manager.service';
+import { CommunityUser } from 'src/community/entities/communityUser.entity';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Artist, Manager, Community]),
+    TypeOrmModule.forFeature([User, Artist, Manager, Community, CommunityUser]),
     AuthModule,
   ],
   controllers: [AdminArtistController, AdminManagerController],
