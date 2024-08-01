@@ -90,7 +90,7 @@ export class CommunityService {
   async findOne(communityId: number) {
     const oneCommunityData = await this.communityRepository.findOne({
       where: { communityId: communityId },
-      relations: ['posts', 'post.postimages'],
+      relations: ['posts', 'posts.postImages'],
     });
 
     return {
