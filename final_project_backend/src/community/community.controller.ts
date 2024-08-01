@@ -8,6 +8,8 @@ import {
   Delete,
   UseGuards,
   Request,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { CommunityService } from './community.service';
 import { CreateCommunityDto } from './dto/create-community.dto';
@@ -18,6 +20,8 @@ import { CommunityAssignDto } from './dto/community-assign.dto';
 import { UserRole } from 'src/user/types/user-role.type';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { coverImageUploadFactory, logoImageUploadFactory } from 'src/factory/community-image-upload.factory';
 
 @ApiTags('커뮤니티')
 @Controller('v1/community')
@@ -81,6 +85,57 @@ export class CommunityController {
   async findMy(@Request() req) {
     const userId = req.user.id;
     return await this.communityService.findMy(+userId);
+  }
+
+    /**
+   * 단일 커뮤니티 조회
+   * @returns 
+   */
+    @Get(':communityId')
+    async findOne(@Param('communityId') communityId: number) {
+      return await this.communityService.findOne(communityId);
+    }
+
+  /**
+   * 로고 이미지 수정
+   * @param req 
+   * @param communityId 
+   * @param File 
+   * @returns 
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(FileInterceptor('logoImage', logoImageUploadFactory()))
+  @Patch(':communityId/logo')
+  async updateLogo(
+    @Request() req,
+    @Param('communityId') communityId: number,
+    @UploadedFile() File: Express.MulterS3.File,
+  ){
+    const userId = req.user.id;
+    const imageUrl = File.location;
+    return await this.communityService.updateLogo(+userId, +communityId, imageUrl)
+  }
+
+  /**
+   * 커버 이미지 수정
+   * @param req 
+   * @param communityId 
+   * @param File 
+   * @returns 
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(FileInterceptor('coverImage', coverImageUploadFactory()))
+  @Patch(':communityId/cover')
+  async updateCover(
+    @Request() req,
+    @Param('communityId') communityId: number,
+    @UploadedFile() File: Express.MulterS3.File,
+  ){
+    const userId = req.user.id;
+    const imageUrl = File.location;
+    return await this.communityService.updateCover(+userId, +communityId, imageUrl)
   }
 
   /**

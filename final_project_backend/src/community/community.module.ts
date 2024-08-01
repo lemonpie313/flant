@@ -6,10 +6,11 @@ import { CommunityUser } from './entities/communityUser.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Manager } from 'src/admin/entities/manager.entity';
 import { Artist } from 'src/admin/entities/artist.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Community, CommunityUser, Manager, Artist]),
+    TypeOrmModule.forFeature([Community, CommunityUser, Manager, User, Artist]),
   ],
   controllers: [CommunityController],
   providers: [CommunityService],

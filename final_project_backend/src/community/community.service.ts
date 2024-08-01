@@ -87,6 +87,19 @@ export class CommunityService {
     };
   }
 
+  async findOne(communityId: number) {
+    const oneCommunityData = await this.communityRepository.findOne({
+      where: { communityId: communityId },
+      relations: ['posts', 'post.postimages'],
+    });
+
+    return {
+      status: HttpStatus.OK,
+      message: '내 커뮤니티 조회에 성공했습니다.',
+      data: oneCommunityData,
+    };
+  }
+
   async updateCommunity(
     userId: number,
     communityId: number,
@@ -98,15 +111,12 @@ export class CommunityService {
     }
     //매니저 이외의 접근일 경우
     const isManager = await this.managerRepository.findOne({
-      where: { userId: userId },
+      where: { userId: userId, communityId: communityId },
     });
     if (!isManager) {
       throw new UnauthorizedException('커뮤니티 수정 권한이 없습니다');
     }
-    //매니저이지만 해당 커뮤니티 매니저가 아닌 경우
-    if (isManager.communityId != communityId) {
-      throw new BadRequestException('해당 커뮤니티의 매니저가 아닙니다.');
-    }
+
     await this.communityRepository.update(
       { communityId: communityId },
       {
@@ -127,14 +137,10 @@ export class CommunityService {
   async removeCommunity(userId: number, communityId: number) {
     //매니저 이외의 접근일 경우
     const isManager = await this.managerRepository.findOne({
-      where: { userId: userId },
+      where: { userId: userId, communityId: communityId },
     });
     if (!isManager) {
       throw new UnauthorizedException('커뮤니티 수정 권한이 없습니다');
-    }
-    //매니저이지만 해당 커뮤니티 매니저가 아닌 경우
-    if (isManager.communityId != communityId) {
-      throw new BadRequestException('해당 커뮤니티의 매니저가 아닙니다.');
     }
 
     await this.communityRepository.delete(communityId);
@@ -145,4 +151,56 @@ export class CommunityService {
       data: communityId,
     };
   }
+  async updateLogo(userId: number, communityId: number, imageUrl: string){
+    //매니저 이외의 접근일 경우
+    const isManager = await this.managerRepository.findOne({
+      where: { userId: userId, communityId: communityId },
+    });
+    if (!isManager) {
+      throw new UnauthorizedException('커뮤니티 수정 권한이 없습니다');
+    }
+    //등록할 이미지가 없는 경우
+    if(!imageUrl){
+      throw new BadRequestException('등록할 이미지를 업로드 해주세요.')
+    }
+    await this.communityRepository.update(
+      { communityId: communityId },
+      { communityLogoImage: imageUrl }
+    )
+    const updatedData = await this.communityRepository.findOne({
+      where: { communityId: communityId },
+      select: { communityName: true, communityLogoImage: true }})
+
+    return {
+      status: HttpStatus.ACCEPTED,
+      message: '로고 이미지 수정이 완료되었습니다.',
+      data: updatedData,
+    }
+  }
+
+  async updateCover(userId: number, communityId: number, imageUrl: string){
+    //매니저 이외의 접근일 경우
+    const isManager = await this.managerRepository.findOne({
+      where: { userId: userId, communityId: communityId },
+    });
+    if (!isManager) {
+      throw new UnauthorizedException('커뮤니티 수정 권한이 없습니다');
+    }
+    if(!imageUrl){
+      throw new BadRequestException('등록할 이미지를 업로드 해주세요.')
+    }
+    await this.communityRepository.update(
+      { communityId: communityId },
+      { communityCoverImage: imageUrl }
+    )
+    const updatedData = await this.communityRepository.findOne({
+      where: { communityId: communityId },
+      select: { communityName: true, communityCoverImage: true }})
+
+    return {
+      status: HttpStatus.ACCEPTED,
+      message: '커버 이미지 수정이 완료되었습니다.',
+      data: updatedData,
+  }
+}
 }
