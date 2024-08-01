@@ -18,7 +18,7 @@ import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { UserInfo } from 'src/util/user-info.decorator';
 import { User } from 'src/user/entities/user.entity';
@@ -49,6 +49,7 @@ export class PostController {
   @UseGuards(AuthGuard('jwt'))
   @Post()
   @UseInterceptors(FileFieldsInterceptor([{ name: 'postImage', maxCount: 3 }]))
+  @ApiConsumes('multipart/form-data')
   async create(
     @UploadedFiles() files: Express.MulterS3.File[],
     @Request() req,

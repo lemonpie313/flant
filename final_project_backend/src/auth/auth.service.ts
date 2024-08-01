@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Request } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
@@ -9,12 +9,19 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserProvider } from 'src/user/types/user-provider.type';
 import { BADNAME } from 'dns';
+import { Res } from '@nestjs/common';
+import { Response } from 'express';
+import { hash } from 'bcrypt';
+import { Refreshtoken } from './entities/refresh-token.entity';
+
 @Injectable()
 export class AuthService {
   constructor(
     private readonly configService: ConfigService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
+    @InjectRepository(Refreshtoken)
+    private readonly refreshtokenRepository: Repository<Refreshtoken>,
   ) {}
 
   // 회원가입
@@ -55,11 +62,25 @@ export class AuthService {
   }
 
   // 로그인
-  signIn(userId: number) {
-    const accessToken = this.createAccessToken(userId);
-    const refreshToken = this.createRefreshToken(userId);
+  async signIn(userId: number, @Res({ passthrough: true }) res: Response) {
+    const { accessToken, ...accessOption } = this.createAccessToken(userId);
+    const { refreshToken, ...refreshOption } = this.createRefreshToken(userId);
+
+    await this.setCurrentRefreshToken(refreshToken, accessToken, userId);
+
+    res.cookie('Authentication', accessToken, accessOption);
+    res.cookie('Refresh', refreshToken, refreshOption);
 
     return { accessToken, refreshToken };
+  }
+
+  //로그아웃
+  async signOut(req) {
+    const { accessOption, refreshOption } = this.getCookiesForLogOut();
+
+    await this.removeRefreshToken(req.user.userId);
+
+    return { accessOption, refreshOption };
   }
 
   async validateUser({ email, password }: SignInDto) {
@@ -122,7 +143,7 @@ export class AuthService {
     // accesstoken을 쿠키에 담아 클라이언트에 전달하기 위함
     return {
       accessToken: accessToken,
-      domain: 'localhost', // 나중에 도메인 수정 할 것.
+      domain: 'localhost', // 추후 도메인 수정 할 것.
       path: '/',
       httpOnly: true, // 클라이언트 측 스크맅브에서 쿠키에 접근할 수 없어 보안 강화
       maxAge: Number(this.configService.get('JWT_EXPIRES_IN')) * 1000,
@@ -137,10 +158,75 @@ export class AuthService {
     });
     return {
       refreshToken: refreshToken,
-      domain: 'localhost',
+      domain: 'localhost', // 추후 도메인 수정 할 것.
       path: '/',
       httpOnly: true,
       maxAge: Number(this.configService.get('REFRESH_TOKEN_EXPIRES_IN')) * 1000,
     };
+  }
+
+  // 로그아웃시 사용
+  getCookiesForLogOut() {
+    return {
+      accessOption: {
+        domain: 'localhost',
+        path: '/',
+        httpOnly: true,
+        maxAge: 0,
+      },
+      refreshOption: {
+        domain: 'localhost',
+        path: '/',
+        httpOnly: true,
+        maxAge: 0,
+      },
+    };
+  }
+
+  // refreshtoken 데이터베이스에 저장
+  async setCurrentRefreshToken(
+    refreshToken: string,
+    accessToken: string,
+    userId: number,
+  ) {
+    // refreshToken 암호화
+    const currentHashedRefreshToken = await hash(refreshToken, 10);
+    const updateContent = { refreshtoken: currentHashedRefreshToken };
+    // User가 RefreshToken을 가지고 있는지 확인
+    const existedRefreshToken = await this.refreshtokenRepository.findOneBy({
+      userId,
+    });
+    // 만약 있다면
+    if (existedRefreshToken) {
+      await this.refreshtokenRepository.update(userId, updateContent);
+    } else {
+      //만약 없다면
+      await this.refreshtokenRepository.save({
+        userId,
+        accessToken,
+        refreshtoken: currentHashedRefreshToken,
+        // expires_at은 어떻게 넣지...
+      });
+    }
+  }
+
+  // refreshtoken이 유효한지
+  async getUserIfRefreshTokenMatches(refreshToken: string, userId: number) {
+    const user = await this.refreshtokenRepository.findOneBy({ userId });
+    const isRefreshTokenMatching = bcrypt.compareSync(
+      refreshToken,
+      user.refreshtoken,
+    );
+
+    if (isRefreshTokenMatching) {
+      return user;
+    }
+  }
+
+  // refreshtoken 삭제
+  async removeRefreshToken(userId: number) {
+    return await this.refreshtokenRepository.update(userId, {
+      refreshtoken: null,
+    });
   }
 }

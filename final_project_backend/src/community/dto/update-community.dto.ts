@@ -1,4 +1,4 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateCommunityDto } from './create-community.dto';
+import { PickType } from '@nestjs/swagger';
+import { Community } from '../entities/community.entity';
 
-export class UpdateCommunityDto extends PartialType(CreateCommunityDto) {}
+export class UpdateCommunityDto extends PickType(Community, ['communityName', 'membershipPrice']) {}

@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { PostImage } from './post-image.entity';
 import { Community } from 'src/community/entities/community.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class Post {
@@ -56,6 +57,7 @@ export class Post {
   deletedAt: Date;
 
   @OneToMany(() => PostImage, (postImage) => postImage.post)
+  @Exclude()
   postImages: PostImage[];
 
   @ManyToOne(() => Community, (community) => community.posts, {

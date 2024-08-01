@@ -11,6 +11,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { configModuleGoogleValidationSchema } from './../configs/google-env-validation.config';
 import { Refreshtoken } from './entities/refresh-token.entity';
+import { JwtRefreshStrategy } from './strategies/jwt-refresh-token.strategy';
 
 @Module({
   imports: [
@@ -32,7 +33,13 @@ import { Refreshtoken } from './entities/refresh-token.entity';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    GoogleStrategy,
+    JwtRefreshStrategy,
+  ],
   exports: [TypeOrmModule.forFeature([User])],
 })
 export class AuthModule {}
