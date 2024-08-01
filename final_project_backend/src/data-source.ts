@@ -13,6 +13,23 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { Comment } from './comment/entities/comment.entity';
 import { Manager } from './admin/entities/manager.entity';
 import { Artist } from './admin/entities/artist.entity';
+import { Cart } from './order/entities/cart.entity';
+import { CartItem } from './order/entities/cart.item.entity';
+import { Form } from './form/entities/form.entity';
+import { FormItem } from './form/entities/form.item';
+import { Like } from './like/entities/like.entity';
+import { Media } from './media/entities/media.entity';
+import { MediaFile } from './media/entities/media-file.entity';
+import { MerchandisePost } from './merchandise/entities/merchandise-post.entity';
+import { MerchandiseImage } from './merchandise/entities/merchandise-image.entity';
+import { MerchandiseOption } from './merchandise/entities/marchandise-option.entity';
+import { Notice } from './notice/entities/notice.entity';
+import { NoticeImage } from './notice/entities/notice-image.entity';
+import { Order } from './order/entities/order.entity';
+import { Post } from './post/entities/post.entity';
+import { PostImage } from './post/entities/post-image.entity';
+import { Product } from './product/entities/product.entity';
+import { ProductCategory } from './product/entities/product.category.entity';
 config();
 const configService = new ConfigService();
 const options: DataSourceOptions & SeederOptions = {
@@ -24,14 +41,31 @@ const options: DataSourceOptions & SeederOptions = {
   password: configService.get('DB_PASSWORD'),
   database: configService.get('DB_NAME'),
   entities: [
-    User,
-    CommunityUser,
-    MembershipPayment,
-    Membership,
-    Community,
-    Comment,
     Artist,
+    Cart,
+    CartItem,
+    Comment,
+    Community,
+    CommunityUser,
+    Form,
+    FormItem,
+    Like,
     Manager,
+    Media,
+    MediaFile,
+    Membership,
+    MembershipPayment,
+    MerchandisePost,
+    MerchandiseImage,
+    MerchandiseOption,
+    Notice,
+    NoticeImage,
+    Order,
+    Post,
+    PostImage,
+    Product,
+    ProductCategory,
+    User
   ],
   seedTracking: true, // seed데이터가 이미 있다면 삽입 x. 중복 삽입 방지
   seeds: [AdminSeeder],
