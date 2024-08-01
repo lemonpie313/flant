@@ -56,10 +56,10 @@ export class AuthService {
 
   // 로그인
   signIn(userId: number) {
-    const payload = { id: userId };
-    const accessToken = this.jwtService.sign(payload);
+    const accessToken = this.createAccessToken(userId);
+    const refreshToken = this.createRefreshToken(userId);
 
-    return { accessToken };
+    return { accessToken, refreshToken };
   }
 
   async validateUser({ email, password }: SignInDto) {
@@ -108,7 +108,39 @@ export class AuthService {
       provider: UserProvider.Google,
     });
 
-    const { accessToken } = await this.signIn(user.userId);
+    const accessToken = await this.createAccessToken(user.userId);
     return accessToken;
+  }
+
+  // accesstoken 생성
+  createAccessToken(userId: number) {
+    const payload = { id: userId };
+    const accessToken = this.jwtService.sign(payload, {
+      secret: this.configService.get<string>('JWT_SECRET'),
+      expiresIn: this.configService.get<string>('JWT_EXPIRES_IN'),
+    });
+    // accesstoken을 쿠키에 담아 클라이언트에 전달하기 위함
+    return {
+      accessToken: accessToken,
+      domain: 'localhost', // 나중에 도메인 수정 할 것.
+      path: '/',
+      httpOnly: true, // 클라이언트 측 스크맅브에서 쿠키에 접근할 수 없어 보안 강화
+      maxAge: Number(this.configService.get('JWT_EXPIRES_IN')) * 1000,
+    };
+  }
+  // refreshtoken 생성
+  createRefreshToken(userId: number) {
+    const payload = { id: userId };
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: this.configService.get<string>('REFRESH_SECRET'),
+      expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRES_IN'),
+    });
+    return {
+      refreshToken: refreshToken,
+      domain: 'localhost',
+      path: '/',
+      httpOnly: true,
+      maxAge: Number(this.configService.get('REFRESH_TOKEN_EXPIRES_IN')) * 1000,
+    };
   }
 }

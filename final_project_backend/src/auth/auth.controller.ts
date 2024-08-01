@@ -17,7 +17,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { SignInDto } from './dto/sign-in.dto';
 import { Response } from 'express';
 @ApiTags('인증')
-@Controller('auth')
+@Controller('v1/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

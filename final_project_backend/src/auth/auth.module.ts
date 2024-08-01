@@ -10,6 +10,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { configModuleGoogleValidationSchema } from './../configs/google-env-validation.config';
+import { Refreshtoken } from './entities/refresh-token.entity';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { configModuleGoogleValidationSchema } from './../configs/google-env-vali
       isGlobal: true,
       validationSchema: configModuleGoogleValidationSchema,
     }),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Refreshtoken]),
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -25,7 +26,7 @@ import { configModuleGoogleValidationSchema } from './../configs/google-env-vali
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: {
-          expiresIn: '12h',
+          expiresIn: configService.get<string>('JWT_EXPIRES_IN'),
         },
       }),
     }),

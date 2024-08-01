@@ -17,7 +17,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
 
 @ApiTags('유저')
-@Controller('users')
+@Controller('v1/users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
   /**
