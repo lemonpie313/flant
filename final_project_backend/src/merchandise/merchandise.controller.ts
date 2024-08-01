@@ -7,31 +7,41 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { MerchandiseService } from './merchandise.service';
 import { CreateMerchandiseDto } from './dto/create-merchandise-post.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { userInfo } from 'os';
 import { FindAllmerchandiseDto } from './dto/find-merchandise.dto';
 import { UpdateMerchandiseDto } from './dto/update-merchandise.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { UserRole } from 'src/user/types/user-role.type';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @ApiTags('상품')
 @Controller('v1/merchandise')
-// @UserInfo()
-// @UserGarud()
+@UseGuards(AuthGuard('jwt'))
 export class MerchandiseController {
   constructor(private readonly merchandiseService: MerchandiseService) {}
 
-  // RoleGarud 추가 필요
   /**
    * 상품 등록
    * @param createMerchandiseDto
    * @returns
    */
+  @ApiBearerAuth()
+  @Roles(UserRole.Manager)
+  @UseGuards(RolesGuard)
   @Post()
-  async create(@Body() createMerchandiseDto: CreateMerchandiseDto) {
-    //유저 받아오기 추가필요
-    const data = await this.merchandiseService.create(createMerchandiseDto);
+  async create(@Body() createMerchandiseDto: CreateMerchandiseDto, @Req() req) {
+    const userId = req.user.id;
+    const data = await this.merchandiseService.create(
+      createMerchandiseDto,
+      userId,
+    );
     return data;
   }
 
@@ -63,15 +73,21 @@ export class MerchandiseController {
    * @param updateMerchandiseDto
    * @returns
    */
+  @ApiBearerAuth()
   @Patch('/:merchandiseId')
+  @Roles(UserRole.Manager)
+  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(RolesGuard)
   async update(
     @Param('merchandiseId') merchandiseId: string,
     @Body() updateMerchandiseDto: UpdateMerchandiseDto,
+    @Req() req,
   ) {
-    //유저도 포함하여 전달 필요
+    const userId = req.user.id;
     const data = await this.merchandiseService.update(
       +merchandiseId,
       updateMerchandiseDto,
+      userId,
     );
     return data;
   }
@@ -81,12 +97,18 @@ export class MerchandiseController {
    * @param merchandiseId
    * @returns
    */
+  @ApiBearerAuth()
   @Delete('/:merchandiseId')
-  remove(
+  @Roles(UserRole.Manager)
+  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(RolesGuard)
+  async remove(
     @Param('merchandiseId')
-    merchandiseId: string /* @UserInfo() user: User 추가에정 */,
+    merchandiseId: string,
+    @Req() req,
   ) {
-    //유저아이디 추가하여 검증 필요
-    return this.merchandiseService.remove(+merchandiseId);
+    const userId = req.user.id;
+
+    return await this.merchandiseService.remove(+merchandiseId, userId);
   }
 }
