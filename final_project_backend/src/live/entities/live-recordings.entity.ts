@@ -18,7 +18,7 @@ export class LiveRecordings {
 
   @IsUrl()
   @IsNotEmpty()
-  @Column({type: 'varchar', unsigned: true})
+  @Column({type: 'varchar', length: 255 })
   media: string;
 
   @OneToOne(() => Live, (live) => live.liveRecording)

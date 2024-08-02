@@ -7,9 +7,10 @@ import { Community } from 'src/community/entities/community.entity';
 import { CommunityUser } from 'src/community/entities/communityUser.entity';
 import { Artist } from 'src/admin/entities/artist.entity';
 import { Live } from './entities/live.entity';
+import { LiveRecordings } from './entities/live-recordings.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Community, CommunityUser, User, Artist, Live])],
+  imports: [TypeOrmModule.forFeature([Community, CommunityUser, User, Artist, Live, LiveRecordings])],
     providers: [LiveService],
     controllers: [LiveController],
   })
