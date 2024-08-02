@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsNumber, IsString, IsUrl } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUrl,
+} from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -9,8 +15,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { CommunityUser } from './communityUser.entity';
+import { Form } from 'src/form/entities/form.entity';
 import { Post } from 'src/post/entities/post.entity';
 import { MembershipPayment } from 'src/membership/entities/membership-payment.entity';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 @Entity('communities')
 export class Community {
@@ -30,28 +38,38 @@ export class Community {
    * 로고 이미지 Url
    * @example "https://www.kasi.re.kr/file/content/20190408102300583_PFFSRTDT.jpg"
    */
-  @IsNotEmpty()
+  @ApiPropertyOptional({
+    example:
+      'https://www.kasi.re.kr/file/content/20190408102300583_PFFSRTDT.jpg',
+  })
+  @IsOptional()
   @IsUrl()
   @Column()
-  communityLogoImage: string;
+  communityLogoImage: string | null;
 
   /**
    * 커버 이미지 Url
    * @example 'https://www.kasi.re.kr/file/205101983193671.jpg'
    */
-  @IsNotEmpty()
+  @ApiPropertyOptional({
+    example: 'https://www.kasi.re.kr/file/205101983193671.jpg',
+  })
+  @IsOptional()
   @IsUrl()
   @Column()
-  communityCoverImage: string;
+  communityCoverImage: string | null;
 
   /**
    * 유료 멤버쉽 가입 금액
    * @example 20000
    */
-  @IsNotEmpty()
+  @ApiPropertyOptional({
+    example: 20000,
+  })
+  @IsOptional()
   @IsNumber()
   @Column({ unsigned: true })
-  membershipPrice: number;
+  membershipPrice: number | null;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -65,9 +83,14 @@ export class Community {
   @OneToMany(() => CommunityUser, (communityUser) => communityUser.community)
   communityUsers: CommunityUser[];
 
+  @OneToMany(() => Form, (form) => form.community, {})
+  form: Form[];
   @OneToMany(() => Post, (post) => post.community)
-  posts: Post;
+  posts: Post[];
 
-  @OneToMany(() => MembershipPayment, (membershipPayment) => membershipPayment.community)
+  @OneToMany(
+    () => MembershipPayment,
+    (membershipPayment) => membershipPayment.community,
+  )
   membershipPayment: MembershipPayment[];
 }

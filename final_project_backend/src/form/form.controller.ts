@@ -7,11 +7,17 @@ import {
   Param,
   Delete,
   NotFoundException,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { FormService } from './form.service';
 import { CreateFormDto } from './dto/create-form.dto';
 import { UpdateFormDto } from './dto/update-form.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { UserRole } from 'src/user/types/user-role.type';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Forms')
 @Controller('v1/forms')
@@ -23,11 +29,14 @@ export class FormController {
    * @param createFormDto
    * @returns
    */
+  @ApiBearerAuth()
+  @Roles(UserRole.Manager)
+  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard('jwt'))
   @Post()
-  async create(
-    @Body() createFormDto: CreateFormDto /* communityId, managerId도 받기 */,
-  ) {
-    return await this.formService.create(createFormDto);
+  async create(@Req() req, @Body() createFormDto: CreateFormDto) {
+    const userId = req.user.id;
+    return await this.formService.create(createFormDto, userId);
   }
 
   /**
@@ -46,13 +55,19 @@ export class FormController {
    * @param updateFormDto
    * @returns
    */
+  @ApiBearerAuth()
   @Patch('/:formId')
+  @Roles(UserRole.Manager)
+  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard('jwt'))
   async update(
     @Param('formId') formId: string,
     @Body() updateFormDto: UpdateFormDto,
-    /* 작성자 id 추가 필요 */
+    @Req() req,
   ) {
-    return await this.formService.update(+formId, updateFormDto);
+    const userId = req.user.id;
+
+    return await this.formService.update(+formId, updateFormDto, userId);
   }
 
   /**
@@ -60,9 +75,14 @@ export class FormController {
    * @param formId
    * @returns
    */
+  @ApiBearerAuth()
   @Delete('/:formId')
-  async remove(@Param('formId') formId: string) {
-    //사용자 id도 추가하여 전달 필요
-    return await this.formService.remove(+formId);
+  @Roles(UserRole.Manager)
+  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard('jwt'))
+  async remove(@Param('formId') formId: string, @Req() req) {
+    const userId = req.user.id;
+
+    return await this.formService.remove(+formId, userId);
   }
 }

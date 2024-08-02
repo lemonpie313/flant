@@ -11,9 +11,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CommunityUser } from './entities/communityUser.entity';
 import { CommunityAssignDto } from './dto/community-assign.dto';
-import { User } from 'src/user/entities/user.entity';
 import _ from 'lodash';
 import { Manager } from 'src/admin/entities/manager.entity';
+import { NotificationService } from './../notification/notification.service';
 
 @Injectable()
 export class CommunityService {
@@ -22,13 +22,12 @@ export class CommunityService {
     private readonly communityRepository: Repository<Community>,
     @InjectRepository(CommunityUser)
     private readonly communityUserRepository: Repository<CommunityUser>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
     @InjectRepository(Manager)
     private readonly managerRepository: Repository<Manager>,
+    private readonly notificationService: NotificationService,
   ) {}
 
-  async create(userId: number, createCommunityDto: CreateCommunityDto) {
+  async create(createCommunityDto: CreateCommunityDto) {
     const createCommunity =
       await this.communityRepository.save(createCommunityDto);
     return {
@@ -41,20 +40,20 @@ export class CommunityService {
   async assignCommunity(
     userId: number,
     communityId: number,
-    nickName: CommunityAssignDto,
+    communityAssignDto: CommunityAssignDto,
   ) {
     const assignData = await this.communityUserRepository.save({
-      userId,
-      communityId,
-      nickName: nickName.nickName,
+      userId: userId,
+      communityId: communityId,
+      nickName: communityAssignDto.nickName,
     });
     const assignedName = assignData.nickName;
     const findCommunity = await this.communityRepository.findOne({
       where: { communityId: communityId },
     });
     const communityName = findCommunity.communityName;
-
     const Data = { assignedName, communityName };
+    this.notificationService.emitCardChangeEvent(userId);
     return {
       status: HttpStatus.OK,
       message: '커뮤니티 가입에 성공했습니다.',
@@ -90,6 +89,19 @@ export class CommunityService {
     };
   }
 
+  async findOne(communityId: number) {
+    const oneCommunityData = await this.communityRepository.findOne({
+      where: { communityId: communityId },
+      relations: ['posts', 'posts.postImages'],
+    });
+
+    return {
+      status: HttpStatus.OK,
+      message: '내 커뮤니티 조회에 성공했습니다.',
+      data: oneCommunityData,
+    };
+  }
+
   async updateCommunity(
     userId: number,
     communityId: number,
@@ -101,45 +113,41 @@ export class CommunityService {
     }
     //매니저 이외의 접근일 경우
     const isManager = await this.managerRepository.findOne({
-      where: { userId: userId },
+      where: { userId: userId, communityId: communityId },
     });
     if (!isManager) {
       throw new UnauthorizedException('커뮤니티 수정 권한이 없습니다');
     }
-    //매니저이지만 해당 커뮤니티 매니저가 아닌 경우
-    if (isManager.communityId != communityId) {
-      throw new BadRequestException('해당 커뮤니티의 매니저가 아닙니다.');
+    //수정된 사항만 반영
+    const existData = await this.communityRepository.findOne({ where: { communityId: communityId }})
+    if(updateCommunityDto.communityName == undefined){
+      updateCommunityDto.communityName = existData.communityName
     }
+    if(updateCommunityDto.membershipPrice == undefined){
+      updateCommunityDto.membershipPrice = existData.membershipPrice
+    }
+    //수정 진행
     await this.communityRepository.update(
       { communityId: communityId },
-      {
-        communityName: updateCommunityDto.communityName,
-        communityCoverImage: updateCommunityDto.communityCoverImage,
-        communityLogoImage: updateCommunityDto.communityLogoImage,
-        membershipPrice: updateCommunityDto.membershipPrice,
-      },
+      updateCommunityDto,
     );
-    const updateData = await this.communityRepository.findOne({
+    const updatedData = await this.communityRepository.findOne({
       where: { communityId: +communityId },
     });
     return {
       status: HttpStatus.ACCEPTED,
       message: '커뮤니티 수정에 성공했습니다.',
-      data: updateData,
+      data: updatedData,
     };
   }
 
   async removeCommunity(userId: number, communityId: number) {
     //매니저 이외의 접근일 경우
     const isManager = await this.managerRepository.findOne({
-      where: { userId: userId },
+      where: { userId: userId, communityId: communityId },
     });
     if (!isManager) {
-      throw new UnauthorizedException('커뮤니티 수정 권한이 없습니다');
-    }
-    //매니저이지만 해당 커뮤니티 매니저가 아닌 경우
-    if (isManager.communityId != communityId) {
-      throw new BadRequestException('해당 커뮤니티의 매니저가 아닙니다.');
+      throw new UnauthorizedException('커뮤니티 삭제 권한이 없습니다');
     }
 
     await this.communityRepository.delete(communityId);
@@ -150,4 +158,56 @@ export class CommunityService {
       data: communityId,
     };
   }
+  async updateLogo(userId: number, communityId: number, imageUrl: string){
+    //매니저 이외의 접근일 경우
+    const isManager = await this.managerRepository.findOne({
+      where: { userId: userId, communityId: communityId },
+    });
+    if (!isManager) {
+      throw new UnauthorizedException('커뮤니티 수정 권한이 없습니다');
+    }
+    //등록할 이미지가 없는 경우
+    if(!imageUrl){
+      throw new BadRequestException('등록할 이미지를 업로드 해주세요.')
+    }
+    await this.communityRepository.update(
+      { communityId: communityId },
+      { communityLogoImage: imageUrl }
+    )
+    const updatedData = await this.communityRepository.findOne({
+      where: { communityId: communityId },
+      select: { communityName: true, communityLogoImage: true }})
+
+    return {
+      status: HttpStatus.ACCEPTED,
+      message: '로고 이미지 수정이 완료되었습니다.',
+      data: updatedData,
+    }
+  }
+
+  async updateCover(userId: number, communityId: number, imageUrl: string){
+    //매니저 이외의 접근일 경우
+    const isManager = await this.managerRepository.findOne({
+      where: { userId: userId, communityId: communityId },
+    });
+    if (!isManager) {
+      throw new UnauthorizedException('커뮤니티 수정 권한이 없습니다');
+    }
+    if(!imageUrl){
+      throw new BadRequestException('등록할 이미지를 업로드 해주세요.')
+    }
+    await this.communityRepository.update(
+      { communityId: communityId },
+      { communityCoverImage: imageUrl }
+    )
+    const updatedData = await this.communityRepository.findOne({
+      where: { communityId: communityId },
+      select: { communityName: true, communityCoverImage: true }})
+
+    return {
+      status: HttpStatus.ACCEPTED,
+      message: '커버 이미지 수정이 완료되었습니다.',
+      data: updatedData,
+  }
+}
 }
