@@ -24,6 +24,8 @@ import { MembershipPayment } from '../../membership/entities/membership-payment.
 import { Cart } from 'src/cart/entities/cart.entity';
 import { Order } from 'src/order/entities/order.entity';
 import { UserProvider } from '../types/user-provider.type';
+import { Refreshtoken } from 'src/auth/entities/refresh-token.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity('users')
 export class User {
@@ -101,6 +103,11 @@ export class User {
   )
   membershipPayment: MembershipPayment;
 
+  @OneToOne(() => Refreshtoken, (refreshtoken) => refreshtoken.user, {
+    onDelete: 'CASCADE',
+  })
+  @Exclude()
+  refreshtoken: Refreshtoken;
   //카트 연결
   @OneToOne(() => Cart, (cart) => cart.user)
   cart: Cart;

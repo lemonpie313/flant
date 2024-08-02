@@ -48,6 +48,8 @@ export class AdminManagerService {
       userId,
       managerNickname,
     });
+
+    // 매니저가 해당 그룹의 커뮤니티 가입
     const communityUser = await this.communityUserRepository.save({
       userId,
       communityId,
