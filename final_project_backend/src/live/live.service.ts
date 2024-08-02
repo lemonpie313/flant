@@ -33,10 +33,10 @@ export class LiveService {
     private readonly liveRepository: Repository<Live>) {
     // AWS S3 클라이언트 초기화
     this.s3Client = new S3Client({
-      region: process.env.AWS_BUCKET_REGION, // AWS Region
+      region: process.env.AWS_BUCKET_REGION,
       credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID, // Access Key
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY, // Secret Key
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
       },
     });
 
@@ -60,9 +60,8 @@ export class LiveService {
         cert: '../cert.pem',
       },
       trans: {
-        //'/usr/bin/ffmpeg',
-        ffmpeg:
-          '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+        ffmpeg: '/usr/bin/ffmpeg',
+          //'/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
@@ -86,16 +85,15 @@ export class LiveService {
     file,  // 업로드할 파일
     ext: string,  // 파일 확장자
   ) {
-    // AWS S3에 이미지 업로드 명령을 생성합니다. 파일 이름, 파일 버퍼, 파일 접근 권한, 파일 타입 등을 설정합니다.
+
     const command = new PutObjectCommand({
-      Bucket: process.env.AWS_BUCKET_NAME, // S3 버킷 이름
-      Key: fileName, // 업로드될 파일의 이름
-      Body: file.buffer, // 업로드할 파일
-      ACL: 'public-read', // 파일 접근 권한
-      ContentType: `image/${ext}`, // 파일 타입
+      Bucket: process.env.AWS_BUCKET_NAME, 
+      Key: fileName, 
+      Body: file.buffer,
+      ACL: 'public-read', 
+      ContentType: `image/${ext}`, 
     });
 
-    // 생성된 명령을 S3 클라이언트에 전달하여 이미지 업로드를 수행합니다.
     await this.s3Client.send(command);
 
     // 업로드된 이미지의 URL을 반환합니다.
@@ -129,7 +127,7 @@ export class LiveService {
           Math.abs(
             time.getTime() - live.createdAt.getTime() - 1000 * 60 * 60 * 9,
           ) / 1000;
-        if (diff > 6000) {
+        if (diff > 60) { // 1분 이내에 스트림키 입력 후 방송 시작이 돼야함 
           session.reject((reason: string) => {
             console.log(reason);
           });
@@ -199,8 +197,8 @@ export class LiveService {
       liveType,
       streamKey,
     });
-    // 배포 시 : return { liveServer: 'rtmp://flant.club/live', ... live };
-    return { liveServer: 'rtmp://localhost/live', ...live };
+    return { liveServer: 'rtmp://flant.club/live-streaming', ... live };
+    //return { liveServer: 'rtmp://localhost/live-streaming', ...live };
   }
 
   async findAllLives(communityId: number) {
@@ -229,7 +227,7 @@ export class LiveService {
       communityId: live.communityId,
       artistId: live.artistId,
       title: live.title,
-      liveHls: `http://localhost:8000/live/${live.streamKey}/index.m3u8`,
+      liveHls: `https://flant.club/live-streaming/${live.streamKey}/index.m3u8`,
     };
   }
 }
