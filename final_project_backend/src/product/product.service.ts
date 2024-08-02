@@ -1,4 +1,9 @@
-import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,6 +13,7 @@ import { stat } from 'fs';
 import { ProductCategory } from './entities/product.category.entity';
 import { Console } from 'console';
 import { FindAllProductDto } from './dto/find-product.dto';
+import { Manager } from 'src/admin/entities/manager.entity';
 
 @Injectable()
 export class ProductService {
@@ -16,21 +22,27 @@ export class ProductService {
     private readonly productRepository: Repository<Product>,
     @InjectRepository(ProductCategory)
     private readonly categoryRepository: Repository<ProductCategory>,
+    @InjectRepository(Manager)
+    private readonly managerRepository: Repository<Manager>,
   ) {}
 
   //상점 생성
-  async productCreate(createProductDto: CreateProductDto) {
-    //매니저 검증 필요
-
+  async productCreate(createProductDto: CreateProductDto, userId: number) {
     const { artist, categoryName, detailInfo, name, productCode } =
       createProductDto;
 
-    // 매니저일시 상점 생성
+    //매니저 정보 가져오기
+    const manager = await this.managerRepository.findOne({
+      where: { userId },
+    });
+
+    // 상점 생성
     const saveProduct = await this.productRepository.save({
       artist,
       name,
       productCode,
       detailInfo,
+      manager,
     });
 
     const saveCategory = await this.categoryRepository.save({
@@ -129,21 +141,23 @@ export class ProductService {
   }
 
   //상점 수정
-  async update(id: number, updateProductDto: UpdateProductDto) {
+  async update(id: number, updateProductDto: UpdateProductDto, userId: number) {
     const { name, artist, productCode, detailInfo, categoryName } =
       updateProductDto;
 
     //상점 유효성 체크
     const product = await this.productRepository.findOne({
       where: { id },
-      relations: ['productCategory'],
+      relations: ['productCategory', 'manager'],
     });
-
     if (!product) {
       throw new NotFoundException('존재하지 않는 상점입니다.');
     }
 
-    //작성한 유저 id 일치한지 확인 로직 추가 필요
+    // product 작성자와 수정 요청한 사용자가 일치한지 확인
+    if (product.manager.userId !== userId) {
+      throw new ForbiddenException('수정 권한이 없습니다.');
+    }
 
     if (name !== undefined) {
       product.name = name;
@@ -170,20 +184,19 @@ export class ProductService {
     };
   }
 
-  async remove(id: number) {
+  async remove(id: number, userId: number) {
     const product = await this.productRepository.findOne({
       where: { id },
-      relations: ['productCategory'],
+      relations: ['productCategory', 'manager'],
     });
-
     if (!product) {
       throw new NotFoundException('존재하지 않는 상점입니다.');
     }
 
-    //작성 유저인지 확인
-    // if (merchandise.product.user.Id !== userId) {
-    //   throw new ForbiddenException('권한이 없습니다');
-    // }
+    // product 작성자와 수정 요청한 사용자가 일치한지 확인
+    if (product.manager.userId !== userId) {
+      throw new ForbiddenException('수정 권한이 없습니다.');
+    }
 
     await this.categoryRepository.delete({
       product: { id }, //

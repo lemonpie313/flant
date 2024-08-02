@@ -13,8 +13,8 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { Comment } from './comment/entities/comment.entity';
 import { Manager } from './admin/entities/manager.entity';
 import { Artist } from './admin/entities/artist.entity';
-import { Cart } from './order/entities/cart.entity';
-import { CartItem } from './order/entities/cart.item.entity';
+import { Cart } from './cart/entities/cart.entity';
+import { CartItem } from './cart/entities/cart.item.entity';
 import { Form } from './form/entities/form.entity';
 import { FormItem } from './form/entities/form.item';
 import { Like } from './like/entities/like.entity';
@@ -65,7 +65,7 @@ const options: DataSourceOptions & SeederOptions = {
     PostImage,
     Product,
     ProductCategory,
-    User
+    User,
   ],
   seedTracking: true, // seed데이터가 이미 있다면 삽입 x. 중복 삽입 방지
   seeds: [AdminSeeder],

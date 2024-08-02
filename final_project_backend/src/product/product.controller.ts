@@ -7,12 +7,18 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { FindAllProductDto } from './dto/find-product.dto';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { UserRole } from 'src/user/types/user-role.type';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('굿즈 샵 API')
 @Controller('v1/products')
@@ -24,10 +30,17 @@ export class ProductController {
    * @param createProductDto
    * @returns
    */
+  @ApiBearerAuth()
+  @Roles(UserRole.Manager)
+  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard('jwt'))
   @Post()
-  async productCreate(@Body() createProductDto: CreateProductDto) {
-    //매니저 id 받아 전달 + 검사 필요
-    const data = await this.productService.productCreate(createProductDto);
+  async productCreate(@Req() req, @Body() createProductDto: CreateProductDto) {
+    const userId = req.user.id;
+    const data = await this.productService.productCreate(
+      createProductDto,
+      userId,
+    );
     return data;
   }
 
@@ -58,13 +71,18 @@ export class ProductController {
    * @param updateProductDto
    * @returns
    */
+  @ApiBearerAuth()
   @Patch(':productId')
+  @Roles(UserRole.Manager)
+  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(RolesGuard)
   update(
     @Param('productId') productId: string,
     @Body() updateProductDto: UpdateProductDto,
+    @Req() req,
   ) {
-    //작성 유저도 전달 필요
-    return this.productService.update(+productId, updateProductDto);
+    const userId = req.user.id;
+    return this.productService.update(+productId, updateProductDto, userId);
   }
 
   /**
@@ -72,9 +90,13 @@ export class ProductController {
    * @param productId
    * @returns
    */
+  @ApiBearerAuth()
   @Delete('/:productId')
-  remove(@Param('productId') productId: string) {
-    //매니저아이디 추가하여 검증 필요
-    return this.productService.remove(+productId);
+  @Roles(UserRole.Manager)
+  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard('jwt'))
+  remove(@Param('productId') productId: string, @Req() req) {
+    const userId = req.user.id;
+    return this.productService.remove(+productId, userId);
   }
 }
