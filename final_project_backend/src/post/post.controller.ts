@@ -28,6 +28,7 @@ import { LikeService } from 'src/like/like.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { postImageUploadFactory } from 'src/factory/post-image-upload.factory';
 import { ApiFiles } from 'src/util/api-file.decorator';
+import { User } from 'src/user/entities/user.entity';
 
 @ApiTags('게시물')
 @Controller('v1/post')
@@ -51,7 +52,7 @@ export class PostController {
   @Post()
   async create(
     @UploadedFiles() files: Express.MulterS3.File[],
-    @Request() req,
+    @UserInfo() user,
     @Query('communityId') communityId: number,
     @Body() createPostDto: CreatePostDto,
   ) {
@@ -60,7 +61,7 @@ export class PostController {
       const imageLocation = files.map(file => file.location);
       imageUrl = JSON.stringify(imageLocation)
     }
-    const userId = req.user.id;
+    const userId = user.id;
     return await this.postService.create(+userId, +communityId, createPostDto, imageUrl);
   }
 
@@ -101,11 +102,11 @@ export class PostController {
   @UseGuards(AuthGuard('jwt'))
   @Patch(':postId')
   async update(
-    @Request() req,
+    @UserInfo() user,
     @Param('postId') postId: number,
     @Body() updatePostDto: UpdatePostDto,
   ) {
-    const userId = req.userId;
+    const userId = user.id;
     return await this.postService.update(+userId, +postId, updatePostDto);
   }
 
@@ -118,8 +119,8 @@ export class PostController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Delete(':postId')
-  async remove(@Request() req, @Param('postId') postId: number) {
-    const userId = req.user.id;
+  async remove(@UserInfo() user, @Param('postId') postId: number) {
+    const userId = user.id;
     return await this.postService.remove(+userId, +postId);
   }
 

@@ -5,6 +5,7 @@ import { UpdateNoticeDto } from './dto/update-notice.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { UserInfo } from 'src/util/user-info.decorator';
 
 @ApiTags('공지사항')
 @Controller('v1/notice')
@@ -25,12 +26,12 @@ export class NoticeController {
   @Post()
   create(
     @UploadedFiles() files: Express.MulterS3.File[],
-    @Request() req,
+    @UserInfo() user,
     @Query('communityId') communityId: number,
     @Body() createNoticeDto: CreateNoticeDto) {
     const imageUrl = files.map((file) => file.location);
     createNoticeDto.noticeImageUrl = JSON.stringify(imageUrl);
-    const userId = req.user.id;
+    const userId = user.id;
     return this.noticeService.create(+userId, +communityId, createNoticeDto);
   }
 
@@ -63,8 +64,8 @@ export class NoticeController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Patch(':noticeId')
-  update(@Request() req, @Param('noticeId') noticeId: number, @Body() updateNoticeDto: UpdateNoticeDto) {
-    const userId = req.user.id;
+  update(@UserInfo() user, @Param('noticeId') noticeId: number, @Body() updateNoticeDto: UpdateNoticeDto) {
+    const userId = user.id;
     return this.noticeService.update(+userId, +noticeId, updateNoticeDto);
   }
 
@@ -77,8 +78,8 @@ export class NoticeController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Delete(':noticeId')
-  remove(@Request() req, @Param('noticeId') noticeId: string) {
-    const userId = req.user.id;
+  remove(@UserInfo() user, @Param('noticeId') noticeId: string) {
+    const userId = user.id;
     return this.noticeService.remove(+userId, +noticeId);
   }
 }

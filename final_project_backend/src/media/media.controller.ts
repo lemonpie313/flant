@@ -5,6 +5,7 @@ import { UpdateMediaDto } from './dto/update-media.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { UserInfo } from 'src/util/user-info.decorator';
 
 @ApiTags('미디어')
 @Controller('v1/media')
@@ -17,10 +18,10 @@ export class MediaController {
   @Post()
   create(
     @UploadedFiles() files: Express.MulterS3.File[],
-    @Request() req,
+    @UserInfo() user,
     @Query('communityId') communityId: number,
     @Body() createMediaDto: CreateMediaDto) {
-    const userId = req.user.id;
+    const userId = user.id;
     return this.mediaService.create(+userId, +communityId, createMediaDto);
   }
 
@@ -53,8 +54,8 @@ export class MediaController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Patch(':noticeId')
-  update(@Request() req, @Param('noticeId') noticeId: number, @Body() updateMediaDto: UpdateMediaDto) {
-    const userId = req.user.id;
+  update(@UserInfo() user, @Param('noticeId') noticeId: number, @Body() updateMediaDto: UpdateMediaDto) {
+    const userId = user.id;
     return this.mediaService.update(+userId, +noticeId, updateMediaDto);
   }
 
@@ -67,8 +68,8 @@ export class MediaController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Delete(':noticeId')
-  remove(@Request() req, @Param('noticeId') noticeId: string) {
-    const userId = req.user.id;
+  remove(@UserInfo() user, @Param('noticeId') noticeId: string) {
+    const userId = user.id;
     return this.mediaService.remove(+userId, +noticeId);
   }
 }
