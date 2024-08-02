@@ -223,7 +223,7 @@ export class LiveService {
       });
     }
     return {
-      liveId: live.liveId,
+      liveId: live.liveId, 
       communityId: live.communityId,
       artistId: live.artistId,
       title: live.title,
