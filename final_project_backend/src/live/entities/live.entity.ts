@@ -1,4 +1,10 @@
-import { Column, CreateDateColumn, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { LiveTypes } from '../types/live-types.enum';
 import {
   IsEnum,
@@ -7,7 +13,6 @@ import {
   IsString,
   IsUrl,
 } from 'class-validator';
-import { LiveRecordings } from './live-recordings.entity';
 
 @Entity('live')
 export class Live {
@@ -41,9 +46,9 @@ export class Live {
   @Column({ type: 'varchar', length: 255, unique: true })
   streamKey: string;
 
+  @Column({ type: 'varchar', length: 255, unique: true, nullable: true })
+  liveVideoUrl: string;
+
   @CreateDateColumn()
   createdAt: Date;
-
-  @OneToOne(() => LiveRecordings, (liveRecording) => liveRecording.live)
-  liveRecording?: LiveRecordings;
 }

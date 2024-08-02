@@ -9,8 +9,16 @@ import { User } from 'src/user/entities/user.entity';
 import { MembershipPayment } from './entities/membership-payment.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Community, CommunityUser, Membership, MembershipPayment, User])],
+  imports: [
+    TypeOrmModule.forFeature([
+      Community,
+      CommunityUser,
+      Membership,
+      MembershipPayment,
+      User,
+    ]),
+  ],
   controllers: [MembershipController],
-  providers: [MembershipService]
+  providers: [MembershipService],
 })
 export class MembershipModule {}

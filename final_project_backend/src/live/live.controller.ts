@@ -23,17 +23,14 @@ export class LiveController {
 
   /**
    * 라이브 스트리밍 제목 등록 + 키 받아오기
-   * 
+   *
    * @returns
    */
   // @ApiBearerAuth()
   // @Roles(UserRole.User)
   // @UseGuards(RolesGuard)
   @Post('/')
-  async createLive(
-    @Request() req,
-    @Body() createLiveDto: CreateLiveDto,
-  ) {
+  async createLive(@Request() req, @Body() createLiveDto: CreateLiveDto) {
     const { title, liveType } = createLiveDto;
     const live = await this.liveService.createLive(1, title, liveType);
     return {
@@ -45,7 +42,7 @@ export class LiveController {
 
   /**
    * 라이브 목록 조회
-   * 
+   *
    * @returns
    */
   // @ApiBearerAuth()
@@ -54,7 +51,7 @@ export class LiveController {
   @Get('/')
   async findAllLives(
     @Request() req,
-    @Query('communityId') communityId: number
+    @Query('communityId') communityId: number,
   ) {
     const lives = await this.liveService.findAllLives(communityId);
     return {
@@ -66,17 +63,14 @@ export class LiveController {
 
   /**
    * 라이브 실시간 시청
-   * 
+   *
    * @returns
    */
   // @ApiBearerAuth()
   // @Roles(UserRole.User)
   // @UseGuards(RolesGuard)
   @Get('/:liveId')
-  async watchLive(
-    @Request() req,
-    @Param('liveId') liveId: number,
-  ) {
+  async watchLive(@Request() req, @Param('liveId') liveId: number) {
     const live = await this.liveService.watchLive(liveId);
     return {
       status: HttpStatus.OK,
@@ -87,7 +81,7 @@ export class LiveController {
 
   // /**
   //  * 라이브 다시보기
-  //  * 
+  //  *
   //  * @returns
   //  */
   // @ApiBearerAuth()

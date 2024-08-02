@@ -1,4 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Request,
+  Query,
+  UseInterceptors,
+  UploadedFiles,
+} from '@nestjs/common';
 import { MediaService } from './media.service';
 import { CreateMediaDto } from './dto/create-media.dto';
 import { UpdateMediaDto } from './dto/update-media.dto';
@@ -19,14 +32,15 @@ export class MediaController {
     @UploadedFiles() files: Express.MulterS3.File[],
     @Request() req,
     @Query('communityId') communityId: number,
-    @Body() createMediaDto: CreateMediaDto) {
+    @Body() createMediaDto: CreateMediaDto,
+  ) {
     const userId = req.user.id;
     return this.mediaService.create(+userId, +communityId, createMediaDto);
   }
 
   /**
    * 모든 공지사항 조회
-   * @returns 
+   * @returns
    */
   @Get()
   findAll(@Query('communityId') communityId: number) {
@@ -35,8 +49,8 @@ export class MediaController {
 
   /**
    * 공지 상세 조회
-   * @param noticeId 
-   * @returns 
+   * @param noticeId
+   * @returns
    */
   @Get(':noticeId')
   findOne(@Param('noticeId') noticeId: number) {
@@ -45,24 +59,28 @@ export class MediaController {
 
   /**
    * 공지 수정
-   * @param req 
-   * @param noticeId 
-   * @param updateNoticeDto 
-   * @returns 
+   * @param req
+   * @param noticeId
+   * @param updateNoticeDto
+   * @returns
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Patch(':noticeId')
-  update(@Request() req, @Param('noticeId') noticeId: number, @Body() updateMediaDto: UpdateMediaDto) {
+  update(
+    @Request() req,
+    @Param('noticeId') noticeId: number,
+    @Body() updateMediaDto: UpdateMediaDto,
+  ) {
     const userId = req.user.id;
     return this.mediaService.update(+userId, +noticeId, updateMediaDto);
   }
 
   /**
    * 공지 삭제
-   * @param req 
-   * @param noticeId 
-   * @returns 
+   * @param req
+   * @param noticeId
+   * @returns
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))

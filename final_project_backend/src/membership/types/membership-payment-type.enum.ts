@@ -1,4 +1,4 @@
 export enum MembershipPaymentType {
-    New = 'New',
-    Extension = 'Extension'
-  }
+  New = 'New',
+  Extension = 'Extension',
+}

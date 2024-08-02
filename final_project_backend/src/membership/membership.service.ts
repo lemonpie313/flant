@@ -297,17 +297,17 @@ export class MembershipService {
         relations: {
           user: true,
           community: true,
-        }
+        },
       });
     } else {
       payments = await this.membershipPaymentRepository.find({
         relations: {
           user: true,
           community: true,
-        }
+        },
       });
     }
-    
+
     return payments.map((payment) => {
       return {
         membershipPaymentId: payment.membershipPaymentId,
@@ -318,8 +318,7 @@ export class MembershipService {
         communityName: payment.community.communityName,
         paymentType: payment.type,
         createdAt: payment.createdAt,
-      }
-    })
-    
+      };
+    });
   }
 }

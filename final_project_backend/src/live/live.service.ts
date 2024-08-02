@@ -10,13 +10,17 @@ import { User } from 'src/user/entities/user.entity';
 import { Artist } from 'src/admin/entities/artist.entity';
 import _ from 'lodash';
 import { Live } from './entities/live.entity';
-import { LiveRecordings } from './entities/live-recordings.entity';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { ConfigService } from '@nestjs/config';
+import fs from 'fs';
+import path from 'path';
 
 @Injectable()
 export class LiveService {
   private readonly nodeMediaServer: NodeMediaServer;
-
+  private s3Client: S3Client;
   constructor(
+    private configService: ConfigService,
     @InjectRepository(Community)
     private readonly communityRepository: Repository<Community>,
     @InjectRepository(CommunityUser)
@@ -26,10 +30,16 @@ export class LiveService {
     @InjectRepository(Artist)
     private readonly artistsRepository: Repository<Artist>,
     @InjectRepository(Live)
-    private readonly liveRepository: Repository<Live>,
-    @InjectRepository(LiveRecordings)
-    private readonly liveRecordingRepository: Repository<LiveRecordings>,
-  ) {
+    private readonly liveRepository: Repository<Live>) {
+    // AWS S3 클라이언트 초기화
+    this.s3Client = new S3Client({
+      region: process.env.AWS_BUCKET_REGION, // AWS Region
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID, // Access Key
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY, // Secret Key
+      },
+    });
+
     // 근데 포트번호 이런것들도 .env로 관리하는게 나을듯...
     const liveConfig = {
       rtmp: {
@@ -46,11 +56,12 @@ export class LiveService {
       },
       https: {
         port: 8443,
-        key:'../key.pem',
-        cert:'../cert.pem',
+        key: '../key.pem',
+        cert: '../cert.pem',
       },
       trans: {
-        ffmpeg: //'/home/ubuntu',
+        //'/usr/bin/ffmpeg',
+        ffmpeg:
           '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
@@ -70,8 +81,32 @@ export class LiveService {
     this.nodeMediaServer = new NodeMediaServer(liveConfig);
   }
 
+  async liveRecordingToS3(
+    fileName: string,  // 업로드될 파일의 이름
+    file,  // 업로드할 파일
+    ext: string,  // 파일 확장자
+  ) {
+    // AWS S3에 이미지 업로드 명령을 생성합니다. 파일 이름, 파일 버퍼, 파일 접근 권한, 파일 타입 등을 설정합니다.
+    const command = new PutObjectCommand({
+      Bucket: process.env.AWS_BUCKET_NAME, // S3 버킷 이름
+      Key: fileName, // 업로드될 파일의 이름
+      Body: file.buffer, // 업로드할 파일
+      ACL: 'public-read', // 파일 접근 권한
+      ContentType: `image/${ext}`, // 파일 타입
+    });
+
+    // 생성된 명령을 S3 클라이언트에 전달하여 이미지 업로드를 수행합니다.
+    await this.s3Client.send(command);
+
+    // 업로드된 이미지의 URL을 반환합니다.
+    return `https://s3.${process.env.AWS_REGION}.amazonaws.com/${process.env.AWS_S3_BUCKET_NAME}/${fileName}`;
+  }
+
   onModuleInit() {
+    // 서버 실행하면서 미디어서버도 같이 실행
     this.nodeMediaServer.run();
+
+    // 방송 전 키값이 유효한지 검증 (따로 암호화 없음, 유효기간만 검증함)
     this.nodeMediaServer.on(
       'prePublish',
       async (id: string, streamPath: string) => {
@@ -84,19 +119,50 @@ export class LiveService {
             streamKey,
           },
         });
-        console.log(live);
         if (_.isNil(live)) {
           session.reject((reason: string) => {
             console.log(reason);
           });
         }
         const time = new Date();
-        const diff = (Math.abs(time.getTime() - live.createdAt.getTime() - (1000*60*60*9)) / 1000);
-        if (diff > 60) {
+        const diff =
+          Math.abs(
+            time.getTime() - live.createdAt.getTime() - 1000 * 60 * 60 * 9,
+          ) / 1000;
+        if (diff > 6000) {
           session.reject((reason: string) => {
             console.log(reason);
           });
         }
+      },
+    );
+
+    // 방송 종료 시 s3에 업로드
+    this.nodeMediaServer.on(
+      'donePublish',
+      async (id: string, streamPath: string) => {
+        const streamKey = streamPath.split('/live/')[1];
+
+        const live = await this.liveRepository.findOne({
+          where: {
+            streamKey,
+          }
+        })
+
+        const files = fs.readdirSync(`../live-streaming/live/${streamKey}`); // 디렉토리를 읽어온다
+        const fileName = files.find((file) => path.extname(file) == ".mp4");
+        const file = fs.readFileSync(`../live-streaming/live/${streamKey}/${fileName}`)
+        console.log(
+          '[NodeEvent on donePublish]',
+          '----------------------', fileName, '---------------------',
+          `id=${id} StreamKey=${streamKey}`,
+        ); 
+        console.log(file);
+        const liveVideoUrl = await this.liveRecordingToS3(fileName, file, 'mp4');
+
+        await this.liveRepository.update({liveId: live.liveId}, {
+          liveVideoUrl,
+        })
       },
     );
   }
@@ -119,7 +185,6 @@ export class LiveService {
     // });
     // if (_.isNil(artist)) {
     //   throw new NotFoundException({
-    //     // 아닌가 unauthorized 에러를 보내야되나
     //     status: 404,
     //     message: '아티스트 회원 정보를 찾을 수 없습니다.',
     //   });
@@ -134,8 +199,8 @@ export class LiveService {
       liveType,
       streamKey,
     });
-    // 커뮤니티ID, 아티스트(회원?)ID, 제목, 키 저장하는 테이블 필요할듯
-    return live;
+    // 배포 시 : return { liveServer: 'rtmp://flant.club/live', ... live };
+    return { liveServer: 'rtmp://localhost/live', ...live };
   }
 
   async findAllLives(communityId: number) {
@@ -156,11 +221,14 @@ export class LiveService {
     if (_.isNil(live)) {
       throw new NotFoundException({
         status: 404,
-        message:
-          '해당 라이브가 존재하지 않습니다.',
+        message: '해당 라이브가 존재하지 않습니다.',
       });
     }
     return {
+      liveId: live.liveId,
+      communityId: live.communityId,
+      artistId: live.artistId,
+      title: live.title,
       liveHls: `http://localhost:8000/live/${live.streamKey}/index.m3u8`,
     };
   }

@@ -119,12 +119,14 @@ export class CommunityService {
       throw new UnauthorizedException('커뮤니티 수정 권한이 없습니다');
     }
     //수정된 사항만 반영
-    const existData = await this.communityRepository.findOne({ where: { communityId: communityId }})
-    if(updateCommunityDto.communityName == undefined){
-      updateCommunityDto.communityName = existData.communityName
+    const existData = await this.communityRepository.findOne({
+      where: { communityId: communityId },
+    });
+    if (updateCommunityDto.communityName == undefined) {
+      updateCommunityDto.communityName = existData.communityName;
     }
-    if(updateCommunityDto.membershipPrice == undefined){
-      updateCommunityDto.membershipPrice = existData.membershipPrice
+    if (updateCommunityDto.membershipPrice == undefined) {
+      updateCommunityDto.membershipPrice = existData.membershipPrice;
     }
     //수정 진행
     await this.communityRepository.update(
@@ -158,7 +160,7 @@ export class CommunityService {
       data: communityId,
     };
   }
-  async updateLogo(userId: number, communityId: number, imageUrl: string){
+  async updateLogo(userId: number, communityId: number, imageUrl: string) {
     //매니저 이외의 접근일 경우
     const isManager = await this.managerRepository.findOne({
       where: { userId: userId, communityId: communityId },
@@ -167,25 +169,26 @@ export class CommunityService {
       throw new UnauthorizedException('커뮤니티 수정 권한이 없습니다');
     }
     //등록할 이미지가 없는 경우
-    if(!imageUrl){
-      throw new BadRequestException('등록할 이미지를 업로드 해주세요.')
+    if (!imageUrl) {
+      throw new BadRequestException('등록할 이미지를 업로드 해주세요.');
     }
     await this.communityRepository.update(
       { communityId: communityId },
-      { communityLogoImage: imageUrl }
-    )
+      { communityLogoImage: imageUrl },
+    );
     const updatedData = await this.communityRepository.findOne({
       where: { communityId: communityId },
-      select: { communityName: true, communityLogoImage: true }})
+      select: { communityName: true, communityLogoImage: true },
+    });
 
     return {
       status: HttpStatus.ACCEPTED,
       message: '로고 이미지 수정이 완료되었습니다.',
       data: updatedData,
-    }
+    };
   }
 
-  async updateCover(userId: number, communityId: number, imageUrl: string){
+  async updateCover(userId: number, communityId: number, imageUrl: string) {
     //매니저 이외의 접근일 경우
     const isManager = await this.managerRepository.findOne({
       where: { userId: userId, communityId: communityId },
@@ -193,21 +196,22 @@ export class CommunityService {
     if (!isManager) {
       throw new UnauthorizedException('커뮤니티 수정 권한이 없습니다');
     }
-    if(!imageUrl){
-      throw new BadRequestException('등록할 이미지를 업로드 해주세요.')
+    if (!imageUrl) {
+      throw new BadRequestException('등록할 이미지를 업로드 해주세요.');
     }
     await this.communityRepository.update(
       { communityId: communityId },
-      { communityCoverImage: imageUrl }
-    )
+      { communityCoverImage: imageUrl },
+    );
     const updatedData = await this.communityRepository.findOne({
       where: { communityId: communityId },
-      select: { communityName: true, communityCoverImage: true }})
+      select: { communityName: true, communityCoverImage: true },
+    });
 
     return {
       status: HttpStatus.ACCEPTED,
       message: '커버 이미지 수정이 완료되었습니다.',
       data: updatedData,
+    };
   }
-}
 }
