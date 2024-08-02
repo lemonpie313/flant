@@ -12,7 +12,8 @@ export class CreatePostDto extends PickType(Post, [
    * @example 'https://www.kasi.re.kr/file/content/20190408102300583_PFFSRTDT.jpg'
    */
   @ApiPropertyOptional({
-    example: 'https://www.kasi.re.kr/file/content/20190408102300583_PFFSRTDT.jpg',
+    example:
+      'https://www.kasi.re.kr/file/content/20190408102300583_PFFSRTDT.jpg',
   })
   @IsOptional()
   @IsString()

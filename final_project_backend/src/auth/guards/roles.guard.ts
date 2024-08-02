@@ -37,7 +37,7 @@ export class RolesGuard extends AuthGuard('jwt') implements CanActivate {
     const user = await this.userRepository.findOneBy({ userId: userId });
     // 요구하는 user의 role과 일치한지 확인하기
     const hasPermission = requiredRoles.some((role) => role === user.role);
-    console.log(user.role)
+    console.log(user.role);
     console.log(requiredRoles);
     console.log(hasPermission);
     if (!hasPermission) throw new ForbiddenException('권한이 없습니다.');
