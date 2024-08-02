@@ -15,7 +15,7 @@ import { UserRole } from 'src/user/types/user-role.type';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @ApiTags('어드민')
-@Controller('admin')
+@Controller('v1/admin')
 export class AdminManagerController {
   constructor(private readonly adminManagerService: AdminManagerService) {}
 

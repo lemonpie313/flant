@@ -12,7 +12,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserProvider } from 'src/user/types/user-provider.type';
 
 @Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy) {
+export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   constructor(
     private readonly authService: AuthService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
