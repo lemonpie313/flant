@@ -34,7 +34,9 @@ export class ProductCategory {
   /**
    * 굿즈샵 연결
    */
-  @ManyToOne(() => Product, (Product) => Product.productCategory)
+  @ManyToOne(() => Product, (Product) => Product.productCategory, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'product_id' })
   product: Product;
 }
