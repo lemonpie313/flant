@@ -158,6 +158,7 @@ export class CommunityService {
       data: communityId,
     };
   }
+  
   async updateLogo(userId: number, communityId: number, imageUrl: string){
     //매니저 이외의 접근일 경우
     const isManager = await this.managerRepository.findOne({

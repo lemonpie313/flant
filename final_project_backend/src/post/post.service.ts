@@ -38,6 +38,7 @@ export class PostService {
     userId: number,
     communityId: number,
     createPostDto: CreatePostDto,
+    imageUrl: string,
   ) {
     const isCommunityUser = await this.communityUserRepository.findOne({
       where: { userId: userId, communityId: communityId },
@@ -46,18 +47,23 @@ export class PostService {
       throw new BadRequestException('커뮤니티 가입을 먼저 진행해주세요.');
     }
     const isArtist = await this.artistRepository.findOne({
-      where: { userId: userId },
+      where: { userId: userId, communityId: communityId },
     });
+    let artistId = null
     if (isArtist) {
-      createPostDto.artistId = isArtist.artistId;
-    }
+      artistId = isArtist.artistId
 
-    const saveData = await this.postRepository.save(createPostDto);
-    console.log(CreatePostDto);
-    if (createPostDto.postImageUrl) {
+    const saveData = await this.postRepository.save({
+      communityId: communityId,
+      communityUserId: isCommunityUser.communityUserId,
+      title: createPostDto.title,
+      content: createPostDto.content,
+      artistId: artistId,
+    });
+    if (imageUrl) {
       const postImageData = {
         postId: saveData.postId,
-        postImageUrl: createPostDto.postImageUrl,
+        postImageUrl: imageUrl,
       };
       await this.postImageRepository.save(postImageData);
     }
@@ -67,11 +73,13 @@ export class PostService {
       data: saveData,
     };
   }
+}
 
   async findPosts(artistId: number | null, communityId: number) {
     if (!artistId) {
       const allPosts = await this.postRepository.find({
         where: { communityId: communityId },
+        relations: ['postImages'],
       });
       return {
         status: HttpStatus.OK,
@@ -81,6 +89,7 @@ export class PostService {
     } else if (artistId) {
       const artistPosts = await this.postRepository.find({
         where: { artistId: artistId, communityId: communityId },
+        relations: ['postImages'],
       });
       return {
         status: HttpStatus.OK,
@@ -106,11 +115,17 @@ export class PostService {
   }
 
   async update(userId: number, postId: number, updatePostDto: UpdatePostDto) {
+    const postData = await this.postRepository.findOne({
+      where: { postId: postId }
+    })
     const isCommunityUser = await this.communityUserRepository.findOne({
-      where: { userId: userId },
+      where: { userId: userId, communityId: postData.communityId },
     });
+    if(!postData){
+      throw new NotFoundException('수정하려는 게시글을 찾을 수 없습니다.')
+    }
     if (!isCommunityUser) {
-      throw new BadRequestException('먼저 커뮤니티에 가입해주세요');
+      throw new UnauthorizedException('먼저 커뮤니티에 가입해주세요');
     }
     if (_.isEmpty(updatePostDto)) {
       throw new BadRequestException('수정할 내용을 입력해주세요.');
@@ -124,7 +139,7 @@ export class PostService {
     });
     return {
       status: HttpStatus.OK,
-      message: '게시물 조회에 성공했습니다.',
+      message: '게시글 수정에 성공했습니다.',
       data: updatedData,
     };
   }

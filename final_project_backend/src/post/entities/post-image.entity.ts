@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Post } from './post.entity';
 import { IsOptional } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 @Entity('post_images')
 export class PostImage {
@@ -16,7 +17,14 @@ export class PostImage {
 
   @Column()
   postId: number;
-
+  
+  /**
+  * 게시글에 등록할 이미지 URL
+  * @example 'https://www.kasi.re.kr/file/content/20190408102300583_PFFSRTDT.jpg'
+  */
+  @ApiPropertyOptional({
+  example: 'https://www.kasi.re.kr/file/content/20190408102300583_PFFSRTDT.jpg',
+  })
   @IsOptional()
   @Column()
   postImageUrl: string;

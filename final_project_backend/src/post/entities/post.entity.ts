@@ -12,6 +12,7 @@ import {
 import { PostImage } from './post-image.entity';
 import { Community } from 'src/community/entities/community.entity';
 import { Exclude } from 'class-transformer';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 @Entity()
 export class Post {
@@ -24,6 +25,12 @@ export class Post {
   @Column()
   communityId: number;
 
+  /**
+   * 작성자가 artist일때 자동 기입
+   */
+  @ApiPropertyOptional({
+    example: '별하늘인간',
+  })
   @IsOptional()
   @IsNumber()
   @Column()

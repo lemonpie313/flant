@@ -18,16 +18,16 @@ import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UserInfo } from 'src/util/user-info.decorator';
-import { User } from 'src/user/entities/user.entity';
 import { CreateLikeDto } from 'src/like/dto/create-like.dto';
 import { ApiResponse } from 'src/util/api-response.interface';
 import { Like } from 'src/like/entities/like.entity';
 import { ItemType } from 'src/like/types/itemType.types';
 import { LikeService } from 'src/like/like.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { postImageUploadFactory } from 'src/factory/post-image-upload.factory';
+import { ApiFiles } from 'src/util/api-file.decorator';
 
 @ApiTags('게시물')
 @Controller('v1/post')
@@ -47,19 +47,21 @@ export class PostController {
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
+  @ApiFiles('postImage', 10, postImageUploadFactory())
   @Post()
-  @UseInterceptors(FileFieldsInterceptor([{ name: 'postImage', maxCount: 3 }]))
-  @ApiConsumes('multipart/form-data')
   async create(
     @UploadedFiles() files: Express.MulterS3.File[],
     @Request() req,
     @Query('communityId') communityId: number,
     @Body() createPostDto: CreatePostDto,
   ) {
-    const imageUrl = files?.map((file) => file.location);
-    createPostDto.postImageUrl = JSON.stringify(imageUrl);
-    const userId = req.userId;
-    return await this.postService.create(+userId, +communityId, createPostDto);
+    let imageUrl = undefined
+    if(files.length != 0){
+      const imageLocation = files.map(file => file.location);
+      imageUrl = JSON.stringify(imageLocation)
+    }
+    const userId = req.user.id;
+    return await this.postService.create(+userId, +communityId, createPostDto, imageUrl);
   }
 
   /**
@@ -69,11 +71,13 @@ export class PostController {
    * @returns
    */
   @Get()
-  findPosts(
-    @Query('artistId') artistId: number | null,
+  @ApiQuery({ name: 'artistId', required: false, type: Number })
+  @ApiQuery({ name: 'communityId', required: true, type: Number })
+  async findPosts(
+    @Query('artistId') artistId: number,
     @Query('communityId') communityId: number,
   ) {
-    return this.postService.findPosts(+artistId, +communityId);
+    return await this.postService.findPosts(+artistId, +communityId);
   }
 
   /**
@@ -82,8 +86,8 @@ export class PostController {
    * @returns
    */
   @Get(':postId')
-  findOne(@Param('postId') postId: number) {
-    return this.postService.findOne(+postId);
+  async findOne(@Param('postId') postId: number) {
+    return await this.postService.findOne(+postId);
   }
 
   /**
@@ -96,13 +100,13 @@ export class PostController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Patch(':postId')
-  update(
+  async update(
     @Request() req,
     @Param('postId') postId: number,
     @Body() updatePostDto: UpdatePostDto,
   ) {
     const userId = req.userId;
-    return this.postService.update(+userId, +postId, updatePostDto);
+    return await this.postService.update(+userId, +postId, updatePostDto);
   }
 
   /**
@@ -114,9 +118,9 @@ export class PostController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Delete(':postId')
-  remove(@Request() req, @Param('postId') postId: number) {
+  async remove(@Request() req, @Param('postId') postId: number) {
     const userId = req.user.id;
-    return this.postService.remove(+userId, +postId);
+    return await this.postService.remove(+userId, +postId);
   }
 
   @ApiBearerAuth()
