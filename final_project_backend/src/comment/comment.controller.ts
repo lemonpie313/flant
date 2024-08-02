@@ -17,6 +17,12 @@ import { Comment } from './entities/comment.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { ApiTags, ApiOperation, ApiParam, ApiBody } from '@nestjs/swagger';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { LikeService } from 'src/like/like.service';
+import { CreateLikeDto } from 'src/like/dto/create-like.dto';
+import { UserInfo } from 'src/util/user-info.decorator';
+import { ApiResponse } from 'src/util/api-response.interface';
+import { Like } from 'src/like/entities/like.entity';
+import { ItemType } from 'src/like/types/itemType.types';
 
 @Controller('comments')
 export class CommentController {
@@ -76,7 +82,7 @@ export class CommentController {
   }
 
   @Put(':id/likes')
-  async updateLikeStatus(
+  async updateLikeStatus( 
     @UserInfo() user,
     @Param('id', ParseIntPipe) id: number,
     @Body() createLikeDto: CreateLikeDto,
