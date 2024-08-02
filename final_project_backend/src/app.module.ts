@@ -21,12 +21,9 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PostModule } from './post/post.module';
 import { LikeModule } from './like/like.module';
-<<<<<<< HEAD
 import { NoticeModule } from './notice/notice.module';
 import { MediaModule } from './media/media.module';
 import { LiveModule } from './live/live.module';
-=======
->>>>>>> b0fbd47f4f612fae236f34179a17853be0f854a3
 
 @Module({
   imports: [
@@ -53,13 +50,10 @@ import { LiveModule } from './live/live.module';
     CartModule, // CommentModule 추가
     PostModule,
     LikeModule,
-<<<<<<< HEAD
     NoticeModule,
     MediaModule, // CommentModule 추가
     PostModule,
     LiveModule, // CommentModule 추가
-=======
->>>>>>> b0fbd47f4f612fae236f34179a17853be0f854a3
   ],
   controllers: [AppController],
   providers: [AppService],

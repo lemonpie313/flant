@@ -41,11 +41,16 @@ export class LiveService {
       },
       http: {
         port: 8000,
-        mediaroot: '../media',
+        mediaroot: '../live-streaming',
         allow_origin: '*',
       },
+      https: {
+        port: 8443,
+        key:'../key.pem',
+        cert:'../cert.pem',
+      },
       trans: {
-        ffmpeg:
+        ffmpeg: //'/home/ubuntu',
           '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
