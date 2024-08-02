@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -19,10 +20,10 @@ export class Post {
   @PrimaryGeneratedColumn({ unsigned: true })
   postId: number;
 
-  @Column()
+  @Column({ unsigned: true })
   communityUserId: number;
 
-  @Column()
+  @Column({ unsigned: true })
   communityId: number;
 
   /**
@@ -33,7 +34,7 @@ export class Post {
   })
   @IsOptional()
   @IsNumber()
-  @Column()
+  @Column({ unsigned: true })
   artistId: number | null;
 
   /**
@@ -70,5 +71,6 @@ export class Post {
   @ManyToOne(() => Community, (community) => community.posts, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({name: 'community_id'})
   community: Community;
 }

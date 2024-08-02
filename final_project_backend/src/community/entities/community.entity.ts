@@ -85,6 +85,7 @@ export class Community {
 
   @OneToMany(() => Form, (form) => form.community, {})
   form: Form[];
+  
   @OneToMany(() => Post, (post) => post.community)
   posts: Post[];
 

@@ -48,7 +48,7 @@ export class PostController {
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @ApiFiles('postImage', 10, postImageUploadFactory())
+  @ApiFiles('postImage', 3, postImageUploadFactory())
   @Post()
   async create(
     @UploadedFiles() files: Express.MulterS3.File[],
@@ -59,7 +59,7 @@ export class PostController {
     let imageUrl = undefined
     if(files.length != 0){
       const imageLocation = files.map(file => file.location);
-      imageUrl = JSON.stringify(imageLocation)
+      imageUrl = imageLocation
     }
     const userId = user.id;
     return await this.postService.create(+userId, +communityId, createPostDto, imageUrl);

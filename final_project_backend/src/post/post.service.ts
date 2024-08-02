@@ -38,7 +38,7 @@ export class PostService {
     userId: number,
     communityId: number,
     createPostDto: CreatePostDto,
-    imageUrl: string,
+    imageUrl: string[] | undefined,
   ) {
     const isCommunityUser = await this.communityUserRepository.findOne({
       where: { userId: userId, communityId: communityId },
@@ -60,12 +60,14 @@ export class PostService {
       content: createPostDto.content,
       artistId: artistId,
     });
-    if (imageUrl) {
-      const postImageData = {
-        postId: saveData.postId,
-        postImageUrl: imageUrl,
-      };
-      await this.postImageRepository.save(postImageData);
+    if (imageUrl && imageUrl.length > 0) {
+      for(const image of imageUrl){
+        const postImageData = {
+          postId: saveData.postId,
+          postImageUrl: image
+        }
+        await this.postImageRepository.save(postImageData)
+      }
     }
     return {
       status: HttpStatus.CREATED,
@@ -81,6 +83,7 @@ export class PostService {
         where: { communityId: communityId },
         relations: ['postImages'],
       });
+
       return {
         status: HttpStatus.OK,
         message: '게시글 조회에 성공했습니다.',
@@ -91,6 +94,7 @@ export class PostService {
         where: { artistId: artistId, communityId: communityId },
         relations: ['postImages'],
       });
+
       return {
         status: HttpStatus.OK,
         message: '해당 아티스트 게시글 조회에 성공했습니다.',

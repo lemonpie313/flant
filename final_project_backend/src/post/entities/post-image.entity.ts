@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -15,7 +16,7 @@ export class PostImage {
   @PrimaryGeneratedColumn({ unsigned: true })
   postImageId: number;
 
-  @Column()
+  @Column({ unsigned: true })
   postId: number;
   
   /**
@@ -36,5 +37,6 @@ export class PostImage {
   updatedAt: Date;
 
   @ManyToOne(() => Post, (post) => post.postImages, { onDelete: 'CASCADE' })
+  @JoinColumn({name: 'post_id'})
   post: Post;
 }
