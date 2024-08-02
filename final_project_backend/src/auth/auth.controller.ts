@@ -94,4 +94,19 @@ export class AuthController {
       message: '로그아웃에 성공했습니다.',
     };
   }
+
+  /**
+   * refreshtoken을 통해 accesstoken발급
+   */
+  async getAccessToken(
+    refreshtoken: string,
+    userId: number,
+    @Req() req: Request,
+  ) {
+    const accesstoken = await this.authService.getAccessToken(
+      refreshtoken,
+      userId,
+      req,
+    );
+  }
 }

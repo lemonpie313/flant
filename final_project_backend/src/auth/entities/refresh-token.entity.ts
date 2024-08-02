@@ -2,6 +2,7 @@ import { IsNotEmpty, IsString } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -41,8 +42,8 @@ export class Refreshtoken {
   @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn()
-  expires_at: Date;
+  @DeleteDateColumn()
+  expiresAt: Date;
 
   @OneToOne(() => User, (user) => user.refreshtoken, {
     cascade: true,
