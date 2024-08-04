@@ -5,7 +5,6 @@ import {
   HttpStatus,
   HttpCode,
   UseGuards,
-  Request,
   Get,
   Req,
   Res,
@@ -16,6 +15,11 @@ import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { SignInDto } from './dto/sign-in.dto';
 import { Response } from 'express';
+import { LocalAuthGuard } from './guards/local-auth.guard';
+import { UserInfo } from 'src/util/decorators/user-info.decorator';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
+import { MESSAGES } from 'src/constants/message.constant';
+
 @ApiTags('인증')
 @Controller('auth')
 export class AuthController {
@@ -32,7 +36,7 @@ export class AuthController {
 
     return {
       statusCode: HttpStatus.CREATED,
-      message: `회원가입에 성공했습니다.`,
+      message: MESSAGES.AUTH.SIGN_UP.SECCEED,
       data: data,
     };
   }
@@ -43,16 +47,15 @@ export class AuthController {
    * @param signInDto
    * @returns
    */
-
   @HttpCode(HttpStatus.OK)
-  @UseGuards(AuthGuard('local'))
+  @UseGuards(LocalAuthGuard)
   @Post('/sign-in')
-  signIn(@Request() req, @Body() signInDto: SignInDto) {
-    const data = this.authService.signIn(req.user.id);
+  signIn(@UserInfo() user: PartialUser, @Body() signInDto: SignInDto) {
+    const data = this.authService.signIn(user.id);
 
     return {
       statusCode: HttpStatus.OK,
-      message: '로그인에 성공했습니다.',
+      message: MESSAGES.AUTH.SIGN_IN.SECCEED,
       data,
     };
   }

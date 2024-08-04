@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsString,
   IsStrongPassword,
+  Validate,
 } from 'class-validator';
 import {
   Column,
@@ -20,6 +21,8 @@ import { UserRole } from '../types/user-role.type';
 import { CommunityUser } from './../../community/entities/communityUser.entity';
 import { MembershipPayment } from '../../membership/entities/membership-payment.entity';
 import { UserProvider } from '../types/user-provider.type';
+import { MESSAGES } from 'src/constants/message.constant';
+import { IsNotEmptyConstraint } from 'src/util/decorators/is-not-emtpy-constraint.decorator';
 
 @Entity('users')
 export class User {
@@ -30,7 +33,8 @@ export class User {
    * 이름
    * @example"신짱구"
    */
-  @IsNotEmpty({ message: `이름을 입력해 주세요.` })
+  @IsNotEmpty({ message: MESSAGES.AUTH.COMMON.NAME.REQUIRED })
+  @Validate(IsNotEmptyConstraint)
   @IsString()
   @Column()
   name: string;
@@ -38,8 +42,8 @@ export class User {
    * 이메일
    * @example "example@example.com"
    */
-  @IsNotEmpty({ message: `이메일을 입력해 주세요.` })
-  @IsEmail({}, { message: `이메일 형식에 맞지 않습니다.` })
+  @IsNotEmpty({ message: MESSAGES.AUTH.COMMON.EMAIL.REQUIRED })
+  @IsEmail({}, { message: MESSAGES.AUTH.COMMON.EMAIL.INVALID_FORMAT })
   @Column({ unique: true })
   email: string;
 
@@ -51,7 +55,7 @@ export class User {
   @IsStrongPassword(
     { minLength: 8 },
     {
-      message: `비밀번호는 영문 알파벳 대,소문자, 숫자, 특수문자(!@#$%^&*)를 포함해서 8자리 이상으로 입력해야 합니다.`,
+      message: MESSAGES.AUTH.COMMON.PASSWORD.INVALID_FORMAT,
     },
   )
   @Column({ select: false, nullable: true })
@@ -61,7 +65,7 @@ export class User {
    * 이미지URL
    * @example "https://i.namu.wiki/i/egdn5_REUgKuBUNPwkOg3inD6mLWMntHc-kXttvomkvaTMsWISF5sQqpHsfGJ8OUVqWRmV5xkUyRpD2U6g_oO03po08TisY6pAj5PXunSWaOHtGwrvXdHcL3p9_9-ZPryAadFZUE2rAxiK9vo5cv7w.svg"
    */
-  @IsNotEmpty({ message: '이미지 URL을 입력해 주세요.' })
+  @IsNotEmpty({ message: MESSAGES.AUTH.COMMON.PROFILE.REQUIRED })
   @IsString()
   @Column()
   profileImage: string;
@@ -76,7 +80,7 @@ export class User {
   deletedAt: Date;
 
   @IsEnum(UserRole)
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.User }) //enum 타입으로 바꿀 예정
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.User })
   role: UserRole;
 
   @IsInt()
@@ -84,7 +88,7 @@ export class User {
   point: number;
 
   @IsEnum(UserProvider)
-  @Column({ type: 'enum', enum: UserProvider, default: UserProvider.Email }) //enum 타입으로 바꿀 예정
+  @Column({ type: 'enum', enum: UserProvider, default: UserProvider.Email })
   provider: UserProvider;
 
   @OneToMany(() => CommunityUser, (communityUser) => communityUser.users)

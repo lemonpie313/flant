@@ -19,7 +19,7 @@ import { CreateReplyDto } from './dto/create-reply.dto';
 
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { UserInfo } from 'src/util/user-info.decorator';
+import { UserInfo } from 'src/util/decorators/user-info.decorator';
 import { Like } from 'src/like/entities/like.entity';
 import { CreateLikeDto } from 'src/like/dto/create-like.dto';
 import { LikeService } from 'src/like/like.service';

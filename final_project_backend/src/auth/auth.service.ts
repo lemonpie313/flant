@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserProvider } from 'src/user/types/user-provider.type';
 import { BADNAME } from 'dns';
+import { MESSAGES } from 'src/constants/message.constant';
 @Injectable()
 export class AuthService {
   constructor(
@@ -28,17 +29,19 @@ export class AuthService {
     // 기존 이메일로 가입된 이력이 있을 경우 False
     const existedEmail = await this.userRepository.findOneBy({ email });
     if (existedEmail)
-      throw new BadRequestException('이미 가입된 이메일이 있습니다.');
+      throw new BadRequestException(MESSAGES.AUTH.COMMON.DUPLICATED);
+
+    // 비밀번호가 Null값일 때, False 반환
+    if (!password)
+      throw new BadRequestException(MESSAGES.AUTH.COMMON.PASSWORD.REQUIRED);
 
     // 비밀번호와 비밀번호 확인이랑 일치하는 지
     const isPasswordMatched = password === passwordConfirm;
     if (!isPasswordMatched) {
       throw new BadRequestException(
-        '비밀번호와 비밀번호 확인이 서로 일치하지 않습니다.',
+        MESSAGES.AUTH.COMMON.PASSWORD_CONFIRM.NOT_MATCHED_WITH_PASSWORD,
       );
     }
-    // 비밀번호가 Null값일 때, False 반환
-    if (!password) throw new BadRequestException('비밀번호를 입력해주세요');
 
     // 비밀번호 뭉개기
     const hashRounds = this.configService.get<number>('PASSWORD_HASH');
@@ -51,6 +54,7 @@ export class AuthService {
       profileImage,
     });
     delete user.password;
+
     return user;
   }
 
@@ -75,7 +79,7 @@ export class AuthService {
     // 구글 소셜 로그인 AND 비밀번호가 NULL값 = 사용자가 비밀번호를 따로 설정하지 않음 = 일반 로그인 불가능
     if (user.provider == UserProvider.Google && !user.password)
       throw new BadRequestException(
-        '구글 소셜을 통해 회원가입한 사용자는 비밀번호를 설정해주세요',
+        MESSAGES.AUTH.COMMON.OAUTH_GOOGLE.PASSWORD.REQUIRED,
       );
 
     if (!user || !isPasswordMatched) {
@@ -88,16 +92,15 @@ export class AuthService {
   //구글 로그인
   async googleLogin(req) {
     if (!req.user) {
-      return 'No user from google';
+      return MESSAGES.AUTH.COMMON.OAUTH_GOOGLE.NOT_FOUND;
     }
+
     // 만약 유저테이블에서 같은 이메일이 있다면 false반환
     const existedUser = await this.userRepository.findOneBy({
       email: req.user.email,
     });
     if (existedUser)
-      throw new BadRequestException(
-        '이미 회원가입된 계정입니다. 다른 방법으로 로그인해주세요.',
-      );
+      throw new BadRequestException(MESSAGES.AUTH.COMMON.OAUTH.DUPLICATED);
 
     // 이곳에 유저테이블과 연결지어서 생성
     const user = await this.userRepository.save({
