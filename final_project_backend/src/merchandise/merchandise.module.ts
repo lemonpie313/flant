@@ -7,6 +7,8 @@ import { MerchandiseImage } from './entities/merchandise-image.entity';
 import { MerchandiseOption } from './entities/marchandise-option.entity';
 import { MerchandisePost } from './entities/merchandise-post.entity';
 import { Product } from 'src/product/entities/product.entity';
+import { Manager } from 'src/admin/entities/manager.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { Product } from 'src/product/entities/product.entity';
       MerchandiseOption,
       MerchandisePost,
       Product,
+      Manager,
+      User,
     ]),
   ],
   controllers: [MerchandiseController],

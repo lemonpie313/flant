@@ -13,7 +13,7 @@ import { UserProvider } from 'src/user/types/user-provider.type';
 import { MESSAGES } from 'src/constants/message.constant';
 
 @Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy) {
+export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   constructor(
     private readonly authService: AuthService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,

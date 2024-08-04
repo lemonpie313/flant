@@ -156,4 +156,14 @@ export class UserService {
 
     return await this.userRepository.delete({ userId: userId });
   }
+
+  // //refreshToken
+  // //validate의 refreshTokenMatches를 통해,
+  // //해당 user의 row에 있는 refresh token이 request의 refresh token과 일치한지 여부를 확인
+  // async refreshTokenMatches(refreshToken: string, no: number): Promise<User> {
+  //   const user = await this.findByNo(no);
+
+  //   const isMatches = this.isMatch(refreshToken, user.refresh_token);
+  //   if (isMatches) return user;
+  // }
 }

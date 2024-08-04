@@ -17,7 +17,7 @@ import { MESSAGES } from 'src/constants/message.constant';
 
 @ApiTags('어드민')
 @ApiBearerAuth()
-@Controller('v1/admin/artists')
+@Controller('v1/v1/admin/artists')
 export class AdminArtistController {
   constructor(private readonly adminArtistService: AdminArtistService) {}
 
