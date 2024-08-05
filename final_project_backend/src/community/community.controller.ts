@@ -7,8 +7,6 @@ import {
   Param,
   Delete,
   UseGuards,
-  Request,
-  UseInterceptors,
   UploadedFile,
 } from '@nestjs/common';
 import { CommunityService } from './community.service';
@@ -20,11 +18,9 @@ import { CommunityAssignDto } from './dto/community-assign.dto';
 import { UserRole } from 'src/user/types/user-role.type';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
-import {
-  coverImageUploadFactory,
-  logoImageUploadFactory,
-} from 'src/factory/community-image-upload.factory';
-import { ApiFile } from 'src/util/api-file.decorator';
+import { coverImageUploadFactory, logoImageUploadFactory } from 'src/factory/community-image-upload.factory';
+import { UserInfo } from 'src/util/decorators/user-info.decorator';
+import { ApiFile } from 'src/util/decorators/api-file.decorator';
 
 @ApiTags('커뮤니티')
 @Controller('v1/community')
@@ -56,11 +52,11 @@ export class CommunityController {
   @UseGuards(AuthGuard('jwt'))
   @Post(':communityId/assign')
   async assignCommunity(
-    @Request() req,
+    @UserInfo() user,
     @Param('communityId') communityId: number,
     @Body() nickName: CommunityAssignDto,
   ) {
-    const userId = req.user.id;
+    const userId = user.id;
     return await this.communityService.assignCommunity(
       +userId,
       +communityId,
@@ -85,8 +81,8 @@ export class CommunityController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Get('my')
-  async findMy(@Request() req) {
-    const userId = req.user.id;
+  async findMy(@UserInfo() user) {
+    const userId = user.id;
     return await this.communityService.findMy(+userId);
   }
 
@@ -111,11 +107,11 @@ export class CommunityController {
   @ApiFile('logoImage', logoImageUploadFactory())
   @Patch(':communityId/logo')
   async updateLogo(
-    @Request() req,
+    @UserInfo() user,
     @Param('communityId') communityId: number,
     @UploadedFile() File: Express.MulterS3.File,
-  ) {
-    const userId = req.user.id;
+  ){
+    const userId = user.id;
     const imageUrl = File.location;
     return await this.communityService.updateLogo(
       +userId,
@@ -136,11 +132,11 @@ export class CommunityController {
   @ApiFile('coverImage', coverImageUploadFactory())
   @Patch(':communityId/cover')
   async updateCover(
-    @Request() req,
+    @UserInfo() user,
     @Param('communityId') communityId: number,
     @UploadedFile() File: Express.MulterS3.File,
-  ) {
-    const userId = req.user.id;
+  ){
+    const userId = user.id;
     const imageUrl = File.location;
     return await this.communityService.updateCover(
       +userId,
@@ -160,11 +156,11 @@ export class CommunityController {
   @UseGuards(AuthGuard('jwt'))
   @Patch(':communityId')
   async updateCommunity(
-    @Request() req,
+    @UserInfo() user,
     @Param('communityId') communityId: number,
     @Body() updateCommunityDto: UpdateCommunityDto,
   ) {
-    const userId = req.user.id;
+    const userId = user.id;
     return await this.communityService.updateCommunity(
       +userId,
       +communityId,
@@ -181,8 +177,8 @@ export class CommunityController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Delete(':communityId')
-  remove(@Request() req, @Param('communityId') communityId: number) {
-    const userId = req.user.id;
+  remove(@UserInfo() user, @Param('communityId') communityId: number) {
+    const userId = user.id;
     return this.communityService.removeCommunity(+userId, +communityId);
   }
 }

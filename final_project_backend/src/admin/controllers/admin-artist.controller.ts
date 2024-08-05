@@ -13,9 +13,11 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRole } from 'src/user/types/user-role.type';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { MESSAGES } from 'src/constants/message.constant';
 
 @ApiTags('어드민')
-@Controller('v1/admin')
+@ApiBearerAuth()
+@Controller('v1/v1/admin/artists')
 export class AdminArtistController {
   constructor(private readonly adminArtistService: AdminArtistService) {}
 
@@ -23,15 +25,14 @@ export class AdminArtistController {
    * 아티스트 생성
    * @param CreateArtistDto
    */
-  @ApiBearerAuth()
   @Roles(UserRole.Admin)
   @UseGuards(RolesGuard)
-  @Post('artists')
+  @Post()
   async createArtist(@Body() createArtistDto: CreateArtistDto) {
     const data = await this.adminArtistService.createArtist(createArtistDto);
     return {
       statusCode: HttpStatus.CREATED,
-      message: `아티스트 생성에 성공했습니다.`,
+      message: MESSAGES.ARTIST.CREATE,
       data,
     };
   }
@@ -40,15 +41,15 @@ export class AdminArtistController {
    * 아티스트 삭제
    * @param artistId
    */
-  @ApiBearerAuth()
+
   @Roles(UserRole.Admin)
   @UseGuards(RolesGuard)
-  @Delete('artists/:artistId')
+  @Delete(':artistId')
   async deleteArtist(@Param('artistId') artistId: number) {
     await this.adminArtistService.deleteArtist(artistId);
     return {
       statusCode: HttpStatus.OK,
-      message: `아티스트 삭제 성공했습니다.`,
+      message: MESSAGES.ARTIST.DELETE,
     };
   }
 }
