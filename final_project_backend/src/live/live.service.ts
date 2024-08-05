@@ -60,8 +60,8 @@ export class LiveService {
         cert: './cert.pem',
       },
       trans: {
-        ffmpeg: '/usr/bin/ffmpeg',
-          //'/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+        ffmpeg: //'/usr/bin/ffmpeg',
+          '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
@@ -127,7 +127,7 @@ export class LiveService {
           Math.abs(
             time.getTime() - live.createdAt.getTime() - 1000 * 60 * 60 * 9,
           ) / 1000;
-        if (diff > 60) { // 1분 이내에 스트림키 입력 후 방송 시작이 돼야함 
+        if (diff > 6000) { // 1분 이내에 스트림키 입력 후 방송 시작이 돼야함 
           session.reject((reason: string) => {
             console.log(reason);
           });
@@ -140,7 +140,6 @@ export class LiveService {
       'donePublish',
       async (id: string, streamPath: string) => {
         const streamKey = streamPath.split('/live/')[1];
-
         const live = await this.liveRepository.findOne({
           where: {
             streamKey,
@@ -150,19 +149,34 @@ export class LiveService {
         const files = fs.readdirSync(`../live-streaming/live/${streamKey}`); // 디렉토리를 읽어온다
         const fileName = files.find((file) => path.extname(file) == ".mp4");
         const file = fs.readFileSync(`../live-streaming/live/${streamKey}/${fileName}`)
-        console.log(
-          '[NodeEvent on donePublish]',
-          '----------------------', fileName, '---------------------',
-          `id=${id} StreamKey=${streamKey}`,
-        ); 
-        console.log(file);
         const liveVideoUrl = await this.liveRecordingToS3(fileName, file, 'mp4');
-
+        await this.cleanupStreamFolder(streamKey);
         await this.liveRepository.update({liveId: live.liveId}, {
           liveVideoUrl,
         })
       },
     );
+  }
+
+  async cleanupStreamFolder(streamKey: string) {
+    console.log('cleanup어쩌고');
+    const folderPath = path.join(__dirname, '../../../live-streaming/live', streamKey);
+    console.log('folderPath: '+folderPath);
+    if (fs.existsSync(folderPath)) {
+      console.log("경로있음")
+      fs.readdirSync(folderPath).forEach(file => {
+        const curPath = path.join(folderPath, file);
+        console.log('파일경로: '+curPath);
+        if (fs.lstatSync(curPath).isDirectory()) {
+          this.cleanupStreamFolder(curPath); // Recursive cleanup
+        } else {
+          fs.unlinkSync(curPath);
+          console.log('파일제거완료')
+        }
+      });
+      fs.rmdirSync(folderPath);
+      console.log('폴더제거완료');
+    }
   }
 
   async createLive(userId: number, title: string, liveType: LiveTypes) {

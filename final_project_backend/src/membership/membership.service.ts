@@ -32,8 +32,8 @@ export class MembershipService {
   ) {}
 
   // 기간 만료된 멤버십 자동 삭제
-  // @Cron('0 0 0 * * *') // 프로덕션 환경에서 코드
-  @Cron('*/30 * * * * *')
+  @Cron('0 0 0 * * *') // 프로덕션 환경에서 코드
+  //@Cron('*/30 * * * * *')
   async handleCron() {
     const date = new Date();
     const memberships = await this.membershipRepository.find({
