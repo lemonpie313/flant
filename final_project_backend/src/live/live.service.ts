@@ -30,7 +30,8 @@ export class LiveService {
     @InjectRepository(Artist)
     private readonly artistsRepository: Repository<Artist>,
     @InjectRepository(Live)
-    private readonly liveRepository: Repository<Live>) {
+    private readonly liveRepository: Repository<Live>,
+  ) {
     // AWS S3 클라이언트 초기화
     this.s3Client = new S3Client({
       region: process.env.AWS_BUCKET_REGION,
@@ -60,7 +61,8 @@ export class LiveService {
         cert: './cert.pem',
       },
       trans: {
-        ffmpeg: //'/usr/bin/ffmpeg',
+        //'/usr/bin/ffmpeg',
+        ffmpeg:
           '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
@@ -81,17 +83,16 @@ export class LiveService {
   }
 
   async liveRecordingToS3(
-    fileName: string,  // 업로드될 파일의 이름
-    file,  // 업로드할 파일
-    ext: string,  // 파일 확장자
+    fileName: string, // 업로드될 파일의 이름
+    file, // 업로드할 파일
+    ext: string, // 파일 확장자
   ) {
-
     const command = new PutObjectCommand({
-      Bucket: process.env.AWS_BUCKET_NAME, 
-      Key: fileName, 
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: fileName,
       Body: file.buffer,
-      ACL: 'public-read', 
-      ContentType: `image/${ext}`, 
+      ACL: 'public-read',
+      ContentType: `image/${ext}`,
     });
 
     await this.s3Client.send(command);
@@ -127,7 +128,8 @@ export class LiveService {
           Math.abs(
             time.getTime() - live.createdAt.getTime() - 1000 * 60 * 60 * 9,
           ) / 1000;
-        if (diff > 6000) { // 1분 이내에 스트림키 입력 후 방송 시작이 돼야함 
+        if (diff > 6000) {
+          // 1분 이내에 스트림키 입력 후 방송 시작이 돼야함
           session.reject((reason: string) => {
             console.log(reason);
           });
@@ -143,39 +145,43 @@ export class LiveService {
         const live = await this.liveRepository.findOne({
           where: {
             streamKey,
-          }
-        })
+          },
+        });
 
         const files = fs.readdirSync(`../live-streaming/live/${streamKey}`); // 디렉토리를 읽어온다
-        const fileName = files.find((file) => path.extname(file) == ".mp4");
-        const file = fs.readFileSync(`../live-streaming/live/${streamKey}/${fileName}`)
-        const liveVideoUrl = await this.liveRecordingToS3(fileName, file, 'mp4');
+        const fileName = files.find((file) => path.extname(file) == '.mp4');
+        const file = fs.readFileSync(
+          `../live-streaming/live/${streamKey}/${fileName}`,
+        );
+        const liveVideoUrl = await this.liveRecordingToS3(
+          fileName,
+          file,
+          'mp4',
+        );
         await this.cleanupStreamFolder(streamKey);
-        await this.liveRepository.update({liveId: live.liveId}, {
-          liveVideoUrl,
-        })
+        await this.liveRepository.update(
+          { liveId: live.liveId },
+          {
+            liveVideoUrl,
+          },
+        );
       },
     );
   }
 
   async cleanupStreamFolder(streamKey: string) {
-    console.log('cleanup어쩌고');
-    const folderPath = path.join(__dirname, '../../../live-streaming/live', streamKey);
-    console.log('folderPath: '+folderPath);
+    const folderPath = path.join(
+      __dirname,
+      '../../../live-streaming/live',
+      streamKey,
+    );
+    console.log('folderPath: ' + folderPath);
     if (fs.existsSync(folderPath)) {
-      console.log("경로있음")
-      fs.readdirSync(folderPath).forEach(file => {
+      fs.readdirSync(folderPath).forEach((file) => {
         const curPath = path.join(folderPath, file);
-        console.log('파일경로: '+curPath);
-        if (fs.lstatSync(curPath).isDirectory()) {
-          this.cleanupStreamFolder(curPath); // Recursive cleanup
-        } else {
-          fs.unlinkSync(curPath);
-          console.log('파일제거완료')
-        }
+        fs.unlinkSync(curPath);
       });
       fs.rmdirSync(folderPath);
-      console.log('폴더제거완료');
     }
   }
 
@@ -211,7 +217,7 @@ export class LiveService {
       liveType,
       streamKey,
     });
-    return { liveServer: 'rtmp://flant.club/live-streaming', ... live };
+    return { liveServer: 'rtmp://flant.club/live-streaming', ...live };
     //return { liveServer: 'rtmp://localhost/live-streaming', ...live };
   }
 
@@ -237,7 +243,7 @@ export class LiveService {
       });
     }
     return {
-      liveId: live.liveId, 
+      liveId: live.liveId,
       communityId: live.communityId,
       artistId: live.artistId,
       title: live.title,
