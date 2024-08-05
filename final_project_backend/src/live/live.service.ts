@@ -78,6 +78,17 @@ export class LiveService {
           },
         ],
       },
+      // relay: {
+      //   ffmpeg: '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+      //   tasks: [
+      //     {
+      //       app: 'live',
+      //       mode: 'static',
+      //       edge: 'rtmps://localhost/live',
+      //       appendName: false,
+      //     },
+      //   ],
+      // },
     };
     this.nodeMediaServer = new NodeMediaServer(liveConfig);
   }
