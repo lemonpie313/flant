@@ -68,7 +68,7 @@ export class Community {
   })
   @IsOptional()
   @IsNumber()
-  @Column({ unsigned: true })
+  @Column({ unsigned: true, nullable: true })
   membershipPrice: number | null;
 
   @CreateDateColumn()
