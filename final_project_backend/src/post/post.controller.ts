@@ -8,9 +8,7 @@ import {
   Delete,
   UseGuards,
   Query,
-  Request,
   UploadedFiles,
-  UseInterceptors,
   Put,
   ParseIntPipe,
 } from '@nestjs/common';

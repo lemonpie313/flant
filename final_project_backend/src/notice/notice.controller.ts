@@ -7,9 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
-  Request,
   Query,
-  UseInterceptors,
   UploadedFiles,
 } from '@nestjs/common';
 import { NoticeService } from './notice.service';

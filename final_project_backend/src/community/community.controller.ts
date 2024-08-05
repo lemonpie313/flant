@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   UseGuards,
-  Request,
   UploadedFile,
 } from '@nestjs/common';
 import { CommunityService } from './community.service';

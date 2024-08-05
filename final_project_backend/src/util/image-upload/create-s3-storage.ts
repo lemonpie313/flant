@@ -42,5 +42,5 @@ export const coverImageUploadFactory = (): MulterOptions =>
 export const thumbnailImageUploadFactory = (): MulterOptions =>
   createS3Storage('thumbnailImage');
 
-export const mediaImageUploadFactory = (): MulterOptions =>
-  createS3Storage('mediaImage')
+export const mediaFileUploadFactory = (): MulterOptions =>
+  createS3Storage('mediaFile')

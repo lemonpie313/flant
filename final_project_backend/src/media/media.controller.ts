@@ -7,9 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
-  Request,
   Query,
-  UseInterceptors,
   UploadedFiles,
   UploadedFile,
 } from '@nestjs/common';
@@ -18,10 +16,9 @@ import { CreateMediaDto } from './dto/create-media.dto';
 import { UpdateMediaDto } from './dto/update-media.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
-import { ApiFile, ApiFiles, ApiMedia } from 'src/util/decorators/api-file.decorator';
-import { mediaImageUploadFactory, thumbnailImageUploadFactory } from 'src/util/image-upload/create-s3-storage';
+import { ApiFile, ApiMedia } from 'src/util/decorators/api-file.decorator';
+import { mediaFileUploadFactory, thumbnailImageUploadFactory } from 'src/util/image-upload/create-s3-storage';
 
 
 @ApiTags('미디어')
@@ -43,7 +40,7 @@ export class MediaController {
     { name: 'mediaImage', maxCount: 3 },
     { name: 'mediaVideo', maxCount: 1 }
   ],
-  mediaImageUploadFactory())
+  mediaFileUploadFactory())
   @Post()
   create(
     @UploadedFiles() files: {mediaImage?: Express.MulterS3.File[], mediaVideo?: Express.MulterS3.File[]},
