@@ -30,11 +30,11 @@ export class Post {
    * 작성자가 artist일때 자동 기입
    */
   @ApiPropertyOptional({
-    example: '별하늘인간',
+    example: 1,
   })
   @IsOptional()
   @IsNumber()
-  @Column({ unsigned: true })
+  @Column({ unsigned: true, nullable: true })
   artistId: number | null;
 
   /**

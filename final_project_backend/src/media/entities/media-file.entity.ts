@@ -19,10 +19,10 @@ export class MediaFile {
 
   @Column({ unsigned: true })
   managerId: number;
-  
+
   @Column()
   mediaFileUrl: string;
-  
+
   @CreateDateColumn()
   createdAt: Date;
   

@@ -54,7 +54,7 @@ export class PostController {
     @Body() createPostDto: CreatePostDto,
   ) {
     let imageUrl = undefined
-    if(files.postImage.length != 0){
+    if(files.postImage && files.postImage.length > 0){
       const imageLocation = files.postImage.map(file=> file.location);
       imageUrl = imageLocation
     }

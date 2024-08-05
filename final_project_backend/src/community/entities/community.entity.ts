@@ -44,7 +44,7 @@ export class Community {
   })
   @IsOptional()
   @IsUrl()
-  @Column()
+  @Column({ default: null, nullable: true })
   communityLogoImage: string | null;
 
   /**
@@ -56,7 +56,7 @@ export class Community {
   })
   @IsOptional()
   @IsUrl()
-  @Column()
+  @Column({ default: null, nullable: true })
   communityCoverImage: string | null;
 
   /**

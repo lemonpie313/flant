@@ -25,7 +25,13 @@ export class MediaService {
     @InjectRepository(Manager)
     private readonly managerRepository: Repository<Manager>,
   ){}
-  async create(userId: number, communityId: number, createMediaDto: CreateMediaDto, imageUrl: string[] | undefined, videoUrl: string | undefined) {
+  async create(
+    userId: number,
+    communityId: number,
+    createMediaDto: CreateMediaDto,
+    imageUrl: string[] | undefined,
+    videoUrl: string | undefined
+  ) {
     const isManager = await this.managerRepository.findOne({where: {userId: userId, communityId: communityId}})
     if(!isManager){
       throw new UnauthorizedException(MESSAGES.MEDIA.CREATE.UNAUTHORIZED)
@@ -61,7 +67,7 @@ export class MediaService {
       const mediaVideoData = {
         mediaId: createdData.mediaId,
         managerId: isManager.managerId,
-        mediaFileUrl: videoUrl
+        mediaFileUrl: videoUrl,
       }
       await this.mediaFileRepository.save(mediaVideoData)
     }

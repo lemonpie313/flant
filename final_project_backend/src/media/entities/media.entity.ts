@@ -22,24 +22,24 @@ export class Media {
   @IsNotEmpty()
   title: string;
 
-    /**
-     * 미디어 내용
-     * @example 'Launch in 24.09.30'
-     */
-    @Column()
-    @IsString()
-    @IsNotEmpty()
-    content: string;
+  /**
+   * 미디어 내용
+   * @example 'Launch in 24.09.30'
+   */
+  @Column()
+  @IsString()
+  @IsNotEmpty()
+  content: string;
 
-    @Column()
-    @IsString()
-    @IsOptional()
-    thumbnailImage: string;
+  @IsString()
+  @IsOptional()
+  @Column({ default: null, nullable: true })
+  thumbnailImage: string | null;
 
-    @Column()
-    @IsString()
-    @IsOptional()
-    publishTime: Date;
+  @Column()
+  @IsString()
+  @IsOptional()
+  publishTime: Date;
 
   @CreateDateColumn()
   createdAt: Date;
