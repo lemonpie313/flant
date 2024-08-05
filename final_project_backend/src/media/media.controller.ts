@@ -20,7 +20,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
-import { ApiFile, ApiFiles } from 'src/util/decorators/api-file.decorator';
+import { ApiFile, ApiFiles, ApiMedia } from 'src/util/decorators/api-file.decorator';
 import { mediaImageUploadFactory, thumbnailImageUploadFactory } from 'src/util/image-upload/create-s3-storage';
 
 
@@ -29,12 +29,24 @@ import { mediaImageUploadFactory, thumbnailImageUploadFactory } from 'src/util/i
 export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
 
+  /**
+   * 미디어 등록
+   * @param files 
+   * @param user 
+   * @param communityId 
+   * @param createMediaDto 
+   * @returns 
+   */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @ApiFiles('mediaImage', 3, mediaImageUploadFactory())
+  @ApiMedia([
+    { name: 'mediaImage', maxCount: 3 },
+    { name: 'mediaVideo', maxCount: 1 }
+  ],
+  mediaImageUploadFactory())
   @Post()
   create(
-    @UploadedFiles() files: {mediaImage?: Express.MulterS3.File[]},
+    @UploadedFiles() files: {mediaImage?: Express.MulterS3.File[], mediaVideo?: Express.MulterS3.File[]},
     @UserInfo() user,
     @Query('communityId') communityId: number,
     @Body() createMediaDto: CreateMediaDto) {
@@ -44,11 +56,16 @@ export class MediaController {
       const imageLocation = files.mediaImage.map(file => file.location);
       imageUrl = imageLocation
     }
-    return this.mediaService.create(+userId, +communityId, createMediaDto, imageUrl);
+    let videoUrl = undefined
+    if(files.mediaVideo.length != 0){
+      const videoLocation = files.mediaVideo.map(file => file.location);
+      videoUrl = videoLocation
+    }
+    return this.mediaService.create(+userId, +communityId, createMediaDto, imageUrl, videoUrl);
   }
 
   /**
-   * 모든 공지사항 조회
+   * 모든 미디어 조회
    * @returns
    */
   @Get()
@@ -84,7 +101,7 @@ export class MediaController {
   }
 
   /**
-   * 공지 수정
+   * 미디어 수정
    * @param req
    * @param noticeId
    * @param updateNoticeDto
@@ -99,16 +116,16 @@ export class MediaController {
   }
 
   /**
-   * 공지 삭제
+   * 미디어 삭제
    * @param req
    * @param noticeId
    * @returns
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Delete(':noticeId')
-  remove(@UserInfo() user, @Param('noticeId') noticeId: string) {
+  @Delete(':mediaId')
+  remove(@UserInfo() user, @Param('mediaId') mediaId: number) {
     const userId = user.id;
-    return this.mediaService.remove(+userId, +noticeId);
+    return this.mediaService.remove(+userId, +mediaId);
   }
 }

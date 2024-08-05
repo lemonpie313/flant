@@ -16,6 +16,8 @@ import { Artist } from 'src/admin/entities/artist.entity';
 import _ from 'lodash';
 import { User } from 'src/user/entities/user.entity';
 import { Manager } from 'src/admin/entities/manager.entity';
+import { MESSAGES } from 'src/constants/message.constant';
+
 
 @Injectable()
 export class PostService {
@@ -44,7 +46,7 @@ export class PostService {
       where: { userId: userId, communityId: communityId },
     });
     if (!isCommunityUser) {
-      throw new BadRequestException('커뮤니티 가입을 먼저 진행해주세요.');
+      throw new BadRequestException(MESSAGES.POST.CREATE.BAD_REQUEST);
     }
     const isArtist = await this.artistRepository.findOne({
       where: { userId: userId, communityId: communityId },
@@ -71,7 +73,7 @@ export class PostService {
     }
     return {
       status: HttpStatus.CREATED,
-      message: '게시물 등록에 성공했습니다.',
+      message: MESSAGES.POST.CREATE.SUCCEED,
       data: saveData,
     };
   }
@@ -86,7 +88,7 @@ export class PostService {
 
       return {
         status: HttpStatus.OK,
-        message: '게시글 조회에 성공했습니다.',
+        message: MESSAGES.POST.FINDPOSTS.SUCCEED,
         data: allPosts,
       };
     } else if (artistId) {
@@ -97,7 +99,7 @@ export class PostService {
 
       return {
         status: HttpStatus.OK,
-        message: '해당 아티스트 게시글 조회에 성공했습니다.',
+        message: MESSAGES.POST.FINDPOSTS.ARTIST,
         data: artistPosts,
       };
     }
@@ -109,11 +111,11 @@ export class PostService {
       relations: ['postImages'],
     });
     if (!data) {
-      throw new NotFoundException('게시글이 존재하지 않습니다.');
+      throw new NotFoundException(MESSAGES.POST.FINDONE.NOT_FOUND);
     }
     return {
       status: HttpStatus.OK,
-      message: '게시글 조회에 성공했습니다.',
+      message: MESSAGES.POST.FINDONE.SUCCEED,
       data: data,
     };
   }
@@ -126,13 +128,13 @@ export class PostService {
       where: { userId: userId, communityId: postData.communityId },
     });
     if(!postData){
-      throw new NotFoundException('수정하려는 게시글을 찾을 수 없습니다.')
+      throw new NotFoundException(MESSAGES.POST.UPDATE.NOT_FOUND)
     }
     if (!isCommunityUser) {
-      throw new UnauthorizedException('먼저 커뮤니티에 가입해주세요');
+      throw new UnauthorizedException(MESSAGES.POST.UPDATE.UNAUTHORIZED);
     }
     if (_.isEmpty(updatePostDto)) {
-      throw new BadRequestException('수정할 내용을 입력해주세요.');
+      throw new BadRequestException(MESSAGES.POST.UPDATE.BAD_REQUEST);
     }
     await this.postRepository.update(
       { postId: postId },
@@ -143,7 +145,7 @@ export class PostService {
     });
     return {
       status: HttpStatus.OK,
-      message: '게시글 수정에 성공했습니다.',
+      message: MESSAGES.POST.UPDATE.SUCCEED,
       data: updatedData,
     };
   }
@@ -169,11 +171,11 @@ export class PostService {
       await this.postRepository.delete(postId);
       return {
         status: HttpStatus.OK,
-        message: '게시글이 삭제되었습니다.',
+        message: MESSAGES.POST.REMOVE.SUCCEED,
         data: postId,
       };
     } else {
-      throw new UnauthorizedException('게시글 삭제 권한이 없습니다.');
+      throw new UnauthorizedException(MESSAGES.POST.REMOVE.UNAUTHORIZED);
     }
   }
 }

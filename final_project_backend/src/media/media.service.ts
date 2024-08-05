@@ -13,6 +13,7 @@ import { Media } from './entities/media.entity';
 import { MediaFile } from './entities/media-file.entity';
 import { CreateMediaDto } from './dto/create-media.dto';
 import { UpdateMediaDto } from './dto/update-media.dto';
+import { MESSAGES } from 'src/constants/message.constant';
 
 @Injectable()
 export class MediaService {
@@ -24,10 +25,10 @@ export class MediaService {
     @InjectRepository(Manager)
     private readonly managerRepository: Repository<Manager>,
   ){}
-  async create(userId: number, communityId: number, createMediaDto: CreateMediaDto, imageUrl: string[] | undefined) {
+  async create(userId: number, communityId: number, createMediaDto: CreateMediaDto, imageUrl: string[] | undefined, videoUrl: string | undefined) {
     const isManager = await this.managerRepository.findOne({where: {userId: userId, communityId: communityId}})
     if(!isManager){
-      throw new UnauthorizedException('미디어 등록 권한이 없습니다.')
+      throw new UnauthorizedException(MESSAGES.MEDIA.CREATE.UNAUTHORIZED)
     }
 
     const publishTime = new Date(
@@ -51,14 +52,22 @@ export class MediaService {
         const mediaImageData = {
           mediaId: createdData.mediaId,
           managerId: isManager.managerId,
-          mediaImageUrl: image
+          mediaFileUrl: image
         }
         await this.mediaFileRepository.save(mediaImageData)
       }
     }
+    if(videoUrl){
+      const mediaVideoData = {
+        mediaId: createdData.mediaId,
+        managerId: isManager.managerId,
+        mediaFileUrl: videoUrl
+      }
+      await this.mediaFileRepository.save(mediaVideoData)
+    }
     return {
       status: HttpStatus.CREATED,
-      message: '공지 등록에 성공했습니다.',
+      message: MESSAGES.MEDIA.CREATE.SUCCEED,
       data: createdData,
     };
   }
@@ -72,7 +81,7 @@ export class MediaService {
     })
     return {
       status: HttpStatus.OK,
-      message: '모든 미디어 목록 조회에 성공했습니다.',
+      message: MESSAGES.MEDIA.FINDALL.SUCCEED,
       data: mediaData,
     };
   }
@@ -84,7 +93,7 @@ export class MediaService {
     })
     return {
       status: HttpStatus.OK,
-      message: '미디어 조회에 성공했습니다.',
+      message: MESSAGES.MEDIA.FINDONE.SUCCEED,
       data: singleMediaData,
     };
   }
@@ -92,17 +101,17 @@ export class MediaService {
   async updateThumbnail(userId: number, mediaId: number, imageUrl: string){
     const mediaData = await this.mediaRepository.findOne({ where: { mediaId: mediaId }})
     if(!mediaData){
-      throw new NotFoundException('미디어를 찾을 수 없습니다.')
+      throw new NotFoundException(MESSAGES.MEDIA.UPDATETHUMBNAIL.NOT_FOUND)
     }
     const isManager = await this.managerRepository.findOne({where: {
       userId: userId,
       communityId: mediaData.communityId
     }})
     if(!isManager){
-      throw new UnauthorizedException('공지 수정 권한이 없습니다.')
+      throw new UnauthorizedException(MESSAGES.MEDIA.UPDATETHUMBNAIL.UNAUTHORIZED)
     }
     if(!imageUrl){
-      throw new BadRequestException('등록할 이미지가 업로드되지 않았습니다.')
+      throw new BadRequestException(MESSAGES.MEDIA.UPDATETHUMBNAIL.BAD_REQUEST)
     }
     await this.mediaRepository.update(
       {mediaId: mediaId},
@@ -111,7 +120,7 @@ export class MediaService {
 
     return {
       status: HttpStatus.OK,
-      message: '썸네일 이미지 수정에 성공했습니다.',
+      message: MESSAGES.MEDIA.UPDATETHUMBNAIL.BAD_REQUEST,
       data: updatedData,
     }
   }
@@ -125,7 +134,7 @@ export class MediaService {
       where: { mediaId: mediaId },
     });
     if (!mediaData) {
-      throw new NotFoundException('미디어를 찾을 수 없습니다.');
+      throw new NotFoundException(MESSAGES.MEDIA.UPDATE.NOT_FOUND);
     }
     const isManager = await this.managerRepository.findOne({
       where: {
@@ -134,10 +143,10 @@ export class MediaService {
       },
     });
     if (!isManager) {
-      throw new UnauthorizedException('공지 수정 권한이 없습니다.');
+      throw new UnauthorizedException(MESSAGES.MEDIA.UPDATE.UNAUTHORIZED);
     }
     if (_.isEmpty(updateMediaDto)) {
-      throw new BadRequestException('수정할 내용을 입력해주세요.');
+      throw new BadRequestException(MESSAGES.MEDIA.UPDATE.BAD_REQUEST);
     }
     await this.mediaRepository.update(
       { mediaId: mediaId },
@@ -148,7 +157,7 @@ export class MediaService {
     });
     return {
       status: HttpStatus.ACCEPTED,
-      message: '공지 수정되었습니다.',
+      message: MESSAGES.MEDIA.UPDATE.SUCCEED,
       data: updatedData,
     };
   }
@@ -158,18 +167,18 @@ export class MediaService {
       where: { mediaId: mediaId },
     });
     if (!mediaData) {
-      throw new NotFoundException('공지를 찾을 수 없습니다.');
+      throw new NotFoundException(MESSAGES.MEDIA.REMOVE.NOT_FOUND);
     }
     const isManager = await this.managerRepository.findOne({
       where: { userId: userId, communityId: mediaData.communityId },
     });
     if (!isManager) {
-      throw new UnauthorizedException('공지 삭제 권한이 없습니다.');
+      throw new UnauthorizedException(MESSAGES.MEDIA.REMOVE.UNAUTHORIZED);
     }
     await this.mediaRepository.delete(mediaId);
     return {
       status: HttpStatus.OK,
-      message: '공지 삭제에 성공했습니다.',
+      message: MESSAGES.MEDIA.REMOVE.SUCCEED,
       data: mediaId,
     };
   }

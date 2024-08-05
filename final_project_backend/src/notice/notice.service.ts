@@ -14,6 +14,7 @@ import { Repository } from 'typeorm';
 import { Manager } from 'src/admin/entities/manager.entity';
 import { NoticeImage } from './entities/notice-image.entity';
 import _ from 'lodash';
+import { MESSAGES } from 'src/constants/message.constant';
 
 @Injectable()
 export class NoticeService {
@@ -28,7 +29,7 @@ export class NoticeService {
   async create(userId: number, communityId: number, createNoticeDto: CreateNoticeDto, imageUrl: string[] | undefined) {
     const isManager = await this.managerRepository.findOne({where: {userId: userId, communityId: communityId}})
     if(!isManager){
-      throw new UnauthorizedException('공지 작성 권한이 없습니다.')
+      throw new UnauthorizedException(MESSAGES.NOTICE.CREATE.UNAUTHORIZED)
     }
 
     const createdData = await this.noticeRepository.save({
@@ -50,7 +51,7 @@ export class NoticeService {
     }
     return {
       status: HttpStatus.CREATED,
-      message: '공지 등록에 성공했습니다.',
+      message: MESSAGES.NOTICE.CREATE.SUCCEED,
       data: createdData,
     };
   }
@@ -63,7 +64,7 @@ export class NoticeService {
     });
     return {
       status: HttpStatus.OK,
-      message: '모든 공지사항 조회에 성공했습니다.',
+      message: MESSAGES.NOTICE.FINDALL.SUCCEED,
       data: noticeData,
     };
   }
@@ -75,7 +76,7 @@ export class NoticeService {
     });
     return {
       status: HttpStatus.OK,
-      message: '공지사항 조회에 성공했습니다.',
+      message: MESSAGES.NOTICE.FINDONE.SUCCEED,
       data: singleNoticeData,
     };
   }
@@ -89,7 +90,7 @@ export class NoticeService {
       where: { noticeId: noticeId },
     });
     if (!noticeData) {
-      throw new NotFoundException('공지를 찾을 수 없습니다.');
+      throw new NotFoundException(MESSAGES.NOTICE.UPDATE.NOT_FOUND);
     }
     const isManager = await this.managerRepository.findOne({
       where: {
@@ -98,10 +99,10 @@ export class NoticeService {
       },
     });
     if (!isManager) {
-      throw new UnauthorizedException('공지 수정 권한이 없습니다.');
+      throw new UnauthorizedException(MESSAGES.NOTICE.UPDATE.UNAUTHORIZED);
     }
     if (_.isEmpty(updateNoticeDto)) {
-      throw new BadRequestException('수정할 내용을 입력해주세요.');
+      throw new BadRequestException(MESSAGES.NOTICE.UPDATE.BAD_REQUEST);
     }
     await this.noticeRepository.update(
       { noticeId: noticeId },
@@ -113,7 +114,7 @@ export class NoticeService {
     });
     return {
       status: HttpStatus.ACCEPTED,
-      message: '공지 수정되었습니다.',
+      message: MESSAGES.NOTICE.UPDATE.SUCCEED,
       data: updatedData,
     };
   }
@@ -123,18 +124,18 @@ export class NoticeService {
       where: { noticeId: noticeId },
     });
     if (!noticeData) {
-      throw new NotFoundException('공지를 찾을 수 없습니다.');
+      throw new NotFoundException(MESSAGES.NOTICE.REMOVE.NOT_FOUND);
     }
     const isManager = await this.managerRepository.findOne({
       where: { userId: userId, communityId: noticeData.communityId },
     });
     if (!isManager) {
-      throw new UnauthorizedException('공지 삭제 권한이 없습니다.');
+      throw new UnauthorizedException(MESSAGES.NOTICE.REMOVE.UNAUTHORIZED);
     }
     await this.noticeRepository.delete(noticeId);
     return {
       status: HttpStatus.OK,
-      message: '공지 삭제에 성공했습니다.',
+      message: MESSAGES.NOTICE.REMOVE.SUCCEED,
       data: noticeId,
     };
   }
