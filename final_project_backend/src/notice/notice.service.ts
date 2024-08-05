@@ -1,4 +1,11 @@
-import { BadGatewayException, BadRequestException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadGatewayException,
+  BadRequestException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateNoticeDto } from './dto/create-notice.dto';
 import { UpdateNoticeDto } from './dto/update-notice.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -50,9 +57,9 @@ export class NoticeService {
   async findAll(communityId: number) {
     const noticeData = await this.noticeRepository.find({
       where: { communityId: communityId },
-      order: { createdAt: 'DESC'},
-      relations: ['noticeImages']
-    })
+      order: { createdAt: 'DESC' },
+      relations: ['noticeImages'],
+    });
     return {
       status: HttpStatus.OK,
       message: '모든 공지사항 조회에 성공했습니다.',
@@ -63,8 +70,8 @@ export class NoticeService {
   async findOne(noticeId: number) {
     const singleNoticeData = await this.noticeRepository.findOne({
       where: { noticeId: noticeId },
-      relations: ['noticeImages']
-    })
+      relations: ['noticeImages'],
+    });
     return {
       status: HttpStatus.OK,
       message: '공지사항 조회에 성공했습니다.',
@@ -72,28 +79,37 @@ export class NoticeService {
     };
   }
 
-  async update(userId: number, noticeId: number, updateNoticeDto: UpdateNoticeDto) {
-    const noticeData = await this.noticeRepository.findOne({where: { noticeId: noticeId }})
-    if(!noticeData){
-      throw new NotFoundException('공지를 찾을 수 없습니다.')
+  async update(
+    userId: number,
+    noticeId: number,
+    updateNoticeDto: UpdateNoticeDto,
+  ) {
+    const noticeData = await this.noticeRepository.findOne({
+      where: { noticeId: noticeId },
+    });
+    if (!noticeData) {
+      throw new NotFoundException('공지를 찾을 수 없습니다.');
     }
-    const isManager = await this.managerRepository.findOne({where: {
-      userId: userId,
-      communityId: noticeData.communityId
-    }})
-    if(!isManager){
-      throw new UnauthorizedException('공지 수정 권한이 없습니다.')
+    const isManager = await this.managerRepository.findOne({
+      where: {
+        userId: userId,
+        communityId: noticeData.communityId,
+      },
+    });
+    if (!isManager) {
+      throw new UnauthorizedException('공지 수정 권한이 없습니다.');
     }
-    if(_.isEmpty(updateNoticeDto)){
-      throw new BadRequestException('수정할 내용을 입력해주세요.')
+    if (_.isEmpty(updateNoticeDto)) {
+      throw new BadRequestException('수정할 내용을 입력해주세요.');
     }
     await this.noticeRepository.update(
-      { noticeId: noticeId }, 
-      { title: updateNoticeDto.title,
-        content: updateNoticeDto.content
-      })
+      { noticeId: noticeId },
+      { title: updateNoticeDto.title, content: updateNoticeDto.content },
+    );
 
-    const updatedData = await this.noticeRepository.findOne({where: { noticeId: noticeId }})
+    const updatedData = await this.noticeRepository.findOne({
+      where: { noticeId: noticeId },
+    });
     return {
       status: HttpStatus.ACCEPTED,
       message: '공지 수정되었습니다.',
@@ -102,15 +118,19 @@ export class NoticeService {
   }
 
   async remove(userId: number, noticeId: number) {
-    const noticeData = await this.noticeRepository.findOne({where: {noticeId: noticeId}})
-    if(!noticeData){
-      throw new NotFoundException('공지를 찾을 수 없습니다.')
+    const noticeData = await this.noticeRepository.findOne({
+      where: { noticeId: noticeId },
+    });
+    if (!noticeData) {
+      throw new NotFoundException('공지를 찾을 수 없습니다.');
     }
-    const isManager = await this.managerRepository.findOne({where: {userId: userId, communityId: noticeData.communityId}})
-    if(!isManager){
-      throw new UnauthorizedException('공지 삭제 권한이 없습니다.')
+    const isManager = await this.managerRepository.findOne({
+      where: { userId: userId, communityId: noticeData.communityId },
+    });
+    if (!isManager) {
+      throw new UnauthorizedException('공지 삭제 권한이 없습니다.');
     }
-    await this.noticeRepository.delete(noticeId)
+    await this.noticeRepository.delete(noticeId);
     return {
       status: HttpStatus.OK,
       message: '공지 삭제에 성공했습니다.',

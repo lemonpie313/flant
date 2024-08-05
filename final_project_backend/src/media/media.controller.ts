@@ -1,4 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query, UseInterceptors, UploadedFiles, UploadedFile } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Request,
+  Query,
+  UseInterceptors,
+  UploadedFiles,
+} from '@nestjs/common';
 import { MediaService } from './media.service';
 import { CreateMediaDto } from './dto/create-media.dto';
 import { UpdateMediaDto } from './dto/update-media.dto';
@@ -30,7 +43,7 @@ export class MediaController {
 
   /**
    * 모든 공지사항 조회
-   * @returns 
+   * @returns
    */
   @Get()
   findAll(@Query('communityId') communityId: number) {
@@ -39,8 +52,8 @@ export class MediaController {
 
   /**
    * 공지 상세 조회
-   * @param noticeId 
-   * @returns 
+   * @param noticeId
+   * @returns
    */
   @Get(':mediaId')
   findOne(@Param('mediaId') mediaId: number) {
@@ -66,10 +79,10 @@ export class MediaController {
 
   /**
    * 공지 수정
-   * @param req 
-   * @param noticeId 
-   * @param updateNoticeDto 
-   * @returns 
+   * @param req
+   * @param noticeId
+   * @param updateNoticeDto
+   * @returns
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
@@ -81,9 +94,9 @@ export class MediaController {
 
   /**
    * 공지 삭제
-   * @param req 
-   * @param noticeId 
-   * @returns 
+   * @param req
+   * @param noticeId
+   * @returns
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))

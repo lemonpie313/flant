@@ -4,23 +4,23 @@ import { MediaFile } from "./media-file.entity";
 
 @Entity('media')
 export class Media {
-    @PrimaryGeneratedColumn({ unsigned: true })
-    mediaId: number;
+  @PrimaryGeneratedColumn({ unsigned: true })
+  mediaId: number;
 
-    @Column({ unsigned: true })
-    communityId: number;
+  @Column({ unsigned: true })
+  communityId: number;
 
-    @Column({ unsigned: true })
-    managerId: number;
+  @Column({ unsigned: true })
+  managerId: number;
 
-    /**
-     * 미디어 제목
-     * @example 'Celestial Born First Teaser'
-     */
-    @Column()
-    @IsString()
-    @IsNotEmpty()
-    title: string;
+  /**
+   * 미디어 제목
+   * @example 'Celestial Born First Teaser'
+   */
+  @Column()
+  @IsString()
+  @IsNotEmpty()
+  title: string;
 
     /**
      * 미디어 내용
@@ -41,15 +41,15 @@ export class Media {
     @IsOptional()
     publishTime: Date;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
+  @UpdateDateColumn()
+  updatedAt: Date;
 
-    @DeleteDateColumn()
-    deletedAt: Date;
-    
-    @OneToMany(() => MediaFile, (mediaFile) => mediaFile.media)
-    mediaFiles: MediaFile[];
+  @DeleteDateColumn()
+  deletedAt: Date;
+
+  @OneToMany(() => MediaFile, (mediaFile) => mediaFile.media)
+  mediaFiles: MediaFile[];
 }

@@ -88,21 +88,21 @@ export class CommunityController {
     return await this.communityService.findMy(+userId);
   }
 
-    /**
+  /**
    * 단일 커뮤니티 조회
-   * @returns 
+   * @returns
    */
-    @Get(':communityId')
-    async findOne(@Param('communityId') communityId: number) {
-      return await this.communityService.findOne(communityId);
-    }
+  @Get(':communityId')
+  async findOne(@Param('communityId') communityId: number) {
+    return await this.communityService.findOne(communityId);
+  }
 
   /**
    * 로고 이미지 수정
-   * @param req 
-   * @param communityId 
-   * @param File 
-   * @returns 
+   * @param req
+   * @param communityId
+   * @param File
+   * @returns
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
@@ -115,15 +115,19 @@ export class CommunityController {
   ){
     const userId = user.id;
     const imageUrl = File.location;
-    return await this.communityService.updateLogo(+userId, +communityId, imageUrl)
+    return await this.communityService.updateLogo(
+      +userId,
+      +communityId,
+      imageUrl,
+    );
   }
 
   /**
    * 커버 이미지 수정
-   * @param req 
-   * @param communityId 
-   * @param File 
-   * @returns 
+   * @param req
+   * @param communityId
+   * @param File
+   * @returns
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
@@ -136,7 +140,11 @@ export class CommunityController {
   ){
     const userId = user.id;
     const imageUrl = File.location;
-    return await this.communityService.updateCover(+userId, +communityId, imageUrl)
+    return await this.communityService.updateCover(
+      +userId,
+      +communityId,
+      imageUrl,
+    );
   }
 
   /**
@@ -160,7 +168,7 @@ export class CommunityController {
       +communityId,
       updateCommunityDto,
     );
-  } 
+  }
 
   /**
    * 커뮤니티 삭제

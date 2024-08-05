@@ -8,14 +8,14 @@ import {
     UpdateDateColumn,
   } from 'typeorm';
 import { Media } from './media.entity';
-  
-  @Entity('media_files')
-  export class MediaFile {
-    @PrimaryGeneratedColumn({ unsigned: true })
-    postImageId: number;
-  
-    @Column({ unsigned: true })
-    noticeId: number;
+
+@Entity('media_files')
+export class MediaFile {
+  @PrimaryGeneratedColumn({ unsigned: true })
+  postImageId: number;
+
+  @Column({ unsigned: true })
+  noticeId: number;
 
     @Column({ unsigned: true })
     managerId: number;

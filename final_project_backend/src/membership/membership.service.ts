@@ -13,7 +13,7 @@ import _ from 'lodash';
 import { User } from 'src/user/entities/user.entity';
 import { MembershipPayment } from './entities/membership-payment.entity';
 import { Cron } from '@nestjs/schedule';
-import { MembershipPaymentType } from './entities/types/membership-payment-type.enum';
+import { MembershipPaymentType } from './types/membership-payment-type.enum';
 
 @Injectable()
 export class MembershipService {
@@ -297,17 +297,17 @@ export class MembershipService {
         relations: {
           user: true,
           community: true,
-        }
+        },
       });
     } else {
       payments = await this.membershipPaymentRepository.find({
         relations: {
           user: true,
           community: true,
-        }
+        },
       });
     }
-    
+
     return payments.map((payment) => {
       return {
         membershipPaymentId: payment.membershipPaymentId,
@@ -318,8 +318,7 @@ export class MembershipService {
         communityName: payment.community.communityName,
         paymentType: payment.type,
         createdAt: payment.createdAt,
-      }
-    })
-    
+      };
+    });
   }
 }
