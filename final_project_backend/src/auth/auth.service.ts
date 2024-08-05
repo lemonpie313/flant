@@ -30,7 +30,7 @@ export class AuthService {
     password,
     passwordConfirm,
     name,
-    profileImage,
+    //profileImage,
   }: SignUpDto) {
     // 기존 이메일로 가입된 이력이 있을 경우 False
     const existedEmail = await this.userRepository.findOneBy({ email });
@@ -55,7 +55,7 @@ export class AuthService {
       email,
       password: hashedPassword,
       name,
-      profileImage,
+      //profileImage,
     });
     delete user.password;
     return user;
@@ -236,6 +236,8 @@ export class AuthService {
 
   // refreshtoken을 통해 accesstoken 발급
   async getAccessToken(refreshToken: string, userId: number, req) {
+    //먼저 쿠키 혹은 로컬에 저장된 refresh와 db에 저장된 refresh가 같은지 확인
+
     // user가 가진 refreshtoken 조회
     const refreshtoken = await this.refreshtokenRepository.findOneBy({
       userId,

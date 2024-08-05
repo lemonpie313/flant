@@ -17,7 +17,12 @@ import { Comment } from './entities/comment.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { ApiTags, ApiOperation, ApiParam, ApiBody } from '@nestjs/swagger';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-
+import { LikeService } from 'src/like/like.service';
+import { UserInfo } from 'src/util/user-info.decorator';
+import { CreateLikeDto } from 'src/like/dto/create-like.dto';
+import { Like } from 'src/like/entities/like.entity';
+import { ItemType } from 'src/like/types/itemType.types';
+import { ApiResponse } from 'src/util/api-response.interface';
 @Controller('comments')
 export class CommentController {
   constructor(
@@ -65,13 +70,17 @@ export class CommentController {
 
   // 특정 게시물의 댓글들 조회
   @Get('post/:postId')
-  async findCommentsByPost(@Param('postId', ParseIntPipe) postId: number): Promise<Comment[]> {
+  async findCommentsByPost(
+    @Param('postId', ParseIntPipe) postId: number,
+  ): Promise<Comment[]> {
     return this.commentService.findCommentsByPost(postId);
   }
 
   // 특정 댓글의 대댓글들 조회
   @Get('reply/:commentId')
-  async findRepliesByComment(@Param('commentId', ParseIntPipe) commentId: number): Promise<Comment[]> {
+  async findRepliesByComment(
+    @Param('commentId', ParseIntPipe) commentId: number,
+  ): Promise<Comment[]> {
     return this.commentService.findRepliesByComment(commentId);
   }
 

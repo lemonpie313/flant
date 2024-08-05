@@ -70,7 +70,7 @@ export class User {
   @IsNotEmpty({ message: '이미지 URL을 입력해 주세요.' })
   @IsString()
   @Column()
-  profileImage: string;
+  profileImage?: string;
 
   @CreateDateColumn()
   createdAt: Date;
