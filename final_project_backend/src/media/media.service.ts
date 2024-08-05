@@ -106,33 +106,6 @@ export class MediaService {
     }
   }
 
-  async updateThumbnail(userId: number, mediaId: number, imageUrl: string){
-    const mediaData = await this.mediaRepository.findOne({ where: { mediaId: mediaId }})
-    if(!mediaData){
-      throw new NotFoundException('미디어를 찾을 수 없습니다.')
-    }
-    const isManager = await this.managerRepository.findOne({where: {
-      userId: userId,
-      communityId: mediaData.communityId
-    }})
-    if(!isManager){
-      throw new UnauthorizedException('공지 수정 권한이 없습니다.')
-    }
-    if(!imageUrl){
-      throw new BadRequestException('등록할 이미지가 업로드되지 않았습니다.')
-    }
-    await this.mediaRepository.update(
-      {mediaId: mediaId},
-      {thumbnailImage: imageUrl})
-    const updatedData = await this.mediaRepository.findOne({ where: { mediaId: mediaId }})
-
-    return {
-      status: HttpStatus.OK,
-      message: '썸네일 이미지 수정에 성공했습니다.',
-      data: updatedData,
-    }
-  }
-
   async update(
     userId: number,
     mediaId: number,

@@ -20,9 +20,8 @@ import { UserRole } from 'src/user/types/user-role.type';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { coverImageUploadFactory, logoImageUploadFactory } from 'src/factory/community-image-upload.factory';
-import { ApiFile } from 'src/util/api-file.decorator';
-import { UserInfo } from 'src/util/user-info.decorator';
-import { User } from 'src/user/entities/user.entity';
+import { UserInfo } from 'src/util/decorators/user-info.decorator';
+import { ApiFile } from 'src/util/decorators/api-file.decorator';
 
 @ApiTags('커뮤니티')
 @Controller('v1/community')

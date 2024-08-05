@@ -11,6 +11,7 @@ import {
   Query,
   UseInterceptors,
   UploadedFiles,
+  UploadedFile,
 } from '@nestjs/common';
 import { MediaService } from './media.service';
 import { CreateMediaDto } from './dto/create-media.dto';
@@ -18,9 +19,10 @@ import { UpdateMediaDto } from './dto/update-media.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { UserInfo } from 'src/util/user-info.decorator';
-import { thumbnailImageUploadFactory } from 'src/factory/media-file-upload.factory';
-import { ApiFile } from 'src/util/api-file.decorator';
+import { UserInfo } from 'src/util/decorators/user-info.decorator';
+import { ApiFile } from 'src/util/decorators/api-file.decorator';
+import { thumbnailImageUploadFactory } from 'src/util/image-upload/create-s3-storage';
+
 
 @ApiTags('미디어')
 @Controller('v1/media')

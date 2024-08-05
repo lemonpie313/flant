@@ -17,9 +17,8 @@ import { CreateNoticeDto } from './dto/create-notice.dto';
 import { UpdateNoticeDto } from './dto/update-notice.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { UserInfo } from 'src/util/user-info.decorator';
-import { ApiFiles } from 'src/util/api-file.decorator';
+import { UserInfo } from 'src/util/decorators/user-info.decorator';
+import { ApiFiles } from 'src/util/decorators/api-file.decorator';
 import { noticeImageUploadFactory } from 'src/factory/notice-image-upload.factory';
 
 @ApiTags('공지사항')

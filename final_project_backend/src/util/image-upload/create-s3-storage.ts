@@ -32,3 +32,12 @@ const createS3Storage = (folder: string): MulterOptions => ({
 
 export const UserProfileUploadFactory = (): MulterOptions =>
   createS3Storage('userProfiles');
+
+export const logoImageUploadFactory = (): MulterOptions =>
+  createS3Storage('logoImage');
+
+export const coverImageUploadFactory = (): MulterOptions =>
+  createS3Storage('coverImage');
+
+export const thumbnailImageUploadFactory = (): MulterOptions =>
+  createS3Storage('thumbnailImage');

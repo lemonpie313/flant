@@ -19,7 +19,6 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { UserInfo } from 'src/util/user-info.decorator';
 import { CreateLikeDto } from 'src/like/dto/create-like.dto';
 import { ApiResponse } from 'src/util/api-response.interface';
 import { Like } from 'src/like/entities/like.entity';
@@ -27,8 +26,8 @@ import { ItemType } from 'src/like/types/itemType.types';
 import { LikeService } from 'src/like/like.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { postImageUploadFactory } from 'src/factory/post-image-upload.factory';
-import { ApiFiles } from 'src/util/api-file.decorator';
-import { User } from 'src/user/entities/user.entity';
+import { ApiFiles } from 'src/util/decorators/api-file.decorator';
+import { UserInfo } from 'src/util/decorators/user-info.decorator';
 
 @ApiTags('게시물')
 @Controller('v1/post')
