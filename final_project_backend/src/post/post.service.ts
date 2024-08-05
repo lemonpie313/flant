@@ -52,7 +52,7 @@ export class PostService {
     let artistId = null
     if (isArtist) {
       artistId = isArtist.artistId
-
+    }
     const saveData = await this.postRepository.save({
       communityId: communityId,
       communityUserId: isCommunityUser.communityUserId,
@@ -60,8 +60,8 @@ export class PostService {
       content: createPostDto.content,
       artistId: artistId,
     });
-    if (imageUrl && imageUrl.length > 0) {
-      for(const image of imageUrl){
+    if (imageUrl.length > 0) {
+      for(let image of imageUrl){
         const postImageData = {
           postId: saveData.postId,
           postImageUrl: image
@@ -75,7 +75,7 @@ export class PostService {
       data: saveData,
     };
   }
-}
+
 
   async findPosts(artistId: number | null, communityId: number) {
     if (!artistId) {

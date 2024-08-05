@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { MediaFile } from "./media-file.entity";
 
 @Entity('media')
@@ -30,6 +30,16 @@ export class Media {
     @IsString()
     @IsNotEmpty()
     content: string;
+
+    @Column()
+    @IsString()
+    @IsOptional()
+    thumbnailImage: string;
+
+    @Column()
+    @IsString()
+    @IsOptional()
+    publishTime: Date;
 
     @CreateDateColumn()
     createdAt: Date;

@@ -1,6 +1,6 @@
 import { BadRequestException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { LessThanOrEqual, Repository } from 'typeorm';
 import { Manager } from 'src/admin/entities/manager.entity';
 import _ from 'lodash';
 import { Media } from './entities/media.entity';
@@ -18,18 +18,19 @@ export class MediaService {
     @InjectRepository(Manager)
     private readonly managerRepository: Repository<Manager>,
   ){}
-  async create(userId: number, communityId: number, createMediaDto: CreateMediaDto) {
+  async create(userId: number, communityId: number, createMediaDto: CreateMediaDto, imageUrl) {
     const isManager = await this.managerRepository.findOne({where: {userId: userId, communityId: communityId}})
     if(!isManager){
       throw new UnauthorizedException('미디어 등록 권한이 없습니다.')
     }
-    const newSavingData = new Media();
-    newSavingData.title = createMediaDto.title;
-    newSavingData.content = createMediaDto.content;
-    newSavingData.managerId = isManager.managerId;
-    newSavingData.communityId = communityId;
 
-    const createdData = await this.mediaRepository.save(newSavingData)
+    const createdData = await this.mediaRepository.save({
+      communityId: communityId,
+      managerId: isManager.managerId,
+      title: createMediaDto.title,
+      content: createMediaDto.content,
+      thumbnailImage: imageUrl
+    })
     /*
     if (createNoticeDto.noticeImageUrl) {
       const noticeImageData = {
@@ -47,8 +48,9 @@ export class MediaService {
   }
 
   async findAll(communityId: number) {
+    const currentTime = new Date()
     const mediaData = await this.mediaRepository.find({
-      where: { communityId: communityId },
+      where: { communityId: communityId, publishTime: LessThanOrEqual(currentTime)},
       order: { createdAt: 'DESC'},
       relations: ['mediaFiles']
     })
@@ -62,13 +64,40 @@ export class MediaService {
   async findOne(mediaId: number) {
     const singleMediaData = await this.mediaRepository.findOne({
       where: { mediaId: mediaId },
-      relations: ['noticeImages']
+      relations: ['mediaFiles']
     })
     return {
       status: HttpStatus.OK,
       message: '미디어 조회에 성공했습니다.',
       data: singleMediaData,
     };
+  }
+
+  async updateThumbnail(userId: number, mediaId: number, imageUrl: string){
+    const mediaData = await this.mediaRepository.findOne({ where: { mediaId: mediaId }})
+    if(!mediaData){
+      throw new NotFoundException('미디어를 찾을 수 없습니다.')
+    }
+    const isManager = await this.managerRepository.findOne({where: {
+      userId: userId,
+      communityId: mediaData.communityId
+    }})
+    if(!isManager){
+      throw new UnauthorizedException('공지 수정 권한이 없습니다.')
+    }
+    if(!imageUrl){
+      throw new BadRequestException('등록할 이미지가 업로드되지 않았습니다.')
+    }
+    await this.mediaRepository.update(
+      {mediaId: mediaId},
+      {thumbnailImage: imageUrl})
+    const updatedData = await this.mediaRepository.findOne({ where: { mediaId: mediaId }})
+
+    return {
+      status: HttpStatus.OK,
+      message: '썸네일 이미지 수정에 성공했습니다.',
+      data: updatedData,
+    }
   }
 
   async update(userId: number, mediaId: number, updateMediaDto: UpdateMediaDto) {

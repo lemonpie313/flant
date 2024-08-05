@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query, UseInterceptors, UploadedFiles, UploadedFile } from '@nestjs/common';
 import { MediaService } from './media.service';
 import { CreateMediaDto } from './dto/create-media.dto';
 import { UpdateMediaDto } from './dto/update-media.dto';
@@ -6,6 +6,8 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { UserInfo } from 'src/util/user-info.decorator';
+import { thumbnailImageUploadFactory } from 'src/factory/media-file-upload.factory';
+import { ApiFile } from 'src/util/api-file.decorator';
 
 @ApiTags('미디어')
 @Controller('v1/media')
@@ -22,7 +24,8 @@ export class MediaController {
     @Query('communityId') communityId: number,
     @Body() createMediaDto: CreateMediaDto) {
     const userId = user.id;
-    return this.mediaService.create(+userId, +communityId, createMediaDto);
+    const mediaUrl = files.map(file => file.location)
+    return this.mediaService.create(+userId, +communityId, createMediaDto, mediaUrl);
   }
 
   /**
@@ -39,9 +42,26 @@ export class MediaController {
    * @param noticeId 
    * @returns 
    */
-  @Get(':noticeId')
-  findOne(@Param('noticeId') noticeId: number) {
-    return this.mediaService.findOne(+noticeId);
+  @Get(':mediaId')
+  findOne(@Param('mediaId') mediaId: number) {
+    return this.mediaService.findOne(+mediaId);
+  }
+
+  /**
+   * 썸네일 이미지 수정
+   * @param user 
+   * @param mediaId 
+   * @param file 
+   * @returns 
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Patch(':mediaId/thumbnail')
+  @ApiFile('thumbnailImage', thumbnailImageUploadFactory())
+  async updateThumbnail(@UserInfo() user, @Param('mediaId') mediaId: number, @UploadedFile() file: Express.MulterS3.File){
+    const userId = user.id
+    const imageUrl = file.location
+    return this.mediaService.updateThumbnail(+userId, +mediaId, imageUrl)
   }
 
   /**
@@ -53,10 +73,10 @@ export class MediaController {
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Patch(':noticeId')
-  update(@UserInfo() user, @Param('noticeId') noticeId: number, @Body() updateMediaDto: UpdateMediaDto) {
+  @Patch(':mediaId')
+  update(@UserInfo() user, @Param('mediaId') mediaId: number, @Body() updateMediaDto: UpdateMediaDto) {
     const userId = user.id;
-    return this.mediaService.update(+userId, +noticeId, updateMediaDto);
+    return this.mediaService.update(+userId, +mediaId, updateMediaDto);
   }
 
   /**

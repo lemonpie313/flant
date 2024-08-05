@@ -18,25 +18,27 @@ export class NoticeService {
     @InjectRepository(Manager)
     private readonly managerRepository: Repository<Manager>,
   ){}
-  async create(userId: number, communityId: number, createNoticeDto: CreateNoticeDto) {
+  async create(userId: number, communityId: number, createNoticeDto: CreateNoticeDto, imageUrl: string[] | undefined) {
     const isManager = await this.managerRepository.findOne({where: {userId: userId, communityId: communityId}})
     if(!isManager){
       throw new UnauthorizedException('공지 작성 권한이 없습니다.')
     }
-    const newSavingData = new Notice();
-    newSavingData.title = createNoticeDto.title;
-    newSavingData.content = createNoticeDto.content;
-    newSavingData.managerId = isManager.managerId;
-    newSavingData.communityId = communityId;
 
-    const createdData = await this.noticeRepository.save(newSavingData)
+    const createdData = await this.noticeRepository.save({
+      communityId: communityId,
+      managerId: isManager.managerId,
+      title: createNoticeDto.title,
+      content: createNoticeDto.content,
+    })
 
-    if (createNoticeDto.noticeImageUrl) {
-      const noticeImageData = {
-        noticeId: newSavingData.noticeId,
-        noticeImageUrl: createNoticeDto.noticeImageUrl,
-      };
-      await this.noticeImageRepository.save(noticeImageData);
+    if (imageUrl.length > 0) {
+      for(let image of imageUrl){
+        const noticeImageData = {
+          noticeId: createdData.noticeId,
+          noticeImageUrl: image
+        }
+        await this.noticeImageRepository.save(noticeImageData)
+      }
     }
     return {
       status: HttpStatus.CREATED,

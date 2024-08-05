@@ -2,6 +2,7 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
@@ -29,5 +30,6 @@ import { Media } from './media.entity';
     updatedAt: Date;
   
     @ManyToOne(() => Media, (media) => media.mediaFiles, { onDelete: 'CASCADE' })
+    @JoinColumn({name: 'media_id'})
     media: Media;
   }

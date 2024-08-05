@@ -6,6 +6,8 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { UserInfo } from 'src/util/user-info.decorator';
+import { ApiFiles } from 'src/util/api-file.decorator';
+import { noticeImageUploadFactory } from 'src/factory/notice-image-upload.factory';
 
 @ApiTags('공지사항')
 @Controller('v1/notice')
@@ -22,17 +24,20 @@ export class NoticeController {
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @UseInterceptors(FileFieldsInterceptor([{ name: 'noticeImage', maxCount: 3 }]))
+  @ApiFiles('noticeImage', 3, noticeImageUploadFactory())
   @Post()
   create(
     @UploadedFiles() files: Express.MulterS3.File[],
     @UserInfo() user,
     @Query('communityId') communityId: number,
     @Body() createNoticeDto: CreateNoticeDto) {
-    const imageUrl = files.map((file) => file.location);
-    createNoticeDto.noticeImageUrl = JSON.stringify(imageUrl);
+      let imageUrl = undefined
+      if(files.length != 0){
+        const imageLocation = files.map(file => file.location);
+        imageUrl = imageLocation
+      }
     const userId = user.id;
-    return this.noticeService.create(+userId, +communityId, createNoticeDto);
+    return this.noticeService.create(+userId, +communityId, createNoticeDto, imageUrl);
   }
 
   /**
