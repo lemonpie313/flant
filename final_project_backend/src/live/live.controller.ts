@@ -79,24 +79,24 @@ export class LiveController {
     };
   }
 
-  // /**
-  //  * 라이브 다시보기
-  //  *
-  //  * @returns
-  //  */
-  // @ApiBearerAuth()
-  // @Roles(UserRole.User)
-  // @UseGuards(RolesGuard)
-  // @Get('/:liveId/recordings')
-  // async watchRecordedLive(
-  //   @Request() req,
-  //   @Param('liveId') liveId: number,
-  // ) {
-  //   const live = await this.liveService.watchRecordedLive(liveId);
-  //   return {
-  //     status: HttpStatus.CREATED,
-  //     message: '완료',
-  //     data: live,
-  //   };
-  // }
+  /**
+   * 라이브 다시보기
+   *
+   * @returns
+   */
+  @ApiBearerAuth()
+  @Roles(UserRole.User)
+  @UseGuards(RolesGuard)
+  @Get('/:liveId/recordings')
+  async watchRecordedLive(
+    @Request() req,
+    @Param('liveId') liveId: number,
+  ) {
+    const live = await this.liveService.watchRecordedLive(liveId);
+    return {
+      status: HttpStatus.CREATED,
+      message: '라이브 녹화본 불러오기에 성공했습니다.',
+      data: live,
+    };
+  }
 }

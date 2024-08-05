@@ -52,7 +52,7 @@ export class LiveService {
       },
       http: {
         port: 8000,
-        mediaroot: '../live-streaming',
+        mediaroot: '../live',
         allow_origin: '*',
       },
       https: {
@@ -217,8 +217,8 @@ export class LiveService {
       liveType,
       streamKey,
     });
-    return { liveServer: 'rtmp://flant.club/live-streaming', ...live };
-    //return { liveServer: 'rtmp://localhost/live-streaming', ...live };
+    return { liveServer: 'rtmp://flant.club/live', ...live };
+    //return { liveServer: 'rtmp://localhost/live', ...live };
   }
 
   async findAllLives(communityId: number) {
@@ -235,6 +235,10 @@ export class LiveService {
       where: {
         liveId,
       },
+      // relations: {
+      //   community: true,
+      //   artist: true,
+      // }
     });
     if (_.isNil(live)) {
       throw new NotFoundException({
@@ -245,9 +249,40 @@ export class LiveService {
     return {
       liveId: live.liveId,
       communityId: live.communityId,
+      // communityName: live.communityId.communityName,
+      // communityLogoImage: live.community.communityLogoImage,
       artistId: live.artistId,
+      // artistNickname: live.artist.artistNickname,
       title: live.title,
       liveHls: `https://flant.club/live-streaming/${live.streamKey}/index.m3u8`,
+    };
+  }
+
+  async watchRecordedLive(liveId: number) {
+    const live = await this.liveRepository.findOne({
+      where: {
+        liveId,
+      },
+      // relations: {
+      //   community: true,
+      //   artist: true,
+      // }
+    });
+    if (_.isNil(live)) {
+      throw new NotFoundException({
+        status: 404,
+        message: '해당 라이브가 존재하지 않습니다.',
+      });
+    }
+    return {
+      liveId: live.liveId,
+      communityId: live.communityId,
+      // communityName: live.communityId.communityName,
+      // communityLogoImage: live.community.communityLogoImage,
+      artistId: live.artistId,
+      // artistNickname: live.artist.artistNickname,
+      title: live.title,
+      liveVideoUrl: live.liveVideoUrl,
     };
   }
 }
