@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import NodeMediaServer from 'node-media-server';
 import { LiveTypes } from './types/live-types.enum';
 import Crypto from 'crypto';
@@ -272,6 +272,11 @@ export class LiveService {
       throw new NotFoundException({
         status: 404,
         message: '해당 라이브가 존재하지 않습니다.',
+      });
+    } else if (!live.liveVideoUrl) {
+      throw new BadRequestException({
+        status: 400,
+        message: '해당 라이브는 다시보기로 시청이 불가능합니다.',
       });
     }
     return {
