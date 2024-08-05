@@ -24,7 +24,7 @@ import {
   coverImageUploadFactory,
   logoImageUploadFactory,
 } from 'src/factory/community-image-upload.factory';
-import { ApiFile } from 'src/util/api-file.decorator';
+import { ApiFile } from 'src/util/decorators/api-file.decorator';
 
 @ApiTags('커뮤니티')
 @Controller('v1/community')
