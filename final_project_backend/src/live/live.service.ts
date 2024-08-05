@@ -52,7 +52,7 @@ export class LiveService {
       },
       http: {
         port: 8000,
-        mediaroot: '../live',
+        mediaroot: '../live-streaming',
         allow_origin: '*',
       },
       https: {
@@ -98,7 +98,7 @@ export class LiveService {
     await this.s3Client.send(command);
 
     // 업로드된 이미지의 URL을 반환합니다.
-    return `https://s3.${process.env.AWS_REGION}.amazonaws.com/${process.env.AWS_S3_BUCKET_NAME}/${fileName}`;
+    return `https://s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${process.env.AWS_BUCKET_NAME}/${fileName}`;
   }
 
   onModuleInit() {
@@ -147,7 +147,6 @@ export class LiveService {
             streamKey,
           },
         });
-
         const files = fs.readdirSync(`../live-streaming/live/${streamKey}`); // 디렉토리를 읽어온다
         const fileName = files.find((file) => path.extname(file) == '.mp4');
         const file = fs.readFileSync(
@@ -170,6 +169,7 @@ export class LiveService {
   }
 
   async cleanupStreamFolder(streamKey: string) {
+    console.log('라이브스트리밍삭제');
     const folderPath = path.join(
       __dirname,
       '../../../live-streaming/live',
@@ -177,10 +177,10 @@ export class LiveService {
     );
     console.log('folderPath: ' + folderPath);
     if (fs.existsSync(folderPath)) {
-      fs.readdirSync(folderPath).forEach((file) => {
+      for (const file of fs.readdirSync(folderPath)) {
         const curPath = path.join(folderPath, file);
         fs.unlinkSync(curPath);
-      });
+      }
       fs.rmdirSync(folderPath);
     }
   }
