@@ -20,8 +20,8 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
-import { ApiFile } from 'src/util/decorators/api-file.decorator';
-import { thumbnailImageUploadFactory } from 'src/util/image-upload/create-s3-storage';
+import { ApiFile, ApiFiles } from 'src/util/decorators/api-file.decorator';
+import { mediaImageUploadFactory, thumbnailImageUploadFactory } from 'src/util/image-upload/create-s3-storage';
 
 
 @ApiTags('미디어')
@@ -31,16 +31,20 @@ export class MediaController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @UseInterceptors(FileFieldsInterceptor([{ name: 'mediaFiles', maxCount: 3 }]))
+  @ApiFiles('mediaImage', 3, mediaImageUploadFactory())
   @Post()
   create(
-    @UploadedFiles() files: Express.MulterS3.File[],
+    @UploadedFiles() files: {mediaImage?: Express.MulterS3.File[]},
     @UserInfo() user,
     @Query('communityId') communityId: number,
     @Body() createMediaDto: CreateMediaDto) {
     const userId = user.id;
-    const mediaUrl = files.map(file => file.location)
-    return this.mediaService.create(+userId, +communityId, createMediaDto, mediaUrl);
+    let imageUrl = undefined
+    if(files.mediaImage.length != 0){
+      const imageLocation = files.mediaImage.map(file => file.location);
+      imageUrl = imageLocation
+    }
+    return this.mediaService.create(+userId, +communityId, createMediaDto, imageUrl);
   }
 
   /**
@@ -53,7 +57,7 @@ export class MediaController {
   }
 
   /**
-   * 공지 상세 조회
+   * 미디어 상세 조회
    * @param noticeId
    * @returns
    */

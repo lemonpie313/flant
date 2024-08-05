@@ -30,8 +30,11 @@ export function ApiFiles(fieldName: string, maxCount: number, localOptions: Mult
         type: 'object',
         properties: {
           [fieldName]: {
-            type: 'string',
-            format: 'binary',
+            type: 'array',
+            items: {
+              type: 'string',
+              format: 'binary',
+            }
           },
           title: {
             type: 'string'

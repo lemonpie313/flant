@@ -50,14 +50,14 @@ export class PostController {
   @ApiFiles('postImage', 3, postImageUploadFactory())
   @Post()
   async create(
-    @UploadedFiles() files: Express.MulterS3.File[],
+    @UploadedFiles() files: { postImage?: Express.MulterS3.File[] } ,
     @UserInfo() user,
     @Query('communityId') communityId: number,
     @Body() createPostDto: CreatePostDto,
   ) {
     let imageUrl = undefined
-    if(files.length != 0){
-      const imageLocation = files.map(file => file.location);
+    if(files.postImage.length != 0){
+      const imageLocation = files.postImage.map(file=> file.location);
       imageUrl = imageLocation
     }
     const userId = user.id;

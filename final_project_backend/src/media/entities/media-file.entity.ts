@@ -15,21 +15,21 @@ export class MediaFile {
   postImageId: number;
 
   @Column({ unsigned: true })
-  noticeId: number;
+  mediaId: number;
 
-    @Column({ unsigned: true })
-    managerId: number;
+  @Column({ unsigned: true })
+  managerId: number;
   
-    @Column()
-    mediaFileUrl: string;
+  @Column()
+  mediaFileUrl: string;
   
-    @CreateDateColumn()
-    createdAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
   
-    @UpdateDateColumn()
-    updatedAt: Date;
+  @UpdateDateColumn()
+  updatedAt: Date;
   
-    @ManyToOne(() => Media, (media) => media.mediaFiles, { onDelete: 'CASCADE' })
-    @JoinColumn({name: 'media_id'})
-    media: Media;
-  }
+  @ManyToOne(() => Media, (media) => media.mediaFiles, { onDelete: 'CASCADE' })
+  @JoinColumn({name: 'media_id'})
+  media: Media;
+}

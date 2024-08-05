@@ -39,13 +39,13 @@ export class NoticeController {
   @ApiFiles('noticeImage', 3, noticeImageUploadFactory())
   @Post()
   create(
-    @UploadedFiles() files: Express.MulterS3.File[],
+    @UploadedFiles() files: {noticeImage?: Express.MulterS3.File[]},
     @UserInfo() user,
     @Query('communityId') communityId: number,
     @Body() createNoticeDto: CreateNoticeDto) {
       let imageUrl = undefined
-      if(files.length != 0){
-        const imageLocation = files.map(file => file.location);
+      if(files.noticeImage.length != 0){
+        const imageLocation = files.noticeImage.map(file => file.location);
         imageUrl = imageLocation
       }
     const userId = user.id;

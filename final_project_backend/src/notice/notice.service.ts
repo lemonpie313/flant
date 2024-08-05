@@ -42,6 +42,7 @@ export class NoticeService {
       for(let image of imageUrl){
         const noticeImageData = {
           noticeId: createdData.noticeId,
+          managerId: isManager.managerId,
           noticeImageUrl: image
         }
         await this.noticeImageRepository.save(noticeImageData)

@@ -54,11 +54,11 @@ export class LiveService {
         mediaroot: '../live-streaming',
         allow_origin: '*',
       },
-      https: {
+      /*https: {
         port: 8443,
         key: './key.pem',
         cert: './cert.pem',
-      },
+      },*/
       trans: {
         ffmpeg: '/usr/bin/ffmpeg',
           //'/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',

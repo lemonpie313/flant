@@ -24,28 +24,38 @@ export class MediaService {
     @InjectRepository(Manager)
     private readonly managerRepository: Repository<Manager>,
   ){}
-  async create(userId: number, communityId: number, createMediaDto: CreateMediaDto, imageUrl) {
+  async create(userId: number, communityId: number, createMediaDto: CreateMediaDto, imageUrl: string[] | undefined) {
     const isManager = await this.managerRepository.findOne({where: {userId: userId, communityId: communityId}})
     if(!isManager){
       throw new UnauthorizedException('미디어 등록 권한이 없습니다.')
     }
+
+    const publishTime = new Date(
+      createMediaDto.year,
+      createMediaDto.month - 1,
+      createMediaDto.day,
+      createMediaDto.hour,
+      createMediaDto.minute
+    )
 
     const createdData = await this.mediaRepository.save({
       communityId: communityId,
       managerId: isManager.managerId,
       title: createMediaDto.title,
       content: createMediaDto.content,
-      thumbnailImage: imageUrl
+      publishTime: publishTime,
     })
-    /*
-    if (createNoticeDto.noticeImageUrl) {
-      const noticeImageData = {
-        noticeId: newSavingData.noticeId,
-        noticeImageUrl: createNoticeDto.noticeImageUrl,
-      };
-      await this.noticeImageRepository.save(noticeImageData);
+
+    if (imageUrl.length > 0) {
+      for(let image of imageUrl){
+        const mediaImageData = {
+          mediaId: createdData.mediaId,
+          managerId: isManager.managerId,
+          mediaImageUrl: image
+        }
+        await this.mediaFileRepository.save(mediaImageData)
+      }
     }
-      */
     return {
       status: HttpStatus.CREATED,
       message: '공지 등록에 성공했습니다.',
