@@ -9,7 +9,7 @@ import Crypto from 'crypto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Community } from 'src/community/entities/community.entity';
-import { CommunityUser } from 'src/community/entities/communityUser.entity';
+import { CommunityUser } from 'src/community/community-user/entities/communityUser.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Artist } from 'src/admin/entities/artist.entity';
 import _ from 'lodash';

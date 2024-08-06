@@ -9,7 +9,7 @@ import { UpdateCommunityDto } from './dto/update-community.dto';
 import { Community } from './entities/community.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CommunityUser } from './entities/communityUser.entity';
+import { CommunityUser } from './community-user/entities/communityUser.entity';
 import { CommunityAssignDto } from './dto/community-assign.dto';
 import _ from 'lodash';
 import { Manager } from 'src/admin/entities/manager.entity';

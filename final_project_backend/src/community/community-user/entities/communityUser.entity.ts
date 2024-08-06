@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString } from 'class-validator';
-import { Membership } from '../../membership/entities/membership.entity';
+import { Membership } from '../../../membership/entities/membership.entity';
 import {
   Column,
   CreateDateColumn,
@@ -10,9 +10,9 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-import { Community } from './community.entity';
-import { User } from '../../user/entities/user.entity';
-import { Comment } from '../../comment/entities/comment.entity';
+import { Community } from '../../entities/community.entity';
+import { User } from '../../../user/entities/user.entity';
+import { Comment } from '../../../comment/entities/comment.entity';
 
 @Entity('community_users')
 export class CommunityUser {

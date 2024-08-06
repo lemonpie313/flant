@@ -18,7 +18,10 @@ import { CommunityAssignDto } from './dto/community-assign.dto';
 import { UserRole } from 'src/user/types/user-role.type';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { coverImageUploadFactory, logoImageUploadFactory } from 'src/factory/community-image-upload.factory';
+import {
+  coverImageUploadFactory,
+  logoImageUploadFactory,
+} from 'src/factory/community-image-upload.factory';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
 import { ApiFile } from 'src/util/decorators/api-file.decorator';
 
@@ -110,7 +113,7 @@ export class CommunityController {
     @UserInfo() user,
     @Param('communityId') communityId: number,
     @UploadedFile() File: Express.MulterS3.File,
-  ){
+  ) {
     const userId = user.id;
     const imageUrl = File.location;
     return await this.communityService.updateLogo(
@@ -135,7 +138,7 @@ export class CommunityController {
     @UserInfo() user,
     @Param('communityId') communityId: number,
     @UploadedFile() File: Express.MulterS3.File,
-  ){
+  ) {
     const userId = user.id;
     const imageUrl = File.location;
     return await this.communityService.updateCover(

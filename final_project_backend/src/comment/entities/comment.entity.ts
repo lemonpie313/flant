@@ -8,7 +8,7 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { CommunityUser } from '../../community/entities/communityUser.entity';
+import { CommunityUser } from '../../community/community-user/entities/communityUser.entity';
 import { Artist } from '../../admin/entities/artist.entity';
 //import { Post } from 'src/post/entities/post.entity';
 

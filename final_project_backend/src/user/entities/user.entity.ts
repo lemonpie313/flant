@@ -20,7 +20,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { UserRole } from '../types/user-role.type';
-import { CommunityUser } from './../../community/entities/communityUser.entity';
+import { CommunityUser } from '../../community/community-user/entities/communityUser.entity';
 import { MembershipPayment } from '../../membership/entities/membership-payment.entity';
 import { Cart } from 'src/cart/entities/cart.entity';
 import { Order } from 'src/order/entities/order.entity';
