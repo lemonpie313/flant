@@ -55,15 +55,15 @@ export class LiveService {
         mediaroot: '../live-streaming',
         allow_origin: '*',
       },
-      /*https: {
+      https: {
         port: 8443,
         key: './key.pem',
         cert: './cert.pem',
-      },*/
+      },
       trans: {
-        //'/usr/bin/ffmpeg',
-        ffmpeg:
-          '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+        
+        ffmpeg: '/usr/bin/ffmpeg',
+          //'/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
@@ -78,17 +78,6 @@ export class LiveService {
           },
         ],
       },
-      // relay: {
-      //   ffmpeg: '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
-      //   tasks: [
-      //     {
-      //       app: 'live',
-      //       mode: 'static',
-      //       edge: 'rtmps://localhost/live',
-      //       appendName: false,
-      //     },
-      //   ],
-      // },
     };
     this.nodeMediaServer = new NodeMediaServer(liveConfig);
   }
@@ -180,7 +169,6 @@ export class LiveService {
   }
 
   async cleanupStreamFolder(streamKey: string) {
-    console.log('라이브스트리밍삭제');
     const folderPath = path.join(
       __dirname,
       '../../../live-streaming/live',
@@ -265,7 +253,8 @@ export class LiveService {
       artistId: live.artistId,
       // artistNickname: live.artist.artistNickname,
       title: live.title,
-      liveHls: `https://flant.club/live-streaming/${live.streamKey}/index.m3u8`,
+      liveHls: `https://localhost:8443/live/${live.streamKey}/index.m3u8`
+      // liveHls: `https://flant.club/live/${live.streamKey}/index.m3u8`,
     };
   }
 
