@@ -8,7 +8,8 @@ import { Artist } from '../entities/artist.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Community } from './../../community/entities/community.entity';
-import { CommunityUser } from 'src/community/entities/communityUser.entity';
+import { CommunityUser } from 'src/community/community-user/entities/communityUser.entity';
+
 import { MESSAGES } from 'src/constants/message.constant';
 import { CreateArtistDto } from '../dto/create-artist.dto';
 @Injectable()
@@ -74,6 +75,22 @@ export class AdminArtistService {
     // 해당 아티스트 삭제 로직
     await this.artistRepository.delete({ artistId });
     await this.userRepository.delete({ userId: existedArtist.userId });
+
+    return true;
+  }
+
+  async findByCommunityIdAndUserId(communityId: number, userId: number) {
+    const existedArtist = await this.artistRepository.findOne({
+      where: {
+        communityId,
+        userId,
+      },
+    });
+
+    if (!existedArtist)
+      throw new NotFoundException(
+        MESSAGES.AUTH.COMMON.COMMUNITY_USER.NOT_ARTIST,
+      );
 
     return true;
   }

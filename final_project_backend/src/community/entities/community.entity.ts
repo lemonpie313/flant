@@ -14,7 +14,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { CommunityUser } from './communityUser.entity';
+import { CommunityUser } from '../community-user/entities/communityUser.entity';
 import { Form } from 'src/form/entities/form.entity';
 import { Post } from 'src/post/entities/post.entity';
 import { MembershipPayment } from 'src/membership/entities/membership-payment.entity';

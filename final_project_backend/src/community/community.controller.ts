@@ -171,18 +171,4 @@ export class CommunityController {
       updateCommunityDto,
     );
   }
-
-  /**
-   * 커뮤니티 삭제
-   * @param req
-   * @param communityId
-   * @returns
-   */
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  @Delete(':communityId')
-  remove(@Request() req, @Param('communityId') communityId: number) {
-    const userId = req.user.id;
-    return this.communityService.removeCommunity(+userId, +communityId);
-  }
 }
