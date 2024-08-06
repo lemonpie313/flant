@@ -1,8 +1,10 @@
 import {
   BadRequestException,
   ConsoleLogger,
+  HttpStatus,
   Injectable,
   NotAcceptableException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -70,29 +72,69 @@ export class OrderService {
 
     // 주문 생성 >> 여기서 막히는 중
     // const createOrder = await this.orderRepository.save({});
-    //유저 포인트에서 합산 금액 차감
+
+    //유저 포인트에서 합산 금액 차감(완료)
     // user.point -= totalPrice;
     // await this.userRepository.save(user);
 
-    //기존 카트 삭제
+    //기존 카트 삭제(완료)
     // await this.cartRepository.delete(user.cart.id);
 
-    return 'This action adds a new order';
+    return {
+      status: HttpStatus.CREATED,
+      message: '주문이 완료되었습니다.',
+    };
   }
 
-  findAll() {
-    return `This action returns all order`;
+  //주문 전체 조회
+  async findAll(userId: number) {
+    const data = await this.orderRepository.find({
+      where: { user: { userId } },
+    });
+
+    return {
+      status: HttpStatus.OK,
+      message: '주문내역 조회에 성공하였습니다.',
+      data,
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  //주문 상세 조회
+  async findOne(id: number, userId: number) {
+    const data = await this.orderRepository.findOne({
+      where: { id, user: { userId } },
+    });
+    if (!data) {
+      throw new NotFoundException('주문이 존재하지 않습니다.');
+    }
+    return {
+      status: HttpStatus.OK,
+      message: '주문내역 상세 조회에 성공하였습니다.',
+      data,
+    };
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
-  }
+  // 주문 취소
+  async update(id: number) {
+    const data = await this.orderRepository.findOne({
+      where: { id },
+    });
+    if (!data) {
+      throw new NotFoundException('주문이 존재하지 않습니다.');
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+    //주문 상태에 따라 불가능한 로직 추가 필요
+    // if (data.progress == 'deliveryFinish') {
+    //   throw new NotFoundException('배송이 완료된 주문입니다.');
+    // }
+    // if (data.progress == 'ready') {
+    //   throw new NotFoundException('주문 취소가 불가능합니다.');
+    // }
+
+    return {
+      statsu: HttpStatus.OK,
+      message: ' 주문 취소 요청이 되었습니다',
+      orderId: data.id,
+    };
   }
 }
