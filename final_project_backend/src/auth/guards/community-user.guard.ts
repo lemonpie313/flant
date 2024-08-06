@@ -34,9 +34,10 @@ export class CommunityUserGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
 
-    console.log(roles);
     const userId = request.user?.id;
-    const { communityId } = request.body;
+    let { communityId } = request.body;
+    if (request?.params?.communityId) communityId = request.params.communityId;
+    console.log(request.params);
     if (!userId) {
       throw new NotFoundException(MESSAGES.AUTH.COMMON.COMMUNITY_USER.NO_USER);
     }
