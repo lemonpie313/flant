@@ -18,9 +18,9 @@ import { CommunityAssignDto } from './dto/community-assign.dto';
 import { UserRole } from 'src/user/types/user-role.type';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { coverImageUploadFactory, logoImageUploadFactory } from 'src/factory/community-image-upload.factory';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
 import { ApiFile } from 'src/util/decorators/api-file.decorator';
+import { coverImageUploadFactory, logoImageUploadFactory } from 'src/util/image-upload/create-s3-storage';
 
 @ApiTags('커뮤니티')
 @Controller('v1/community')

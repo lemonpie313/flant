@@ -36,6 +36,9 @@ export const UserProfileUploadFactory = (): MulterOptions =>
 export const postImageUploadFactory = (): MulterOptions =>
   createS3Storage('postImages');
 
+export const noticeImageUploadFactory = (): MulterOptions =>
+  createS3Storage('noticeImages');
+
 export const logoImageUploadFactory = (): MulterOptions =>
   createS3Storage('logoImages');
 

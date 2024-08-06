@@ -17,7 +17,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
 import { ApiFiles } from 'src/util/decorators/api-file.decorator';
-import { noticeImageUploadFactory } from 'src/factory/notice-image-upload.factory';
+import { noticeImageUploadFactory } from 'src/util/image-upload/create-s3-storage';
 
 @ApiTags('공지사항')
 @Controller('v1/notice')
