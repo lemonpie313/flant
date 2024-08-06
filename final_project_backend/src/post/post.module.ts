@@ -15,9 +15,6 @@ import { LikeModule } from 'src/like/like.module';
 
 @Module({
   imports: [
-    MulterModule.registerAsync({
-      useFactory: postImageUploadFactory,
-    }),
     TypeOrmModule.forFeature([
       Post,
       PostImage,

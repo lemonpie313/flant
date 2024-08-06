@@ -59,6 +59,40 @@ export const MESSAGES = {
         REQUIRED: '해당하는 커뮤니티 ID를 입력해주세요.',
       },
     },
+    CREATE: {
+      SUCCEED: '커뮤니티 생성에 성공했습니다.',
+    },
+    ASSIGN: {
+      SUCCEED: '커뮤니티 가입에 성공했습니다.',
+    },
+    FIND: {
+      SUCCEED: '모든 커뮤니티 조회에 성공했습니다.',
+    },
+    FINDMY: {
+      SUCCEED: '내 커뮤니티 조회에 성공했습니다.',
+    },
+    FINDONE: {
+      SUCCEED: '커뮤니티 상세 조회에 성공했습니다.',
+    },
+    UPDATE: {
+      REQUIRED: '입력된 수정 사항이 없습니다.',
+      UNAUTHORIZED: '커뮤니티 수정 권한이 없습니다',
+      SUCCEED: '커뮤니티 수정에 성공했습니다.'
+    },
+    REMOVE: {
+      UNAUTHORIZED: '커뮤니티 삭제 권한이 없습니다',
+      SUCCEED: '커뮤니티 삭제에 성공했습니다.',
+    },
+    UPDATELOGO: {
+      UNAUTHORIZED: '커뮤니티 수정 권한이 없습니다',
+      BAD_REQUEST:'등록할 이미지를 업로드 해주세요.',
+      SUCCEED: '로고 이미지 수정이 완료되었습니다.',
+    },
+    UPDATECOVER: {
+      UNAUTHORIZED: '커뮤니티 수정 권한이 없습니다',
+      BAD_REQUEST:'등록할 이미지를 업로드 해주세요.',
+      SUCCEED: '커버 이미지 수정이 완료되었습니다.',
+    },
   },
   COMMUNITY_USER: {
     COMMON: {
@@ -137,5 +171,81 @@ export const MESSAGES = {
   },
   CUSTOM_DECORATOR: {
     IS_NOT_EMPTY: '값을 입력해주세요.',
+  },
+  POST: {
+    CREATE: {
+      BAD_REQUEST: '커뮤니티 가입을 먼저 진행해주세요.',
+      SUCCEED: '게시물 등록에 성공했습니다.',
+    },
+    FINDPOSTS: {
+      SUCCEED: '게시글 조회에 성공했습니다.',
+      ARTIST: '해당 아티스트 게시글 조회에 성공했습니다.',
+    },
+    FINDONE: {
+      NOT_FOUND: '게시글이 존재하지 않습니다.',
+      SUCCEED: '게시글 조회에 성공했습니다.',
+    },
+    UPDATE: {
+      NOT_FOUND: '수정하려는 게시글을 찾을 수 없습니다.',
+      UNAUTHORIZED: '먼저 커뮤니티에 가입해주세요.',
+      BAD_REQUEST: '수정할 내용을 입력해주세요.',
+      SUCCEED: '게시글 수정에 성공했습니다.',
+    },
+    REMOVE: {
+      SUCCEED: '게시글이 삭제되었습니다.',
+      UNAUTHORIZED: '게시글 삭제 권한이 없습니다.',
+    },
+  },
+  NOTICE: {
+    CREATE: {
+      UNAUTHORIZED: '공지 작성 권한이 없습니다.',
+      SUCCEED: '공지 등록에 성공했습니다.',
+    },
+    FINDALL: {
+      SUCCEED: '모든 공지사항 조회에 성공했습니다.',
+    },
+    FINDONE: {
+      SUCCEED: '공지사항 조회에 성공했습니다.',
+    },
+    UPDATE: {
+      NOT_FOUND: '공지를 찾을 수 없습니다.',
+      UNAUTHORIZED: '공지 수정 권한이 없습니다.',
+      BAD_REQUEST: '수정할 내용을 입력해주세요.',
+      SUCCEED: '공지 수정되었습니다.',
+    },
+    REMOVE: {
+      NOT_FOUND: '공지를 찾을 수 없습니다.',
+      UNAUTHORIZED: '공지 삭제 권한이 없습니다.',
+      SUCCEED: '공지 삭제되었습니다.',
+    },
+  },
+  MEDIA: {
+    CREATE:{
+      UNAUTHORIZED: '미디어 등록 권한이 없습니다.',
+      SUCCEED: '미디어 등록에 성공했습니다.',
+    },
+    FINDALL:{
+      SUCCEED: '모든 미디어 목록 조회에 성공했습니다.',
+    },
+    FINDONE:{
+      SUCCEED: '미디어 조회에 성공했습니다.',
+    },
+    UPDATETHUMBNAIL:{
+      NOT_FOUND: '미디어를 찾을 수 없습니다.',
+      UNAUTHORIZED: '이미지 수정 권한이 없습니다.',
+      BAD_REQUEST: '등록할 이미지가 업로드되지 않았습니다.',
+      SUCCEED: '썸네일 이미지 수정에 성공했습니다.',
+    },
+    UPDATE:{
+      NOT_FOUND: '미디어를 찾을 수 없습니다.',
+      UNAUTHORIZED: '미디어 수정 권한이 없습니다.',
+      BAD_REQUEST: '수정할 내용을 입력해주세요.',
+      SUCCEED: '미디어 수정되었습니다.',
+    },
+    REMOVE:{
+      SUCCEED: '미디어 삭제에 성공했습니다.',
+      UNAUTHORIZED: '미디어 삭제 권한이 없습니다.',
+      NOT_FOUND: '미디어를 찾을 수 없습니다.',
+    },
   },
 };

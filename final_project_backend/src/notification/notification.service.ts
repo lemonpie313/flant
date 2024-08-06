@@ -10,7 +10,6 @@ export class NotificationService {
   // 이벤트 발생 함수
   emitCardChangeEvent(userId: number) {
     // next를 통해 이벤트를 생성
-    console.log('bb');
     this.users$.next({ id: userId });
   }
   // 이벤트 연결

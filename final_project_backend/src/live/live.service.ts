@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import NodeMediaServer from 'node-media-server';
 import { LiveTypes } from './types/live-types.enum';
 import Crypto from 'crypto';
@@ -55,15 +59,17 @@ export class LiveService {
         mediaroot: '../live-streaming',
         allow_origin: '*',
       },
-      // https: {
-      //   port: 8443,
-      //   key: './key.pem',
-      //   cert: './cert.pem',
-      // },
+      /*
+      https: {
+        port: 8443,
+        key: './key.pem',
+        cert: './cert.pem',
+      },
+      */
       trans: {
         //'/usr/bin/ffmpeg',
         ffmpeg:
-          '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+          'C:/Users/Wooni/Downloads/ffmpeg-2024-08-01-git-bcf08c1171-full_build/ffmpeg-2024-08-01-git-bcf08c1171-full_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
@@ -98,7 +104,7 @@ export class LiveService {
     await this.s3Client.send(command);
 
     // 업로드된 이미지의 URL을 반환합니다.
-    return `https://s3.${process.env.AWS_REGION}.amazonaws.com/${process.env.AWS_S3_BUCKET_NAME}/${fileName}`;
+    return `https://s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${process.env.AWS_BUCKET_NAME}/${fileName}`;
   }
 
   onModuleInit() {
@@ -128,7 +134,7 @@ export class LiveService {
           Math.abs(
             time.getTime() - live.createdAt.getTime() - 1000 * 60 * 60 * 9,
           ) / 1000;
-        if (diff > 60) {
+        if (diff > 6000) {
           // 1분 이내에 스트림키 입력 후 방송 시작이 돼야함
           session.reject((reason: string) => {
             console.log(reason);
@@ -142,32 +148,22 @@ export class LiveService {
       'donePublish',
       async (id: string, streamPath: string) => {
         const streamKey = streamPath.split('/live/')[1];
-
         const live = await this.liveRepository.findOne({
           where: {
             streamKey,
           },
         });
-
         const files = fs.readdirSync(`../live-streaming/live/${streamKey}`); // 디렉토리를 읽어온다
         const fileName = files.find((file) => path.extname(file) == '.mp4');
         const file = fs.readFileSync(
           `../live-streaming/live/${streamKey}/${fileName}`,
         );
-        console.log(
-          '[NodeEvent on donePublish]',
-          '----------------------',
-          fileName,
-          '---------------------',
-          `id=${id} StreamKey=${streamKey}`,
-        );
-        console.log(file);
         const liveVideoUrl = await this.liveRecordingToS3(
           fileName,
           file,
           'mp4',
         );
-
+        await this.cleanupStreamFolder(streamKey);
         await this.liveRepository.update(
           { liveId: live.liveId },
           {
@@ -176,6 +172,22 @@ export class LiveService {
         );
       },
     );
+  }
+
+  async cleanupStreamFolder(streamKey: string) {
+    const folderPath = path.join(
+      __dirname,
+      '../../../live-streaming/live',
+      streamKey,
+    );
+    console.log('folderPath: ' + folderPath);
+    if (fs.existsSync(folderPath)) {
+      for (const file of fs.readdirSync(folderPath)) {
+        const curPath = path.join(folderPath, file);
+        fs.unlinkSync(curPath);
+      }
+      fs.rmdirSync(folderPath);
+    }
   }
 
   async createLive(userId: number, title: string, liveType: LiveTypes) {
@@ -210,8 +222,8 @@ export class LiveService {
       liveType,
       streamKey,
     });
-    return { liveServer: 'rtmp://flant.club/live-streaming', ...live };
-    //return { liveServer: 'rtmp://localhost/live-streaming', ...live };
+    return { liveServer: 'rtmp://flant.club/live', ...live };
+    //return { liveServer: 'rtmp://localhost/live', ...live };
   }
 
   async findAllLives(communityId: number) {
@@ -228,6 +240,10 @@ export class LiveService {
       where: {
         liveId,
       },
+      // relations: {
+      //   community: true,
+      //   artist: true,
+      // }
     });
     if (_.isNil(live)) {
       throw new NotFoundException({
@@ -238,9 +254,46 @@ export class LiveService {
     return {
       liveId: live.liveId,
       communityId: live.communityId,
+      // communityName: live.communityId.communityName,
+      // communityLogoImage: live.community.communityLogoImage,
       artistId: live.artistId,
+      // artistNickname: live.artist.artistNickname,
       title: live.title,
-      liveHls: `https://flant.club/live-streaming/${live.streamKey}/index.m3u8`,
+      liveHls: `https://localhost:8443/live/${live.streamKey}/index.m3u8`,
+      // liveHls: `https://flant.club/live/${live.streamKey}/index.m3u8`,
+    };
+  }
+
+  async watchRecordedLive(liveId: number) {
+    const live = await this.liveRepository.findOne({
+      where: {
+        liveId,
+      },
+      // relations: {
+      //   community: true,
+      //   artist: true,
+      // }
+    });
+    if (_.isNil(live)) {
+      throw new NotFoundException({
+        status: 404,
+        message: '해당 라이브가 존재하지 않습니다.',
+      });
+    } else if (!live.liveVideoUrl) {
+      throw new BadRequestException({
+        status: 400,
+        message: '해당 라이브는 다시보기로 시청이 불가능합니다.',
+      });
+    }
+    return {
+      liveId: live.liveId,
+      communityId: live.communityId,
+      // communityName: live.communityId.communityName,
+      // communityLogoImage: live.community.communityLogoImage,
+      artistId: live.artistId,
+      // artistNickname: live.artist.artistNickname,
+      title: live.title,
+      liveVideoUrl: live.liveVideoUrl,
     };
   }
 }

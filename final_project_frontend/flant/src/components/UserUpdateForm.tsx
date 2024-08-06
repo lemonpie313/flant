@@ -1,13 +1,13 @@
 // src/components/UserUpdateForm.tsx
-import React, { useState } from 'react';
-import { userApi } from '../services/api';
-import { UpdateUserDto } from '../types/user';
+import React, { useState } from "react";
+import { userApi } from "../services/api";
+import { UpdateUserDto } from "../types/user";
 
 const UserUpdateForm: React.FC<{ userId: number }> = ({ userId }) => {
   const [userData, setUserData] = useState<UpdateUserDto>({
-    password: '',
-    name: '',
-    newPassword: '',
+    password: "",
+    name: "",
+    newPassword: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,10 +22,10 @@ const UserUpdateForm: React.FC<{ userId: number }> = ({ userId }) => {
     e.preventDefault();
     try {
       await userApi.update(userId, userData);
-      alert('User updated successfully');
+      alert("User updated successfully");
     } catch (error) {
-      console.error('Update failed:', error);
-      alert('Update failed. Please try again.');
+      console.error("Update failed:", error);
+      alert("Update failed. Please try again.");
     }
   };
 
@@ -37,7 +37,7 @@ const UserUpdateForm: React.FC<{ userId: number }> = ({ userId }) => {
           type="text"
           id="name"
           name="name"
-          value={userData.name || ''}
+          value={userData.name || ""}
           onChange={handleChange}
         />
       </div>
@@ -58,7 +58,7 @@ const UserUpdateForm: React.FC<{ userId: number }> = ({ userId }) => {
           type="password"
           id="newPassword"
           name="newPassword"
-          value={userData.newPassword || ''}
+          value={userData.newPassword || ""}
           onChange={handleChange}
         />
       </div>
