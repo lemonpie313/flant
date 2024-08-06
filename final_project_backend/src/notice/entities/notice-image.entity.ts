@@ -2,6 +2,7 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
@@ -28,6 +29,7 @@ import {
     @UpdateDateColumn()
     updatedAt: Date;
   
-    @ManyToOne(() => Notice, (notice) => notice.noticeImages, { onDelete: 'CASCADE' })
+    @ManyToOne(() => Notice, (notice) => notice.noticeImages, { onDelete: 'CASCADE'})
+    @JoinColumn({name: 'notice_id'})
     notice: Notice;
   }

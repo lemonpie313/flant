@@ -1,32 +1,69 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+  UploadedFiles,
+  UploadedFile,
+} from '@nestjs/common';
 import { MediaService } from './media.service';
 import { CreateMediaDto } from './dto/create-media.dto';
 import { UpdateMediaDto } from './dto/update-media.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { UserInfo } from 'src/util/decorators/user-info.decorator';
+import { ApiFile, ApiMedia } from 'src/util/decorators/api-file.decorator';
+import { mediaFileUploadFactory, thumbnailImageUploadFactory } from 'src/util/image-upload/create-s3-storage';
+
 
 @ApiTags('미디어')
 @Controller('v1/media')
 export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
 
+  /**
+   * 미디어 등록
+   * @param files 
+   * @param user 
+   * @param communityId 
+   * @param createMediaDto 
+   * @returns 
+   */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @UseInterceptors(FileFieldsInterceptor([{ name: 'mediaFiles', maxCount: 3 }]))
+  @ApiMedia([
+    { name: 'mediaImage', maxCount: 3 },
+    { name: 'mediaVideo', maxCount: 1 }
+  ],
+  mediaFileUploadFactory())
   @Post()
   create(
-    @UploadedFiles() files: Express.MulterS3.File[],
-    @Request() req,
+    @UploadedFiles() files: {mediaImage?: Express.MulterS3.File[], mediaVideo?: Express.MulterS3.File[]},
+    @UserInfo() user,
     @Query('communityId') communityId: number,
     @Body() createMediaDto: CreateMediaDto) {
-    const userId = req.user.id;
-    return this.mediaService.create(+userId, +communityId, createMediaDto);
+    const userId = user.id;
+    let imageUrl = undefined
+    if(files.mediaImage.length != 0){
+      const imageLocation = files.mediaImage.map(file => file.location);
+      imageUrl = imageLocation
+    }
+    let videoUrl = undefined
+    if(files.mediaVideo.length != 0){
+      const videoLocation = files.mediaVideo.map(file => file.location);
+      videoUrl = videoLocation
+    }
+    return this.mediaService.create(+userId, +communityId, createMediaDto, imageUrl, videoUrl);
   }
 
   /**
-   * 모든 공지사항 조회
-   * @returns 
+   * 모든 미디어 조회
+   * @returns
    */
   @Get()
   findAll(@Query('communityId') communityId: number) {
@@ -34,41 +71,58 @@ export class MediaController {
   }
 
   /**
-   * 공지 상세 조회
-   * @param noticeId 
-   * @returns 
+   * 미디어 상세 조회
+   * @param noticeId
+   * @returns
    */
-  @Get(':noticeId')
-  findOne(@Param('noticeId') noticeId: number) {
-    return this.mediaService.findOne(+noticeId);
+  @Get(':mediaId')
+  findOne(@Param('mediaId') mediaId: number) {
+    return this.mediaService.findOne(+mediaId);
   }
 
   /**
-   * 공지 수정
-   * @param req 
-   * @param noticeId 
-   * @param updateNoticeDto 
+   * 썸네일 이미지 수정
+   * @param user 
+   * @param mediaId 
+   * @param file 
    * @returns 
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Patch(':noticeId')
-  update(@Request() req, @Param('noticeId') noticeId: number, @Body() updateMediaDto: UpdateMediaDto) {
-    const userId = req.user.id;
-    return this.mediaService.update(+userId, +noticeId, updateMediaDto);
+  @Patch(':mediaId/thumbnail')
+  @ApiFile('thumbnailImage', thumbnailImageUploadFactory())
+  async updateThumbnail(@UserInfo() user, @Param('mediaId') mediaId: number, @UploadedFile() file: Express.MulterS3.File){
+    const userId = user.id
+    const imageUrl = file.location
+    return this.mediaService.updateThumbnail(+userId, +mediaId, imageUrl)
   }
 
   /**
-   * 공지 삭제
-   * @param req 
-   * @param noticeId 
-   * @returns 
+   * 미디어 수정
+   * @param req
+   * @param noticeId
+   * @param updateNoticeDto
+   * @returns
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Delete(':noticeId')
-  remove(@Request() req, @Param('noticeId') noticeId: string) {
-    const userId = req.user.id;
-    return this.mediaService.remove(+userId, +noticeId);
+  @Patch(':mediaId')
+  update(@UserInfo() user, @Param('mediaId') mediaId: number, @Body() updateMediaDto: UpdateMediaDto) {
+    const userId = user.id;
+    return this.mediaService.update(+userId, +mediaId, updateMediaDto);
+  }
+
+  /**
+   * 미디어 삭제
+   * @param req
+   * @param noticeId
+   * @returns
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Delete(':mediaId')
+  remove(@UserInfo() user, @Param('mediaId') mediaId: number) {
+    const userId = user.id;
+    return this.mediaService.remove(+userId, +mediaId);
   }
 }

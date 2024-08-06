@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Membership } from './membership.entity';
-import { MembershipPaymentType } from './types/membership-payment-type.enum';
+import { MembershipPaymentType } from '../types/membership-payment-type.enum';
 import { Community } from 'src/community/entities/community.entity';
 
 @Entity('membership_payment')

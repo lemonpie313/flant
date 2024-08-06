@@ -9,6 +9,8 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateUserDto } from './dto/update-user.dto';
 import bcrypt from 'bcrypt';
+import { MESSAGES } from 'src/constants/message.constant';
+import { CheckPasswordDto } from './dto/check-password-dto';
 
 @Injectable()
 export class UserService {
@@ -17,6 +19,16 @@ export class UserService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
+  async createUserResponse(user: User) {
+    return {
+      id: user.userId,
+      email: user.email,
+      name: user.name,
+      profileImage: user.profileImage,
+      role: user.role,
+    };
+  }
+
   // 내 정보 조회
   async findMe(userId: number) {
     const user = await this.userRepository.findOne({
@@ -24,18 +36,10 @@ export class UserService {
     });
 
     if (!user) {
-      throw new NotFoundException('사용자를 찾을 수 없습니다.');
+      throw new NotFoundException(MESSAGES.USER.COMMON.NOT_FOUND);
     }
 
-    const response = {
-      id: user.userId,
-      email: user.email,
-      name: user.name,
-      profile_image: user.profileImage,
-      role: user.role,
-    };
-
-    return response;
+    return this.createUserResponse(user);
   }
 
   // 다른 사람 정보 조회
@@ -43,58 +47,86 @@ export class UserService {
     const user = await this.userRepository.findOneBy({
       userId: userId,
     });
-    const response = {
-      id: user.userId,
-      email: user.email,
-      name: user.name,
-      profile_image: user.profileImage,
-      role: user.role,
-    };
 
-    return response;
+    if (!user) {
+      throw new NotFoundException(MESSAGES.USER.COMMON.NOT_FOUND);
+    }
+
+    return this.createUserResponse(user);
   }
 
-  // 내 정보 수정
-  async updateUser(userId: number, updateUserDto: UpdateUserDto) {
-    const { password, name, newPassword, newPasswordConfirm, profile_image } =
-      updateUserDto;
+  async checkPassword(userId: number, checkPasswordDto: CheckPasswordDto) {
+    const { password } = checkPasswordDto;
+
     const user = await this.userRepository.findOne({
       where: { userId: userId },
       select: { password: true },
     });
 
-    // 현재 비밀번호가 일치한지 확인
-    const isPasswordMatched = bcrypt.compareSync(
-      password,
-      user?.password ?? '',
-    );
+    // 현재 비밀번호가 일치 확인
+    const isPasswordMatched = bcrypt.compareSync(password, user.password);
 
     if (!isPasswordMatched)
-      throw new BadRequestException('기존 비밀번호와 일치하지 않습니다.');
+      throw new BadRequestException(
+        MESSAGES.AUTH.COMMON.PASSWORD.PASSWORD_MISMATCH,
+      );
+  }
 
-    // 새로운 비밀번호와 확인이 일치한지 확인
+  // 사용자 프로필 이미지 업로드
+  async uploadProfileImage(userId: number, profileImage: string) {
+    const existedUser = await this.userRepository.findOneBy({
+      userId,
+    });
+
+    if (!existedUser) {
+      throw new NotFoundException(MESSAGES.USER.COMMON.NOT_FOUND);
+    }
+
+    if (!profileImage) {
+      throw new NotFoundException(MESSAGES.USER.COMMON.PROFILE_IMAGE.REQUIRED);
+    }
+
+    const updateUser = await this.userRepository.update(userId, {
+      profileImage,
+    });
+
+    return updateUser;
+  }
+
+  // 내 정보 수정
+  async updateUser(userId: number, updateUserDto: UpdateUserDto) {
+    const { name, newPassword, newPasswordConfirm } = updateUserDto;
+
+    // 비밀번호 변경의 경우
     if (newPassword) {
+      // 새 비밀번호 일치 확인
       const isNewPasswordMatched = newPassword === newPasswordConfirm;
       if (!isNewPasswordMatched) {
         throw new BadRequestException(
-          '새 비밀번호와 새 비밀번호 확인이 서로 일치하지 않습니다.',
+          MESSAGES.AUTH.COMMON.PASSWORD_CONFIRM.NEW_PASSWORD_MISMATCH,
         );
       }
     }
-    // 비밀번호 뭉개기
+
+    // 비밀번호 hash 처리
     const hashRounds = this.configService.get<number>('PASSWORD_HASH');
     const hashedPassword = bcrypt.hashSync(newPassword, hashRounds);
-    console.log(hashedPassword);
+
+    const existedUser = await this.userRepository.findOneBy({
+      userId: userId,
+    });
+
+    if (!existedUser) {
+      throw new NotFoundException(MESSAGES.USER.COMMON.NOT_FOUND);
+    }
 
     // 회원 정보 수정 로직
-    // update 조건
     const whereCondition = userId;
-    // update 내용
     const whereContent = {
       ...(name && { name }),
       ...(newPassword && { password: hashedPassword }),
-      ...(profile_image && { profile_image }),
     };
+
     const updateUser = await this.userRepository.update(
       whereCondition,
       whereContent,
@@ -105,23 +137,33 @@ export class UserService {
 
   // 회원 탈퇴
   async deleteUser(userId: number, password: string) {
-    // 비밀번호 일치한지 확인
+    // 비밀번호 일치 확인
     const user = await this.userRepository.findOne({
       where: { userId: userId },
       select: { password: true },
     });
-    console.log(user.password);
+    if (!user) throw new BadRequestException(MESSAGES.USER.COMMON.NOT_FOUND);
+
     const isPasswordMatched = bcrypt.compareSync(
       password,
       user?.password ?? '',
     );
 
     if (!isPasswordMatched)
-      throw new BadRequestException('기존 비밀번호와 일치하지 않습니다.');
+      throw new BadRequestException(
+        MESSAGES.AUTH.COMMON.PASSWORD.PASSWORD_MISMATCH,
+      );
 
-    // 회원 삭제 로직
-    await this.userRepository.delete({ userId: userId });
-
-    return true;
+    return await this.userRepository.delete({ userId: userId });
   }
+
+  // //refreshToken
+  // //validate의 refreshTokenMatches를 통해,
+  // //해당 user의 row에 있는 refresh token이 request의 refresh token과 일치한지 여부를 확인
+  // async refreshTokenMatches(refreshToken: string, no: number): Promise<User> {
+  //   const user = await this.findByNo(no);
+
+  //   const isMatches = this.isMatch(refreshToken, user.refresh_token);
+  //   if (isMatches) return user;
+  // }
 }

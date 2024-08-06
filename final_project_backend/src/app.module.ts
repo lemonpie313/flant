@@ -16,11 +16,15 @@ import { AdminModule } from './admin/admin.module';
 import { MembershipModule } from './membership/membership.module';
 import { CommentModule } from './comment/comment.module'; // CommentModule 추가
 import { ScheduleModule } from '@nestjs/schedule';
+import { ChatModule } from './chat/chat.module';
 import { CartModule } from './cart/cart.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PostModule } from './post/post.module';
 import { LikeModule } from './like/like.module';
+import { NoticeModule } from './notice/notice.module';
+import { MediaModule } from './media/media.module';
+import { LiveModule } from './live/live.module';
 
 @Module({
   imports: [
@@ -43,10 +47,15 @@ import { LikeModule } from './like/like.module';
     CommunityModule,
     AdminModule,
     MembershipModule,
+    CommentModule, // CommentModule 추가
     CommentModule,
     CartModule, // CommentModule 추가
     PostModule,
     LikeModule,
+    NoticeModule,
+    MediaModule, // CommentModule 추가
+    PostModule,
+    LiveModule, // CommentModule 추가
   ],
   controllers: [AppController],
   providers: [AppService],

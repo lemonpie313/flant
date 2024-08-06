@@ -1,16 +1,51 @@
-import { ApiPropertyOptional, PickType } from "@nestjs/swagger";
-import { IsOptional, IsString } from "class-validator";
+import { PickType } from "@nestjs/swagger";
 import { Media } from "../entities/media.entity";
+import { IsNumber, Max, Min } from "class-validator";
 
 export class CreateMediaDto extends PickType(Media, ['title', 'content']) {
-   /**
-   * 미디어에 등록할 이미지 URL
-   * @example 'https://www.kasi.re.kr/file/content/20190408102300583_PFFSRTDT.jpg'
+
+  /**
+   * 공개 년도
+   * @example 2024
    */
-  @ApiPropertyOptional({
-    example: 'https://www.kasi.re.kr/file/content/20190408102300583_PFFSRTDT.jpg',
-  })
-  @IsOptional()
-  @IsString()
-  noticeImageUrl: string | null;
+  @IsNumber()
+  @Min(1900)
+  @Max(2100)
+  year: number
+
+  /**
+   * 공개 월
+   * @example 8
+   */
+  @IsNumber()
+  @Min(1)
+  @Max(12)
+  month: number
+
+  /**
+   * 공개 일
+   * @example 15
+   */
+  @IsNumber()
+  @Min(1)
+  @Max(31)
+  day: number
+
+  /**
+   * 공개 시간(시)
+   * @example 20
+   */
+  @IsNumber()
+  @Min(0)
+  @Max(23)
+  hour: number
+
+  /**
+   * 공개 시간(분)
+   * @example 0
+   */
+  @IsNumber()
+  @Min(0)
+  @Max(59)
+  minute: number
 }

@@ -13,7 +13,7 @@ import _ from 'lodash';
 import { User } from 'src/user/entities/user.entity';
 import { MembershipPayment } from './entities/membership-payment.entity';
 import { Cron } from '@nestjs/schedule';
-import { MembershipPaymentType } from './entities/types/membership-payment-type.enum';
+import { MembershipPaymentType } from './types/membership-payment-type.enum';
 
 @Injectable()
 export class MembershipService {
@@ -32,8 +32,8 @@ export class MembershipService {
   ) {}
 
   // 기간 만료된 멤버십 자동 삭제
-  // @Cron('0 0 0 * * *') // 프로덕션 환경에서 코드
-  @Cron('*/30 * * * * *')
+  @Cron('0 0 0 * * *') // 프로덕션 환경에서 코드
+  //@Cron('*/30 * * * * *')
   async handleCron() {
     const date = new Date();
     const memberships = await this.membershipRepository.find({
@@ -91,12 +91,12 @@ export class MembershipService {
     await queryRunner.startTransaction('READ UNCOMMITTED');
     try {
       const expiration = new Date();
-      // expiration.setFullYear(expiration.getFullYear() + 1); // 배포용
-      // expiration.setHours(9);
-      // expiration.setMilliseconds(0);
-      // expiration.setSeconds(0);
-      // expiration.setMinutes(0);
-      expiration.setMinutes(expiration.getMinutes() + 3); // 테스트용, 3분 간격으로
+      expiration.setFullYear(expiration.getFullYear() + 1); // 배포용
+      expiration.setHours(9);
+      expiration.setMilliseconds(0);
+      expiration.setSeconds(0);
+      expiration.setMinutes(0);
+      //xpiration.setMinutes(expiration.getMinutes() + 3); // 테스트용, 3분 간격으로
 
       // 커뮤니티유저 ID > 멤버쉽 추가
       const membership = this.membershipRepository.create({
@@ -297,17 +297,17 @@ export class MembershipService {
         relations: {
           user: true,
           community: true,
-        }
+        },
       });
     } else {
       payments = await this.membershipPaymentRepository.find({
         relations: {
           user: true,
           community: true,
-        }
+        },
       });
     }
-    
+
     return payments.map((payment) => {
       return {
         membershipPaymentId: payment.membershipPaymentId,
@@ -318,8 +318,7 @@ export class MembershipService {
         communityName: payment.community.communityName,
         paymentType: payment.type,
         createdAt: payment.createdAt,
-      }
-    })
-    
+      };
+    });
   }
 }

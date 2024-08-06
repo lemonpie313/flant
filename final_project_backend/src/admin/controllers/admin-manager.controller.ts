@@ -13,9 +13,11 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRole } from 'src/user/types/user-role.type';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { MESSAGES } from 'src/constants/message.constant';
 
 @ApiTags('어드민')
-@Controller('admin')
+@ApiBearerAuth()
+@Controller('v1/admin/managers')
 export class AdminManagerController {
   constructor(private readonly adminManagerService: AdminManagerService) {}
 
@@ -23,15 +25,14 @@ export class AdminManagerController {
    * 매니저 생성
    * @param CreateManagerDto
    */
-  @ApiBearerAuth()
   @Roles(UserRole.Admin)
   @UseGuards(RolesGuard)
-  @Post('managers')
+  @Post()
   async createManager(@Body() createManagerDto: CreateManagerDto) {
     const data = await this.adminManagerService.createManager(createManagerDto);
     return {
       statusCode: HttpStatus.CREATED,
-      message: `매니저 생성에 성공했습니다.`,
+      message: MESSAGES.MANAGER.CREATE,
       data,
     };
   }
@@ -40,15 +41,14 @@ export class AdminManagerController {
    * 매니저 삭제
    * @param managerId
    */
-  @ApiBearerAuth()
   @Roles(UserRole.Admin)
   @UseGuards(RolesGuard)
-  @Delete('managers/:managerId')
+  @Delete(':managerId')
   async deleteManager(@Param('managerId') managerId: number) {
     await this.adminManagerService.deleteManager(managerId);
     return {
       statusCode: HttpStatus.OK,
-      message: `매니저 삭제 성공했습니다.`,
+      message: MESSAGES.MANAGER.DELETE,
     };
   }
 }

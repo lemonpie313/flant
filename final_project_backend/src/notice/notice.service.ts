@@ -1,4 +1,11 @@
-import { BadGatewayException, BadRequestException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadGatewayException,
+  BadRequestException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateNoticeDto } from './dto/create-notice.dto';
 import { UpdateNoticeDto } from './dto/update-notice.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +14,7 @@ import { Repository } from 'typeorm';
 import { Manager } from 'src/admin/entities/manager.entity';
 import { NoticeImage } from './entities/notice-image.entity';
 import _ from 'lodash';
+import { MESSAGES } from 'src/constants/message.constant';
 
 @Injectable()
 export class NoticeService {
@@ -18,29 +26,32 @@ export class NoticeService {
     @InjectRepository(Manager)
     private readonly managerRepository: Repository<Manager>,
   ){}
-  async create(userId: number, communityId: number, createNoticeDto: CreateNoticeDto) {
+  async create(userId: number, communityId: number, createNoticeDto: CreateNoticeDto, imageUrl: string[] | undefined) {
     const isManager = await this.managerRepository.findOne({where: {userId: userId, communityId: communityId}})
     if(!isManager){
-      throw new UnauthorizedException('공지 작성 권한이 없습니다.')
+      throw new UnauthorizedException(MESSAGES.NOTICE.CREATE.UNAUTHORIZED)
     }
-    const newSavingData = new Notice();
-    newSavingData.title = createNoticeDto.title;
-    newSavingData.content = createNoticeDto.content;
-    newSavingData.managerId = isManager.managerId;
-    newSavingData.communityId = communityId;
 
-    const createdData = await this.noticeRepository.save(newSavingData)
+    const createdData = await this.noticeRepository.save({
+      communityId: communityId,
+      managerId: isManager.managerId,
+      title: createNoticeDto.title,
+      content: createNoticeDto.content,
+    })
 
-    if (createNoticeDto.noticeImageUrl) {
-      const noticeImageData = {
-        noticeId: newSavingData.noticeId,
-        noticeImageUrl: createNoticeDto.noticeImageUrl,
-      };
-      await this.noticeImageRepository.save(noticeImageData);
+    if (imageUrl.length > 0) {
+      for(let image of imageUrl){
+        const noticeImageData = {
+          noticeId: createdData.noticeId,
+          managerId: isManager.managerId,
+          noticeImageUrl: image
+        }
+        await this.noticeImageRepository.save(noticeImageData)
+      }
     }
     return {
       status: HttpStatus.CREATED,
-      message: '공지 등록에 성공했습니다.',
+      message: MESSAGES.NOTICE.CREATE.SUCCEED,
       data: createdData,
     };
   }
@@ -48,12 +59,12 @@ export class NoticeService {
   async findAll(communityId: number) {
     const noticeData = await this.noticeRepository.find({
       where: { communityId: communityId },
-      order: { createdAt: 'DESC'},
-      relations: ['noticeImages']
-    })
+      order: { createdAt: 'DESC' },
+      relations: ['noticeImages'],
+    });
     return {
       status: HttpStatus.OK,
-      message: '모든 공지사항 조회에 성공했습니다.',
+      message: MESSAGES.NOTICE.FINDALL.SUCCEED,
       data: noticeData,
     };
   }
@@ -61,57 +72,70 @@ export class NoticeService {
   async findOne(noticeId: number) {
     const singleNoticeData = await this.noticeRepository.findOne({
       where: { noticeId: noticeId },
-      relations: ['noticeImages']
-    })
+      relations: ['noticeImages'],
+    });
     return {
       status: HttpStatus.OK,
-      message: '공지사항 조회에 성공했습니다.',
+      message: MESSAGES.NOTICE.FINDONE.SUCCEED,
       data: singleNoticeData,
     };
   }
 
-  async update(userId: number, noticeId: number, updateNoticeDto: UpdateNoticeDto) {
-    const noticeData = await this.noticeRepository.findOne({where: { noticeId: noticeId }})
-    if(!noticeData){
-      throw new NotFoundException('공지를 찾을 수 없습니다.')
+  async update(
+    userId: number,
+    noticeId: number,
+    updateNoticeDto: UpdateNoticeDto,
+  ) {
+    const noticeData = await this.noticeRepository.findOne({
+      where: { noticeId: noticeId },
+    });
+    if (!noticeData) {
+      throw new NotFoundException(MESSAGES.NOTICE.UPDATE.NOT_FOUND);
     }
-    const isManager = await this.managerRepository.findOne({where: {
-      userId: userId,
-      communityId: noticeData.communityId
-    }})
-    if(!isManager){
-      throw new UnauthorizedException('공지 수정 권한이 없습니다.')
+    const isManager = await this.managerRepository.findOne({
+      where: {
+        userId: userId,
+        communityId: noticeData.communityId,
+      },
+    });
+    if (!isManager) {
+      throw new UnauthorizedException(MESSAGES.NOTICE.UPDATE.UNAUTHORIZED);
     }
-    if(_.isEmpty(updateNoticeDto)){
-      throw new BadRequestException('수정할 내용을 입력해주세요.')
+    if (_.isEmpty(updateNoticeDto)) {
+      throw new BadRequestException(MESSAGES.NOTICE.UPDATE.BAD_REQUEST);
     }
     await this.noticeRepository.update(
-      { noticeId: noticeId }, 
-      { title: updateNoticeDto.title,
-        content: updateNoticeDto.content
-      })
+      { noticeId: noticeId },
+      { title: updateNoticeDto.title, content: updateNoticeDto.content },
+    );
 
-    const updatedData = await this.noticeRepository.findOne({where: { noticeId: noticeId }})
+    const updatedData = await this.noticeRepository.findOne({
+      where: { noticeId: noticeId },
+    });
     return {
       status: HttpStatus.ACCEPTED,
-      message: '공지 수정되었습니다.',
+      message: MESSAGES.NOTICE.UPDATE.SUCCEED,
       data: updatedData,
     };
   }
 
   async remove(userId: number, noticeId: number) {
-    const noticeData = await this.noticeRepository.findOne({where: {noticeId: noticeId}})
-    if(!noticeData){
-      throw new NotFoundException('공지를 찾을 수 없습니다.')
+    const noticeData = await this.noticeRepository.findOne({
+      where: { noticeId: noticeId },
+    });
+    if (!noticeData) {
+      throw new NotFoundException(MESSAGES.NOTICE.REMOVE.NOT_FOUND);
     }
-    const isManager = await this.managerRepository.findOne({where: {userId: userId, communityId: noticeData.communityId}})
-    if(!isManager){
-      throw new UnauthorizedException('공지 삭제 권한이 없습니다.')
+    const isManager = await this.managerRepository.findOne({
+      where: { userId: userId, communityId: noticeData.communityId },
+    });
+    if (!isManager) {
+      throw new UnauthorizedException(MESSAGES.NOTICE.REMOVE.UNAUTHORIZED);
     }
-    await this.noticeRepository.delete(noticeId)
+    await this.noticeRepository.delete(noticeId);
     return {
       status: HttpStatus.OK,
-      message: '공지 삭제에 성공했습니다.',
+      message: MESSAGES.NOTICE.REMOVE.SUCCEED,
       data: noticeId,
     };
   }
