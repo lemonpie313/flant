@@ -14,6 +14,7 @@ import { CommunityAssignDto } from './dto/community-assign.dto';
 import _ from 'lodash';
 import { Manager } from 'src/admin/entities/manager.entity';
 import { NotificationService } from './../notification/notification.service';
+import { MESSAGES } from 'src/constants/message.constant';
 
 @Injectable()
 export class CommunityService {
@@ -32,7 +33,7 @@ export class CommunityService {
       await this.communityRepository.save(createCommunityDto);
     return {
       status: HttpStatus.CREATED,
-      message: '커뮤니티 생성에 성공했습니다.',
+      message: MESSAGES.COMMUNITY.CREATE.SUCCEED,
       data: createCommunity,
     };
   }
@@ -56,7 +57,7 @@ export class CommunityService {
     this.notificationService.emitCardChangeEvent(userId);
     return {
       status: HttpStatus.OK,
-      message: '커뮤니티 가입에 성공했습니다.',
+      message: MESSAGES.COMMUNITY.ASSIGN.SUCCEED,
       data: Data,
     };
   }
@@ -67,7 +68,7 @@ export class CommunityService {
     });
     return {
       status: HttpStatus.OK,
-      message: '모든 커뮤니티 조회에 성공했습니다.',
+      message: MESSAGES.COMMUNITY.FIND.SUCCEED,
       data: allCommunities,
     };
   }
@@ -84,7 +85,7 @@ export class CommunityService {
 
     return {
       status: HttpStatus.OK,
-      message: '내 커뮤니티 조회에 성공했습니다.',
+      message: MESSAGES.COMMUNITY.FINDMY.SUCCEED,
       data: myData,
     };
   }
@@ -97,11 +98,11 @@ export class CommunityService {
 
     return {
       status: HttpStatus.OK,
-      message: '내 커뮤니티 조회에 성공했습니다.',
+      message: MESSAGES.COMMUNITY.FINDONE.SUCCEED,
       data: oneCommunityData,
     };
   }
-
+ 
   async updateCommunity(
     userId: number,
     communityId: number,
@@ -109,14 +110,14 @@ export class CommunityService {
   ) {
     //입력된 수정 사항이 없을 경우
     if (_.isEmpty(updateCommunityDto)) {
-      throw new BadRequestException('입력된 수정 사항이 없습니다.');
+      throw new BadRequestException(MESSAGES.COMMUNITY.UPDATE.REQUIRED);
     }
     //매니저 이외의 접근일 경우
     const isManager = await this.managerRepository.findOne({
       where: { userId: userId, communityId: communityId },
     });
     if (!isManager) {
-      throw new UnauthorizedException('커뮤니티 수정 권한이 없습니다');
+      throw new UnauthorizedException(MESSAGES.COMMUNITY.UPDATE.UNAUTHORIZED);
     }
     //수정된 사항만 반영
     const existData = await this.communityRepository.findOne({
@@ -138,7 +139,7 @@ export class CommunityService {
     });
     return {
       status: HttpStatus.ACCEPTED,
-      message: '커뮤니티 수정에 성공했습니다.',
+      message: MESSAGES.COMMUNITY.UPDATE.SUCCEED,
       data: updatedData,
     };
   }
@@ -149,28 +150,29 @@ export class CommunityService {
       where: { userId: userId, communityId: communityId },
     });
     if (!isManager) {
-      throw new UnauthorizedException('커뮤니티 삭제 권한이 없습니다');
+      throw new UnauthorizedException(MESSAGES.COMMUNITY.REMOVE.UNAUTHORIZED);
     }
 
     await this.communityRepository.delete(communityId);
 
     return {
       status: HttpStatus.OK,
-      message: '커뮤니티 삭제에 성공했습니다.',
+      message: MESSAGES.COMMUNITY.REMOVE.SUCCEED,
       data: communityId,
     };
   }
-  async updateLogo(userId: number, communityId: number, imageUrl: string) {
+  
+  async updateLogo(userId: number, communityId: number, imageUrl: string){
     //매니저 이외의 접근일 경우
     const isManager = await this.managerRepository.findOne({
       where: { userId: userId, communityId: communityId },
     });
     if (!isManager) {
-      throw new UnauthorizedException('커뮤니티 수정 권한이 없습니다');
+      throw new UnauthorizedException(MESSAGES.COMMUNITY.UPDATELOGO.UNAUTHORIZED);
     }
     //등록할 이미지가 없는 경우
-    if (!imageUrl) {
-      throw new BadRequestException('등록할 이미지를 업로드 해주세요.');
+    if(!imageUrl){
+      throw new BadRequestException(MESSAGES.COMMUNITY.UPDATELOGO.BAD_REQUEST)
     }
     await this.communityRepository.update(
       { communityId: communityId },
@@ -183,7 +185,7 @@ export class CommunityService {
 
     return {
       status: HttpStatus.ACCEPTED,
-      message: '로고 이미지 수정이 완료되었습니다.',
+      message: MESSAGES.COMMUNITY.UPDATELOGO.SUCCEED,
       data: updatedData,
     };
   }
@@ -194,10 +196,10 @@ export class CommunityService {
       where: { userId: userId, communityId: communityId },
     });
     if (!isManager) {
-      throw new UnauthorizedException('커뮤니티 수정 권한이 없습니다');
+      throw new UnauthorizedException(MESSAGES.COMMUNITY.UPDATECOVER.UNAUTHORIZED);
     }
-    if (!imageUrl) {
-      throw new BadRequestException('등록할 이미지를 업로드 해주세요.');
+    if(!imageUrl){
+      throw new BadRequestException(MESSAGES.COMMUNITY.UPDATECOVER.BAD_REQUEST)
     }
     await this.communityRepository.update(
       { communityId: communityId },
@@ -210,7 +212,7 @@ export class CommunityService {
 
     return {
       status: HttpStatus.ACCEPTED,
-      message: '커버 이미지 수정이 완료되었습니다.',
+      message: MESSAGES.COMMUNITY.UPDATECOVER.SUCCEED,
       data: updatedData,
     };
   }

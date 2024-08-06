@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -12,21 +13,28 @@ import {
 import { PostImage } from './post-image.entity';
 import { Community } from 'src/community/entities/community.entity';
 import { Exclude } from 'class-transformer';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 @Entity()
 export class Post {
   @PrimaryGeneratedColumn({ unsigned: true })
   postId: number;
 
-  @Column()
+  @Column({ unsigned: true })
   communityUserId: number;
 
-  @Column()
+  @Column({ unsigned: true })
   communityId: number;
 
+  /**
+   * 작성자가 artist일때 자동 기입
+   */
+  @ApiPropertyOptional({
+    example: 1,
+  })
   @IsOptional()
   @IsNumber()
-  @Column()
+  @Column({ unsigned: true, nullable: true })
   artistId: number | null;
 
   /**
@@ -63,5 +71,6 @@ export class Post {
   @ManyToOne(() => Community, (community) => community.posts, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({name: 'community_id'})
   community: Community;
 }
