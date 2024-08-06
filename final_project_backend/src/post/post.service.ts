@@ -62,7 +62,7 @@ export class PostService {
       content: createPostDto.content,
       artistId: artistId,
     });
-    if (imageUrl.length > 0) {
+    if (imageUrl && imageUrl.length > 0) {
       for(let image of imageUrl){
         const postImageData = {
           postId: saveData.postId,

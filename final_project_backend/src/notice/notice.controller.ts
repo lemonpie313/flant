@@ -42,7 +42,7 @@ export class NoticeController {
     @Query('communityId') communityId: number,
     @Body() createNoticeDto: CreateNoticeDto) {
       let imageUrl = undefined
-      if(files.noticeImage.length != 0){
+      if(files && files.noticeImage && files.noticeImage.length != 0){
         const imageLocation = files.noticeImage.map(file => file.location);
         imageUrl = imageLocation
       }

@@ -49,14 +49,17 @@ export class MediaController {
     @Body() createMediaDto: CreateMediaDto) {
     const userId = user.id;
     let imageUrl = undefined
-    if(files.mediaImage.length != 0){
-      const imageLocation = files.mediaImage.map(file => file.location);
-      imageUrl = imageLocation
-    }
     let videoUrl = undefined
-    if(files.mediaVideo.length != 0){
-      const videoLocation = files.mediaVideo.map(file => file.location);
-      videoUrl = videoLocation
+    console.log(files.mediaImage)
+    if(files != undefined){
+      if(files.mediaImage && files.mediaImage.length > 0){
+        const imageLocation = files.mediaImage.map(file => file.location);
+        imageUrl = imageLocation
+        }
+      if(files.mediaVideo && files.mediaVideo.length > 0){
+        const videoLocation = files.mediaVideo.map(file => file.location);
+        videoUrl = videoLocation
+        }
     }
     return this.mediaService.create(+userId, +communityId, createMediaDto, imageUrl, videoUrl);
   }

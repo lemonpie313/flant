@@ -23,9 +23,9 @@ import { Like } from 'src/like/entities/like.entity';
 import { ItemType } from 'src/like/types/itemType.types';
 import { LikeService } from 'src/like/like.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { postImageUploadFactory } from 'src/factory/post-image-upload.factory';
 import { ApiFiles } from 'src/util/decorators/api-file.decorator';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
+import { postImageUploadFactory } from 'src/util/image-upload/create-s3-storage';
 
 @ApiTags('게시물')
 @Controller('v1/post')
@@ -54,7 +54,7 @@ export class PostController {
     @Body() createPostDto: CreatePostDto,
   ) {
     let imageUrl = undefined
-    if(files.postImage && files.postImage.length > 0){
+    if(files && files.postImage && files.postImage.length > 0){
       const imageLocation = files.postImage.map(file=> file.location);
       imageUrl = imageLocation
     }

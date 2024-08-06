@@ -33,14 +33,17 @@ const createS3Storage = (folder: string): MulterOptions => ({
 export const UserProfileUploadFactory = (): MulterOptions =>
   createS3Storage('userProfiles');
 
+export const postImageUploadFactory = (): MulterOptions =>
+  createS3Storage('postImages');
+
 export const logoImageUploadFactory = (): MulterOptions =>
-  createS3Storage('logoImage');
+  createS3Storage('logoImages');
 
 export const coverImageUploadFactory = (): MulterOptions =>
-  createS3Storage('coverImage');
+  createS3Storage('coverImages');
 
 export const thumbnailImageUploadFactory = (): MulterOptions =>
-  createS3Storage('thumbnailImage');
+  createS3Storage('thumbnailImages');
 
 export const mediaFileUploadFactory = (): MulterOptions =>
-  createS3Storage('mediaFile')
+  createS3Storage('mediaFiles')

@@ -39,7 +39,7 @@ export class NoticeService {
       content: createNoticeDto.content,
     })
 
-    if (imageUrl.length > 0) {
+    if (imageUrl && imageUrl.length > 0) {
       for(let image of imageUrl){
         const noticeImageData = {
           noticeId: createdData.noticeId,
