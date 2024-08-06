@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import NodeMediaServer from 'node-media-server';
 import { LiveTypes } from './types/live-types.enum';
 import Crypto from 'crypto';
@@ -55,15 +59,17 @@ export class LiveService {
         mediaroot: '../live-streaming',
         allow_origin: '*',
       },
+      /*
       https: {
         port: 8443,
         key: './key.pem',
         cert: './cert.pem',
       },
+      */
       trans: {
-        
-        ffmpeg: '/usr/bin/ffmpeg',
-          //'/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+        //'/usr/bin/ffmpeg',
+        ffmpeg:
+          'C:/Users/Wooni/Downloads/ffmpeg-2024-08-01-git-bcf08c1171-full_build/ffmpeg-2024-08-01-git-bcf08c1171-full_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
@@ -253,7 +259,7 @@ export class LiveService {
       artistId: live.artistId,
       // artistNickname: live.artist.artistNickname,
       title: live.title,
-      liveHls: `https://localhost:8443/live/${live.streamKey}/index.m3u8`
+      liveHls: `https://localhost:8443/live/${live.streamKey}/index.m3u8`,
       // liveHls: `https://flant.club/live/${live.streamKey}/index.m3u8`,
     };
   }

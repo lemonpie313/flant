@@ -74,7 +74,7 @@ export class User {
   @IsNotEmpty({ message: MESSAGES.AUTH.COMMON.PROFILE.REQUIRED })
   @IsString()
   @Column()
-  profileImage: string;
+  profileImage?: string;
 
   @CreateDateColumn()
   createdAt: Date;
