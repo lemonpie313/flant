@@ -46,7 +46,9 @@ export class CommunityUser {
   @JoinColumn({ name: 'community_id' })
   community: Community;
 
-  @ManyToOne(() => User, (user) => user.communityUsers)
+  @ManyToOne(() => User, (user) => user.communityUsers, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'user_id' })
   users: User;
 

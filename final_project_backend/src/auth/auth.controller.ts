@@ -16,6 +16,10 @@ import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { SignInDto } from './dto/sign-in.dto';
 import { Response } from 'express';
+import { LocalAuthGuard } from './guards/local-auth.guard';
+import { UserInfo } from 'src/util/decorators/user-info.decorator';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
+import { MESSAGES } from 'src/constants/message.constant';
 
 @ApiTags('인증')
 @Controller('v1/auth')
@@ -33,7 +37,7 @@ export class AuthController {
 
     return {
       statusCode: HttpStatus.CREATED,
-      message: `회원가입에 성공했습니다.`,
+      message: MESSAGES.AUTH.SIGN_UP.SECCEED,
       data: data,
     };
   }
@@ -44,20 +48,19 @@ export class AuthController {
    * @param signInDto
    * @returns
    */
-
   @HttpCode(HttpStatus.OK)
-  @UseGuards(AuthGuard('local'))
+  @UseGuards(LocalAuthGuard)
   @Post('/sign-in')
   async signIn(
-    @Request() req,
+    @UserInfo() user: PartialUser,
     @Body() signInDto: SignInDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const data = await this.authService.signIn(req.user.id, res);
+    const data = await this.authService.signIn(user.id, res);
 
     return {
       statusCode: HttpStatus.OK,
-      message: '로그인에 성공했습니다.',
+      message: MESSAGES.AUTH.SIGN_IN.SECCEED,
       data,
     };
   }
@@ -82,11 +85,11 @@ export class AuthController {
   /**
    * 로그아웃
    */
-  @UseGuards(AuthGuard('jwt-refresh-token'))
+  //@UseGuards(AuthGuard('jwt-refresh-token'))
   @Post('/sign-out')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const { accessOption, refreshOption } = await this.authService.signOut(req);
-
+    console.log(accessOption);
     res.cookie('Authentication', '', accessOption);
     res.cookie('Refresh', '', refreshOption);
     return {

@@ -15,15 +15,28 @@ import {
 import { CommentService } from './comment.service';
 import { Comment } from './entities/comment.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
-import { ApiTags, ApiOperation, ApiParam, ApiBody } from '@nestjs/swagger';
+import { CreateReplyDto } from './dto/create-reply.dto';
+
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { UserInfo } from 'src/util/decorators/user-info.decorator';
+import {
+  ApiOperation,
+  ApiParam,
+  ApiBody,
+  ApiBearerAuth,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { LikeService } from 'src/like/like.service';
-import { UserInfo } from 'src/util/user-info.decorator';
 import { CreateLikeDto } from 'src/like/dto/create-like.dto';
+import { ApiResponse } from 'src/util/api-response.interface';
 import { Like } from 'src/like/entities/like.entity';
 import { ItemType } from 'src/like/types/itemType.types';
-import { ApiResponse } from 'src/util/api-response.interface';
-@Controller('comments')
+
+@ApiTags('댓글')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
+@Controller('v1/comments')
 export class CommentController {
   constructor(
     private readonly commentService: CommentService,

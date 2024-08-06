@@ -39,7 +39,7 @@ export class LikeService {
     if (!existedItem) {
       throw new NotFoundException(MESSAGES.LIKE.ITEMID.NOT_FOUND);
     }
-    console.log(userId);
+
     // DB에서 기존 Like 엔티티 조회
     let like = await this.likeRepository.findOne({
       where: { userId, itemId, itemType },

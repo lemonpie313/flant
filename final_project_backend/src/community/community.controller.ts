@@ -20,8 +20,11 @@ import { CommunityAssignDto } from './dto/community-assign.dto';
 import { UserRole } from 'src/user/types/user-role.type';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { coverImageUploadFactory, logoImageUploadFactory } from 'src/factory/community-image-upload.factory';
-import { ApiFile } from 'src/util/api-file.decorator';
+import {
+  coverImageUploadFactory,
+  logoImageUploadFactory,
+} from 'src/factory/community-image-upload.factory';
+import { ApiFile } from 'src/util/decorators/api-file.decorator';
 
 @ApiTags('커뮤니티')
 @Controller('v1/community')
@@ -87,21 +90,21 @@ export class CommunityController {
     return await this.communityService.findMy(+userId);
   }
 
-    /**
+  /**
    * 단일 커뮤니티 조회
-   * @returns 
+   * @returns
    */
-    @Get(':communityId')
-    async findOne(@Param('communityId') communityId: number) {
-      return await this.communityService.findOne(communityId);
-    }
+  @Get(':communityId')
+  async findOne(@Param('communityId') communityId: number) {
+    return await this.communityService.findOne(communityId);
+  }
 
   /**
    * 로고 이미지 수정
-   * @param req 
-   * @param communityId 
-   * @param File 
-   * @returns 
+   * @param req
+   * @param communityId
+   * @param File
+   * @returns
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
@@ -111,18 +114,22 @@ export class CommunityController {
     @Request() req,
     @Param('communityId') communityId: number,
     @UploadedFile() File: Express.MulterS3.File,
-  ){
+  ) {
     const userId = req.user.id;
     const imageUrl = File.location;
-    return await this.communityService.updateLogo(+userId, +communityId, imageUrl)
+    return await this.communityService.updateLogo(
+      +userId,
+      +communityId,
+      imageUrl,
+    );
   }
 
   /**
    * 커버 이미지 수정
-   * @param req 
-   * @param communityId 
-   * @param File 
-   * @returns 
+   * @param req
+   * @param communityId
+   * @param File
+   * @returns
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
@@ -132,10 +139,14 @@ export class CommunityController {
     @Request() req,
     @Param('communityId') communityId: number,
     @UploadedFile() File: Express.MulterS3.File,
-  ){
+  ) {
     const userId = req.user.id;
     const imageUrl = File.location;
-    return await this.communityService.updateCover(+userId, +communityId, imageUrl)
+    return await this.communityService.updateCover(
+      +userId,
+      +communityId,
+      imageUrl,
+    );
   }
 
   /**
@@ -159,7 +170,7 @@ export class CommunityController {
       +communityId,
       updateCommunityDto,
     );
-  } 
+  }
 
   /**
    * 커뮤니티 삭제
