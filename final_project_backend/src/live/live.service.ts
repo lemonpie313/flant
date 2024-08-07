@@ -232,7 +232,7 @@ export class LiveService {
     //     message: '아티스트 회원 정보를 찾을 수 없습니다.',
     //   });
     // }
-
+    console.log("-----------------------------------------------------------------")
     // 키 발급
     const streamKey = Crypto.randomBytes(20).toString('hex');
     const live = await this.liveRepository.save({
