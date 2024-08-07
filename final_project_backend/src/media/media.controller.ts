@@ -50,7 +50,6 @@ export class MediaController {
     const userId = user.id;
     let imageUrl = undefined
     let videoUrl = undefined
-    console.log(files.mediaImage)
     if(files != undefined){
       if(files.mediaImage && files.mediaImage.length > 0){
         const imageLocation = files.mediaImage.map(file => file.location);
@@ -124,7 +123,6 @@ export class MediaController {
     const userId = user.id;
     let imageUrl = undefined
     let videoUrl = undefined
-    console.log(files.mediaImage)
     if(files != undefined){
       if(files.mediaImage && files.mediaImage.length > 0){
         const imageLocation = files.mediaImage.map(file => file.location);
