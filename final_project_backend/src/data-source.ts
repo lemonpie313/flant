@@ -5,7 +5,7 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { SeederOptions } from 'typeorm-extension';
 import { User } from './user/entities/user.entity';
 import AdminSeeder from './database/seeds/admin.seeder';
-import { CommunityUser } from './community/entities/communityUser.entity';
+import { CommunityUser } from './community/community-user/entities/communityUser.entity';
 import { MembershipPayment } from './membership/entities/membership-payment.entity';
 import { Membership } from './membership/entities/membership.entity';
 import { Community } from './community/entities/community.entity';

@@ -14,7 +14,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { CommunityUser } from './communityUser.entity';
+import { CommunityUser } from '../community-user/entities/communityUser.entity';
 import { Form } from 'src/form/entities/form.entity';
 import { Post } from 'src/post/entities/post.entity';
 import { MembershipPayment } from 'src/membership/entities/membership-payment.entity';
@@ -44,7 +44,7 @@ export class Community {
   })
   @IsOptional()
   @IsUrl()
-  @Column()
+  @Column({ default: null, nullable: true })
   communityLogoImage: string | null;
 
   /**
@@ -56,7 +56,7 @@ export class Community {
   })
   @IsOptional()
   @IsUrl()
-  @Column()
+  @Column({ default: null, nullable: true })
   communityCoverImage: string | null;
 
   /**
@@ -68,7 +68,7 @@ export class Community {
   })
   @IsOptional()
   @IsNumber()
-  @Column({ unsigned: true })
+  @Column({ unsigned: true, nullable: true })
   membershipPrice: number | null;
 
   @CreateDateColumn()
@@ -85,6 +85,7 @@ export class Community {
 
   @OneToMany(() => Form, (form) => form.community, {})
   form: Form[];
+  
   @OneToMany(() => Post, (post) => post.community)
   posts: Post[];
 
