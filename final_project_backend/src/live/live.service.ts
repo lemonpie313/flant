@@ -45,7 +45,6 @@ export class LiveService {
       },
     });
 
-    // 근데 포트번호 이런것들도 .env로 관리하는게 나을듯...
     const liveConfig = {
       rtmp: {
         port: 1935,
@@ -62,14 +61,14 @@ export class LiveService {
       /*
       https: {
         port: 8443,
-        key: './key.pem',
-        cert: './cert.pem',
+        // key: './key.pem',
+        // cert: './cert.pem',
       },
       */
       trans: {
-        //'/usr/bin/ffmpeg',
-        ffmpeg:
-          'C:/Users/Wooni/Downloads/ffmpeg-2024-08-01-git-bcf08c1171-full_build/ffmpeg-2024-08-01-git-bcf08c1171-full_build/bin/ffmpeg.exe',
+        
+        ffmpeg: '/usr/bin/ffmpeg',
+          //'/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
@@ -259,8 +258,8 @@ export class LiveService {
       artistId: live.artistId,
       // artistNickname: live.artist.artistNickname,
       title: live.title,
-      liveHls: `https://localhost:8443/live/${live.streamKey}/index.m3u8`,
-      // liveHls: `https://flant.club/live/${live.streamKey}/index.m3u8`,
+      liveHls: `https://localhost:8443/live/${live.streamKey}/index.m3u8`
+      // liveHls: `https://flant.club:8443/live/${live.streamKey}/index.m3u8`,
     };
   }
 
