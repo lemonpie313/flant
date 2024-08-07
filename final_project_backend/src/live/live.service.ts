@@ -58,11 +58,11 @@ export class LiveService {
         mediaroot: path.join(__dirname, '../../../live-streaming'),
         allow_origin: '*',
       },
-      https: {
-        port: 8443,
-        // key: './key.pem',
-        // cert: './cert.pem',
-      },
+      // https: {
+      //   port: 8443,
+      //   // key: './key.pem',
+      //   // cert: './cert.pem',
+      // },
       trans: {
         ffmpeg: '/usr/bin/ffmpeg',
         //'/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
