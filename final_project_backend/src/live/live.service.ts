@@ -123,12 +123,22 @@ export class LiveService {
         );
         const directoryExists = fs.existsSync(directoryPath);
 
-        if (!directoryExists) {
-          fs.mkdirSync(directoryPath, { recursive: true });
-          console.log(`디렉토리 생성됨: ${directoryPath}`);
-        } else {
-          console.log(`디렉토리 이미 존재함: ${directoryPath}`);
+        try {
+          // 디렉토리 생성 로그
+          console.log('Attempting to create directory:', directoryPath);
+
+          if (!fs.existsSync(directoryPath)) {
+            fs.mkdirSync(directoryPath, { recursive: true });
+            console.log('Directory created successfully:', directoryPath);
+          } else {
+            console.log('Directory already exists:', directoryPath);
+          }
+
+          // Additional logic for prePublish event
+        } catch (error) {
+          console.error('Error creating directory:', error);
         }
+
         const live = await this.liveRepository.findOne({
           where: {
             streamKey,
@@ -232,7 +242,9 @@ export class LiveService {
     //     message: '아티스트 회원 정보를 찾을 수 없습니다.',
     //   });
     // }
-    console.log("-----------------------------------------------------------------")
+    console.log(
+      '-----------------------------------------------------------------',
+    );
     // 키 발급
     const streamKey = Crypto.randomBytes(20).toString('hex');
     const live = await this.liveRepository.save({
