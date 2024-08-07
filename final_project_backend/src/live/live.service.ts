@@ -72,6 +72,8 @@ export class LiveService {
             hls: true,
             hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
             hlsKeep: true, // to prevent hls file delete after end the stream
+            dash: true,
+            dashFlags: '[f=dash:window_size=3:extra_window_size=5]',
           },
           {
             app: 'live',
@@ -174,32 +176,32 @@ export class LiveService {
     //     const live = await this.liveRepository.findOne({
     //       where: { streamKey },
     //     });
-    
+
     //     const liveDirectory = path.join(
     //       __dirname,
     //       '../../../live-streaming/live',
     //       streamKey,
     //     );
     //     console.log(`Reading directory: ${liveDirectory}`);
-    
+
     //     if (!fs.existsSync(liveDirectory)) {
     //       console.error('Live directory does not exist:', liveDirectory);
     //       return;
     //     }
-    
+
     //     const files = fs.readdirSync(liveDirectory);
     //     console.log('Files in directory:', files);
-    
+
     //     const fileName = files.find((file) => path.extname(file) === '.mp4');
-    
+
     //     if (!fileName) {
     //       console.error('No .mp4 file found in directory:', liveDirectory);
     //       return;
     //     }
-    
+
     //     const filePath = path.join(liveDirectory, fileName);
     //     console.log('Reading file:', filePath);
-    
+
     //     try {
     //       const file = fs.readFileSync(filePath);
     //       const liveVideoUrl = await this.liveRecordingToS3(fileName, file, 'mp4');
