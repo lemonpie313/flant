@@ -153,7 +153,10 @@ export class LiveService {
             streamKey,
           },
         });
-        const files = fs.readdirSync(`../live-streaming/live/${streamKey}`); // 디렉토리를 읽어온다
+        const liveDirectory = path.resolve(__dirname, '../../../live-streaming/live', streamKey);
+        console.log(`Reading directory: ${liveDirectory}`);
+        const files = fs.readdirSync(liveDirectory);
+        //const files = fs.readdirSync(`../live-streaming/live/${streamKey}`); // 디렉토리를 읽어온다
         const fileName = files.find((file) => path.extname(file) == '.mp4');
         const file = fs.readFileSync(
           `../live-streaming/live/${streamKey}/${fileName}`,
