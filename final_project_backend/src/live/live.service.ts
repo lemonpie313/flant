@@ -55,7 +55,7 @@ export class LiveService {
       },
       http: {
         port: 8000,
-        mediaroot: path.join(__dirname, '../../../live-streaming'),
+        mediaroot: './media',
         allow_origin: '*',
       },
       // https: {
@@ -118,11 +118,7 @@ export class LiveService {
         );
         const session = this.nodeMediaServer.getSession(id);
         const streamKey = streamPath.split('/live/')[1];
-        const directoryPath = path.join(
-          __dirname,
-          '../../../live-streaming/live',
-          streamKey,
-        );
+        const directoryPath = './media'
         const directoryExists = fs.existsSync(directoryPath);
 
         try {
@@ -218,19 +214,15 @@ export class LiveService {
   }
 
   async cleanupStreamFolder(streamKey: string) {
-    const folderPath = path.join(
-      __dirname,
-      '../../../live-streaming/live',
-      streamKey,
-    );
-    console.log('folderPath: ' + folderPath);
-    if (fs.existsSync(folderPath)) {
-      for (const file of fs.readdirSync(folderPath)) {
-        const curPath = path.join(folderPath, file);
-        fs.unlinkSync(curPath);
-      }
-      fs.rmdirSync(folderPath);
-    }
+    // const folderPath = './media';
+    // console.log('folderPath: ' + folderPath);
+    // if (fs.existsSync(folderPath)) {
+    //   for (const file of fs.readdirSync(folderPath)) {
+    //     const curPath = path.join(folderPath, file);
+    //     fs.unlinkSync(curPath);
+    //   }
+    //   fs.rmdirSync(folderPath);
+    // }
   }
 
   async createLive(userId: number, title: string, liveType: LiveTypes) {
