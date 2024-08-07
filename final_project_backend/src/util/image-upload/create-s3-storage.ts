@@ -4,6 +4,18 @@ import multerS3 from 'multer-s3';
 import { basename, extname } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
+const extensionFilter = (req, file, callback) => {
+  const allowedImageExtensions = ['image/jpeg', 'image/jpg', 'image/png'];
+  const allowedVideoExtensions = ['video/mp4', 'video/avi'];
+
+  if (allowedImageExtensions.includes(file.mimetype) ||
+      allowedVideoExtensions.includes(file.mimetype)) {
+    callback(null, true);
+  } else {
+    callback(new Error('이미지 확장자는 jpeg, jpg, png, 동영상 확장자는 mp4, avi 지원됩니다.'), false);
+  }
+}
+
 // 공통 S3 설정 생성 함수 (multerOption)
 const createS3Storage = (folder: string): MulterOptions => ({
   storage: multerS3({
@@ -28,6 +40,7 @@ const createS3Storage = (folder: string): MulterOptions => ({
       callback(null, fileName);
     },
   }),
+  fileFilter: extensionFilter,
 });
 
 export const UserProfileUploadFactory = (): MulterOptions =>
