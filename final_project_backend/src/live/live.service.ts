@@ -172,39 +172,45 @@ export class LiveService {
       async (id: string, streamPath: string) => {
         const streamKey = streamPath.split('/live/')[1];
         const live = await this.liveRepository.findOne({
-          where: {
-            streamKey,
-          },
+          where: { streamKey },
         });
+    
         const liveDirectory = path.join(
           __dirname,
           '../../../live-streaming/live',
           streamKey,
         );
         console.log(`Reading directory: ${liveDirectory}`);
+    
+        if (!fs.existsSync(liveDirectory)) {
+          console.error('Live directory does not exist:', liveDirectory);
+          return;
+        }
+    
         const files = fs.readdirSync(liveDirectory);
-        //const files = fs.readdirSync(`../live-streaming/live/${streamKey}`); // 디렉토리를 읽어온다
-        const fileName = files.find((file) => path.extname(file) == '.mp4');
-        const mp4FileDir = path.join(
-          __dirname,
-          '../../../live-streaming/live',
-          streamKey, fileName
-        );
-        const file = fs.readFileSync(
-          mp4FileDir
-        );
-        const liveVideoUrl = await this.liveRecordingToS3(
-          fileName,
-          file,
-          'mp4',
-        );
-        await this.cleanupStreamFolder(streamKey);
-        await this.liveRepository.update(
-          { liveId: live.liveId },
-          {
-            liveVideoUrl,
-          },
-        );
+        console.log('Files in directory:', files);
+    
+        const fileName = files.find((file) => path.extname(file) === '.mp4');
+    
+        if (!fileName) {
+          console.error('No .mp4 file found in directory:', liveDirectory);
+          return;
+        }
+    
+        const filePath = path.join(liveDirectory, fileName);
+        console.log('Reading file:', filePath);
+    
+        try {
+          const file = fs.readFileSync(filePath);
+          const liveVideoUrl = await this.liveRecordingToS3(fileName, file, 'mp4');
+          await this.cleanupStreamFolder(streamKey);
+          await this.liveRepository.update(
+            { liveId: live.liveId },
+            { liveVideoUrl },
+          );
+        } catch (error) {
+          console.error('Error handling live stream file:', error);
+        }
       },
     );
   }
