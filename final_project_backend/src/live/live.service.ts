@@ -136,9 +136,14 @@ export class LiveService {
             console.log(reason);
           });
         }
-        const directory = fs.existsSync(`./live-streaming/live/${streamKey}`);
-        if (!directory) {
-          fs.mkdirSync(`./live-streaming/live/${streamKey}`, { recursive: true });
+        const directoryPath = path.resolve(
+          __dirname,
+          '../../../live-streaming/live',
+          streamKey,
+        );
+        const directoryExists = fs.existsSync(directoryPath);
+        if (!directoryExists) {
+          fs.mkdirSync(directoryPath, { recursive: true });
         }
       },
     );
@@ -153,7 +158,14 @@ export class LiveService {
             streamKey,
           },
         });
-        const files = fs.readdirSync(`../live-streaming/live/${streamKey}`); // 디렉토리를 읽어온다
+        const liveDirectory = path.resolve(
+          __dirname,
+          '../../../live-streaming/live',
+          streamKey,
+        );
+        console.log(`Reading directory: ${liveDirectory}`);
+        const files = fs.readdirSync(liveDirectory);
+        //const files = fs.readdirSync(`../live-streaming/live/${streamKey}`); // 디렉토리를 읽어온다
         const fileName = files.find((file) => path.extname(file) == '.mp4');
         const file = fs.readFileSync(
           `../live-streaming/live/${streamKey}/${fileName}`,
