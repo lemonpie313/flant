@@ -111,10 +111,16 @@ export class LiveService {
     this.nodeMediaServer.on(
       'prePublish',
       async (id: string, streamPath: string) => {
-        console.log('-----------------------방송시작직전--------------------------');
+        console.log(
+          '-----------------------방송시작직전--------------------------',
+        );
         const session = this.nodeMediaServer.getSession(id);
         const streamKey = streamPath.split('/live/')[1];
-        const directoryPath = path.join(__dirname, '../../../live-streaming/live', streamKey);
+        const directoryPath = path.join(
+          __dirname,
+          '../../../live-streaming/live',
+          streamKey,
+        );
         const directoryExists = fs.existsSync(directoryPath);
 
         if (!directoryExists) {
@@ -128,6 +134,8 @@ export class LiveService {
             streamKey,
           },
         });
+        console.log('----------------foundData----------------');
+        console.log(live);
         if (_.isNil(live)) {
           session.reject((reason: string) => {
             console.log(reason);
@@ -144,9 +152,7 @@ export class LiveService {
             console.log(reason);
           });
         }
-        console.log(
-          '------------------------방송시작?------------------',
-        );
+        console.log('------------------------방송시작?------------------');
       },
     );
 
