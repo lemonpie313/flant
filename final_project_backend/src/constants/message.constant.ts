@@ -36,6 +36,12 @@ export const MESSAGES = {
       JWT: {
         UNAUTHORIZED: '인증 정보가 유효하지 않습니다.',
       },
+      COMMUNITY_USER: {
+        NO_USER: '멤버 식별에 필요한 사용자 정보를 입력해주세요.',
+        NO_COMMUNITY: '멤버 식별에 필요한 커뮤니티 정보를 입력해주세요.',
+        NOT_ARTIST: '해당 커뮤니티의 아티스트가 아닙니다.',
+        NOT_MANAGER: '해당 커뮤니티의 매니저가 아닙니다.',
+      },
       DUPLICATED: '이미 등록된 사용자 입니다.',
       FORBIDDEN: '접근 권한이 없습니다.',
     },
@@ -86,6 +92,11 @@ export const MESSAGES = {
       UNAUTHORIZED: '커뮤니티 수정 권한이 없습니다',
       BAD_REQUEST:'등록할 이미지를 업로드 해주세요.',
       SUCCEED: '커버 이미지 수정이 완료되었습니다.',
+    },
+  },
+  COMMUNITY_USER: {
+    COMMON: {
+      NOT_FOUND: '커뮤니티에 가입하지 않은 사용자입니다.',
     },
   },
   USER: {
