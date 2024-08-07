@@ -55,7 +55,7 @@ export class LiveService {
       },
       http: {
         port: 8000,
-        mediaroot: '../live-streaming',
+        mediaroot: path.join(__dirname, '../../../live-streaming'),
         allow_origin: '*',
       },
       https: {
@@ -111,23 +111,17 @@ export class LiveService {
     this.nodeMediaServer.on(
       'prePublish',
       async (id: string, streamPath: string) => {
-        console.log(
-          '-----------------------방송시작직전--------------------------',
-        );
+        console.log('-----------------------방송시작직전--------------------------');
         const session = this.nodeMediaServer.getSession(id);
         const streamKey = streamPath.split('/live/')[1];
-        const directoryPath = path.resolve(
-          __dirname,
-          '../../../live-streaming/live',
-          streamKey,
-        );
+        const directoryPath = path.join(__dirname, '../../../live-streaming/live', streamKey);
         const directoryExists = fs.existsSync(directoryPath);
 
-        console.log(
-          '---------------------------디렉토리생성완료------------------',
-        );
         if (!directoryExists) {
           fs.mkdirSync(directoryPath, { recursive: true });
+          console.log(`디렉토리 생성됨: ${directoryPath}`);
+        } else {
+          console.log(`디렉토리 이미 존재함: ${directoryPath}`);
         }
         const live = await this.liveRepository.findOne({
           where: {
@@ -166,7 +160,7 @@ export class LiveService {
             streamKey,
           },
         });
-        const liveDirectory = path.resolve(
+        const liveDirectory = path.join(
           __dirname,
           '../../../live-streaming/live',
           streamKey,
