@@ -78,10 +78,21 @@ export class NoticeController {
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
+  @ApiFiles('noticeImage', 3, noticeImageUploadFactory())
   @Patch(':noticeId')
-  update(@UserInfo() user, @Param('noticeId') noticeId: number, @Body() updateNoticeDto: UpdateNoticeDto) {
+  update(
+    @UploadedFiles() files: {noticeImage?: Express.MulterS3.File[]},
+    @UserInfo() user,
+    @Param('noticeId') noticeId: number,
+    @Body() updateNoticeDto: UpdateNoticeDto,
+  ) {
     const userId = user.id;
-    return this.noticeService.update(+userId, +noticeId, updateNoticeDto);
+    let imageUrl = undefined
+    if(files && files.noticeImage && files.noticeImage.length != 0){
+      const imageLocation = files.noticeImage.map(file => file.location);
+      imageUrl = imageLocation
+    }
+    return this.noticeService.update(+userId, +noticeId, updateNoticeDto, imageUrl);
   }
 
   /**

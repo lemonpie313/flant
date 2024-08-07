@@ -109,10 +109,33 @@ export class MediaController {
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
+  @ApiMedia([
+    { name: 'mediaImage', maxCount: 3 },
+    { name: 'mediaVideo', maxCount: 1 }
+  ],
+  mediaFileUploadFactory())
   @Patch(':mediaId')
-  update(@UserInfo() user, @Param('mediaId') mediaId: number, @Body() updateMediaDto: UpdateMediaDto) {
+  update(
+    @UploadedFiles() files: {mediaImage?: Express.MulterS3.File[], mediaVideo?: Express.MulterS3.File[]},
+    @UserInfo() user,
+    @Param('mediaId') mediaId: number,
+    @Body() updateMediaDto: UpdateMediaDto
+  ) {
     const userId = user.id;
-    return this.mediaService.update(+userId, +mediaId, updateMediaDto);
+    let imageUrl = undefined
+    let videoUrl = undefined
+    console.log(files.mediaImage)
+    if(files != undefined){
+      if(files.mediaImage && files.mediaImage.length > 0){
+        const imageLocation = files.mediaImage.map(file => file.location);
+        imageUrl = imageLocation
+        }
+      if(files.mediaVideo && files.mediaVideo.length > 0){
+        const videoLocation = files.mediaVideo.map(file => file.location);
+        videoUrl = videoLocation
+        }
+    }
+    return this.mediaService.update(+userId, +mediaId, updateMediaDto, imageUrl, videoUrl);
   }
 
   /**

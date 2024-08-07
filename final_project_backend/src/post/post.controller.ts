@@ -97,14 +97,21 @@ export class PostController {
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
+  @ApiFiles('postImage', 3, postImageUploadFactory())
   @Patch(':postId')
   async update(
+    @UploadedFiles() files: { postImage?: Express.MulterS3.File[] },
     @UserInfo() user,
     @Param('postId') postId: number,
     @Body() updatePostDto: UpdatePostDto,
   ) {
+    let imageUrl = undefined
+    if(files && files.postImage && files.postImage.length > 0){
+      const imageLocation = files.postImage.map(file=> file.location);
+      imageUrl = imageLocation
+    }
     const userId = user.id;
-    return await this.postService.update(+userId, +postId, updatePostDto);
+    return await this.postService.update(+userId, +postId, updatePostDto, imageUrl);
   }
 
   /**

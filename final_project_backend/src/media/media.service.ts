@@ -119,6 +119,7 @@ export class MediaService {
     if(!imageUrl){
       throw new BadRequestException(MESSAGES.MEDIA.UPDATETHUMBNAIL.BAD_REQUEST)
     }
+    
     await this.mediaRepository.update(
       {mediaId: mediaId},
       {thumbnailImage: imageUrl})
@@ -135,6 +136,8 @@ export class MediaService {
     userId: number,
     mediaId: number,
     updateMediaDto: UpdateMediaDto,
+    imageUrl: string[] | undefined,
+    videoUrl: string | undefined,
   ) {
     const mediaData = await this.mediaRepository.findOne({
       where: { mediaId: mediaId },
@@ -154,10 +157,63 @@ export class MediaService {
     if (_.isEmpty(updateMediaDto)) {
       throw new BadRequestException(MESSAGES.MEDIA.UPDATE.BAD_REQUEST);
     }
+    const newData = {
+      title: mediaData.title,
+      content: mediaData.content,
+      publishTime: mediaData.publishTime,
+    }
+
+    const newPublishTime = new Date(
+      updateMediaDto.year,
+      updateMediaDto.month - 1,
+      updateMediaDto.day,
+      updateMediaDto.hour,
+      updateMediaDto.minute
+    )
+
+    if(newPublishTime != mediaData.publishTime){
+      newData.publishTime = newPublishTime
+    }
+    if(updateMediaDto.title != mediaData.title){
+      newData.title = updateMediaDto.title
+    }
+    if(updateMediaDto.content != mediaData.content){
+      newData.content = updateMediaDto.content
+    }
+
+    if (imageUrl && imageUrl.length > 0 || videoUrl) {
+      await this.mediaFileRepository
+      .createQueryBuilder()
+      .delete() 
+      .from(MediaFile)
+      .where('media_id = :mediaId', { mediaId })
+      .execute();
+      
+      if(imageUrl){
+      for(let image of imageUrl){
+        const mediaImageData = {
+          mediaId: mediaData.mediaId,
+          managerId: isManager.managerId,
+          mediaFileUrl: image,
+        }
+        await this.mediaFileRepository.save(mediaImageData)
+      }
+    }
+      if(videoUrl){
+        const mediaVideoData = {
+          mediaId: mediaData.mediaId,
+          managerId: isManager.managerId,
+          mediaFileUrl: videoUrl,
+        }
+        await this.mediaFileRepository.save(mediaVideoData)
+      }
+    }
+
     await this.mediaRepository.update(
       { mediaId: mediaId },
-      { title: updateMediaDto.title, content: updateMediaDto.content },
+      newData,
     );
+
     const updatedData = await this.mediaRepository.findOne({
       where: { mediaId: mediaId },
     });
