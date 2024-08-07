@@ -106,9 +106,20 @@ export class NoticeService {
       throw new BadRequestException(MESSAGES.NOTICE.UPDATE.BAD_REQUEST);
     }
 
+    const newData = {
+      title: noticeData.title,
+      content: noticeData.content,
+    }
+    if(updateNoticeDto.title != noticeData.title){
+      newData.title = updateNoticeDto.title
+    }
+    if(updateNoticeDto.content != noticeData.content){
+      newData.content = updateNoticeDto.content
+    }    
+
     await this.noticeRepository.update(
       { noticeId: noticeId },
-      { title: updateNoticeDto.title, content: updateNoticeDto.content },
+      newData,
     );
 
 

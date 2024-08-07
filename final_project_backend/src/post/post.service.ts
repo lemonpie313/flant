@@ -142,10 +142,20 @@ export class PostService {
       throw new BadRequestException(MESSAGES.POST.UPDATE.BAD_REQUEST);
     }
 
+    const newData = {
+      title: postData.title,
+      content: postData.content,
+    }
+    if(updatePostDto.title != postData.title){
+      newData.title = updatePostDto.title
+    }
+    if(updatePostDto.content != postData.content){
+      newData.content = updatePostDto.content
+    }
 
     await this.postRepository.update(
       { postId: postId },
-      { title: updatePostDto.title, content: updatePostDto.content },
+      newData,
     );
 
     if (imageUrl && imageUrl.length > 0) {
