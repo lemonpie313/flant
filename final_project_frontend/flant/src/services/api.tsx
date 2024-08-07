@@ -1,8 +1,7 @@
 import axios from "axios";
 import { UpdateUserDto } from "../types/user";
 // 환경 변수에서 API_BASE_URL을 가져옵니다.
-
-const API_BASE_URL = "http://localhost:3000/api/v1"; // 추후 env파일로 수정
+const API_BASE_URL = "http://localhost:3001/api/v1"; // 추후 env파일로 수정
 // Axios 인스턴스 생성
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -18,7 +17,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 // 응답 인터셉터 - 토큰 만료 시 리프레시 토큰으로 갱신
-/*
 api.interceptors.response.use(
   (response) => {
     return response;
@@ -46,28 +44,15 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-*/
 export const authApi = {
-  signIn: (email: string, password: string) =>
+  login: (email: string, password: string) =>
     api.post("/auth/sign-in", { email, password }),
-  signUp: (
-    name: string,
-    email: string,
-    password: string,
-    passwordConfirm: string
-  ) =>
-    api.post("/auth/sign-up", {
-      name,
-      email,
-      password,
-      passwordConfirm,
-    }),
   googleLogin: (token: string) => api.post("/auth/google", { token }),
-  signOut: () => api.post("/auth/sign-out"),
-  //refresh: (refreshToken: string) => api.post("/auth/refresh", { refreshToken }),
+  logout: () => api.post("/auth/logout"),
+  refresh: (refreshToken: string) =>
+    api.post("/auth/refresh", { refreshToken }),
 };
 // 다른 API 함수들 (userApi, postApi, fileApi)은 이전과 동일하게 유지
-
 export const userApi = {
   login: (email: string, password: string) =>
     api.post("/auth/login", { email, password }),

@@ -1,18 +1,16 @@
-// src/index.tsx
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import { json } from 'react-router-dom';
-import './styles/custom.scss';
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import React from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import "./styles/custom.scss";
+
+const root = createRoot(document.getElementById("root") as HTMLElement);
 
 
-ReactDOM.render(
+root.render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-); 
-
+  </React.StrictMode>
+);
