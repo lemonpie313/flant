@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Community } from 'src/community/entities/community.entity';
-import { CommunityUser } from 'src/community/entities/communityUser.entity';
+import { CommunityUser } from 'src/community/community-user/entities/communityUser.entity';
 import { DataSource, IsNull, LessThan, Not, Repository } from 'typeorm';
 import { Membership } from './entities/membership.entity';
 import _ from 'lodash';

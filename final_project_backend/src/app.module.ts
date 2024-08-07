@@ -25,6 +25,7 @@ import { LikeModule } from './like/like.module';
 import { NoticeModule } from './notice/notice.module';
 import { MediaModule } from './media/media.module';
 import { LiveModule } from './live/live.module';
+import { CommunityUserModule } from './community/community-user/community-user.module';
 
 @Module({
   imports: [
@@ -48,14 +49,14 @@ import { LiveModule } from './live/live.module';
     AdminModule,
     MembershipModule,
     CommentModule, // CommentModule 추가
-    CommentModule,
-    CartModule, // CommentModule 추가
+    CartModule,
     PostModule,
     LikeModule,
     NoticeModule,
-    MediaModule, // CommentModule 추가
+    MediaModule,
     PostModule,
-    LiveModule, // CommentModule 추가
+    LiveModule,
+    CommunityUserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

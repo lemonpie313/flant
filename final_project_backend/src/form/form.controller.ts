@@ -6,9 +6,8 @@ import {
   Patch,
   Param,
   Delete,
-  NotFoundException,
   UseGuards,
-  Req,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { FormService } from './form.service';
 import { CreateFormDto } from './dto/create-form.dto';
@@ -17,7 +16,8 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { UserRole } from 'src/user/types/user-role.type';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { UserInfo } from 'src/util/decorators/user-info.decorator';
 
 @ApiTags('Forms')
 @Controller('v1/forms')
@@ -31,12 +31,10 @@ export class FormController {
    */
   @ApiBearerAuth()
   @Roles(UserRole.Manager)
-  @UseGuards(RolesGuard)
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post()
-  async create(@Req() req, @Body() createFormDto: CreateFormDto) {
-    const userId = req.user.id;
-    return await this.formService.create(createFormDto, userId);
+  async create(@UserInfo() user, @Body() createFormDto: CreateFormDto) {
+    return await this.formService.create(createFormDto, user.id);
   }
 
   /**
@@ -45,8 +43,8 @@ export class FormController {
    * @returns
    */
   @Get('/:formId')
-  async findOne(@Param('formId') formId: string) {
-    return await this.formService.findOne(+formId);
+  async findOne(@Param('formId', ParseIntPipe) formId: number) {
+    return await this.formService.findOne(formId);
   }
 
   /**
@@ -58,16 +56,13 @@ export class FormController {
   @ApiBearerAuth()
   @Patch('/:formId')
   @Roles(UserRole.Manager)
-  @UseGuards(RolesGuard)
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async update(
-    @Param('formId') formId: string,
+    @Param('formId', ParseIntPipe) formId: number,
     @Body() updateFormDto: UpdateFormDto,
-    @Req() req,
+    @UserInfo() user,
   ) {
-    const userId = req.user.id;
-
-    return await this.formService.update(+formId, updateFormDto, userId);
+    return await this.formService.update(formId, updateFormDto, user.id);
   }
 
   /**
@@ -78,11 +73,11 @@ export class FormController {
   @ApiBearerAuth()
   @Delete('/:formId')
   @Roles(UserRole.Manager)
-  @UseGuards(RolesGuard)
-  @UseGuards(AuthGuard('jwt'))
-  async remove(@Param('formId') formId: string, @Req() req) {
-    const userId = req.user.id;
-
-    return await this.formService.remove(+formId, userId);
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  async remove(
+    @Param('formId', ParseIntPipe) formId: number,
+    @UserInfo() user,
+  ) {
+    return await this.formService.remove(formId, user.id);
   }
 }

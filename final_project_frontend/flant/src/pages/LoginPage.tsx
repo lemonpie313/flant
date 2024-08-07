@@ -1,52 +1,96 @@
 // src/pages/LoginPage.tsx
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { authApi } from '../services/api';
-import './LoginPage.scss';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { authApi } from "../services/api";
+import "./LoginPage.scss";
+import { Link } from "react-router-dom";
+interface LoginPageProps {
+  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-const LoginPage: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await authApi.login(username, password); // axios를 사용하여 로그인 요청을 보냄
-      localStorage.setItem('isLoggedIn', 'true');
-      navigate('/');
+      await authApi.signIn(email, password); // axios를 사용하여 로그인 요청을 보냄
+      alert("로그인이 정상적으로 되었습니다.");
+      localStorage.setItem("isLoggedIn", "true");
+      setIsLoggedIn(true);
+      navigate("/main");
     } catch (error) {
-      console.error('Login failed:', error);
-      alert('Login failed. Please check your credentials.');
+      console.error("로그인 실패:", error);
+      alert("Login failed. Please check your credentials.");
     }
   };
 
   return (
     <div className="login-page">
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="username">Username:</label>
-          <input
-            type="text"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
+      <div className="login-box">
+        <header>
+          <img
+            className="main-box-logo"
+            src="/TGSrd-removebg-preview.png"
+            alt="logo"
+          ></img>
+        </header>
+        <main>
+          <form onSubmit={handleSubmit}>
+            <div className="main-email">
+              <input
+                className="main-email-input"
+                type="text"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              ></input>
+              <label className="main-email-label">email</label>
+              <span className="main-email-span"></span>
+            </div>
+            <div className="main-email main-password">
+              <input
+                className="main-email-input"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              ></input>
+              <label className="main-email-label">password</label>
+              <span className="main-email-span"></span>
+            </div>
+            <div className="main-login-button">
+              <button type="submit" className="main-login-btn login-btn-3">
+                로그인
+              </button>
+            </div>
+          </form>
+          <div className="main-signup">
+            <Link to="/signup" className="main-signup-a">
+              회원가입 하기
+            </Link>
+            <Link to="/main" className="main-signup-a ">
+              계정 정보 찾기
+            </Link>
+          </div>
+
+          <div className="main-login-forget"></div>
+        </main>
+        <footer>
+          <div className="footer-line">혹은</div>
+          <div className="footer-socialLogin">
+            <a href="#">
+              <img
+                className="login-google-image"
+                src="/google-icon.png"
+                alt="google"
+              ></img>
+            </a>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 };
