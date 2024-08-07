@@ -85,4 +85,20 @@ export class FormController {
 
     return await this.formService.remove(+formId, userId);
   }
+
+  /**
+   * 폼신청
+   * @param formId
+   * @param applyToFormDto
+   * @param req
+   * @returns
+   */
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/:formId')
+  async applyForm(@Param('formId') formId: string, @Req() req) {
+    const userId = req.user.id;
+
+    return await this.formService.applyForm(userId, +formId);
+  }
 }

@@ -1,4 +1,4 @@
-export enum FromItemType {
+export enum FormType {
   IDOL = 'idol',
   BOY = 'boy',
 }

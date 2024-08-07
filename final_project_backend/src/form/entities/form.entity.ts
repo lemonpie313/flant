@@ -10,33 +10,41 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { FormItem } from './form.item';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty } from 'class-validator';
 import { Exclude } from 'class-transformer';
 import { Manager } from 'src/admin/entities/manager.entity';
 import { Community } from 'src/community/entities/community.entity';
+import { FormType } from '../types/form-type.enum';
 
 @Entity('form')
 export class Form {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
-  /**
-   * 제목
-   *  @example "Form 제목"
-   */
-  @IsNotEmpty({ message: '제목을 입력해주세요' })
-  @IsString()
   @Column()
   title: string;
 
-  /**
-   * 내용
-   * @example "Form 내용"
-   */
-  @IsNotEmpty({ message: '내용을 입력해주세요' })
-  @IsString()
   @Column()
   content: string;
+
+  @IsEnum({
+    type: 'enum',
+    enum: FormType,
+  })
+  @Column()
+  formType: FormType;
+
+  @Column()
+  maxApply: number;
+
+  @Column()
+  spareApply: number;
+
+  @Column()
+  startTime: string;
+
+  @Column()
+  endTime: string;
 
   @CreateDateColumn()
   createdAt: Date;

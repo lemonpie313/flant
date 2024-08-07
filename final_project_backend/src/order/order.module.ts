@@ -8,9 +8,22 @@ import { Order } from './entities/order.entity';
 import { MerchandiseModule } from 'src/merchandise/merchandise.module';
 import { ProductModule } from 'src/product/product.module';
 import { User } from 'src/user/entities/user.entity';
+import { OrderItem } from './entities/orderItem.entity';
+import { MerchandisePost } from 'src/merchandise/entities/merchandise-post.entity';
+import { MerchandiseOption } from 'src/merchandise/entities/marchandise-option.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Cart, CartItem, Order, User])],
+  imports: [
+    TypeOrmModule.forFeature([
+      Cart,
+      CartItem,
+      Order,
+      OrderItem,
+      User,
+      MerchandisePost,
+      MerchandiseOption,
+    ]),
+  ],
   controllers: [OrderController],
   providers: [OrderService],
 })
