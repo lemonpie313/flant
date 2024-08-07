@@ -64,9 +64,8 @@ export class LiveService {
         // cert: './cert.pem',
       },
       trans: {
-        
         ffmpeg: '/usr/bin/ffmpeg',
-          //'/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+        //'/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
@@ -136,6 +135,10 @@ export class LiveService {
           session.reject((reason: string) => {
             console.log(reason);
           });
+        }
+        const directory = fs.existsSync(`./live-streaming/live/${streamKey}`);
+        if (!directory) {
+          fs.mkdirSync(`./live-streaming/live/${streamKey}`, { recursive: true });
         }
       },
     );
@@ -256,7 +259,7 @@ export class LiveService {
       artistId: live.artistId,
       // artistNickname: live.artist.artistNickname,
       title: live.title,
-      liveHls: `https://localhost:8443/live/${live.streamKey}/index.m3u8`
+      liveHls: `https://localhost:8443/live/${live.streamKey}/index.m3u8`,
       // liveHls: `https://flant.club:8443/live/${live.streamKey}/index.m3u8`,
     };
   }
