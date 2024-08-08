@@ -18,6 +18,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { UserRole } from 'src/user/types/user-role.type';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 
 @ApiTags('Forms')
 @Controller('v1/forms')
@@ -89,11 +90,12 @@ export class FormController {
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Post('/:formId')
-  async applyForm(@Param('formId') formId: string, @Req() req) {
-    const userId = req.user.id;
-
-    return await this.formService.applyForm(userId, +formId);
+  async applyForm(
+    @Param('formId', ParseIntPipe) formId: string,
+    @UserInfo() user: PartialUser,
+  ) {
+    return await this.formService.applyForm(user.id, +formId);
   }
 }
