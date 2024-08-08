@@ -192,7 +192,7 @@ export class ProductService {
     if (!product) {
       throw new NotFoundException('존재하지 않는 상점입니다.');
     }
-
+    console.log(product);
     // product 작성자와 수정 요청한 사용자가 일치한지 확인
     if (product.manager.userId !== userId) {
       throw new ForbiddenException('수정 권한이 없습니다.');
