@@ -55,7 +55,7 @@ export class LiveService {
       },
       http: {
         port: 8000,
-        mediaroot: './media',
+        mediaroot: path.join(__dirname, '../../../media'),
         allow_origin: '*',
       },
       // https: {
@@ -72,8 +72,8 @@ export class LiveService {
             hls: true,
             hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
             hlsKeep: true, // to prevent hls file delete after end the stream
-            dash: true,
-            dashFlags: '[f=dash:window_size=3:extra_window_size=5]',
+            // dash: true,
+            // dashFlags: '[f=dash:window_size=3:extra_window_size=5]',
           },
           {
             app: 'live',
@@ -91,18 +91,18 @@ export class LiveService {
     file, // 업로드할 파일
     ext: string, // 파일 확장자
   ) {
-    const command = new PutObjectCommand({
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: fileName,
-      Body: file.buffer,
-      ACL: 'public-read',
-      ContentType: `image/${ext}`,
-    });
+    // const command = new PutObjectCommand({
+    //   Bucket: process.env.AWS_BUCKET_NAME,
+    //   Key: fileName,
+    //   Body: file.buffer,
+    //   ACL: 'public-read',
+    //   ContentType: `image/${ext}`,
+    // });
 
-    await this.s3Client.send(command);
+    // await this.s3Client.send(command);
 
-    // 업로드된 이미지의 URL을 반환합니다.
-    return `https://s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${process.env.AWS_BUCKET_NAME}/${fileName}`;
+    // // 업로드된 이미지의 URL을 반환합니다.
+    // return `https://s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${process.env.AWS_BUCKET_NAME}/${fileName}`;
   }
 
   onModuleInit() {
@@ -118,9 +118,13 @@ export class LiveService {
         );
         const session = this.nodeMediaServer.getSession(id);
         const streamKey = streamPath.split('/live/')[1];
-        const directoryPath = './media'
+        const directoryPath = path.join(
+          __dirname,
+          '../../../media/live',
+          streamKey,
+        );
         const directoryExists = fs.existsSync(directoryPath);
-
+        console.log("--------------------"+directoryExists);
         try {
           // 디렉토리 생성 로그
           console.log('Attempting to create directory:', directoryPath);
