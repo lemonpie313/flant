@@ -92,14 +92,17 @@ export class CartController {
       data,
     });
   }
+
   /**
-   * 카트 item 삭제
+   * 카트 아이템 삭제
    * @param cartItemId
+   * @param req
+   * @param res
    * @returns
    */
-  @Delete()
+  @Delete('/item/:cartItemId')
   async remove(
-    @Query('cartItemId') cartItemId: string,
+    @Param('cartItemId') cartItemId: string,
     @Req() req,
     @Res() res,
   ) {
@@ -117,5 +120,46 @@ export class CartController {
     }
     //반환
     return res.json(data);
+  }
+
+  /**
+   * 상품 수량 수정
+   * @param cartItemId
+   * @param updateCadrDto
+   * @param req
+   * @param res
+   * @returns
+   */
+  @Patch('/item/:cartItemId')
+  async cartQuantity(
+    @Param('cartItemId') cartItemId: string,
+    @Body() updateCadrDto: UpdateCartDto,
+    @Req() req,
+    @Res() res,
+  ) {
+    const userId = req.user?.id;
+    const cookies = req.cookies || {};
+
+    // 서비스 호출하여 로직 처리
+    const data = await this.cartService.cartQuantity(
+      userId,
+      +cartItemId,
+      cookies,
+      updateCadrDto,
+    );
+
+    // 비회원의 경우 쿠키 업데이트
+    if (!userId) {
+      res.cookie('guestCart', JSON.stringify(data.data.updateCart), {
+        maxAge: 24 * 60 * 60 * 1000, // 1일 동안 유지
+      });
+    }
+    //반환
+    return res.json({
+      status: data.status,
+      message: data.message,
+      cartItemId,
+      afterQuantity: updateCadrDto.quantity,
+    });
   }
 }

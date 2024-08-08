@@ -8,7 +8,7 @@ import {
 import { CreateFormDto } from './dto/create-form.dto';
 import { UpdateFormDto } from './dto/update-form.dto';
 import { Form } from './entities/form.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FormItem } from './entities/form.item';
 import { Manager } from '../admin/entities/manager.entity';
@@ -28,6 +28,7 @@ export class FormService {
     private readonly managerRepository: Repository<Manager>,
     @InjectRepository(Community)
     private readonly communityRepository: Repository<Community>,
+    private dataSource: DataSource,
   ) {}
 
   //폼 생성
@@ -232,9 +233,9 @@ export class FormService {
     const userCheck = await this.formItemRepository.findOne({
       where: { userId },
     });
-    // if (userCheck) {
-    //   throw new BadRequestException('중복 신청은 불가능합니다');
-    // }
+    if (userCheck) {
+      throw new BadRequestException('중복 신청은 불가능합니다');
+    }
 
     // 문자열을 date로 변환 후, 현재 시간이 시작 + 마감 시간이 아닐 경우 오류 반환
     const now = new Date();
@@ -255,27 +256,36 @@ export class FormService {
       throw new BadRequestException('선착순 마감되었습니다.');
     }
 
-    // 현재신청자가 1차 신청자 수보다 적거나 동일할 경우엔 pass로 저장
-    let finishForm;
-    if (nowTotalApply <= maxApply) {
-      finishForm = await this.formItemRepository.save({
-        userId,
-        applyType: ApplyType.Pass,
-        form,
-      });
-    } // 현재신청자가 총 신청인원보다 적거나 동일하고, 1차 신청인원보다 클 경우엔 예비로 저장
-    else if (nowTotalApply <= totalApply && nowTotalApply > maxApply) {
-      finishForm = await this.formItemRepository.save({
-        userId,
-        applyType: ApplyType.Spare,
-        form,
-      });
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.startTransaction();
+    try {
+      // 현재신청자가 1차 신청자 수보다 적거나 동일할 경우엔 pass로 저장
+      let finishForm;
+      if (nowTotalApply <= maxApply) {
+        finishForm = await queryRunner.manager.save(FormItem, {
+          userId,
+          applyType: ApplyType.Pass,
+          form,
+        });
+      } // 현재신청자가 총 신청인원보다 적거나 동일하고, 1차 신청인원보다 클 경우엔 예비로 저장
+      else if (nowTotalApply <= totalApply && nowTotalApply > maxApply) {
+        finishForm = await queryRunner.manager.save(FormItem, {
+          userId,
+          applyType: ApplyType.Spare,
+          form,
+        });
+      }
+      await queryRunner.commitTransaction();
+      return {
+        status: HttpStatus.OK,
+        message: '신청이 완료되었습니다.',
+        data: { formId, ApplyStatus: finishForm.applyType },
+      };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
     }
-
-    return {
-      status: HttpStatus.OK,
-      message: '신청이 완료되었습니다.',
-      data: { formId, ApplyStatus: finishForm.applyType },
-    };
   }
 }
