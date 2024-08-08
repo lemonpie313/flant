@@ -1,14 +1,9 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import {
-  Column,
-  CreateDateColumn,
   Entity,
   JoinColumn,
-  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 import { CartItem } from './cart.item.entity';
 import { Order } from '../../order/entities/order.entity';
