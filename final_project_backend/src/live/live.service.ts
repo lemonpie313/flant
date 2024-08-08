@@ -156,7 +156,7 @@ export class LiveService {
         const time = new Date();
         const diff =
           Math.abs(
-            time.getTime() - live.createdAt.getTime() - 1000 * 60 * 60 * 9,
+            time.getTime() - live.createdAt.getTime(),
           ) / 1000;
         if (diff > 6000) {
           // 1분 이내에 스트림키 입력 후 방송 시작이 돼야함
