@@ -62,7 +62,7 @@ export class PostService {
       content: createPostDto.content,
       artistId: artistId,
     });
-    if (imageUrl.length > 0) {
+    if (imageUrl && imageUrl.length > 0) {
       for(let image of imageUrl){
         const postImageData = {
           postId: saveData.postId,
@@ -120,7 +120,12 @@ export class PostService {
     };
   }
 
-  async update(userId: number, postId: number, updatePostDto: UpdatePostDto) {
+  async update(
+    userId: number,
+    postId: number,
+    updatePostDto: UpdatePostDto,
+    imageUrl: string[] | undefined
+  ) {
     const postData = await this.postRepository.findOne({
       where: { postId: postId }
     })
@@ -133,15 +138,48 @@ export class PostService {
     if (!isCommunityUser) {
       throw new UnauthorizedException(MESSAGES.POST.UPDATE.UNAUTHORIZED);
     }
-    if (_.isEmpty(updatePostDto)) {
+    if (_.isEmpty(updatePostDto.title && updatePostDto.content)) {
       throw new BadRequestException(MESSAGES.POST.UPDATE.BAD_REQUEST);
     }
+
+    const newData = {
+      title: postData.title,
+      content: postData.content,
+    }
+    if(updatePostDto.title != postData.title){
+      newData.title = updatePostDto.title
+    }
+    if(updatePostDto.content != postData.content){
+      newData.content = updatePostDto.content
+    }
+
     await this.postRepository.update(
       { postId: postId },
-      { title: updatePostDto.title, content: updatePostDto.content },
+      newData,
     );
+
+    if (imageUrl && imageUrl.length > 0) {
+      //postId에 연결된 모든 postImage 데이터 삭제
+      //의도 : DELETE FROM post_image WHERE post_id = postId
+      await this.postImageRepository
+      .createQueryBuilder()
+      .delete() 
+      .from(PostImage)
+      .where('post_id = :postId', { postId })
+      .execute();
+
+      //업로드된 이미지 숫자만큼 다시 생성
+      for(let image of imageUrl){
+        const postImageData = {
+          postId: postData.postId,
+          postImageUrl: image
+        }
+        await this.postImageRepository.save(postImageData)
+      }
+    }
     const updatedData = await this.postRepository.findOne({
       where: { postId: postId },
+      relations: ['postImages'],
     });
     return {
       status: HttpStatus.OK,
