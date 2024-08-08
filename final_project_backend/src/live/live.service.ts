@@ -91,6 +91,9 @@ export class LiveService {
     file, // 업로드할 파일
     ext: string, // 파일 확장자
   ) {
+    console.log(
+      '-------------------------------------종료후업로드전-----------',
+    );
     const command = new PutObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: fileName,
@@ -118,28 +121,28 @@ export class LiveService {
         );
         const session = this.nodeMediaServer.getSession(id);
         const streamKey = streamPath.split('/live/')[1];
-        const directoryPath = path.join(
-          __dirname,
-          '../../../media/live',
-          streamKey,
-        );
-        const directoryExists = fs.existsSync(directoryPath);
-        console.log("--------------------"+directoryExists);
-        try {
-          // 디렉토리 생성 로그
-          console.log('Attempting to create directory:', directoryPath);
+        // const directoryPath = path.join(
+        //   __dirname,
+        //   '../../../media/live',
+        //   streamKey,
+        // );
+        // const directoryExists = fs.existsSync(directoryPath);
+        // console.log('--------------------' + directoryExists);
+        // try {
+        //   // 디렉토리 생성 로그
+        //   console.log('Attempting to create directory:', directoryPath);
 
-          if (!fs.existsSync(directoryPath)) {
-            fs.mkdirSync(directoryPath, { recursive: true });
-            console.log('Directory created successfully:', directoryPath);
-          } else {
-            console.log('Directory already exists:', directoryPath);
-          }
+        //   if (!fs.existsSync(directoryPath)) {
+        //     fs.mkdirSync(directoryPath, { recursive: true });
+        //     console.log('Directory created successfully:', directoryPath);
+        //   } else {
+        //     console.log('Directory already exists:', directoryPath);
+        //   }
 
-          // Additional logic for prePublish event
-        } catch (error) {
-          console.error('Error creating directory:', error);
-        }
+        //   // Additional logic for prePublish event
+        // } catch (error) {
+        //   console.error('Error creating directory:', error);
+        // }
 
         const live = await this.liveRepository.findOne({
           where: {
@@ -154,10 +157,7 @@ export class LiveService {
           });
         }
         const time = new Date();
-        const diff =
-          Math.abs(
-            time.getTime() - live.createdAt.getTime(),
-          ) / 1000;
+        const diff = Math.abs(time.getTime() - live.createdAt.getTime()) / 1000;
         if (diff > 6000) {
           // 1분 이내에 스트림키 입력 후 방송 시작이 돼야함
           session.reject((reason: string) => {
@@ -172,6 +172,7 @@ export class LiveService {
     this.nodeMediaServer.on(
       'donePublish',
       async (id: string, streamPath: string) => {
+        console.log('---------------------------방송종료?------------------');
         const streamKey = streamPath.split('/live/')[1];
         const live = await this.liveRepository.findOne({
           where: { streamKey },
@@ -182,7 +183,9 @@ export class LiveService {
           '../../../media/live',
           streamKey,
         );
-        console.log(`Reading directory: ${liveDirectory}`);
+        console.log(
+          `-------------------------------Reading directory: ${liveDirectory}`,
+        );
 
         if (!fs.existsSync(liveDirectory)) {
           console.error('Live directory does not exist:', liveDirectory);
@@ -200,12 +203,22 @@ export class LiveService {
         }
 
         const filePath = path.join(liveDirectory, fileName);
-        console.log('Reading file:', filePath);
+        console.log(
+          '-------------------------------------------------Reading file:',
+          filePath,
+        );
 
         try {
           const file = fs.readFileSync(filePath);
-          const liveVideoUrl = await this.liveRecordingToS3(fileName, file, 'mp4');
+          const liveVideoUrl = await this.liveRecordingToS3(
+            fileName,
+            file,
+            'mp4',
+          );
           await this.cleanupStreamFolder(streamKey);
+          console.log(
+            '----------------------repository 업데이트-----------------------',
+          );
           await this.liveRepository.update(
             { liveId: live.liveId },
             { liveVideoUrl },
@@ -218,11 +231,7 @@ export class LiveService {
   }
 
   async cleanupStreamFolder(streamKey: string) {
-    const folderPath = path.join(
-      __dirname,
-      '../../../media/live',
-      streamKey,
-    );
+    const folderPath = path.join(__dirname, '../../../media/live', streamKey);
     console.log('folderPath: ' + folderPath);
     if (fs.existsSync(folderPath)) {
       for (const file of fs.readdirSync(folderPath)) {
