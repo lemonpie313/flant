@@ -98,28 +98,6 @@ export class LiveService {
         );
         const session = this.nodeMediaServer.getSession(id);
         const streamKey = streamPath.split('/live/')[1];
-        // const directoryPath = path.join(
-        //   __dirname,
-        //   '../../../media/live',
-        //   streamKey,
-        // );
-        // const directoryExists = fs.existsSync(directoryPath);
-        // console.log('--------------------' + directoryExists);
-        // try {
-        //   // 디렉토리 생성 로그
-        //   console.log('Attempting to create directory:', directoryPath);
-
-        //   if (!fs.existsSync(directoryPath)) {
-        //     fs.mkdirSync(directoryPath, { recursive: true });
-        //     console.log('Directory created successfully:', directoryPath);
-        //   } else {
-        //     console.log('Directory already exists:', directoryPath);
-        //   }
-
-        //   // Additional logic for prePublish event
-        // } catch (error) {
-        //   console.error('Error creating directory:', error);
-        // }
 
         const live = await this.liveRepository.findOne({
           where: {
@@ -129,6 +107,7 @@ export class LiveService {
         console.log('----------------foundData----------------');
         console.log(live);
         if (_.isNil(live)) {
+          console.log("-------------에러------------")
           session.reject((reason: string) => {
             console.log(reason);
           });
@@ -137,6 +116,7 @@ export class LiveService {
         const diff = Math.abs(time.getTime() - live.createdAt.getTime()) / 1000;
         if (diff > 6000) {
           // 1분 이내에 스트림키 입력 후 방송 시작이 돼야함
+          console.log("-------------에러------------")
           session.reject((reason: string) => {
             console.log(reason);
           });
@@ -144,25 +124,21 @@ export class LiveService {
         console.log('------------------------방송시작?------------------');
       },
     );
-
-    // 방송 종료 시 s3에 업로드
     this.nodeMediaServer.on(
       'donePublish',
       async (id: string, streamPath: string) => {
-        console.log('---------------------------방송종료?------------------');
+        console.log("-----------")
         const streamKey = streamPath.split('/live/')[1];
-        const live = await this.liveRepository.findOne({
-          where: { streamKey },
-        });
+        // const live = await this.liveRepository.findOne({
+        //   where: { streamKey },
+        // });
 
         const liveDirectory = path.join(
           __dirname,
           '../../../media/live',
           streamKey,
         );
-        console.log(
-          `-------------------------------Reading directory: ${liveDirectory}`,
-        );
+        console.log(`Reading directory: ${liveDirectory}`);
 
         if (!fs.existsSync(liveDirectory)) {
           console.error('Live directory does not exist:', liveDirectory);
@@ -180,31 +156,72 @@ export class LiveService {
         }
 
         const filePath = path.join(liveDirectory, fileName);
-        console.log(
-          '-------------------------------------------------Reading file:',
-          filePath,
-        );
+        console.log('Reading file:', filePath);
 
-        try {
-          const file = fs.readFileSync(filePath);
-          const liveVideoUrl = await this.liveRecordingToS3(
-            fileName,
-            file,
-            'mp4',
-          );
-          await this.cleanupStreamFolder(streamKey);
-          console.log(
-            '----------------------repository 업데이트-----------------------',
-          );
-          await this.liveRepository.update(
-            { liveId: live.liveId },
-            { liveVideoUrl },
-          );
-        } catch (error) {
-          console.error('Error handling live stream file:', error);
-        }
+        await this.cleanupStreamFolder(streamKey);
       },
     );
+
+    // 방송 종료 시 s3에 업로드
+    // this.nodeMediaServer.on(
+    //   'donePublish',
+    //   async (id: string, streamPath: string) => {
+    //     console.log('---------------------------방송종료?------------------');
+    //     const streamKey = streamPath.split('/live/')[1];
+    //     const live = await this.liveRepository.findOne({
+    //       where: { streamKey },
+    //     });
+
+    //     const liveDirectory = path.join(
+    //       __dirname,
+    //       '../../../media/live',
+    //       streamKey,
+    //     );
+    //     console.log(
+    //       `-------------------------------Reading directory: ${liveDirectory}`,
+    //     );
+
+    //     if (!fs.existsSync(liveDirectory)) {
+    //       console.error('Live directory does not exist:', liveDirectory);
+    //       return;
+    //     }
+
+    //     const files = fs.readdirSync(liveDirectory);
+    //     console.log('Files in directory:', files);
+
+    //     const fileName = files.find((file) => path.extname(file) === '.mp4');
+
+    //     if (!fileName) {
+    //       console.error('No .mp4 file found in directory:', liveDirectory);
+    //       return;
+    //     }
+
+    //     const filePath = path.join(liveDirectory, fileName);
+    //     console.log(
+    //       '-------------------------------------------------Reading file:',
+    //       filePath,
+    //     );
+
+    //     try {
+    //       const file = fs.readFileSync(filePath);
+    //       const liveVideoUrl = await this.liveRecordingToS3(
+    //         fileName,
+    //         file,
+    //         'mp4',
+    //       );
+    //       await this.cleanupStreamFolder(streamKey);
+    //       console.log(
+    //         '----------------------repository 업데이트-----------------------',
+    //       );
+    //       await this.liveRepository.update(
+    //         { liveId: live.liveId },
+    //         { liveVideoUrl },
+    //       );
+    //     } catch (error) {
+    //       console.error('Error handling live stream file:', error);
+    //     }
+    //   },
+    // );
 
     // 서버 실행하면서 미디어서버도 같이 실행
     this.nodeMediaServer.run();
