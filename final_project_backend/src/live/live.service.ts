@@ -56,6 +56,7 @@ export class LiveService {
       http: {
         port: 8000,
         mediaroot: path.join(__dirname, '../../../media'),
+        webroot: './www',
         allow_origin: '*',
       },
       // https: {
@@ -69,6 +70,7 @@ export class LiveService {
         tasks: [
           {
             app: 'live',
+            ac: 'aac',
             hls: true,
             hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
             hlsKeep: true, // to prevent hls file delete after end the stream
@@ -84,28 +86,6 @@ export class LiveService {
       },
     };
     this.nodeMediaServer = new NodeMediaServer(liveConfig);
-  }
-
-  async liveRecordingToS3(
-    fileName: string, // 업로드될 파일의 이름
-    file, // 업로드할 파일
-    ext: string, // 파일 확장자
-  ) {
-    console.log(
-      '-------------------------------------종료후업로드전-----------',
-    );
-    const command = new PutObjectCommand({
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: fileName,
-      Body: file.buffer,
-      ACL: 'public-read',
-      ContentType: `image/${ext}`,
-    });
-
-    await this.s3Client.send(command);
-
-    // 업로드된 이미지의 URL을 반환합니다.
-    return `https://s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${process.env.AWS_BUCKET_NAME}/${fileName}`;
   }
 
   onModuleInit() {
@@ -228,6 +208,28 @@ export class LiveService {
 
     // 서버 실행하면서 미디어서버도 같이 실행
     this.nodeMediaServer.run();
+  }
+
+  async liveRecordingToS3(
+    fileName: string, // 업로드될 파일의 이름
+    file, // 업로드할 파일
+    ext: string, // 파일 확장자
+  ) {
+    console.log(
+      '-------------------------------------종료후업로드전-----------',
+    );
+    const command = new PutObjectCommand({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: fileName,
+      Body: file.buffer,
+      ACL: 'public-read',
+      ContentType: `image/${ext}`,
+    });
+
+    await this.s3Client.send(command);
+
+    // 업로드된 이미지의 URL을 반환합니다.
+    return `https://s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${process.env.AWS_BUCKET_NAME}/${fileName}`;
   }
 
   async cleanupStreamFolder(streamKey: string) {
