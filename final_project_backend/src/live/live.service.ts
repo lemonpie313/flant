@@ -109,9 +109,6 @@ export class LiveService {
   }
 
   onModuleInit() {
-    // 서버 실행하면서 미디어서버도 같이 실행
-    this.nodeMediaServer.run();
-
     // 방송 전 키값이 유효한지 검증 (따로 암호화 없음, 유효기간만 검증함)
     this.nodeMediaServer.on(
       'prePublish',
@@ -228,6 +225,9 @@ export class LiveService {
         }
       },
     );
+
+    // 서버 실행하면서 미디어서버도 같이 실행
+    this.nodeMediaServer.run();
   }
 
   async cleanupStreamFolder(streamKey: string) {
