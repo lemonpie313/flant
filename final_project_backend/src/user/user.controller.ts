@@ -114,16 +114,13 @@ export class UserController {
   /**
    * 회원 탈퇴
    * @param userId
-   * @param deleteUserDto
    * @returns
    */
 
   @Delete('/me')
-  async deleteUser(
-    @UserInfo() user: PartialUser,
-    @Body() deleteUserDto: DeleteUserDto,
-  ) {
-    await this.userService.deleteUser(user.id, deleteUserDto.password);
+  async deleteUser(@UserInfo() user: PartialUser) {
+    console.log(user.id);
+    await this.userService.deleteUser(user.id);
 
     return {
       statusCode: HttpStatus.OK,

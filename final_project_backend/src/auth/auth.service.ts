@@ -81,8 +81,8 @@ export class AuthService {
   //로그아웃
   async signOut(req) {
     const { accessOption, refreshOption } = this.getCookiesForLogOut();
-
-    await this.removeRefreshToken(req.user.userId);
+    console.log(req);
+    await this.removeRefreshToken(req.id);
 
     return { accessOption, refreshOption };
   }
@@ -232,7 +232,8 @@ export class AuthService {
 
   // refreshtoken 삭제
   async removeRefreshToken(userId: number) {
-    return await this.refreshtokenRepository.update(userId, {
+    const updateCondition = { userId: userId };
+    return await this.refreshtokenRepository.update(updateCondition, {
       refreshtoken: null,
     });
   }

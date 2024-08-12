@@ -86,9 +86,14 @@ export class AuthController {
    * 로그아웃
    */
   //@UseGuards(AuthGuard('jwt-refresh-token'))
+  @UseGuards(AuthGuard('jwt'))
   @Post('/sign-out')
-  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const { accessOption, refreshOption } = await this.authService.signOut(req);
+  async logout(@UserInfo() user, @Res({ passthrough: true }) res: Response) {
+    console.log(user);
+    const userId = user.id;
+    console.log(userId);
+    const { accessOption, refreshOption } =
+      await this.authService.signOut(userId);
     console.log(accessOption);
     res.cookie('Authentication', '', accessOption);
     res.cookie('Refresh', '', refreshOption);
