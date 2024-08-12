@@ -3,6 +3,6 @@ import { Artist } from '../entities/artist.entity';
 
 export class CreateArtistDto extends PickType(Artist, [
   'communityId',
-  'userId',
+  'communityUserId',
   'artistNickname',
 ]) {}
