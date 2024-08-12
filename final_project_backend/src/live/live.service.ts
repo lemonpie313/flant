@@ -55,7 +55,7 @@ export class LiveService {
       },
       http: {
         port: 8000,
-        mediaroot: path.join(__dirname, '../../../media'),
+        mediaroot: './media', //path.join(__dirname, '../../media'),
         webroot: './www',
         allow_origin: '*',
       },
@@ -135,9 +135,10 @@ export class LiveService {
 
         const liveDirectory = path.join(
           __dirname,
-          '../../../media/live',
+          '../../media/live',
           streamKey,
         );
+        //const liveDirectory = `./media/live/${streamKey}`
         console.log(`Reading directory: ${liveDirectory}`);
 
         if (!fs.existsSync(liveDirectory)) {
