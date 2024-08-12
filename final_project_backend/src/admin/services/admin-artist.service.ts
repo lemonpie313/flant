@@ -17,8 +17,6 @@ export class AdminArtistService {
   constructor(
     @InjectRepository(Artist)
     private readonly artistRepository: Repository<Artist>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
     @InjectRepository(Community)
     private readonly communityRepository: Repository<Community>,
     @InjectRepository(CommunityUser)
@@ -26,7 +24,7 @@ export class AdminArtistService {
   ) {}
   // 아티스트 생성
   async createArtist(createArtistDto: CreateArtistDto) {
-    const { communityId, userId, artistNickname } = createArtistDto;
+    const { communityId, communityUserId, artistNickname } = createArtistDto;
 
     //만약 해당 커뮤니티가 없다면 false반환
     const existedCommunity = await this.communityRepository.findOneBy({
@@ -36,8 +34,8 @@ export class AdminArtistService {
       throw new NotFoundException(MESSAGES.COMMUNITY.COMMON.NOT_FOUND);
 
     //만약 해당 유저가 없다면 false 반환
-    const existedUser = await this.userRepository.findOneBy({
-      userId,
+    const existedUser = await this.communityUserRepository.findOneBy({
+      communityUserId,
     });
     if (!existedUser)
       throw new NotFoundException(MESSAGES.USER.COMMON.NOT_FOUND);
@@ -51,13 +49,13 @@ export class AdminArtistService {
 
     const artist = await this.artistRepository.save({
       communityId,
-      userId,
+      communityUserId,
       artistNickname,
     });
 
     // 아티스트가 해당 그룹의 커뮤니티 가입
     await this.communityUserRepository.save({
-      userId,
+      communityUserId,
       communityId,
       nickName: artistNickname,
     });
@@ -74,16 +72,21 @@ export class AdminArtistService {
 
     // 해당 아티스트 삭제 로직
     await this.artistRepository.delete({ artistId });
-    await this.userRepository.delete({ userId: existedArtist.userId });
+    await this.communityUserRepository.delete({
+      communityUserId: existedArtist.communityUserId,
+    });
 
     return true;
   }
 
-  async findByCommunityIdAndUserId(communityId: number, userId: number) {
+  async findByCommunityIdAndUserId(
+    communityId: number,
+    communityUserId: number,
+  ) {
     const existedArtist = await this.artistRepository.findOne({
       where: {
         communityId,
-        userId,
+        communityUserId,
       },
     });
 

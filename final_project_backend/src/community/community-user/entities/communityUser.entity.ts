@@ -9,10 +9,12 @@ import {
   UpdateDateColumn,
   JoinColumn,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
 import { Community } from '../../entities/community.entity';
 import { User } from '../../../user/entities/user.entity';
 import { Comment } from '../../../comment/entities/comment.entity';
+import { Artist } from 'src/admin/entities/artist.entity';
 
 @Entity('community_users')
 export class CommunityUser {
@@ -59,4 +61,7 @@ export class CommunityUser {
 
   @OneToMany(() => Comment, (comment) => comment.communityUser)
   comments: Comment[]; // 커뮤니티와 댓글 관계
+
+  @OneToOne(() => Artist, (artist) => artist.communityUser)
+  artist: Artist;
 }

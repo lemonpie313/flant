@@ -163,20 +163,7 @@ export class CommunityService {
     };
   }
 
-<<<<<<< HEAD
-  async updateLogo(userId: number, communityId: number, imageUrl: string) {
-    //매니저 이외의 접근일 경우
-    const isManager = await this.managerRepository.findOne({
-      where: { userId: userId, communityId: communityId },
-    });
-    if (!isManager) {
-      throw new UnauthorizedException(
-        MESSAGES.COMMUNITY.UPDATELOGO.UNAUTHORIZED,
-      );
-    }
-=======
   async updateLogo(communityId: number, imageUrl: string) {
->>>>>>> 93fb68797c303eefb143db210b6caa7b6f8f511c
     //등록할 이미지가 없는 경우
     if (!imageUrl) {
       throw new BadRequestException(MESSAGES.COMMUNITY.UPDATELOGO.BAD_REQUEST);
@@ -199,20 +186,7 @@ export class CommunityService {
     };
   }
 
-<<<<<<< HEAD
-  async updateCover(userId: number, communityId: number, imageUrl: string) {
-    //매니저 이외의 접근일 경우
-    const isManager = await this.managerRepository.findOne({
-      where: { userId: userId, communityId: communityId },
-    });
-    if (!isManager) {
-      throw new UnauthorizedException(
-        MESSAGES.COMMUNITY.UPDATECOVER.UNAUTHORIZED,
-      );
-    }
-=======
   async updateCover(communityId: number, imageUrl: string) {
->>>>>>> 93fb68797c303eefb143db210b6caa7b6f8f511c
     if (!imageUrl) {
       throw new BadRequestException(MESSAGES.COMMUNITY.UPDATECOVER.BAD_REQUEST);
     }
