@@ -15,6 +15,7 @@ import { Community } from '../../entities/community.entity';
 import { User } from '../../../user/entities/user.entity';
 import { Comment } from '../../../comment/entities/comment.entity';
 import { Manager } from 'src/admin/entities/manager.entity';
+import { Artist } from 'src/admin/entities/artist.entity';
 
 @Entity('community_users')
 export class CommunityUser {
@@ -66,4 +67,7 @@ export class CommunityUser {
     cascade: true,
   })
   manager: Manager;
+
+  @OneToOne(() => Artist, (artist) => artist.communityUser)
+  artist: Artist;
 }
