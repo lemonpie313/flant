@@ -16,14 +16,18 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await authApi.signIn(email, password); // axios를 사용하여 로그인 요청을 보냄
+      const token = await authApi.signIn(email, password); // axios를 사용하여 로그인 요청을 보냄
+      const { accessToken, refreshToken } = token.data.data;
+
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
       alert("로그인이 정상적으로 되었습니다.");
       localStorage.setItem("isLoggedIn", "true");
       setIsLoggedIn(true);
       navigate("/main");
     } catch (error) {
       console.error("로그인 실패:", error);
-      alert("Login failed. Please check your credentials.");
+      alert("아이디 및 비밀번호 재확인 바랍니다.");
     }
   };
 
