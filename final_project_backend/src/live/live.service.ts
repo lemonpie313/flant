@@ -204,16 +204,18 @@ export class LiveService {
     const command = new PutObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: fileName,
-      Body: file.buffer,
-      ACL: 'public-read',
-      ContentType: `image/${ext}`,
+      Body: file,
+      ContentType: `video/${ext}`,
     });
 
-    await this.s3Client.send(command);
-
-    // 업로드된 이미지의 URL을 반환합니다.
-    return `https://s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${process.env.AWS_BUCKET_NAME}/${fileName}`;
-  }
+    try {
+      await this.s3Client.send(command);
+      // 업로드된 이미지의 URL 반환
+      return `https://s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${process.env.AWS_BUCKET_NAME}/${fileName}`;
+    } catch (error) {
+      console.error('Error uploading file to S3:', error);
+      throw error; // 에러를 상위 함수로 전달
+    }  }
 
   async cleanupStreamFolder(streamKey: string) {
     const folderPath = path.join(__dirname, '../../../media/live', streamKey);
