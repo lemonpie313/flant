@@ -10,7 +10,7 @@ import { MerchandisePost } from './entities/merchandise-post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { MerchandiseImage } from './entities/merchandise-image.entity';
-import { Product } from 'src/product/entities/product.entity';
+
 import { NotFoundError } from 'rxjs';
 import { MerchandiseOption } from './entities/marchandise-option.entity';
 import { FindAllmerchandiseDto } from './dto/find-merchandise.dto';
@@ -18,6 +18,7 @@ import { UpdateMerchandiseDto } from './dto/update-merchandise.dto';
 import { title } from 'process';
 import * as Flatted from 'flatted';
 import { Manager } from 'src/admin/entities/manager.entity';
+import { GoodsShop } from 'src/goods_shop/entities/goods-shop.entity';
 
 @Injectable()
 export class MerchandiseService {
@@ -26,8 +27,8 @@ export class MerchandiseService {
     private readonly merchandiseRepository: Repository<MerchandisePost>,
     @InjectRepository(MerchandiseImage)
     private readonly merchandiseImageRepository: Repository<MerchandiseImage>,
-    @InjectRepository(Product)
-    private readonly productRepository: Repository<Product>,
+    @InjectRepository(GoodsShop)
+    private readonly goodsShopRepository: Repository<GoodsShop>,
     @InjectRepository(MerchandiseOption)
     private readonly merchandiseOptionRepository: Repository<MerchandiseOption>,
     @InjectRepository(Manager)
@@ -36,14 +37,14 @@ export class MerchandiseService {
 
   // 상품 생성 API
   async create(createMerchandiseDto: CreateMerchandiseDto, userId: number) {
-    const { productId, imageUrl, option, optionPrice, ...merchandiseData } =
+    const { goodsShopId, imageUrl, option, optionPrice, ...merchandiseData } =
       createMerchandiseDto;
 
     // 상점 유효성 체크
-    const product = await this.productRepository.findOne({
-      where: { id: productId },
+    const goodsShop = await this.goodsShopRepository.findOne({
+      where: { id: goodsShopId },
     });
-    if (!product) {
+    if (!goodsShop) {
       throw new NotFoundException('상점이 존재하지 않습니다');
     }
 
@@ -67,18 +68,17 @@ export class MerchandiseService {
     });
 
     // 상점 아이디가 있을 경우 생성
-    const merchandise = await this.merchandiseRepository.create({
+    const merchandise = await this.merchandiseRepository.save({
       ...merchandiseData,
-      product,
+      goodsShop,
       manager,
     });
-    const saveMerchandise = await this.merchandiseRepository.save(merchandise);
 
     //상품 생성 후 이미지 데이터 저장
     const saveImage = await this.merchandiseImageRepository.save(
       imageUrl.map((url) => ({
         url,
-        merchandisePost: saveMerchandise,
+        merchandisePost: merchandise,
       })),
     );
 
@@ -87,7 +87,7 @@ export class MerchandiseService {
       option.map((optionName, price) => ({
         optionName,
         optionPrice: optionPrice[price],
-        merchandisePost: saveMerchandise,
+        merchandisePost: merchandise,
       })),
     );
 
@@ -104,9 +104,9 @@ export class MerchandiseService {
         deliveryPrice: merchandise.deliveryPrice,
         createdAt: merchandise.createdAt,
         updatedAt: merchandise.updatedAt,
-        product: {
-          productId: merchandise.product.id,
-          productName: merchandise.product.name,
+        goodsShop: {
+          goodsShopId: merchandise.goodsShop.id,
+          goodsShopName: merchandise.goodsShop.name,
         },
         option: { option, optionPrice },
       },
@@ -124,28 +124,56 @@ export class MerchandiseService {
       merchandise = await this.merchandiseRepository.find();
     } else if (artist && category) {
       merchandise = await this.merchandiseRepository.find({
-        where: [
-          { salesName: Like(`%${artist}%`), content: Like(`%${category}%`) },
-        ],
+        where: {
+          goodsShop: {
+            artist: Like(`%${artist}%`),
+            goodsShopCategory: {
+              name: Like(`%${category}%`),
+            },
+          },
+        },
         relations: ['merchandiseOption'],
       });
     } else if (artist) {
       merchandise = await this.merchandiseRepository.find({
-        where: { salesName: Like(`%${artist}%`) },
+        where: { goodsShop: { artist: Like(`%${artist}%`) } },
         relations: ['merchandiseOption'],
       });
     } else if (category) {
       merchandise = await this.merchandiseRepository.find({
-        where: { salesName: Like(`%${category}%`) },
+        where: {
+          goodsShop: { goodsShopCategory: { name: Like(`%${category}%`) } },
+        },
         relations: ['merchandiseOption'],
       });
     }
+    // let merchandise;
+    // if (!artist && !category) {
+    //   merchandise = await this.merchandiseRepository.find();
+    // } else if (artist && category) {
+    //   merchandise = await this.merchandiseRepository.find({
+    //     where: [
+    //       { salesName: Like(`%${artist}%`), content: Like(`%${category}%`) },
+    //     ],
+    //     relations: ['merchandiseOption'],
+    //   });
+    // } else if (artist) {
+    //   merchandise = await this.merchandiseRepository.find({
+    //     where: { salesName: Like(`%${artist}%`) },
+    //     relations: ['merchandiseOption'],
+    //   });
+    // } else if (category) {
+    //   merchandise = await this.merchandiseRepository.find({
+    //     where: { salesName: Like(`%${category}%`) },
+    //     relations: ['merchandiseOption'],
+    //   });
+    // }
 
     const data = merchandise.map((merchandises) => ({
       id: merchandises.id,
       title: merchandises.title,
-      category: '추가 시 수정 예정',
-      artist: '추가 시 수정 예정',
+      category: merchandise.cartgory,
+      artist: merchandise.artist,
       thumbnail: merchandises.thumbnail,
       salesName: merchandises.salesName,
       content: merchandises.content,
@@ -207,8 +235,8 @@ export class MerchandiseService {
       throw new NotFoundException('존재하지 않는 상품입니다.');
     }
 
-    // product 생성자와 수정 요청한 사용자가 일치한지 확인
-    if (merchandise.manager.userId !== userId) {
+    // goodsShop 생성자와 수정 요청한 사용자가 일치한지 확인
+    if (merchandise.goodsShop.manager.userId !== userId) {
       throw new ForbiddenException('수정 권한이 없습니다.');
     }
 
@@ -287,8 +315,8 @@ export class MerchandiseService {
       throw new NotFoundException('존재하지 않는 상품입니다.');
     }
 
-    // product 생성자와 수정 요청한 사용자가 일치한지 확인
-    if (merchandise.manager.userId !== userId) {
+    // goodsShop 생성자와 수정 요청한 사용자가 일치한지 확인
+    if (merchandise.goodsShop.manager.userId !== userId) {
       throw new ForbiddenException('수정 권한이 없습니다.');
     }
 

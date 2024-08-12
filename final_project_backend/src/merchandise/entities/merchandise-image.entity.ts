@@ -9,7 +9,6 @@ import {
 } from 'typeorm';
 
 import { IsArray, IsNotEmpty, IsString } from 'class-validator';
-import { Product } from 'src/product/entities/product.entity';
 import { MerchandisePost } from './merchandise-post.entity';
 
 @Entity('merchandise_image')

@@ -10,12 +10,13 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Product } from '../../product/entities/product.entity';
 
 import { MerchandiseOption } from './marchandise-option.entity';
 import { MerchandiseImage } from './merchandise-image.entity';
 import { CartItem } from 'src/cart/entities/cart.item.entity';
 import { Manager } from 'src/admin/entities/manager.entity';
+import { GoodsShop } from 'src/goods_shop/entities/goods-shop.entity';
+import { Community } from 'src/community/entities/community.entity';
 
 @Entity('merchandise_post')
 export class MerchandisePost {
@@ -74,9 +75,9 @@ export class MerchandisePost {
   updatedAt: Date;
 
   // 굿즈샵 연결
-  @ManyToOne(() => Product, (product) => product.merchandisePosts)
-  @JoinColumn({ name: 'product_id' })
-  product: Product;
+  @ManyToOne(() => GoodsShop, (goodsShop) => goodsShop.merchandisePost)
+  @JoinColumn({ name: 'goodsShop_id' })
+  goodsShop: GoodsShop;
 
   // 상품 이미지 연결
   @OneToMany(
@@ -99,10 +100,4 @@ export class MerchandisePost {
     onDelete: 'CASCADE',
   })
   cartItems: CartItem[];
-
-  //매니저 연결
-  @ManyToOne(() => Manager, (manager) => manager.merchandisePost, {
-    onDelete: 'CASCADE',
-  })
-  manager: Manager;
 }

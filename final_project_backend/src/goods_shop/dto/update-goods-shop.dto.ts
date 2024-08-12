@@ -1,8 +1,6 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateProductDto } from './create-product.dto';
 import { IsOptional, IsString } from 'class-validator';
 
-export class UpdateProductDto {
+export class UpdateGoodsShopDto {
   /**
    * 수정 상점명
    * @example "수정 상점명"
@@ -25,7 +23,7 @@ export class UpdateProductDto {
    */
   @IsOptional()
   @IsString()
-  productCode?: string;
+  goodsShopCode?: string;
 
   /**
    * 수정 내용

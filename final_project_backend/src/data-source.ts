@@ -28,8 +28,9 @@ import { NoticeImage } from './notice/entities/notice-image.entity';
 import { Order } from './order/entities/order.entity';
 import { Post } from './post/entities/post.entity';
 import { PostImage } from './post/entities/post-image.entity';
-import { Product } from './product/entities/product.entity';
-import { ProductCategory } from './product/entities/product.category.entity';
+import { GoodsShop } from './goods_shop/entities/goods-shop.entity';
+import { GoodsShopCategory } from './goods_shop/entities/goods-shop.category.entity';
+
 config();
 const configService = new ConfigService();
 const options: DataSourceOptions & SeederOptions = {
@@ -68,8 +69,8 @@ const options: DataSourceOptions & SeederOptions = {
     Order,
     Post,
     PostImage,
-    Product,
-    ProductCategory,
+    GoodsShop,
+    GoodsShopCategory,
     User,
   ],
   seedTracking: true, // seed데이터가 이미 있다면 삽입 x. 중복 삽입 방지

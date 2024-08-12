@@ -5,7 +5,6 @@ import { ConfigModule } from '@nestjs/config';
 import { configModuleValidationSchema } from './configs/env-validation.config';
 import { typeOrmModuleOptions } from './configs/database.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
@@ -26,6 +25,7 @@ import { NoticeModule } from './notice/notice.module';
 import { MediaModule } from './media/media.module';
 import { LiveModule } from './live/live.module';
 import { CommunityUserModule } from './community/community-user/community-user.module';
+import { GoodsShopModule } from './goods_shop/goods-shop.module';
 
 @Module({
   imports: [
@@ -39,7 +39,7 @@ import { CommunityUserModule } from './community/community-user/community-user.m
       rootPath: join(__dirname, '../..', 'final_project_frontend'),
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
-    ProductModule,
+    GoodsShopModule,
     OrderModule,
     AuthModule,
     UserModule,

@@ -20,9 +20,9 @@ export class CreateMerchandiseDto extends PickType(MerchandisePost, [
   'content',
   'deliveryPrice',
 ]) {
-  @IsNotEmpty({ message: 'productId를 입력해주세요' })
+  @IsNotEmpty({ message: 'goodsShopId를 입력해주세요' })
   @IsNumber()
-  productId: number;
+  goodsShopId: number;
 
   /**
    * 이미지 URL

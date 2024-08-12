@@ -25,7 +25,7 @@ import { OptionalJwtAuthGuard } from '../auth/guards/optionaljwtauthguard ';
 
 @ApiTags('카트 API')
 @ApiBearerAuth()
-@Controller('v1/cart')
+@Controller('v1/carts')
 @UseGuards(OptionalJwtAuthGuard)
 export class CartController {
   constructor(private readonly cartService: CartService) {}
@@ -100,7 +100,7 @@ export class CartController {
    * @param res
    * @returns
    */
-  @Delete('/item/:cartItemId')
+  @Delete('/items/:cartItemId')
   async remove(
     @Param('cartItemId') cartItemId: string,
     @Req() req,
@@ -130,7 +130,7 @@ export class CartController {
    * @param res
    * @returns
    */
-  @Patch('/item/:cartItemId')
+  @Patch('/items/:cartItemId')
   async cartQuantity(
     @Param('cartItemId') cartItemId: string,
     @Body() updateCadrDto: UpdateCartDto,
