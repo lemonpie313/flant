@@ -115,7 +115,7 @@ export class AuthService {
     if (!req.user) {
       return MESSAGES.AUTH.COMMON.OAUTH_GOOGLE.NOT_FOUND;
     }
-
+    console.log(req);
     // 만약 유저테이블에서 같은 이메일이 있다면 false반환
     const existedUser = await this.userRepository.findOneBy({
       email: req.user.email,
