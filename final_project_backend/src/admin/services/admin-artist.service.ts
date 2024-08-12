@@ -12,6 +12,7 @@ import { CommunityUser } from 'src/community/community-user/entities/communityUs
 
 import { MESSAGES } from 'src/constants/message.constant';
 import { CreateArtistDto } from '../dto/create-artist.dto';
+import { CommunityUserRole } from 'src/community/community-user/types/community-user-role.type';
 @Injectable()
 export class AdminArtistService {
   constructor(
@@ -21,10 +22,12 @@ export class AdminArtistService {
     private readonly communityRepository: Repository<Community>,
     @InjectRepository(CommunityUser)
     private readonly communityUserRepository: Repository<CommunityUser>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
   // 아티스트 생성
   async createArtist(createArtistDto: CreateArtistDto) {
-    const { communityId, communityUserId, artistNickname } = createArtistDto;
+    const { communityId, userId, artistNickname } = createArtistDto;
 
     //만약 해당 커뮤니티가 없다면 false반환
     const existedCommunity = await this.communityRepository.findOneBy({
@@ -34,15 +37,24 @@ export class AdminArtistService {
       throw new NotFoundException(MESSAGES.COMMUNITY.COMMON.NOT_FOUND);
 
     //만약 해당 유저가 없다면 false 반환
-    const existedUser = await this.communityUserRepository.findOneBy({
-      communityUserId,
+    const existedUser = await this.userRepository.findOneBy({
+      userId,
     });
+
     if (!existedUser)
       throw new NotFoundException(MESSAGES.USER.COMMON.NOT_FOUND);
 
+    // 아티스트가 해당 그룹의 커뮤니티 가입
+    const artistCommunityUser = await this.communityUserRepository.save({
+      userId,
+      communityId,
+      nickName: artistNickname,
+    });
+    const communityUserId = artistCommunityUser.communityUserId;
+
     //이미 user_id로 가입된 아티스트라면 false반환
     const existedArtist = await this.artistRepository.findOneBy({
-      artistNickname,
+      communityUserId,
     });
     if (existedArtist)
       throw new ConflictException(MESSAGES.ARTIST.COMMON.DUPLICATED);
@@ -51,13 +63,6 @@ export class AdminArtistService {
       communityId,
       communityUserId,
       artistNickname,
-    });
-
-    // 아티스트가 해당 그룹의 커뮤니티 가입
-    await this.communityUserRepository.save({
-      communityUserId,
-      communityId,
-      nickName: artistNickname,
     });
 
     return artist;
@@ -79,15 +84,9 @@ export class AdminArtistService {
     return true;
   }
 
-  async findByCommunityIdAndUserId(
-    communityId: number,
-    communityUserId: number,
-  ) {
-    const existedArtist = await this.artistRepository.findOne({
-      where: {
-        communityId,
-        communityUserId,
-      },
+  async findByCommunityIdAndUserId(communityUserId: number) {
+    const existedArtist = await this.artistRepository.findOneBy({
+      communityUserId,
     });
 
     if (!existedArtist)
@@ -95,6 +94,6 @@ export class AdminArtistService {
         MESSAGES.AUTH.COMMON.COMMUNITY_USER.NOT_ARTIST,
       );
 
-    return true;
+    return { roleId: existedArtist.artistId, role: CommunityUserRole.ARTIST };
   }
 }
