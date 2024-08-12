@@ -51,6 +51,9 @@ export const MESSAGES = {
     SIGN_IN: {
       SECCEED: '로그인에 성공했습니다.',
     },
+    SIGN_OUT: {
+      SECCEED: '로그아웃에 성공했습니다.',
+    },
   },
   COMMUNITY: {
     COMMON: {
@@ -77,7 +80,7 @@ export const MESSAGES = {
     UPDATE: {
       REQUIRED: '입력된 수정 사항이 없습니다.',
       UNAUTHORIZED: '커뮤니티 수정 권한이 없습니다',
-      SUCCEED: '커뮤니티 수정에 성공했습니다.'
+      SUCCEED: '커뮤니티 수정에 성공했습니다.',
     },
     REMOVE: {
       UNAUTHORIZED: '커뮤니티 삭제 권한이 없습니다',
@@ -85,12 +88,12 @@ export const MESSAGES = {
     },
     UPDATELOGO: {
       UNAUTHORIZED: '커뮤니티 수정 권한이 없습니다',
-      BAD_REQUEST:'등록할 이미지를 업로드 해주세요.',
+      BAD_REQUEST: '등록할 이미지를 업로드 해주세요.',
       SUCCEED: '로고 이미지 수정이 완료되었습니다.',
     },
     UPDATECOVER: {
       UNAUTHORIZED: '커뮤니티 수정 권한이 없습니다',
-      BAD_REQUEST:'등록할 이미지를 업로드 해주세요.',
+      BAD_REQUEST: '등록할 이미지를 업로드 해주세요.',
       SUCCEED: '커버 이미지 수정이 완료되었습니다.',
     },
   },
@@ -220,29 +223,29 @@ export const MESSAGES = {
     },
   },
   MEDIA: {
-    CREATE:{
+    CREATE: {
       UNAUTHORIZED: '미디어 등록 권한이 없습니다.',
       SUCCEED: '미디어 등록에 성공했습니다.',
     },
-    FINDALL:{
+    FINDALL: {
       SUCCEED: '모든 미디어 목록 조회에 성공했습니다.',
     },
-    FINDONE:{
+    FINDONE: {
       SUCCEED: '미디어 조회에 성공했습니다.',
     },
-    UPDATETHUMBNAIL:{
+    UPDATETHUMBNAIL: {
       NOT_FOUND: '미디어를 찾을 수 없습니다.',
       UNAUTHORIZED: '이미지 수정 권한이 없습니다.',
       BAD_REQUEST: '등록할 이미지가 업로드되지 않았습니다.',
       SUCCEED: '썸네일 이미지 수정에 성공했습니다.',
     },
-    UPDATE:{
+    UPDATE: {
       NOT_FOUND: '미디어를 찾을 수 없습니다.',
       UNAUTHORIZED: '미디어 수정 권한이 없습니다.',
       BAD_REQUEST: '수정할 내용을 입력해주세요.',
       SUCCEED: '미디어 수정되었습니다.',
     },
-    REMOVE:{
+    REMOVE: {
       SUCCEED: '미디어 삭제에 성공했습니다.',
       UNAUTHORIZED: '미디어 삭제 권한이 없습니다.',
       NOT_FOUND: '미디어를 찾을 수 없습니다.',

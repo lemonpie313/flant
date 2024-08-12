@@ -14,6 +14,7 @@ import { PostImage } from './post-image.entity';
 import { Community } from 'src/community/entities/community.entity';
 import { Exclude } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Artist } from './../../admin/entities/artist.entity';
 
 @Entity()
 export class Post {
@@ -71,6 +72,9 @@ export class Post {
   @ManyToOne(() => Community, (community) => community.posts, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({name: 'community_id'})
+  @JoinColumn({ name: 'community_id' })
   community: Community;
+
+  @ManyToOne(() => Artist, (artist) => artist.posts)
+  artist: Artist;
 }
