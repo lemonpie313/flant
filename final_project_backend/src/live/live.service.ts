@@ -75,8 +75,6 @@ export class LiveService {
             hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
             hlsKeep: true, // to prevent hls file delete after end the stream
             ffmpegParams: '-loglevel debug -report', // FFmpeg 로그 기록
-            // dash: true,
-            // dashFlags: '[f=dash:window_size=3:extra_window_size=5]',
           },
           {
             app: 'live',
@@ -231,34 +229,30 @@ export class LiveService {
 
   async createLive(userId: number, title: string, liveType: LiveTypes) {
     // userId로 커뮤니티아티인지 확인 + 어느 커뮤니티인지 조회
-    // const communityUser = await this.communityUserRepository.findOne({
-    //   where: {
-    //     userId,
-    //   },
-    //   relations: {
-    //     community: true,
-    //     artists: true,
-    //   },
-    // });
-    // const artist = await this.artistsRepository.findOne({
-    //   where: {
-    //     userId,
-    //   },
-    // });
-    // if (_.isNil(artist)) {
-    //   throw new NotFoundException({
-    //     status: 404,
-    //     message: '아티스트 회원 정보를 찾을 수 없습니다.',
-    //   });
-    // }
-    console.log(
-      '-----------------------------------------------------------------',
-    );
+    const communityUser = await this.communityUserRepository.findOne({
+      where: {
+        userId,
+      },
+      relations: {
+        community: true,
+      },
+    });
+    const artist = await this.artistsRepository.findOne({
+      where: {
+        userId,
+      },
+    });
+    if (_.isNil(artist)) {
+      throw new NotFoundException({
+        status: 404,
+        message: '아티스트 회원 정보를 찾을 수 없습니다.',
+      });
+    }
     // 키 발급
     const streamKey = Crypto.randomBytes(20).toString('hex');
     const live = await this.liveRepository.save({
-      communityId: 1, //artist.communityId,
-      artistId: 1, //artist.artistId,
+      communityId: artist.communityId,
+      artistId: artist.artistId,
       title,
       liveType,
       streamKey,

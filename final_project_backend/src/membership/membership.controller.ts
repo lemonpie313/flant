@@ -7,6 +7,7 @@ import {
   Query,
   HttpStatus,
   Get,
+  Body,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
@@ -14,6 +15,7 @@ import { MembershipService } from './membership.service';
 import { UserRole } from 'src/user/types/user-role.type';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { MembershipDto } from './dtos/membership.dto';
 
 @ApiTags('membership_payments')
 @Controller('v1/membership')
@@ -28,12 +30,12 @@ export class MembershipController {
   @ApiBearerAuth()
   @Roles(UserRole.Admin)
   @UseGuards(RolesGuard)
-  @ApiQuery({ name: 'communityId', required: false, type: Number })
   @Get('/payments')
   async findMembershipPayments(
     @Request() req,
-    @Query('communityId') communityId?: number,
+    @Body() membershipDto: MembershipDto
   ) {
+    const { communityId } = membershipDto;
     const payments =
       await this.membershipService.findMembershipPayments(communityId);
     return {
