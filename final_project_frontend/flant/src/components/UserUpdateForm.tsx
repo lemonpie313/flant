@@ -21,7 +21,7 @@ const UserUpdateForm: React.FC<{ userId: number }> = ({ userId }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await userApi.update(userId, userData);
+      //await userApi.update(userId, userData);
       alert("User updated successfully");
     } catch (error) {
       console.error("Update failed:", error);

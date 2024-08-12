@@ -19,7 +19,11 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { UserRole } from 'src/user/types/user-role.type';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
+<<<<<<< HEAD
 import { AuthGuard } from '@nestjs/passport';
+=======
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
+>>>>>>> df0efc78d92b9cb66f8cae6020850394ce92e568
 
 @ApiTags('Forms')
 @Controller('v1/forms')
@@ -91,11 +95,21 @@ export class FormController {
    * @returns
    */
   @ApiBearerAuth()
+<<<<<<< HEAD
   @UseGuards(AuthGuard('jwt'))
   @Post('/:formId/apply')
   async applyForm(@Param('formId') formId: string, @Req() req) {
     const userId = req.user.id;
 
     return await this.formService.applyForm(userId, +formId);
+=======
+  @UseGuards(JwtAuthGuard)
+  @Post('/:formId')
+  async applyForm(
+    @Param('formId', ParseIntPipe) formId: string,
+    @UserInfo() user: PartialUser,
+  ) {
+    return await this.formService.applyForm(user.id, +formId);
+>>>>>>> df0efc78d92b9cb66f8cae6020850394ce92e568
   }
 }
