@@ -8,7 +8,8 @@ import { Manager } from '../entities/manager.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Community } from './../../community/entities/community.entity';
-import { CommunityUser } from 'src/community/entities/communityUser.entity';
+import { CommunityUser } from 'src/community/community-user/entities/communityUser.entity';
+
 import { MESSAGES } from 'src/constants/message.constant';
 import { CreateManagerDto } from '../dto/create-manager.dto';
 @Injectable()
@@ -76,6 +77,35 @@ export class AdminManagerService {
     // 해당 매니저 삭제 로직
     await this.managerRepository.delete({ managerId });
     await this.userRepository.delete({ userId: existedManagewr.userId });
+
+    return true;
+  }
+
+  async findByCommunityIdAndUserId(communityId: number, userId: number) {
+    const exsitedManager = await this.managerRepository.findOne({
+      where: {
+        communityId,
+        userId,
+      },
+    });
+
+    if (!exsitedManager)
+      throw new NotFoundException(
+        MESSAGES.AUTH.COMMON.COMMUNITY_USER.NOT_MANAGER,
+      );
+
+    return true;
+  }
+
+  async findByUserId(userId: number) {
+    const exsitedManager = await this.managerRepository.findOne({
+      where: {
+        userId,
+      },
+    });
+
+    if (!exsitedManager)
+      throw new NotFoundException(MESSAGES.MANAGER.COMMON.NOT_FOUND);
 
     return true;
   }

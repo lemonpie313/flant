@@ -10,7 +10,8 @@ import { AdminArtistController } from './controllers/admin-artist.controller';
 import { AdminManagerController } from './controllers/admin-manager.controller';
 import { AdminArtistService } from './services/admin-artist.service';
 import { AdminManagerService } from './services/admin-manager.service';
-import { CommunityUser } from 'src/community/entities/communityUser.entity';
+import { CommunityUser } from 'src/community/community-user/entities/communityUser.entity';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Artist, Manager, Community, CommunityUser]),
@@ -18,5 +19,6 @@ import { CommunityUser } from 'src/community/entities/communityUser.entity';
   ],
   controllers: [AdminArtistController, AdminManagerController],
   providers: [AdminArtistService, AdminManagerService],
+  exports: [AdminArtistService, AdminManagerService],
 })
 export class AdminModule {}

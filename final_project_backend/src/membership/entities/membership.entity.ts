@@ -12,7 +12,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { CommunityUser } from '../../community/entities/communityUser.entity';
+import { CommunityUser } from '../../community/community-user/entities/communityUser.entity';
 import { MembershipPayment } from './membership-payment.entity';
 
 @Entity('membership')

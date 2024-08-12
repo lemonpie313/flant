@@ -39,7 +39,7 @@ export class NoticeService {
       content: createNoticeDto.content,
     })
 
-    if (imageUrl.length > 0) {
+    if (imageUrl && imageUrl.length > 0) {
       for(let image of imageUrl){
         const noticeImageData = {
           noticeId: createdData.noticeId,
@@ -85,6 +85,7 @@ export class NoticeService {
     userId: number,
     noticeId: number,
     updateNoticeDto: UpdateNoticeDto,
+    imageUrl: string[] | undefined,
   ) {
     const noticeData = await this.noticeRepository.findOne({
       where: { noticeId: noticeId },
@@ -101,13 +102,47 @@ export class NoticeService {
     if (!isManager) {
       throw new UnauthorizedException(MESSAGES.NOTICE.UPDATE.UNAUTHORIZED);
     }
-    if (_.isEmpty(updateNoticeDto)) {
+    if (_.isEmpty(updateNoticeDto.title && updateNoticeDto.content)) {
       throw new BadRequestException(MESSAGES.NOTICE.UPDATE.BAD_REQUEST);
     }
+
+    const newData = {
+      title: noticeData.title,
+      content: noticeData.content,
+    }
+    if(updateNoticeDto.title != noticeData.title){
+      newData.title = updateNoticeDto.title
+    }
+    if(updateNoticeDto.content != noticeData.content){
+      newData.content = updateNoticeDto.content
+    }    
+
     await this.noticeRepository.update(
       { noticeId: noticeId },
-      { title: updateNoticeDto.title, content: updateNoticeDto.content },
+      newData,
     );
+
+
+    //입력된 imageUrl이 있을 경우에
+    if (imageUrl && imageUrl.length > 0) {
+      //postId에 연결된 모든 postImage 데이터 삭제
+      //의도 : DELETE FROM post_image WHERE notice_id = noticeId
+      await this.noticeImageRepository
+      .createQueryBuilder()
+      .delete() 
+      .from(NoticeImage)
+      .where('notice_id = :noticeId', { noticeId })
+      .execute();
+
+      //업로드된 이미지 숫자만큼 다시 생성
+      for(let image of imageUrl){
+        const noticeImageData = {
+          noticeId: noticeData.noticeId,
+          postImageUrl: image
+        }
+        await this.noticeImageRepository.save(noticeImageData)
+      }
+    }
 
     const updatedData = await this.noticeRepository.findOne({
       where: { noticeId: noticeId },

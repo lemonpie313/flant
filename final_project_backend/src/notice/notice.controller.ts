@@ -17,7 +17,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
 import { ApiFiles } from 'src/util/decorators/api-file.decorator';
-import { noticeImageUploadFactory } from 'src/factory/notice-image-upload.factory';
+import { noticeImageUploadFactory } from 'src/util/image-upload/create-s3-storage';
 
 @ApiTags('공지사항')
 @Controller('v1/notice')
@@ -42,7 +42,7 @@ export class NoticeController {
     @Query('communityId') communityId: number,
     @Body() createNoticeDto: CreateNoticeDto) {
       let imageUrl = undefined
-      if(files.noticeImage.length != 0){
+      if(files && files.noticeImage && files.noticeImage.length != 0){
         const imageLocation = files.noticeImage.map(file => file.location);
         imageUrl = imageLocation
       }
@@ -78,10 +78,21 @@ export class NoticeController {
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
+  @ApiFiles('noticeImage', 3, noticeImageUploadFactory())
   @Patch(':noticeId')
-  update(@UserInfo() user, @Param('noticeId') noticeId: number, @Body() updateNoticeDto: UpdateNoticeDto) {
+  update(
+    @UploadedFiles() files: {noticeImage?: Express.MulterS3.File[]},
+    @UserInfo() user,
+    @Param('noticeId') noticeId: number,
+    @Body() updateNoticeDto: UpdateNoticeDto,
+  ) {
     const userId = user.id;
-    return this.noticeService.update(+userId, +noticeId, updateNoticeDto);
+    let imageUrl = undefined
+    if(files && files.noticeImage && files.noticeImage.length != 0){
+      const imageLocation = files.noticeImage.map(file => file.location);
+      imageUrl = imageLocation
+    }
+    return this.noticeService.update(+userId, +noticeId, updateNoticeDto, imageUrl);
   }
 
   /**

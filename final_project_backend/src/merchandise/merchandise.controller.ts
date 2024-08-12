@@ -23,7 +23,6 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @ApiTags('상품')
 @Controller('v1/merchandise')
-@UseGuards(AuthGuard('jwt'))
 export class MerchandiseController {
   constructor(private readonly merchandiseService: MerchandiseService) {}
 
@@ -34,6 +33,7 @@ export class MerchandiseController {
    */
   @ApiBearerAuth()
   @Roles(UserRole.Manager)
+  @UseGuards(AuthGuard('jwt'))
   @UseGuards(RolesGuard)
   @Post()
   async create(@Body() createMerchandiseDto: CreateMerchandiseDto, @Req() req) {
