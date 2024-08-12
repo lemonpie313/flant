@@ -64,7 +64,7 @@ export class CommunityService {
 
   async findAll() {
     const allCommunities = await this.communityRepository.find({
-      select: ['communityLogoImage', 'communityName'],
+      select: ['communityLogoImage', 'communityName', 'communityCoverImage'],
     });
     return {
       status: HttpStatus.OK,
@@ -102,7 +102,7 @@ export class CommunityService {
       data: oneCommunityData,
     };
   }
- 
+
   async updateCommunity(
     userId: number,
     communityId: number,
@@ -161,18 +161,20 @@ export class CommunityService {
       data: communityId,
     };
   }
-  
-  async updateLogo(userId: number, communityId: number, imageUrl: string){
+
+  async updateLogo(userId: number, communityId: number, imageUrl: string) {
     //매니저 이외의 접근일 경우
     const isManager = await this.managerRepository.findOne({
       where: { userId: userId, communityId: communityId },
     });
     if (!isManager) {
-      throw new UnauthorizedException(MESSAGES.COMMUNITY.UPDATELOGO.UNAUTHORIZED);
+      throw new UnauthorizedException(
+        MESSAGES.COMMUNITY.UPDATELOGO.UNAUTHORIZED,
+      );
     }
     //등록할 이미지가 없는 경우
-    if(!imageUrl){
-      throw new BadRequestException(MESSAGES.COMMUNITY.UPDATELOGO.BAD_REQUEST)
+    if (!imageUrl) {
+      throw new BadRequestException(MESSAGES.COMMUNITY.UPDATELOGO.BAD_REQUEST);
     }
     await this.communityRepository.update(
       { communityId: communityId },
@@ -196,10 +198,12 @@ export class CommunityService {
       where: { userId: userId, communityId: communityId },
     });
     if (!isManager) {
-      throw new UnauthorizedException(MESSAGES.COMMUNITY.UPDATECOVER.UNAUTHORIZED);
+      throw new UnauthorizedException(
+        MESSAGES.COMMUNITY.UPDATECOVER.UNAUTHORIZED,
+      );
     }
-    if(!imageUrl){
-      throw new BadRequestException(MESSAGES.COMMUNITY.UPDATECOVER.BAD_REQUEST)
+    if (!imageUrl) {
+      throw new BadRequestException(MESSAGES.COMMUNITY.UPDATECOVER.BAD_REQUEST);
     }
     await this.communityRepository.update(
       { communityId: communityId },
