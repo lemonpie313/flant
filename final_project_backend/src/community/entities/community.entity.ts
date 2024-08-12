@@ -19,6 +19,7 @@ import { Form } from 'src/form/entities/form.entity';
 import { Post } from 'src/post/entities/post.entity';
 import { MembershipPayment } from 'src/membership/entities/membership-payment.entity';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Artist } from 'src/admin/entities/artist.entity';
 
 @Entity('communities')
 export class Community {
@@ -85,7 +86,7 @@ export class Community {
 
   @OneToMany(() => Form, (form) => form.community, {})
   form: Form[];
-  
+
   @OneToMany(() => Post, (post) => post.community)
   posts: Post[];
 
@@ -94,4 +95,7 @@ export class Community {
     (membershipPayment) => membershipPayment.community,
   )
   membershipPayment: MembershipPayment[];
+
+  @OneToMany(() => Artist, (artist) => artist.community)
+  artist: Artist[];
 }
