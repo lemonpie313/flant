@@ -110,6 +110,7 @@ export class LiveService {
           console.log("-------------에러------------")
           session.reject((reason: string) => {
             console.log(reason);
+            console.log("라이브 스트림키를 확인해주세요.");
           });
         }
         const time = new Date();
@@ -119,47 +120,17 @@ export class LiveService {
           console.log("-------------에러------------")
           session.reject((reason: string) => {
             console.log(reason);
+            console.log("라이브 스트림키의 유효기간이 만료되었습니다.");
           });
         }
         console.log('------------------------방송시작?------------------');
       },
     );
+
     this.nodeMediaServer.on(
       'donePublish',
       async (id: string, streamPath: string) => {
         console.log("-----------")
-        const streamKey = streamPath.split('/live/')[1];
-        // const live = await this.liveRepository.findOne({
-        //   where: { streamKey },
-        // });
-
-        const liveDirectory = path.join(
-          __dirname,
-          '../../media/live',
-          streamKey,
-        );
-        //const liveDirectory = `./media/live/${streamKey}`
-        console.log(`Reading directory: ${liveDirectory}`);
-
-        if (!fs.existsSync(liveDirectory)) {
-          console.error('Live directory does not exist:', liveDirectory);
-          return;
-        }
-
-        const files = fs.readdirSync(liveDirectory);
-        console.log('Files in directory:', files);
-
-        const fileName = files.find((file) => path.extname(file) === '.mp4');
-
-        if (!fileName) {
-          console.error('No .mp4 file found in directory:', liveDirectory);
-          return;
-        }
-
-        const filePath = path.join(liveDirectory, fileName);
-        console.log('Reading file:', filePath);
-
-        await this.cleanupStreamFolder(streamKey);
       },
     );
 
