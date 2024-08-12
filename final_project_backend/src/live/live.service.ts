@@ -203,7 +203,7 @@ export class LiveService {
     );
     const command = new PutObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
-      Key: fileName,
+      Key: `liveRecordings/${fileName}`,
       Body: file,
       ContentType: `video/${ext}`,
     });
@@ -218,7 +218,7 @@ export class LiveService {
     }  }
 
   async cleanupStreamFolder(streamKey: string) {
-    const folderPath = path.join(__dirname, '../../../media/live', streamKey);
+    const folderPath = path.join(__dirname, '../../media/live', streamKey);
     console.log('folderPath: ' + folderPath);
     if (fs.existsSync(folderPath)) {
       for (const file of fs.readdirSync(folderPath)) {
