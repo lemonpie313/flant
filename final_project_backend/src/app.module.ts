@@ -26,9 +26,21 @@ import { NoticeModule } from './notice/notice.module';
 import { MediaModule } from './media/media.module';
 import { LiveModule } from './live/live.module';
 import { CommunityUserModule } from './community/community-user/community-user.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { RedisClientOptions } from 'redis';
+import { redisStore } from 'cache-manager-redis-yet'
 
 @Module({
   imports: [
+    CacheModule.register<RedisClientOptions>({
+      store: redisStore,
+      socket: {
+        port: 6379,
+        host: 'localhost'
+      },
+      isGlobal: true,
+      ttl: 60 * 1000,
+    }),
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,

@@ -11,6 +11,7 @@ import {
   UploadedFiles,
   Put,
   ParseIntPipe,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -26,9 +27,11 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ApiFiles } from 'src/util/decorators/api-file.decorator';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
 import { postImageUploadFactory } from 'src/util/image-upload/create-s3-storage';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiTags('게시물')
 @Controller('v1/post')
+@UseInterceptors(CacheInterceptor)
 export class PostController {
   constructor(
     private readonly postService: PostService,
@@ -75,6 +78,7 @@ export class PostController {
     @Query('artistId') artistId: number,
     @Query('communityId') communityId: number,
   ) {
+    console.log('컨트롤러를 거침')
     return await this.postService.findPosts(+artistId, +communityId);
   }
 

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   HttpStatus,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -17,6 +18,7 @@ import _ from 'lodash';
 import { User } from 'src/user/entities/user.entity';
 import { Manager } from 'src/admin/entities/manager.entity';
 import { MESSAGES } from 'src/constants/message.constant';
+import { Cache } from 'cache-manager';
 
 
 @Injectable()
@@ -34,6 +36,7 @@ export class PostService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Manager)
     private readonly managerRepository: Repository<Manager>,
+    @Inject('CACHE_MANAGER') private cacheManager: Cache,
   ) {}
 
   async create(
@@ -80,6 +83,12 @@ export class PostService {
 
 
   async findPosts(artistId: number | null, communityId: number) {
+      console.log('DB에서 접근') 
+      const dataFromDB = await this.findPostsInDB(artistId, communityId)
+      return dataFromDB
+  }
+
+  async findPostsInDB(artistId: number | null, communityId: number){
     if (!artistId) {
       const allPosts = await this.postRepository.find({
         where: { communityId: communityId },
