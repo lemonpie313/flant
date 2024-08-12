@@ -72,25 +72,6 @@ export class AuthController {
    * @param req
    * @returns
    */
-  // @Get('google')
-  // @UseGuards(GoogleAuthGuard)
-  // async googleAuth(@Req() req) {}
-
-  // @Get('google/redirect')
-  // @UseGuards(GoogleAuthGuard)
-  // async googleAuthRedirect(
-  //   @UserInfo() user: PartialUser,
-  //   @Res() res: Response,
-  // ) {
-  //   const accessToken = await this.authService.googleLogin(user);
-  //   console.log('zz');
-  //   console.log(accessToken);
-  //   res.redirect(`http://localhost:3000/index.html?token=${accessToken}`);
-  //   return {
-  //     statusCode: HttpStatus.OK,
-  //     message: MESSAGES.AUTH.SIGN_IN.SECCEED,
-  //   };
-  // }
   @Get('/google')
   @UseGuards(GoogleAuthGuard)
   async googleAuth(@Req() req) {}

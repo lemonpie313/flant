@@ -19,7 +19,7 @@ import { MESSAGES } from 'src/constants/message.constant';
 @ApiBearerAuth()
 @Roles(UserRole.Admin)
 @UseGuards(RolesGuard)
-@Controller('v1/v1/admin/artists')
+@Controller('v1/admin/artists')
 export class AdminArtistController {
   constructor(private readonly adminArtistService: AdminArtistService) {}
 

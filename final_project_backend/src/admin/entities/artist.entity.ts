@@ -36,7 +36,7 @@ export class Artist {
   @IsNotEmpty({ message: MESSAGES.USER.COMMON.USERID.REQUIRED })
   @IsInt()
   @Column()
-  communitiyUserId: number;
+  communityUserId: number;
 
   /**
    * 아티스트 닉네임
