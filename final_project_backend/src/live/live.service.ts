@@ -74,6 +74,7 @@ export class LiveService {
             hls: true,
             hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
             hlsKeep: true, // to prevent hls file delete after end the stream
+            ffmpegParams: '-loglevel debug -report', // FFmpeg 로그 기록
             // dash: true,
             // dashFlags: '[f=dash:window_size=3:extra_window_size=5]',
           },
@@ -89,6 +90,9 @@ export class LiveService {
   }
 
   onModuleInit() {
+    // 서버 실행하면서 미디어서버도 같이 실행
+    this.nodeMediaServer.run();
+
     // 방송 전 키값이 유효한지 검증 (따로 암호화 없음, 유효기간만 검증함)
     this.nodeMediaServer.on(
       'prePublish',
@@ -106,33 +110,33 @@ export class LiveService {
         });
         console.log('----------------foundData----------------');
         console.log(live);
-        if (_.isNil(live)) {
-          console.log("-------------에러------------")
+        if (!live) {
+          console.log('-------------에러------------');
           session.reject((reason: string) => {
             console.log(reason);
-            console.log("라이브 스트림키를 확인해주세요.");
+            console.log('라이브 스트림키를 확인해주세요.');
           });
         }
         const time = new Date();
         const diff = Math.abs(time.getTime() - live.createdAt.getTime()) / 1000;
         if (diff > 6000) {
           // 1분 이내에 스트림키 입력 후 방송 시작이 돼야함
-          console.log("-------------에러------------")
+          console.log('-------------에러------------');
           session.reject((reason: string) => {
             console.log(reason);
-            console.log("라이브 스트림키의 유효기간이 만료되었습니다.");
+            console.log('라이브 스트림키의 유효기간이 만료되었습니다.');
           });
         }
         console.log('------------------------방송시작?------------------');
       },
     );
 
-    this.nodeMediaServer.on(
-      'donePublish',
-      async (id: string, streamPath: string) => {
-        console.log("-----------")
-      },
-    );
+    this.nodeMediaServer.on('donePublish', (id, streamPath, args) => {
+      console.log('Done publish called');
+      console.log('ID:', id);
+      console.log('StreamPath:', streamPath);
+      console.log('Args:', args);
+    });
 
     // 방송 종료 시 s3에 업로드
     // this.nodeMediaServer.on(
@@ -194,9 +198,6 @@ export class LiveService {
     //     }
     //   },
     // );
-
-    // 서버 실행하면서 미디어서버도 같이 실행
-    this.nodeMediaServer.run();
   }
 
   async liveRecordingToS3(
