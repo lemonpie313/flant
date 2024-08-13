@@ -239,7 +239,7 @@ export class LiveService {
     });
     const artist = await this.artistsRepository.findOne({
       where: {
-        userId,
+        communityUserId: communityUser.communityUserId,
       },
     });
     if (_.isNil(artist)) {

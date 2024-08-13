@@ -12,7 +12,7 @@ import { Membership } from './membership.entity';
 import { MembershipPaymentType } from '../types/membership-payment-type.enum';
 import { Community } from 'src/community/entities/community.entity';
 
-@Entity('membership_payment')
+@Entity('membership_payments')
 export class MembershipPayment {
   @PrimaryGeneratedColumn({ unsigned: true })
   membershipPaymentId: number;

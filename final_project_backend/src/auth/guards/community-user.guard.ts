@@ -47,7 +47,9 @@ export class CommunityUserGuard implements CanActivate {
         MESSAGES.AUTH.COMMON.COMMUNITY_USER.NO_COMMUNITY,
       );
     }
-
+    console.log("-------------------")
+    console.log(userId);
+    console.log(communityId);
     // Roles 지정하지 않을 경우 communityUser만 검사
     if (_.isEmpty(roles)) {
       await this.communityUserService.findByCommunityIdAndUserId(
@@ -60,13 +62,16 @@ export class CommunityUserGuard implements CanActivate {
     // Roles 설정시 Roles(ARIST,MANAGER) + communityUser 검사
 
     let hasRole = false;
-    console.log;
+    console.log("----------------");
+    console.log(roles);
     if (roles.includes(CommunityUserRole.ARTIST)) {
       try {
-        await this.artistService.findByCommunityIdAndUserId(
+        console.log('--------------------------------------')
+        const data =await this.artistService.findByCommunityIdAndUserId(
           communityId,
           userId,
         );
+        console.log(data);
         hasRole = true;
       } catch (e) {}
     }

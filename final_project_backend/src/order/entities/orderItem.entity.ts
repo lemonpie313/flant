@@ -1,12 +1,15 @@
 import { IsNumber } from 'class-validator';
 
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Order } from './order.entity';
 
 @Entity('order_items')
 export class OrderItem {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
+
+  @Column({unsigned: true})
+  orderId: number;
 
   @IsNumber()
   @Column()
@@ -24,7 +27,7 @@ export class OrderItem {
   @Column()
   quantity: number;
 
-  //유저연결
   @ManyToOne(() => Order, (order) => order.orderItem, { onDelete: 'CASCADE' })
+  @JoinColumn({name: 'order_id'})
   order: Order;
 }

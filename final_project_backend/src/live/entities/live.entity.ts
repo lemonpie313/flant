@@ -18,7 +18,7 @@ import {
 import { Community } from 'src/community/entities/community.entity';
 import { Artist } from 'src/admin/entities/artist.entity';
 
-@Entity('live')
+@Entity('lives')
 export class Live {
   @PrimaryGeneratedColumn({ unsigned: true })
   liveId: number;
@@ -63,4 +63,8 @@ export class Live {
   @ManyToOne(() => Community, (community) => community.live)
   @JoinColumn({name: 'community_id'})
   community: Community;
+
+  @ManyToOne(() => Artist, (artist) => artist.live)
+  @JoinColumn({name: 'artist_id'})
+  artist: Artist;
 }
