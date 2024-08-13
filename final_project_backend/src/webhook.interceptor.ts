@@ -28,7 +28,7 @@ export class SentryWebhookInterceptor implements NestInterceptor {
           attachments: [
             {
               color: 'danger',
-              text: `:경광등: API 서버 에러발생:경광등:`,
+              text: `🚨 API 서버 에러발생 🚨`,
               fields: [
                 {
                   title: error.message,
