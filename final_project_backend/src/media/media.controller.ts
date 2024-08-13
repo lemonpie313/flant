@@ -41,6 +41,7 @@ export class MediaController {
    * @returns 
    */
   @ApiBearerAuth()
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
   @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @ApiMedia([
     { name: 'mediaImage', maxCount: 3 },
@@ -49,7 +50,7 @@ export class MediaController {
   mediaFileUploadFactory())
   @Post()
   create(
-    @UploadedFiles() files: {mediaImage?: Express.MulterS3.File[], mediaVideo?: Express.MulterS3.File[]},
+    @UploadedFiles() files: { mediaImage?: Express.MulterS3.File[], mediaVideo?: Express.MulterS3.File[] },
     @UserInfo() user,
     @Body() createMediaDto: CreateMediaDto) {
     const userId = user.id;
@@ -95,6 +96,7 @@ export class MediaController {
    * @returns 
    */
   @ApiBearerAuth()
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
   @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @Patch(':mediaId/thumbnail')
   @ApiFile('thumbnailImage', thumbnailImageUploadFactory())
@@ -112,9 +114,10 @@ export class MediaController {
    * @returns
    */
   @ApiBearerAuth()
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
   @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @ApiMedia([
-    { name: 'mediaImage', maxCount: 3 },
+    { name: 'mediaImage', maxCount: 10 },
     { name: 'mediaVideo', maxCount: 1 }
   ],
   mediaFileUploadFactory())
@@ -148,6 +151,7 @@ export class MediaController {
    * @returns
    */
   @ApiBearerAuth()
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
   @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @Delete(':mediaId')
   remove(@UserInfo() user, @Param('mediaId') mediaId: number) {

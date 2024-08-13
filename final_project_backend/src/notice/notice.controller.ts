@@ -39,6 +39,7 @@ export class NoticeController {
    * @returns
    */
   @ApiBearerAuth()
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
   @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @ApiFiles('noticeImage', 3, noticeImageUploadFactory())
   @Post()
@@ -82,6 +83,7 @@ export class NoticeController {
    * @returns
    */
   @ApiBearerAuth()
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
   @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @ApiFiles('noticeImage', 3, noticeImageUploadFactory())
   @Patch(':noticeId')
@@ -107,6 +109,7 @@ export class NoticeController {
    * @returns
    */
   @ApiBearerAuth()
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
   @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @Delete(':noticeId')
   remove(@UserInfo() user, @Param('noticeId') noticeId: string) {

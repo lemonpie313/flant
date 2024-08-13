@@ -224,6 +224,8 @@ export const MESSAGES = {
   },
   MEDIA: {
     CREATE: {
+      BAD_REQUEST: '이미지 또는 동영상 중 한 종류만 등록할 수 있습니다.',
+      CONFLICT: '동영상은 한 개만 등록할 수 있습니다.',
       UNAUTHORIZED: '미디어 등록 권한이 없습니다.',
       SUCCEED: '미디어 등록에 성공했습니다.',
     },

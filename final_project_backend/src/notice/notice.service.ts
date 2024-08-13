@@ -27,7 +27,7 @@ export class NoticeService {
     private readonly managerRepository: Repository<Manager>,
   ){}
   async create(userId: number, createNoticeDto: CreateNoticeDto, imageUrl: string[] | undefined) {
-    const isManager = await this.managerRepository.findOne({where: {userId: userId, communityId: createNoticeDto.communityId}})
+    const isManager = await this.managerRepository.findOne({where: { userId: userId, communityId: createNoticeDto.communityId }})
     if(!isManager){
       throw new UnauthorizedException(MESSAGES.NOTICE.CREATE.UNAUTHORIZED)
     }
