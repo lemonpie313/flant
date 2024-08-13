@@ -55,7 +55,7 @@ export class LiveService {
       },
       http: {
         port: 8000,
-        mediaroot: '../media', // path.join(__dirname, '../../media'), 
+        mediaroot: '../media', // path.join(__dirname, '../../media'),
         //webroot: './www',
         allow_origin: '*',
       },
@@ -65,30 +65,72 @@ export class LiveService {
       //   // cert: './cert.pem',
       // },
       trans: {
-        ffmpeg: //'/usr/bin/ffmpeg',
-        '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+        //'/usr/bin/ffmpeg',
+        ffmpeg:
+          '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
-            vc: 'copy',
-            vcParam: [],
-            ac: 'aac',
-            acParam: ['-ab', '64k', '-ac', '1', '-ar', '44100'],
+            vc: 'libx264', // x264 비디오 코덱 사용
+            vcParam: [
+              '-crf',
+              '18', // CRF 값 (18은 거의 무손실, 23은 기본값)
+              '-preset',
+              'slow', // 인코딩 프리셋 (slow는 품질과 속도 사이의 좋은 균형)
+              '-b:v',
+              '4M', // 비트레이트 (4M는 4 Mbps)
+              '-maxrate',
+              '4M', // 최대 비트레이트
+              '-bufsize',
+              '8M', // 버퍼 사이즈
+            ],
+            ac: 'copy',
+            // acParam: ['-ab', '64k', '-ac', '1', '-ar', '44100'],
             hls: true,
             hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
-            hlsKeep: true, // to prevent hls file delete after end the stream
-            ffmpegParams: '-loglevel debug -report', // FFmpeg 로그 기록
-            dash: true,
-            dashFlags: '[f=dash:window_size=3:extra_window_size=5]',
-            dashKeep: true, // to prevent dash file delete after end the stream
+            // hlsKeep: true, // to prevent hls file delete after end the stream
+            // ffmpegParams: '-loglevel debug -report', // FFmpeg 로그 기록
+            // dash: true,
+            // dashFlags: '[f=dash:window_size=3:extra_window_size=5]',
+            // dashKeep: true, // to prevent dash file delete after end the stream
             mp4: true,
             mp4Flags: '[movflags=frag_keyframe+empty_moov]',
           },
-          // {
-          //   app: 'live',
-          //   mp4: true,
-          //   mp4Flags: '[movflags=frag_keyframe+empty_moov]',
-          // },
+        ],
+      },
+      fission: {
+        ffmpeg:
+          '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+        tasks: [
+          {
+            rule: 'live/*',
+            model: [
+            //   { // 1080p 추가하면 인코딩 과부하 걸림...
+            //     ab: '128k',                // 오디오 비트레이트
+            //     vb: '2000k',               // 비디오 비트레이트 (5 Mbps)
+            //     vs: '1920x1080',           // 비디오 해상도
+            //     vf: '30',                  // 프레임 레이트 (30 fps)
+            // },
+              {
+                ab: '128k',
+                vb: '1500k',
+                vs: '1280x720',
+                vf: '30',
+              },
+              {
+                ab: '96k',
+                vb: '1000k',
+                vs: '854x480',
+                vf: '24',
+              },
+              {
+                ab: '96k',
+                vb: '600k',
+                vs: '640x360',
+                vf: '20',
+              },
+            ],
+          },
         ],
       },
     };
@@ -107,7 +149,7 @@ export class LiveService {
           '-----------------------방송시작직전--------------------------',
         );
         const session = this.nodeMediaServer.getSession(id);
-        const streamKey = streamPath.split('/live/')[1];
+        const streamKey = streamPath.split('/live/')[1].split('_')[0];
 
         const live = await this.liveRepository.findOne({
           where: {
@@ -155,7 +197,7 @@ export class LiveService {
         //   '../../media/live',
         //   streamKey,
         // );
-        const liveDirectory = '../media/live/'+streamKey;
+        const liveDirectory = '../media/live/' + streamKey;
         console.log(
           `-------------------------------Reading directory: ${liveDirectory}`,
         );
@@ -201,6 +243,23 @@ export class LiveService {
         }
       },
     );
+    this.nodeMediaServer.on('postPublish', (id, StreamPath, args) => {
+      console.log('[NodeEvent on postPublish]');
+    });
+
+    this.nodeMediaServer.on('prePlay', (id, StreamPath, args) => {
+      console.log('[NodeEvent on prePlay]');
+      // let session = nms.getSession(id);
+      // session.reject();
+    });
+
+    this.nodeMediaServer.on('postPlay', (id, StreamPath, args) => {
+      console.log('[NodeEvent on postPlay]');
+    });
+
+    this.nodeMediaServer.on('donePlay', (id, StreamPath, args) => {
+      console.log('[NodeEvent on donePlay]');
+    });
   }
 
   async liveRecordingToS3(
@@ -229,7 +288,7 @@ export class LiveService {
   }
 
   async cleanupStreamFolder(streamKey: string) {
-    const folderPath = '../media/live/'+streamKey; //path.join(__dirname, '../../media/live', streamKey);
+    const folderPath = '../media/live/' + streamKey; //path.join(__dirname, '../../media/live', streamKey);
     console.log('folderPath: ' + folderPath);
     if (fs.existsSync(folderPath)) {
       for (const file of fs.readdirSync(folderPath)) {
