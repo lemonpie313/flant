@@ -20,6 +20,8 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
 import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 import { MESSAGES } from 'src/constants/message.constant';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @ApiTags('인증')
 @Controller('v1/auth')
@@ -70,12 +72,12 @@ export class AuthController {
    * @param req
    * @returns
    */
-  @Get('google')
-  @UseGuards(AuthGuard('google'))
+  @Get('/google')
+  @UseGuards(GoogleAuthGuard)
   async googleAuth(@Req() req) {}
 
-  @Get('google/redirect')
-  @UseGuards(AuthGuard('google'))
+  @Get('/google/redirect')
+  @UseGuards(GoogleAuthGuard)
   async googleAuthRedirect(@Req() req, @Res() res: Response) {
     const accessToken = await this.authService.googleLogin(req);
 
@@ -86,15 +88,23 @@ export class AuthController {
    * 로그아웃
    */
   //@UseGuards(AuthGuard('jwt-refresh-token'))
+  @UseGuards(JwtAuthGuard)
   @Post('/sign-out')
-  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const { accessOption, refreshOption } = await this.authService.signOut(req);
+  async logout(
+    @UserInfo() user: PartialUser,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    console.log(user);
+    const userId = user.id;
+    console.log(userId);
+    const { accessOption, refreshOption } =
+      await this.authService.signOut(userId);
     console.log(accessOption);
     res.cookie('Authentication', '', accessOption);
     res.cookie('Refresh', '', refreshOption);
     return {
       statusCode: HttpStatus.OK,
-      message: '로그아웃에 성공했습니다.',
+      message: MESSAGES.AUTH.SIGN_OUT.SECCEED,
     };
   }
 
@@ -104,12 +114,12 @@ export class AuthController {
   async getAccessToken(
     refreshtoken: string,
     userId: number,
-    @Req() req: Request,
+    @UserInfo() user: PartialUser,
   ) {
     const accesstoken = await this.authService.getAccessToken(
       refreshtoken,
       userId,
-      req,
+      user,
     );
   }
 }

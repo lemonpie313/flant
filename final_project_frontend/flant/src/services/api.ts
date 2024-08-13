@@ -11,14 +11,14 @@ const api = axios.create({
 });
 // 요청 인터셉터를 추가하여 JWT 토큰을 헤더에 포함시킵니다.
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("accessToken");
   if (token) {
     config.headers["Authorization"] = `Bearer ${token}`;
   }
   return config;
 });
 // 응답 인터셉터 - 토큰 만료 시 리프레시 토큰으로 갱신
-/*
+
 api.interceptors.response.use(
   (response) => {
     return response;
@@ -46,7 +46,7 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-*/
+
 export const authApi = {
   signIn: (email: string, password: string) =>
     api.post("/auth/sign-in", { email, password }),
@@ -69,11 +69,18 @@ export const authApi = {
 // 다른 API 함수들 (userApi, postApi, fileApi)은 이전과 동일하게 유지
 
 export const userApi = {
-  login: (email: string, password: string) =>
-    api.post("/auth/login", { email, password }),
-  googleLogin: (token: string) => api.post("/auth/google", { token }),
-  logout: () => api.post("/auth/logout"),
-  refresh: (refreshToken: string) =>
-    api.post("/auth/refresh", { refreshToken }),
-  update: (userId: number, userData: UpdateUserDto) => api.post("/auth/logout"),
+  findMy: () => api.get("/users/me"),
+  update: (
+    newUserName: string,
+    newPassword: string,
+    confirmNewPassword: string
+  ) => api.patch("/users/me", { newUserName, newPassword, confirmNewPassword }),
+  checkPassword: (password: string) =>
+    api.post("/users/check-password", { password }),
+  delete: () => api.delete("/users/me"),
+};
+
+export const communityApi = {
+  findAll: () => api.get("/community"),
+  findMy: () => api.get("/community/my"),
 };

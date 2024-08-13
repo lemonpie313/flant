@@ -95,19 +95,22 @@ export class UserService {
 
   // 내 정보 수정
   async updateUser(userId: number, updateUserDto: UpdateUserDto) {
-    const { name, newPassword, newPasswordConfirm } = updateUserDto;
-
+    const { newUserName, newPassword, confirmNewPassword } = updateUserDto;
+    console.log(updateUserDto);
+    console.log('zzzzzzzzzzz');
+    console.log(newUserName);
+    console.log('bb');
     // 비밀번호 변경의 경우
     if (newPassword) {
       // 새 비밀번호 일치 확인
-      const isNewPasswordMatched = newPassword === newPasswordConfirm;
+      const isNewPasswordMatched = newPassword === confirmNewPassword;
       if (!isNewPasswordMatched) {
         throw new BadRequestException(
           MESSAGES.AUTH.COMMON.PASSWORD_CONFIRM.NEW_PASSWORD_MISMATCH,
         );
       }
     }
-
+    console.log('zzzzzzzzzzz');
     // 비밀번호 hash 처리
     const hashRounds = this.configService.get<number>('PASSWORD_HASH');
     const hashedPassword = bcrypt.hashSync(newPassword, hashRounds);
@@ -123,10 +126,10 @@ export class UserService {
     // 회원 정보 수정 로직
     const whereCondition = userId;
     const whereContent = {
-      ...(name && { name }),
+      ...(newUserName && { name: newUserName }),
       ...(newPassword && { password: hashedPassword }),
     };
-
+    console.log('zzzzzzzzzzz');
     const updateUser = await this.userRepository.update(
       whereCondition,
       whereContent,
@@ -136,23 +139,23 @@ export class UserService {
   }
 
   // 회원 탈퇴
-  async deleteUser(userId: number, password: string) {
+  async deleteUser(userId: number) {
     // 비밀번호 일치 확인
-    const user = await this.userRepository.findOne({
-      where: { userId: userId },
-      select: { password: true },
-    });
-    if (!user) throw new BadRequestException(MESSAGES.USER.COMMON.NOT_FOUND);
+    // const user = await this.userRepository.findOne({
+    //   where: { userId: userId },
+    //   select: { password: true },
+    // });
+    // if (!user) throw new BadRequestException(MESSAGES.USER.COMMON.NOT_FOUND);
 
-    const isPasswordMatched = bcrypt.compareSync(
-      password,
-      user?.password ?? '',
-    );
+    // const isPasswordMatched = bcrypt.compareSync(
+    //   password,
+    //   user?.password ?? '',
+    // );
 
-    if (!isPasswordMatched)
-      throw new BadRequestException(
-        MESSAGES.AUTH.COMMON.PASSWORD.PASSWORD_MISMATCH,
-      );
+    // if (!isPasswordMatched)
+    //   throw new BadRequestException(
+    //     MESSAGES.AUTH.COMMON.PASSWORD.PASSWORD_MISMATCH,
+    //   );
 
     return await this.userRepository.delete({ userId: userId });
   }

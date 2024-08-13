@@ -69,7 +69,7 @@ export class CommunityService {
 
   async findAll() {
     const allCommunities = await this.communityRepository.find({
-      select: ['communityLogoImage', 'communityName'],
+      select: ['communityLogoImage', 'communityName', 'communityCoverImage'],
     });
     return {
       status: HttpStatus.OK,

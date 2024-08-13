@@ -17,7 +17,9 @@ import { MESSAGES } from 'src/constants/message.constant';
 
 @ApiTags('어드민')
 @ApiBearerAuth()
-@Controller('v1/v1/admin/artists')
+@Roles(UserRole.Admin)
+@UseGuards(RolesGuard)
+@Controller('v1/admin/artists')
 export class AdminArtistController {
   constructor(private readonly adminArtistService: AdminArtistService) {}
 
@@ -25,8 +27,6 @@ export class AdminArtistController {
    * 아티스트 생성
    * @param CreateArtistDto
    */
-  @Roles(UserRole.Admin)
-  @UseGuards(RolesGuard)
   @Post()
   async createArtist(@Body() createArtistDto: CreateArtistDto) {
     const data = await this.adminArtistService.createArtist(createArtistDto);
@@ -42,8 +42,6 @@ export class AdminArtistController {
    * @param artistId
    */
 
-  @Roles(UserRole.Admin)
-  @UseGuards(RolesGuard)
   @Delete(':artistId')
   async deleteArtist(@Param('artistId') artistId: number) {
     await this.adminArtistService.deleteArtist(artistId);

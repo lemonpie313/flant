@@ -81,8 +81,8 @@ export class AuthService {
   //로그아웃
   async signOut(req) {
     const { accessOption, refreshOption } = this.getCookiesForLogOut();
-
-    await this.removeRefreshToken(req.user.userId);
+    console.log(req);
+    await this.removeRefreshToken(req.id);
 
     return { accessOption, refreshOption };
   }
@@ -115,7 +115,7 @@ export class AuthService {
     if (!req.user) {
       return MESSAGES.AUTH.COMMON.OAUTH_GOOGLE.NOT_FOUND;
     }
-
+    console.log(req);
     // 만약 유저테이블에서 같은 이메일이 있다면 false반환
     const existedUser = await this.userRepository.findOneBy({
       email: req.user.email,
@@ -232,7 +232,8 @@ export class AuthService {
 
   // refreshtoken 삭제
   async removeRefreshToken(userId: number) {
-    return await this.refreshtokenRepository.update(userId, {
+    const updateCondition = { userId: userId };
+    return await this.refreshtokenRepository.update(updateCondition, {
       refreshtoken: null,
     });
   }
