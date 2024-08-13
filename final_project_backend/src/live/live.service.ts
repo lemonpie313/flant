@@ -65,17 +65,74 @@ export class LiveService {
       //   // cert: './cert.pem',
       // },
       trans: {
-        ffmpeg: '/usr/bin/ffmpeg',
-        //'/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+        ffmpeg: //'/usr/bin/ffmpeg',
+        '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
-            ac: 'aac',
             hls: true,
             hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
-            hlsKeep: true, // to prevent hls file delete after end the stream
-            ffmpegParams: '-loglevel debug -report', // FFmpeg 로그 기록
+            // dash: true,
+            // dashFlags: '[f=dash:window_size=3:extra_window_size=5]',
+            vc: 'libx264',
+            vcParam: ['-preset', 'veryfast', '-profile:v', 'main', '-level', '3.1'],
+            ac: 'aac',
+            acParam: ['-ab', '128k', '-ar', '44100'],
+            rtmp: true,
+            rtmpApp: 'live_1080p',
+            rtmpVCParam: ['-s', '1920x1080', '-b:v', '5000k'],
+            rtmpACParam: ['-ab', '128k', '-ar', '44100'],
+            hlsVCParam: ['-s', '1920x1080', '-b:v', '5000k'],
+            hlsACParam: ['-ab', '128k', '-ar', '44100'],
+            // dashVCParam: ['-s', '1920x1080', '-b:v', '5000k'],
+            // dashACParam: ['-ab', '128k', '-ar', '44100'],
           },
+          {
+            app: 'live',
+            hls: true,
+            hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
+            // dash: true,
+            // dashFlags: '[f=dash:window_size=3:extra_window_size=5]',
+            vc: 'libx264',
+            vcParam: ['-preset', 'veryfast', '-profile:v', 'main', '-level', '3.1'],
+            ac: 'aac',
+            acParam: ['-ab', '128k', '-ar', '44100'],
+            rtmp: true,
+            rtmpApp: 'live_720p',
+            rtmpVCParam: ['-s', '1280x720', '-b:v', '3000k'],
+            rtmpACParam: ['-ab', '128k', '-ar', '44100'],
+            hlsVCParam: ['-s', '1280x720', '-b:v', '3000k'],
+            hlsACParam: ['-ab', '128k', '-ar', '44100'],
+            // dashVCParam: ['-s', '1280x720', '-b:v', '3000k'],
+            // dashACParam: ['-ab', '128k', '-ar', '44100'],
+          },
+          {
+            app: 'live',
+            hls: true,
+            hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
+            // dash: true,
+            // dashFlags: '[f=dash:window_size=3:extra_window_size=5]',
+            vc: 'libx264',
+            vcParam: ['-preset', 'veryfast', '-profile:v', 'main', '-level', '3.1'],
+            ac: 'aac',
+            acParam: ['-ab', '128k', '-ar', '44100'],
+            rtmp: true,
+            rtmpApp: 'live_480p',
+            rtmpVCParam: ['-s', '854x480', '-b:v', '1500k'],
+            rtmpACParam: ['-ab', '128k', '-ar', '44100'],
+            hlsVCParam: ['-s', '854x480', '-b:v', '1500k'],
+            hlsACParam: ['-ab', '128k', '-ar', '44100'],
+            // dashVCParam: ['-s', '854x480', '-b:v', '1500k'],
+            // dashACParam: ['-ab', '128k', '-ar', '44100'],
+          },
+          // {
+          //   app: 'live',
+          //   ac: 'aac',
+          //   hls: true,
+          //   hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
+          //   hlsKeep: true, // to prevent hls file delete after end the stream
+          //   ffmpegParams: '-loglevel debug -report', // FFmpeg 로그 기록
+          // },
           {
             app: 'live',
             mp4: true,
@@ -213,7 +270,8 @@ export class LiveService {
     } catch (error) {
       console.error('Error uploading file to S3:', error);
       throw error; // 에러를 상위 함수로 전달
-    }  }
+    }
+  }
 
   async cleanupStreamFolder(streamKey: string) {
     const folderPath = path.join(__dirname, '../../media/live', streamKey);
