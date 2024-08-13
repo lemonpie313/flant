@@ -4,10 +4,14 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import * as Sentry from '@sentry/node';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  // sentry 초기 설정
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+  });
   // CORS 설정
   app.enableCors({
     origin: 'http://localhost:3001', // 프론트엔드 주소
