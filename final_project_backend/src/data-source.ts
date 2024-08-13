@@ -77,6 +77,8 @@ const options: DataSourceOptions & SeederOptions = {
     ProductCategory,
     Refreshtoken,
     User,
+    OrderItem,
+    Refreshtoken,
   ],
   seedTracking: true, // seed데이터가 이미 있다면 삽입 x. 중복 삽입 방지
   seeds: [AdminSeeder],
