@@ -84,7 +84,7 @@ export class AdminArtistService {
     return true;
   }
 
-  async findByCommunityIdAndUserId(communityUserId: number) {
+  async findByCommunityUserId(communityUserId: number) {
     const existedArtist = await this.artistRepository.findOneBy({
       communityUserId,
     });

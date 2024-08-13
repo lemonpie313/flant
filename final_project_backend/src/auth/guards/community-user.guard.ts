@@ -65,7 +65,7 @@ export class CommunityUserGuard implements CanActivate {
     if (roles.includes(CommunityUserRole.ARTIST)) {
       try {
         const artistInfo =
-          await this.artistService.findByCommunityIdAndUserId(communityUserId);
+          await this.artistService.findByCommunityUserId(communityUserId);
         request.user.roleInfo = artistInfo;
         hasRole = true;
       } catch (e) {}
