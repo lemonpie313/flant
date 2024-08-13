@@ -13,7 +13,7 @@ export class UpdateUserDto {
    */
   @IsOptional()
   @IsString()
-  name?: string;
+  newUserName?: string;
 
   /**
    * 새 비밀번호
@@ -39,5 +39,5 @@ export class UpdateUserDto {
       message: MESSAGES.AUTH.COMMON.PASSWORD.INVALID_FORMAT,
     },
   )
-  newPasswordConfirm?: string;
+  confirmNewPassword?: string;
 }

@@ -12,17 +12,18 @@ import { CommunityUser } from 'src/community/community-user/entities/communityUs
 
 import { MESSAGES } from 'src/constants/message.constant';
 import { CreateArtistDto } from '../dto/create-artist.dto';
+import { CommunityUserRole } from 'src/community/community-user/types/community-user-role.type';
 @Injectable()
 export class AdminArtistService {
   constructor(
     @InjectRepository(Artist)
     private readonly artistRepository: Repository<Artist>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
     @InjectRepository(Community)
     private readonly communityRepository: Repository<Community>,
     @InjectRepository(CommunityUser)
     private readonly communityUserRepository: Repository<CommunityUser>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
   // 아티스트 생성
   async createArtist(createArtistDto: CreateArtistDto) {
@@ -39,27 +40,29 @@ export class AdminArtistService {
     const existedUser = await this.userRepository.findOneBy({
       userId,
     });
+
     if (!existedUser)
       throw new NotFoundException(MESSAGES.USER.COMMON.NOT_FOUND);
 
+    // 아티스트가 해당 그룹의 커뮤니티 가입
+    const artistCommunityUser = await this.communityUserRepository.save({
+      userId,
+      communityId,
+      nickName: artistNickname,
+    });
+    const communityUserId = artistCommunityUser.communityUserId;
+
     //이미 user_id로 가입된 아티스트라면 false반환
     const existedArtist = await this.artistRepository.findOneBy({
-      artistNickname,
+      communityUserId,
     });
     if (existedArtist)
       throw new ConflictException(MESSAGES.ARTIST.COMMON.DUPLICATED);
 
     const artist = await this.artistRepository.save({
       communityId,
-      userId,
+      communityUserId,
       artistNickname,
-    });
-
-    // 아티스트가 해당 그룹의 커뮤니티 가입
-    await this.communityUserRepository.save({
-      userId,
-      communityId,
-      nickName: artistNickname,
     });
 
     return artist;
@@ -74,17 +77,16 @@ export class AdminArtistService {
 
     // 해당 아티스트 삭제 로직
     await this.artistRepository.delete({ artistId });
-    await this.userRepository.delete({ userId: existedArtist.userId });
+    await this.communityUserRepository.delete({
+      communityUserId: existedArtist.communityUserId,
+    });
 
     return true;
   }
 
-  async findByCommunityIdAndUserId(communityId: number, userId: number) {
-    const existedArtist = await this.artistRepository.findOne({
-      where: {
-        communityId,
-        userId,
-      },
+  async findByCommunityUserId(communityUserId: number) {
+    const existedArtist = await this.artistRepository.findOneBy({
+      communityUserId,
     });
 
     if (!existedArtist)
@@ -92,6 +94,6 @@ export class AdminArtistService {
         MESSAGES.AUTH.COMMON.COMMUNITY_USER.NOT_ARTIST,
       );
 
-    return true;
+    return { roleId: existedArtist.artistId, role: CommunityUserRole.ARTIST };
   }
 }

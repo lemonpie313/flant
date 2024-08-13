@@ -17,6 +17,8 @@ import { MESSAGES } from 'src/constants/message.constant';
 
 @ApiTags('어드민')
 @ApiBearerAuth()
+@Roles(UserRole.Admin)
+@UseGuards(RolesGuard)
 @Controller('v1/admin/managers')
 export class AdminManagerController {
   constructor(private readonly adminManagerService: AdminManagerService) {}
@@ -25,8 +27,6 @@ export class AdminManagerController {
    * 매니저 생성
    * @param CreateManagerDto
    */
-  @Roles(UserRole.Admin)
-  @UseGuards(RolesGuard)
   @Post()
   async createManager(@Body() createManagerDto: CreateManagerDto) {
     const data = await this.adminManagerService.createManager(createManagerDto);
@@ -41,8 +41,6 @@ export class AdminManagerController {
    * 매니저 삭제
    * @param managerId
    */
-  @Roles(UserRole.Admin)
-  @UseGuards(RolesGuard)
   @Delete(':managerId')
   async deleteManager(@Param('managerId') managerId: number) {
     await this.adminManagerService.deleteManager(managerId);

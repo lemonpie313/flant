@@ -6,6 +6,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -13,38 +14,20 @@ import {
 import { ProgressTypes } from '../types/progress.types';
 import { Cart } from '../../cart/entities/cart.entity';
 import { User } from 'src/user/entities/user.entity';
+import { OrderItem } from './orderItem.entity';
 
 @Entity('orders')
 export class Order {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
-  // /**
-  //  * 주문번호
-  //  */
-  // @IsString()
-  // @Column()
-  // orderNumber: string;
-
-  @IsNumber()
-  @Column()
-  merchandisePostId: number;
-
-  @IsNumber()
-  @Column()
-  merchandiseOption: number;
+  @Column({unsigned: true})
+  userId: number;
 
   @IsNumber()
   @Column()
   totalPrice: number;
 
-  @IsNumber()
-  @Column()
-  quantity: number;
-  /**
-   * 진행상태
-   */
-  @IsEnum(ProgressTypes)
   @Column({ type: 'enum', enum: ProgressTypes, default: 'ready' })
   progress: ProgressTypes;
 
@@ -55,10 +38,15 @@ export class Order {
   updatedAt: Date;
 
   //유저연결
-  @ManyToOne(() => User, (user) => user.order)
+  @ManyToOne(() => User, (user) => user.order, { onDelete: 'CASCADE' })
+  @JoinColumn({name: 'user_id'})
   user: User;
 
   //카트연결
   @OneToOne(() => Cart, (cart) => cart.order)
   cart: Cart;
+
+  //orderItem 연결
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.order)
+  orderItem: OrderItem[];
 }

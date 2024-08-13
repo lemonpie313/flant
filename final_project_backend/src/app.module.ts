@@ -26,7 +26,8 @@ import { NoticeModule } from './notice/notice.module';
 import { MediaModule } from './media/media.module';
 import { LiveModule } from './live/live.module';
 import { CommunityUserModule } from './community/community-user/community-user.module';
-
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { SentryWebhookInterceptor } from './webhook.interceptor';
 @Module({
   imports: [
     ScheduleModule.forRoot(),
@@ -59,6 +60,13 @@ import { CommunityUserModule } from './community/community-user/community-user.m
     CommunityUserModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      // centry가 전역에 사용될수있도록 설정
+      provide: APP_INTERCEPTOR,
+      useClass: SentryWebhookInterceptor,
+    },
+  ],
 })
 export class AppModule {}

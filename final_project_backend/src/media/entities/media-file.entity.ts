@@ -12,7 +12,7 @@ import { Media } from './media.entity';
 @Entity('media_files')
 export class MediaFile {
   @PrimaryGeneratedColumn({ unsigned: true })
-  postImageId: number;
+  mediaFilesId: number;
 
   @Column({ unsigned: true })
   mediaId: number;

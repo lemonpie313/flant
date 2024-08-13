@@ -55,7 +55,8 @@ export class LiveService {
       },
       http: {
         port: 8000,
-        mediaroot: './media',
+        mediaroot: path.join(__dirname, '../../media'),
+        webroot: './www',
         allow_origin: '*',
       },
       // https: {
@@ -65,15 +66,15 @@ export class LiveService {
       // },
       trans: {
         ffmpeg: '/usr/bin/ffmpeg',
-        //'/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+        // '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
+            ac: 'aac',
             hls: true,
             hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
             hlsKeep: true, // to prevent hls file delete after end the stream
-            dash: true,
-            dashFlags: '[f=dash:window_size=3:extra_window_size=5]',
+            ffmpegParams: '-loglevel debug -report', // FFmpeg 로그 기록
           },
           {
             app: 'live',
@@ -84,25 +85,6 @@ export class LiveService {
       },
     };
     this.nodeMediaServer = new NodeMediaServer(liveConfig);
-  }
-
-  async liveRecordingToS3(
-    fileName: string, // 업로드될 파일의 이름
-    file, // 업로드할 파일
-    ext: string, // 파일 확장자
-  ) {
-    const command = new PutObjectCommand({
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: fileName,
-      Body: file.buffer,
-      ACL: 'public-read',
-      ContentType: `image/${ext}`,
-    });
-
-    await this.s3Client.send(command);
-
-    // 업로드된 이미지의 URL을 반환합니다.
-    return `https://s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${process.env.AWS_BUCKET_NAME}/${fileName}`;
   }
 
   onModuleInit() {
@@ -118,24 +100,6 @@ export class LiveService {
         );
         const session = this.nodeMediaServer.getSession(id);
         const streamKey = streamPath.split('/live/')[1];
-        const directoryPath = './media'
-        const directoryExists = fs.existsSync(directoryPath);
-
-        try {
-          // 디렉토리 생성 로그
-          console.log('Attempting to create directory:', directoryPath);
-
-          if (!fs.existsSync(directoryPath)) {
-            fs.mkdirSync(directoryPath, { recursive: true });
-            console.log('Directory created successfully:', directoryPath);
-          } else {
-            console.log('Directory already exists:', directoryPath);
-          }
-
-          // Additional logic for prePublish event
-        } catch (error) {
-          console.error('Error creating directory:', error);
-        }
 
         const live = await this.liveRepository.findOne({
           where: {
@@ -144,18 +108,19 @@ export class LiveService {
         });
         console.log('----------------foundData----------------');
         console.log(live);
-        if (_.isNil(live)) {
+        if (!live) {
+          console.log('-------------에러------------');
+          console.log('라이브 스트림키를 확인해주세요.');
           session.reject((reason: string) => {
             console.log(reason);
           });
         }
         const time = new Date();
-        const diff =
-          Math.abs(
-            time.getTime() - live.createdAt.getTime() - 1000 * 60 * 60 * 9,
-          ) / 1000;
+        const diff = Math.abs(time.getTime() - live.createdAt.getTime()) / 1000;
         if (diff > 6000) {
           // 1분 이내에 스트림키 입력 후 방송 시작이 돼야함
+          console.log('-------------에러------------');
+          console.log('라이브 스트림키의 유효기간이 만료되었습니다.');
           session.reject((reason: string) => {
             console.log(reason);
           });
@@ -165,96 +130,129 @@ export class LiveService {
     );
 
     // 방송 종료 시 s3에 업로드
-    // this.nodeMediaServer.on(
-    //   'donePublish',
-    //   async (id: string, streamPath: string) => {
-    //     const streamKey = streamPath.split('/live/')[1];
-    //     const live = await this.liveRepository.findOne({
-    //       where: { streamKey },
-    //     });
+    this.nodeMediaServer.on(
+      'donePublish',
+      async (id: string, streamPath: string) => {
+        console.log('---------------------------방송종료?------------------');
+        console.log(streamPath);
+        const streamKey = streamPath.split('/live/')[1];
+        console.log('streamKey: ' + streamKey);
+        const live = await this.liveRepository.findOne({
+          where: { streamKey },
+        });
 
-    //     const liveDirectory = path.join(
-    //       __dirname,
-    //       '../../../live-streaming/live',
-    //       streamKey,
-    //     );
-    //     console.log(`Reading directory: ${liveDirectory}`);
+        console.log(__dirname, '../../media/live', streamKey);
+        const liveDirectory = path.join(
+          __dirname,
+          '../../media/live',
+          streamKey,
+        );
+        console.log(
+          `-------------------------------Reading directory: ${liveDirectory}`,
+        );
 
-    //     if (!fs.existsSync(liveDirectory)) {
-    //       console.error('Live directory does not exist:', liveDirectory);
-    //       return;
-    //     }
+        if (!fs.existsSync(liveDirectory)) {
+          console.error('Live directory does not exist:', liveDirectory);
+          return;
+        }
 
-    //     const files = fs.readdirSync(liveDirectory);
-    //     console.log('Files in directory:', files);
+        const files = fs.readdirSync(liveDirectory);
+        console.log('Files in directory:', files);
 
-    //     const fileName = files.find((file) => path.extname(file) === '.mp4');
+        const fileName = files.find((file) => path.extname(file) === '.mp4');
 
-    //     if (!fileName) {
-    //       console.error('No .mp4 file found in directory:', liveDirectory);
-    //       return;
-    //     }
+        if (!fileName) {
+          console.error('No .mp4 file found in directory:', liveDirectory);
+          return;
+        }
 
-    //     const filePath = path.join(liveDirectory, fileName);
-    //     console.log('Reading file:', filePath);
+        const filePath = path.join(liveDirectory, fileName);
+        console.log(
+          '-------------------------------------------------Reading file:',
+          filePath,
+        );
 
-    //     try {
-    //       const file = fs.readFileSync(filePath);
-    //       const liveVideoUrl = await this.liveRecordingToS3(fileName, file, 'mp4');
-    //       await this.cleanupStreamFolder(streamKey);
-    //       await this.liveRepository.update(
-    //         { liveId: live.liveId },
-    //         { liveVideoUrl },
-    //       );
-    //     } catch (error) {
-    //       console.error('Error handling live stream file:', error);
-    //     }
-    //   },
-    // );
+        try {
+          const file = fs.readFileSync(filePath);
+          const liveVideoUrl = await this.liveRecordingToS3(
+            fileName,
+            file,
+            'mp4',
+          );
+          await this.cleanupStreamFolder(streamKey);
+          console.log(
+            '----------------------repository 업데이트-----------------------',
+          );
+          await this.liveRepository.update(
+            { liveId: live.liveId },
+            { liveVideoUrl },
+          );
+        } catch (error) {
+          console.error('Error handling live stream file:', error);
+        }
+      },
+    );
+  }
+
+  async liveRecordingToS3(
+    fileName: string, // 업로드될 파일의 이름
+    file, // 업로드할 파일
+    ext: string, // 파일 확장자
+  ) {
+    console.log(
+      '-------------------------------------종료후업로드전-----------',
+    );
+    const command = new PutObjectCommand({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: `liveRecordings/${fileName}`,
+      Body: file,
+      ContentType: `video/${ext}`,
+    });
+
+    try {
+      await this.s3Client.send(command);
+      // 업로드된 이미지의 URL 반환
+      return `https://s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${process.env.AWS_BUCKET_NAME}/${fileName}`;
+    } catch (error) {
+      console.error('Error uploading file to S3:', error);
+      throw error; // 에러를 상위 함수로 전달
+    }
   }
 
   async cleanupStreamFolder(streamKey: string) {
-    // const folderPath = './media';
-    // console.log('folderPath: ' + folderPath);
-    // if (fs.existsSync(folderPath)) {
-    //   for (const file of fs.readdirSync(folderPath)) {
-    //     const curPath = path.join(folderPath, file);
-    //     fs.unlinkSync(curPath);
-    //   }
-    //   fs.rmdirSync(folderPath);
-    // }
+    const folderPath = path.join(__dirname, '../../media/live', streamKey);
+    console.log('folderPath: ' + folderPath);
+    if (fs.existsSync(folderPath)) {
+      for (const file of fs.readdirSync(folderPath)) {
+        const curPath = path.join(folderPath, file);
+        fs.unlinkSync(curPath);
+      }
+      fs.rmdirSync(folderPath);
+    }
   }
 
-  async createLive(userId: number, title: string, liveType: LiveTypes) {
+  async createLive(artistId: number, title: string, liveType: LiveTypes) {
     // userId로 커뮤니티아티인지 확인 + 어느 커뮤니티인지 조회
-    // const communityUser = await this.communityUserRepository.findOne({
-    //   where: {
-    //     userId,
-    //   },
-    //   relations: {
-    //     community: true,
-    //     artists: true,
-    //   },
-    // });
-    // const artist = await this.artistsRepository.findOne({
-    //   where: {
-    //     userId,
-    //   },
-    // });
-    // if (_.isNil(artist)) {
-    //   throw new NotFoundException({
-    //     status: 404,
-    //     message: '아티스트 회원 정보를 찾을 수 없습니다.',
-    //   });
-    // }
-    console.log(
-      '-----------------------------------------------------------------',
-    );
+    const artist = await this.artistsRepository.findOne({
+      where: {
+        artistId,
+      },
+      relations: {
+        community: true,
+        communityUser: true,
+      },
+    });
+    if (_.isNil(artist)) {
+      throw new NotFoundException({
+        status: 404,
+        message: '아티스트 회원 정보를 찾을 수 없습니다.',
+      });
+    }
     // 키 발급
     const streamKey = Crypto.randomBytes(20).toString('hex');
     const live = await this.liveRepository.save({
-      communityId: 1, //artist.communityId,
-      artistId: 1, //artist.artistId,
+      communityId: artist.communityId,
+      artistId: artistId,
       title,
       liveType,
       streamKey,

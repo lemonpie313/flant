@@ -18,7 +18,6 @@ import { User } from 'src/user/entities/user.entity';
 import { Manager } from 'src/admin/entities/manager.entity';
 import { MESSAGES } from 'src/constants/message.constant';
 
-
 @Injectable()
 export class PostService {
   constructor(
@@ -42,33 +41,34 @@ export class PostService {
     createPostDto: CreatePostDto,
     imageUrl: string[] | undefined,
   ) {
-    const isCommunityUser = await this.communityUserRepository.findOne({
+    const communityUser = await this.communityUserRepository.findOne({
       where: { userId: userId, communityId: communityId },
     });
-    if (!isCommunityUser) {
+    if (!communityUser) {
       throw new BadRequestException(MESSAGES.POST.CREATE.BAD_REQUEST);
     }
     const isArtist = await this.artistRepository.findOne({
-      where: { userId: userId, communityId: communityId },
+      where: { communityUserId: communityUser.communityUserId, communityId: communityId },
     });
-    let artistId = null
+    
+    let artistId: number;
     if (isArtist) {
-      artistId = isArtist.artistId
+      artistId = isArtist.artistId;
     }
     const saveData = await this.postRepository.save({
       communityId: communityId,
-      communityUserId: isCommunityUser.communityUserId,
+      communityUserId: communityUser.communityUserId,
       title: createPostDto.title,
       content: createPostDto.content,
       artistId: artistId,
     });
-    if (imageUrl.length > 0) {
-      for(let image of imageUrl){
+    if (imageUrl && imageUrl.length > 0) {
+      for (let image of imageUrl) {
         const postImageData = {
           postId: saveData.postId,
-          postImageUrl: image
-        }
-        await this.postImageRepository.save(postImageData)
+          postImageUrl: image,
+        };
+        await this.postImageRepository.save(postImageData);
       }
     }
     return {
@@ -77,7 +77,6 @@ export class PostService {
       data: saveData,
     };
   }
-
 
   async findPosts(artistId: number | null, communityId: number) {
     if (!artistId) {
@@ -120,28 +119,63 @@ export class PostService {
     };
   }
 
-  async update(userId: number, postId: number, updatePostDto: UpdatePostDto) {
+  async update(
+    userId: number,
+    postId: number,
+    updatePostDto: UpdatePostDto,
+    imageUrl: string[] | undefined,
+  ) {
     const postData = await this.postRepository.findOne({
-      where: { postId: postId }
-    })
-    const isCommunityUser = await this.communityUserRepository.findOne({
+      where: { postId: postId },
+    });
+    const communityUser = await this.communityUserRepository.findOne({
       where: { userId: userId, communityId: postData.communityId },
     });
-    if(!postData){
-      throw new NotFoundException(MESSAGES.POST.UPDATE.NOT_FOUND)
+    if (!postData) {
+      throw new NotFoundException(MESSAGES.POST.UPDATE.NOT_FOUND);
     }
-    if (!isCommunityUser) {
+    if (!communityUser) {
       throw new UnauthorizedException(MESSAGES.POST.UPDATE.UNAUTHORIZED);
     }
-    if (_.isEmpty(updatePostDto)) {
+    if (_.isEmpty(updatePostDto.title && updatePostDto.content)) {
       throw new BadRequestException(MESSAGES.POST.UPDATE.BAD_REQUEST);
     }
-    await this.postRepository.update(
-      { postId: postId },
-      { title: updatePostDto.title, content: updatePostDto.content },
-    );
+
+    const newData = {
+      title: postData.title,
+      content: postData.content,
+    };
+    if (updatePostDto.title != postData.title) {
+      newData.title = updatePostDto.title;
+    }
+    if (updatePostDto.content != postData.content) {
+      newData.content = updatePostDto.content;
+    }
+
+    await this.postRepository.update({ postId: postId }, newData);
+
+    if (imageUrl && imageUrl.length > 0) {
+      //postId에 연결된 모든 postImage 데이터 삭제
+      //의도 : DELETE FROM post_image WHERE post_id = postId
+      await this.postImageRepository
+        .createQueryBuilder()
+        .delete()
+        .from(PostImage)
+        .where('post_id = :postId', { postId })
+        .execute();
+
+      //업로드된 이미지 숫자만큼 다시 생성
+      for (let image of imageUrl) {
+        const postImageData = {
+          postId: postData.postId,
+          postImageUrl: image,
+        };
+        await this.postImageRepository.save(postImageData);
+      }
+    }
     const updatedData = await this.postRepository.findOne({
       where: { postId: postId },
+      relations: ['postImages'],
     });
     return {
       status: HttpStatus.OK,
