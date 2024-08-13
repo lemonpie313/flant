@@ -66,7 +66,7 @@ export class LiveService {
       // },
       trans: {
         ffmpeg: '/usr/bin/ffmpeg',
-        //'/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+        // '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
@@ -75,8 +75,6 @@ export class LiveService {
             hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
             hlsKeep: true, // to prevent hls file delete after end the stream
             ffmpegParams: '-loglevel debug -report', // FFmpeg 로그 기록
-            // dash: true,
-            // dashFlags: '[f=dash:window_size=3:extra_window_size=5]',
           },
           {
             app: 'live',
@@ -112,9 +110,9 @@ export class LiveService {
         console.log(live);
         if (!live) {
           console.log('-------------에러------------');
+          console.log('라이브 스트림키를 확인해주세요.');
           session.reject((reason: string) => {
             console.log(reason);
-            console.log('라이브 스트림키를 확인해주세요.');
           });
         }
         const time = new Date();
@@ -122,9 +120,9 @@ export class LiveService {
         if (diff > 6000) {
           // 1분 이내에 스트림키 입력 후 방송 시작이 돼야함
           console.log('-------------에러------------');
+          console.log('라이브 스트림키의 유효기간이 만료되었습니다.');
           session.reject((reason: string) => {
             console.log(reason);
-            console.log('라이브 스트림키의 유효기간이 만료되었습니다.');
           });
         }
         console.log('------------------------방송시작?------------------');
@@ -136,11 +134,14 @@ export class LiveService {
       'donePublish',
       async (id: string, streamPath: string) => {
         console.log('---------------------------방송종료?------------------');
+        console.log(streamPath);
         const streamKey = streamPath.split('/live/')[1];
+        console.log('streamKey: ' + streamKey);
         const live = await this.liveRepository.findOne({
           where: { streamKey },
         });
 
+        console.log(__dirname, '../../media/live', streamKey);
         const liveDirectory = path.join(
           __dirname,
           '../../media/live',
@@ -215,7 +216,8 @@ export class LiveService {
     } catch (error) {
       console.error('Error uploading file to S3:', error);
       throw error; // 에러를 상위 함수로 전달
-    }  }
+    }
+  }
 
   async cleanupStreamFolder(streamKey: string) {
     const folderPath = path.join(__dirname, '../../media/live', streamKey);
@@ -229,36 +231,28 @@ export class LiveService {
     }
   }
 
-  async createLive(userId: number, title: string, liveType: LiveTypes) {
+  async createLive(artistId: number, title: string, liveType: LiveTypes) {
     // userId로 커뮤니티아티인지 확인 + 어느 커뮤니티인지 조회
-    // const communityUser = await this.communityUserRepository.findOne({
-    //   where: {
-    //     userId,
-    //   },
-    //   relations: {
-    //     community: true,
-    //     artists: true,
-    //   },
-    // });
-    // const artist = await this.artistsRepository.findOne({
-    //   where: {
-    //     userId,
-    //   },
-    // });
-    // if (_.isNil(artist)) {
-    //   throw new NotFoundException({
-    //     status: 404,
-    //     message: '아티스트 회원 정보를 찾을 수 없습니다.',
-    //   });
-    // }
-    console.log(
-      '-----------------------------------------------------------------',
-    );
+    const artist = await this.artistsRepository.findOne({
+      where: {
+        artistId,
+      },
+      relations: {
+        community: true,
+        communityUser: true,
+      },
+    });
+    if (_.isNil(artist)) {
+      throw new NotFoundException({
+        status: 404,
+        message: '아티스트 회원 정보를 찾을 수 없습니다.',
+      });
+    }
     // 키 발급
     const streamKey = Crypto.randomBytes(20).toString('hex');
     const live = await this.liveRepository.save({
-      communityId: 1, //artist.communityId,
-      artistId: 1, //artist.artistId,
+      communityId: artist.communityId,
+      artistId: artistId,
       title,
       liveType,
       streamKey,

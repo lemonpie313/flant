@@ -2,6 +2,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -13,12 +15,18 @@ import {
   IsString,
   IsUrl,
 } from 'class-validator';
+import { Community } from 'src/community/entities/community.entity';
+import { Artist } from 'src/admin/entities/artist.entity';
 
-@Entity('live')
+@Entity('lives')
 export class Live {
   @PrimaryGeneratedColumn({ unsigned: true })
   liveId: number;
 
+  /**
+   *  커뮤니티 ID
+   * @example 1
+   */
   @Column({ type: 'int', unsigned: true })
   communityId: number;
 
@@ -51,4 +59,12 @@ export class Live {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @ManyToOne(() => Community, (community) => community.live)
+  @JoinColumn({name: 'community_id'})
+  community: Community;
+
+  @ManyToOne(() => Artist, (artist) => artist.live)
+  @JoinColumn({name: 'artist_id'})
+  artist: Artist;
 }

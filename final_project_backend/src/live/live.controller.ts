@@ -15,6 +15,12 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRole } from 'src/user/types/user-role.type';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { CreateLiveDto } from './dtos/create-live.dto';
+import { CommunityUserRoles } from 'src/auth/decorators/community-user-roles.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { CommunityUserGuard } from 'src/auth/guards/community-user.guard';
+import { CommunityUserRole } from 'src/community/community-user/types/community-user-role.type';
+import { UserInfo } from 'src/util/decorators/user-info.decorator';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 
 @ApiTags('live')
 @Controller('live')
@@ -26,16 +32,16 @@ export class LiveController {
    *
    * @returns
    */
-  // @ApiBearerAuth()
-  // @Roles(UserRole.User)
-  // @UseGuards(RolesGuard)
+  @ApiBearerAuth()
+  @CommunityUserRoles(CommunityUserRole.ARTIST)
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @Post('/')
-  async createLive(@Request() req, @Body() createLiveDto: CreateLiveDto) {
+  async createLive(@UserInfo() user: PartialUser, @Body() createLiveDto: CreateLiveDto) {
     const { title, liveType } = createLiveDto;
-    const live = await this.liveService.createLive(1, title, liveType);
+    const live = await this.liveService.createLive(user.roleInfo.roleId, title, liveType);
     return {
       status: HttpStatus.CREATED,
-      message: '완료',
+      message: '스트림키 생성 완료',
       data: live,
     };
   }

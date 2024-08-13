@@ -41,22 +41,23 @@ export class PostService {
     createPostDto: CreatePostDto,
     imageUrl: string[] | undefined,
   ) {
-    const isCommunityUser = await this.communityUserRepository.findOne({
+    const communityUser = await this.communityUserRepository.findOne({
       where: { userId: userId, communityId: communityId },
     });
-    if (!isCommunityUser) {
+    if (!communityUser) {
       throw new BadRequestException(MESSAGES.POST.CREATE.BAD_REQUEST);
     }
     const isArtist = await this.artistRepository.findOne({
-      where: { communityUserId: userId, communityId: communityId },
+      where: { communityUserId: communityUser.communityUserId, communityId: communityId },
     });
-    let artistId = null;
+    
+    let artistId: number;
     if (isArtist) {
       artistId = isArtist.artistId;
     }
     const saveData = await this.postRepository.save({
       communityId: communityId,
-      communityUserId: isCommunityUser.communityUserId,
+      communityUserId: communityUser.communityUserId,
       title: createPostDto.title,
       content: createPostDto.content,
       artistId: artistId,
@@ -127,13 +128,13 @@ export class PostService {
     const postData = await this.postRepository.findOne({
       where: { postId: postId },
     });
-    const isCommunityUser = await this.communityUserRepository.findOne({
+    const communityUser = await this.communityUserRepository.findOne({
       where: { userId: userId, communityId: postData.communityId },
     });
     if (!postData) {
       throw new NotFoundException(MESSAGES.POST.UPDATE.NOT_FOUND);
     }
-    if (!isCommunityUser) {
+    if (!communityUser) {
       throw new UnauthorizedException(MESSAGES.POST.UPDATE.UNAUTHORIZED);
     }
     if (_.isEmpty(updatePostDto.title && updatePostDto.content)) {
