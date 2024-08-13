@@ -55,8 +55,8 @@ export class LiveService {
       },
       http: {
         port: 8000,
-        mediaroot: path.join(__dirname, '../../media'),
-        webroot: './www',
+        mediaroot: '../media', // path.join(__dirname, '../../media'), 
+        //webroot: './www',
         allow_origin: '*',
       },
       // https: {
@@ -65,22 +65,30 @@ export class LiveService {
       //   // cert: './cert.pem',
       // },
       trans: {
-        ffmpeg: '/usr/bin/ffmpeg',
-        // '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+        ffmpeg: //'/usr/bin/ffmpeg',
+        '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
+            vc: 'copy',
+            vcParam: [],
             ac: 'aac',
+            acParam: ['-ab', '64k', '-ac', '1', '-ar', '44100'],
             hls: true,
             hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
             hlsKeep: true, // to prevent hls file delete after end the stream
             ffmpegParams: '-loglevel debug -report', // FFmpeg 로그 기록
-          },
-          {
-            app: 'live',
+            dash: true,
+            dashFlags: '[f=dash:window_size=3:extra_window_size=5]',
+            dashKeep: true, // to prevent dash file delete after end the stream
             mp4: true,
             mp4Flags: '[movflags=frag_keyframe+empty_moov]',
           },
+          // {
+          //   app: 'live',
+          //   mp4: true,
+          //   mp4Flags: '[movflags=frag_keyframe+empty_moov]',
+          // },
         ],
       },
     };
@@ -117,14 +125,14 @@ export class LiveService {
         }
         const time = new Date();
         const diff = Math.abs(time.getTime() - live.createdAt.getTime()) / 1000;
-        if (diff > 6000) {
-          // 1분 이내에 스트림키 입력 후 방송 시작이 돼야함
-          console.log('-------------에러------------');
-          console.log('라이브 스트림키의 유효기간이 만료되었습니다.');
-          session.reject((reason: string) => {
-            console.log(reason);
-          });
-        }
+        // if (diff > 6000) {
+        //   // 1분 이내에 스트림키 입력 후 방송 시작이 돼야함
+        //   console.log('-------------에러------------');
+        //   console.log('라이브 스트림키의 유효기간이 만료되었습니다.');
+        //   session.reject((reason: string) => {
+        //     console.log(reason);
+        //   });
+        // }
         console.log('------------------------방송시작?------------------');
       },
     );
@@ -142,11 +150,12 @@ export class LiveService {
         });
 
         console.log(__dirname, '../../media/live', streamKey);
-        const liveDirectory = path.join(
-          __dirname,
-          '../../media/live',
-          streamKey,
-        );
+        // const liveDirectory = path.join(
+        //   __dirname,
+        //   '../../media/live',
+        //   streamKey,
+        // );
+        const liveDirectory = '../media/live/'+streamKey;
         console.log(
           `-------------------------------Reading directory: ${liveDirectory}`,
         );
@@ -212,7 +221,7 @@ export class LiveService {
     try {
       await this.s3Client.send(command);
       // 업로드된 이미지의 URL 반환
-      return `https://s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${process.env.AWS_BUCKET_NAME}/${fileName}`;
+      return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/liveRecordings/${fileName}`;
     } catch (error) {
       console.error('Error uploading file to S3:', error);
       throw error; // 에러를 상위 함수로 전달
@@ -220,7 +229,7 @@ export class LiveService {
   }
 
   async cleanupStreamFolder(streamKey: string) {
-    const folderPath = path.join(__dirname, '../../media/live', streamKey);
+    const folderPath = '../media/live/'+streamKey; //path.join(__dirname, '../../media/live', streamKey);
     console.log('folderPath: ' + folderPath);
     if (fs.existsSync(folderPath)) {
       for (const file of fs.readdirSync(folderPath)) {
