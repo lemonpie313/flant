@@ -30,6 +30,8 @@ import { Post } from './post/entities/post.entity';
 import { PostImage } from './post/entities/post-image.entity';
 import { GoodsShop } from './goods_shop/entities/goods-shop.entity';
 import { GoodsShopCategory } from './goods_shop/entities/goods-shop.category.entity';
+import { OrderItem } from './order/entities/orderItem.entity';
+import { Refreshtoken } from './auth/entities/refresh-token.entity';
 
 config();
 const configService = new ConfigService();
@@ -72,6 +74,8 @@ const options: DataSourceOptions & SeederOptions = {
     GoodsShop,
     GoodsShopCategory,
     User,
+    OrderItem,
+    Refreshtoken,
   ],
   seedTracking: true, // seed데이터가 이미 있다면 삽입 x. 중복 삽입 방지
   seeds: [AdminSeeder],

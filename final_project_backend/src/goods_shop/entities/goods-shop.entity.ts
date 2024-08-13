@@ -12,8 +12,9 @@ import { GoodsShopCategory } from './goods-shop.category.entity';
 import { MerchandiseImage } from 'src/merchandise/entities/merchandise-image.entity';
 import { MerchandisePost } from '../../merchandise/entities/merchandise-post.entity';
 import { Manager } from 'src/admin/entities/manager.entity';
+import { Community } from 'src/community/entities/community.entity';
 
-@Entity('products')
+@Entity('goods_shop')
 export class GoodsShop {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
@@ -41,6 +42,12 @@ export class GoodsShop {
     onDelete: 'CASCADE',
   })
   manager: Manager;
+
+  //커뮤니티 연결
+  @ManyToOne(() => Community, (community) => community.goodsShop, {
+    onDelete: 'CASCADE',
+  })
+  community: Community;
 
   //상품 게시물 연결
   @OneToMany(
