@@ -32,7 +32,7 @@ import { Product } from './product/entities/product.entity';
 import { ProductCategory } from './product/entities/product.category.entity';
 import { OrderItem } from './order/entities/orderItem.entity';
 import { Refreshtoken } from './auth/entities/refresh-token.entity';
-
+import { Live } from './live/entities/live.entity';
 config();
 const configService = new ConfigService();
 const options: DataSourceOptions & SeederOptions = {
@@ -53,6 +53,7 @@ const options: DataSourceOptions & SeederOptions = {
     Form,
     FormItem,
     Like,
+    Live,
     Manager,
     Media,
     MediaFile,
@@ -69,10 +70,12 @@ const options: DataSourceOptions & SeederOptions = {
     Notice,
     NoticeImage,
     Order,
+    OrderItem,
     Post,
     PostImage,
     Product,
     ProductCategory,
+    Refreshtoken,
     User,
     OrderItem,
     Refreshtoken,
