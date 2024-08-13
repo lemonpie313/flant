@@ -37,7 +37,7 @@ export class CommunityUserGuard implements CanActivate {
     const userId = request.user?.id;
     let { communityId } = request.body;
     if (request?.params?.communityId) communityId = request.params.communityId;
-    console.log(request.params);
+
     if (!userId) {
       throw new NotFoundException(MESSAGES.AUTH.COMMON.COMMUNITY_USER.NO_USER);
     }
@@ -47,31 +47,26 @@ export class CommunityUserGuard implements CanActivate {
         MESSAGES.AUTH.COMMON.COMMUNITY_USER.NO_COMMUNITY,
       );
     }
-    console.log("-------------------")
-    console.log(userId);
-    console.log(communityId);
-    // Roles 지정하지 않을 경우 communityUser만 검사
-    if (_.isEmpty(roles)) {
+
+    const existedCommunityUser =
       await this.communityUserService.findByCommunityIdAndUserId(
         communityId,
         userId,
       );
+
+    // Roles 지정하지 않을 경우 communityUser만 검사
+    if (_.isEmpty(roles) && existedCommunityUser) {
       return true;
     }
 
     // Roles 설정시 Roles(ARIST,MANAGER) + communityUser 검사
-
     let hasRole = false;
-    console.log("----------------");
-    console.log(roles);
+    const communityUserId = existedCommunityUser.communityUserId;
     if (roles.includes(CommunityUserRole.ARTIST)) {
       try {
-        console.log('--------------------------------------')
-        const data =await this.artistService.findByCommunityIdAndUserId(
-          communityId,
-          userId,
-        );
-        console.log(data);
+        const artistInfo =
+          await this.artistService.findByCommunityUserId(communityUserId);
+        request.user.roleInfo = artistInfo;
         hasRole = true;
       } catch (e) {}
     }
