@@ -28,11 +28,19 @@ import { NoticeImage } from './notice/entities/notice-image.entity';
 import { Order } from './order/entities/order.entity';
 import { Post } from './post/entities/post.entity';
 import { PostImage } from './post/entities/post-image.entity';
+<<<<<<< HEAD
 import { GoodsShop } from './goods_shop/entities/goods-shop.entity';
 import { GoodsShopCategory } from './goods_shop/entities/goods-shop.category.entity';
 import { OrderItem } from './order/entities/orderItem.entity';
 import { Refreshtoken } from './auth/entities/refresh-token.entity';
 
+=======
+import { Product } from './product/entities/product.entity';
+import { ProductCategory } from './product/entities/product.category.entity';
+import { OrderItem } from './order/entities/orderItem.entity';
+import { Refreshtoken } from './auth/entities/refresh-token.entity';
+import { Live } from './live/entities/live.entity';
+>>>>>>> dev
 config();
 const configService = new ConfigService();
 const options: DataSourceOptions & SeederOptions = {
@@ -53,6 +61,7 @@ const options: DataSourceOptions & SeederOptions = {
     Form,
     FormItem,
     Like,
+    Live,
     Manager,
     Media,
     MediaFile,
@@ -69,10 +78,17 @@ const options: DataSourceOptions & SeederOptions = {
     Notice,
     NoticeImage,
     Order,
+    OrderItem,
     Post,
     PostImage,
+<<<<<<< HEAD
     GoodsShop,
     GoodsShopCategory,
+=======
+    Product,
+    ProductCategory,
+    Refreshtoken,
+>>>>>>> dev
     User,
     OrderItem,
     Refreshtoken,

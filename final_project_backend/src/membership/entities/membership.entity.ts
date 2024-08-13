@@ -49,4 +49,5 @@ export class Membership {
     (membershipPayment) => membershipPayment.membership,
   )
   membershipPayment: MembershipPayment;
+
 }

@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -16,10 +17,11 @@ import { IsNotEmptyConstraint } from 'src/util/decorators/is-not-emtpy-constrain
 import { CommunityUser } from './../../community/community-user/entities/communityUser.entity';
 import { Community } from 'src/community/entities/community.entity';
 import { Post } from 'src/post/entities/post.entity';
+import { Live } from 'src/live/entities/live.entity';
 
 @Entity('artists')
 export class Artist {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ unsigned: true })
   artistId: number;
   /**
    * 그룹 ID
@@ -27,7 +29,7 @@ export class Artist {
    */
   @IsNotEmpty({ message: MESSAGES.COMMUNITY.COMMON.COMMUNITYID.REQUIRED })
   @IsInt()
-  @Column()
+  @Column({ unsigned: true })
   communityId: number;
   /**
    * 회원 ID
@@ -35,7 +37,7 @@ export class Artist {
    */
   @IsNotEmpty({ message: MESSAGES.USER.COMMON.USERID.REQUIRED })
   @IsInt()
-  @Column()
+  @Column({ unsigned: true })
   communityUserId: number;
 
   /**
@@ -58,11 +60,16 @@ export class Artist {
   comments: Comment[]; // 아티스트와 댓글 관계
 
   @OneToOne(() => CommunityUser, (communityuser) => communityuser.artist)
+  @JoinColumn({ name: 'community_user_id' })
   communityUser: CommunityUser; // 아티스트와 댓글 관계
 
   @ManyToOne(() => Community, (community) => community.artist)
+  @JoinColumn({ name: 'community_id' })
   community: Community;
 
   @OneToMany(() => Post, (post) => post.artist)
   posts: Post[];
+
+  @OneToMany(() => Live, (live) => live.artist)
+  live: Live[];
 }
