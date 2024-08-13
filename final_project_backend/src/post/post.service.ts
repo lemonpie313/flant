@@ -41,25 +41,24 @@ export class PostService {
 
   async create(
     userId: number,
-    communityId: number,
     createPostDto: CreatePostDto,
     imageUrl: string[] | undefined,
   ) {
     const isCommunityUser = await this.communityUserRepository.findOne({
-      where: { userId: userId, communityId: communityId },
+      where: { userId: userId, communityId: createPostDto.communityId },
     });
     if (!isCommunityUser) {
       throw new BadRequestException(MESSAGES.POST.CREATE.BAD_REQUEST);
     }
     const isArtist = await this.artistRepository.findOne({
-      where: { userId: userId, communityId: communityId },
+      where: { userId: userId, communityId: createPostDto.communityId },
     });
     let artistId = null
     if (isArtist) {
       artistId = isArtist.artistId
     }
     const saveData = await this.postRepository.save({
-      communityId: communityId,
+      communityId: createPostDto.communityId,
       communityUserId: isCommunityUser.communityUserId,
       title: createPostDto.title,
       content: createPostDto.content,

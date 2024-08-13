@@ -26,14 +26,14 @@ export class NoticeService {
     @InjectRepository(Manager)
     private readonly managerRepository: Repository<Manager>,
   ){}
-  async create(userId: number, communityId: number, createNoticeDto: CreateNoticeDto, imageUrl: string[] | undefined) {
-    const isManager = await this.managerRepository.findOne({where: {userId: userId, communityId: communityId}})
+  async create(userId: number, createNoticeDto: CreateNoticeDto, imageUrl: string[] | undefined) {
+    const isManager = await this.managerRepository.findOne({where: {userId: userId, communityId: createNoticeDto.communityId}})
     if(!isManager){
       throw new UnauthorizedException(MESSAGES.NOTICE.CREATE.UNAUTHORIZED)
     }
 
     const createdData = await this.noticeRepository.save({
-      communityId: communityId,
+      communityId: createNoticeDto.communityId,
       managerId: isManager.managerId,
       title: createNoticeDto.title,
       content: createNoticeDto.content,

@@ -32,21 +32,23 @@ import { redisStore } from 'cache-manager-redis-yet'
 
 @Module({
   imports: [
-    CacheModule.register<RedisClientOptions>({
-      store: redisStore,
-      socket: {
-        port: 6379,
-        host: 'localhost'
-      },
-      isGlobal: true,
-      ttl: 60 * 1000,
-    }),
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: configModuleValidationSchema,
       envFilePath: '.env',
     }),
+    CacheModule.register<RedisClientOptions>({
+      store: redisStore,
+      password: process.env.REDIS_PASSWORD,
+      socket: {
+        port: parseInt(process.env.REDIS_PORT),
+        host: process.env.REDIS_HOST,
+      },
+      isGlobal: true,
+      ttl: 60 * 1000,
+    }),
+    
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '../..', 'final_project_frontend'),
     }),

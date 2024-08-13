@@ -36,6 +36,9 @@ export function ApiFiles(fieldName: string, maxCount: number, localOptions: Mult
               format: 'binary',
             }
           },
+          communityId: {
+            type: 'number'
+          },
           title: {
             type: 'string'
           },
@@ -65,8 +68,10 @@ export function ApiMedia(fileFields: { name: string, maxCount: number }[], local
           };
           return acc;
         }, {
+          communityId: { type: 'number' },
           title: { type: 'string' },
           content: { type: 'string' },
+          youtubeUrl: { type: 'string' },
           year: { type: 'number' },
           month: { type: 'number' },
           day: { type: 'number' },

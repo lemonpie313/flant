@@ -30,7 +30,7 @@ import { postImageUploadFactory } from 'src/util/image-upload/create-s3-storage'
 import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiTags('게시물')
-@Controller('v1/post')
+@Controller('v1/posts')
 @UseInterceptors(CacheInterceptor)
 export class PostController {
   constructor(
@@ -47,13 +47,12 @@ export class PostController {
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @ApiFiles('postImage', 3, postImageUploadFactory())
   @Post()
   async create(
     @UploadedFiles() files: { postImage?: Express.MulterS3.File[] } ,
     @UserInfo() user,
-    @Query('communityId') communityId: number,
     @Body() createPostDto: CreatePostDto,
   ) {
     let imageUrl = undefined
@@ -62,7 +61,7 @@ export class PostController {
       imageUrl = imageLocation
     }
     const userId = user.id;
-    return await this.postService.create(+userId, +communityId, createPostDto, imageUrl);
+    return await this.postService.create(+userId, createPostDto, imageUrl);
   }
 
   /**
@@ -78,7 +77,6 @@ export class PostController {
     @Query('artistId') artistId: number,
     @Query('communityId') communityId: number,
   ) {
-    console.log('컨트롤러를 거침')
     return await this.postService.findPosts(+artistId, +communityId);
   }
 
@@ -100,7 +98,7 @@ export class PostController {
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @ApiFiles('postImage', 3, postImageUploadFactory())
   @Patch(':postId')
   async update(
@@ -125,7 +123,7 @@ export class PostController {
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Delete(':postId')
   async remove(@UserInfo() user, @Param('postId') postId: number) {
     const userId = user.id;

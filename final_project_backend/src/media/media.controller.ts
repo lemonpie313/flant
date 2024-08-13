@@ -10,19 +10,25 @@ import {
   Query,
   UploadedFiles,
   UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { MediaService } from './media.service';
 import { CreateMediaDto } from './dto/create-media.dto';
 import { UpdateMediaDto } from './dto/update-media.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
 import { ApiFile, ApiMedia } from 'src/util/decorators/api-file.decorator';
 import { mediaFileUploadFactory, thumbnailImageUploadFactory } from 'src/util/image-upload/create-s3-storage';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { CacheInterceptor } from '@nestjs/cache-manager';
+import { CommunityUserRoles } from 'src/auth/decorators/community-user-roles.decorator';
+import { CommunityUserRole } from 'src/community/community-user/types/community-user-role.type';
+import { CommunityUserGuard } from 'src/auth/guards/community-user.guard';
 
 
 @ApiTags('미디어')
 @Controller('v1/media')
+@UseInterceptors(CacheInterceptor)
 export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
 
@@ -35,7 +41,7 @@ export class MediaController {
    * @returns 
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @ApiMedia([
     { name: 'mediaImage', maxCount: 3 },
     { name: 'mediaVideo', maxCount: 1 }
@@ -45,7 +51,6 @@ export class MediaController {
   create(
     @UploadedFiles() files: {mediaImage?: Express.MulterS3.File[], mediaVideo?: Express.MulterS3.File[]},
     @UserInfo() user,
-    @Query('communityId') communityId: number,
     @Body() createMediaDto: CreateMediaDto) {
     const userId = user.id;
     let imageUrl = undefined
@@ -60,7 +65,7 @@ export class MediaController {
         videoUrl = videoLocation
         }
     }
-    return this.mediaService.create(+userId, +communityId, createMediaDto, imageUrl, videoUrl);
+    return this.mediaService.create(+userId, createMediaDto, imageUrl, videoUrl);
   }
 
   /**
@@ -90,7 +95,7 @@ export class MediaController {
    * @returns 
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @Patch(':mediaId/thumbnail')
   @ApiFile('thumbnailImage', thumbnailImageUploadFactory())
   async updateThumbnail(@UserInfo() user, @Param('mediaId') mediaId: number, @UploadedFile() file: Express.MulterS3.File){
@@ -107,7 +112,7 @@ export class MediaController {
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @ApiMedia([
     { name: 'mediaImage', maxCount: 3 },
     { name: 'mediaVideo', maxCount: 1 }
@@ -143,7 +148,7 @@ export class MediaController {
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @Delete(':mediaId')
   remove(@UserInfo() user, @Param('mediaId') mediaId: number) {
     const userId = user.id;

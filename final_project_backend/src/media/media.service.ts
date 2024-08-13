@@ -27,15 +27,16 @@ export class MediaService {
   ){}
   async create(
     userId: number,
-    communityId: number,
     createMediaDto: CreateMediaDto,
     imageUrl: string[] | undefined,
     videoUrl: string | undefined
   ) {
-    const isManager = await this.managerRepository.findOne({where: {userId: userId, communityId: communityId}})
+    const isManager = await this.managerRepository.findOne({where: { userId: userId, communityId: createMediaDto.communityId }})
     if(!isManager){
       throw new UnauthorizedException(MESSAGES.MEDIA.CREATE.UNAUTHORIZED)
     }
+
+    if(videoUrl && createMediaDto.youtubeUrl){}
 
     const publishTime = new Date(
       createMediaDto.year,
@@ -46,7 +47,7 @@ export class MediaService {
     )
 
     const createdData = await this.mediaRepository.save({
-      communityId: communityId,
+      communityId: createMediaDto.communityId,
       managerId: isManager.managerId,
       title: createMediaDto.title,
       content: createMediaDto.content,

@@ -1,9 +1,21 @@
-import { PickType } from "@nestjs/swagger";
+import { ApiPropertyOptional, PickType } from "@nestjs/swagger";
 import { Media } from "../entities/media.entity";
-import { IsNumber, Max, Min } from "class-validator";
+import { IsNumber, IsOptional, IsString, Max, Min } from "class-validator";
 import { Transform } from "class-transformer";
 
 export class CreateMediaDto extends PickType(Media, ['title', 'content']) {
+
+  /**
+   * 유튜브 영상일 경우 URL
+   * @example "https://www.youtube.com/watch?v=KXnkhWRCj40"
+   */
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  youtubeUrl : string;
+
+  @IsNumber()
+  communityId: number;
 
   /**
    * 공개 년도
