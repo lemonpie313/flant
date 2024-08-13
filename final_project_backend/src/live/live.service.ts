@@ -65,9 +65,8 @@ export class LiveService {
       //   // cert: './cert.pem',
       // },
       trans: {
-        
         ffmpeg: '/usr/bin/ffmpeg',
-          // '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+        // '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
@@ -137,12 +136,12 @@ export class LiveService {
         console.log('---------------------------방송종료?------------------');
         console.log(streamPath);
         const streamKey = streamPath.split('/live/')[1];
-        console.log('streamKey: '+streamKey)
+        console.log('streamKey: ' + streamKey);
         const live = await this.liveRepository.findOne({
           where: { streamKey },
         });
 
-        console.log(__dirname, '../../media/live', streamKey)
+        console.log(__dirname, '../../media/live', streamKey);
         const liveDirectory = path.join(
           __dirname,
           '../../media/live',
@@ -232,19 +231,15 @@ export class LiveService {
     }
   }
 
-  async createLive(userId: number, title: string, liveType: LiveTypes) {
+  async createLive(artistId: number, title: string, liveType: LiveTypes) {
     // userId로 커뮤니티아티인지 확인 + 어느 커뮤니티인지 조회
-    const communityUser = await this.communityUserRepository.findOne({
+    const artist = await this.artistsRepository.findOne({
       where: {
-        userId,
+        artistId,
       },
       relations: {
         community: true,
-      },
-    });
-    const artist = await this.artistsRepository.findOne({
-      where: {
-        communityUserId: communityUser.communityUserId,
+        communityUser: true,
       },
     });
     if (_.isNil(artist)) {
@@ -257,7 +252,7 @@ export class LiveService {
     const streamKey = Crypto.randomBytes(20).toString('hex');
     const live = await this.liveRepository.save({
       communityId: artist.communityId,
-      artistId: artist.artistId,
+      artistId: artistId,
       title,
       liveType,
       streamKey,

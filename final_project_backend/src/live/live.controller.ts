@@ -38,7 +38,7 @@ export class LiveController {
   @Post('/')
   async createLive(@UserInfo() user: PartialUser, @Body() createLiveDto: CreateLiveDto) {
     const { title, liveType } = createLiveDto;
-    const live = await this.liveService.createLive(user.id, title, liveType);
+    const live = await this.liveService.createLive(user.roleInfo.roleId, title, liveType);
     return {
       status: HttpStatus.CREATED,
       message: '스트림키 생성 완료',
