@@ -56,7 +56,7 @@ export class LiveService {
       http: {
         port: 8000,
         mediaroot: '../media', // path.join(__dirname, '../../media'),
-        //webroot: './www',
+        webroot: './www',
         allow_origin: '*',
       },
       // https: {
@@ -65,24 +65,23 @@ export class LiveService {
       //   // cert: './cert.pem',
       // },
       trans: {
-        //'/usr/bin/ffmpeg',
-        ffmpeg:
-          '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+        ffmpeg: '/usr/bin/ffmpeg',
+          // '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
-            vc: 'libx264', // x264 비디오 코덱 사용
+            vc: 'libx264', // x264 비디오 코덱 사용 (H.264는 인코딩 시 그래픽카드의 GPU 사용 > 사양 좋아야함.. x264는 CPU 사용)
             vcParam: [
               '-crf',
-              '18', // CRF 값 (18은 거의 무손실, 23은 기본값)
+              '18', // CRF 값 (인코딩시 사용되는 품질 기준값, 18은 거의 무손실, 23은 기본값)
               '-preset',
-              'slow', // 인코딩 프리셋 (slow는 품질과 속도 사이의 좋은 균형)
+              'slow', // 인코딩 프리셋 (한 프레임을 만드는 데에 얼마나 CPU 자원을 사용할지, 느려질수록 같은 비트레이트에서 더 나은  품질)
               '-b:v',
-              '4M', // 비트레이트 (4M는 4 Mbps)
+              '4M', // 비디오스트림 비트레이트 (초당 비트 전송률, 즉 1초당 용량, 4M는 4 Mbps)
               '-maxrate',
               '4M', // 최대 비트레이트
               '-bufsize',
-              '8M', // 버퍼 사이즈
+              '8M', // 버퍼(임시 저장공간?) 사이즈 (8MB)
             ],
             ac: 'copy',
             // acParam: ['-ab', '64k', '-ac', '1', '-ar', '44100'],
@@ -98,7 +97,7 @@ export class LiveService {
           },
         ],
       },
-      fission: {
+      fission: { // 화질별 분할
         ffmpeg:
           '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
@@ -107,9 +106,9 @@ export class LiveService {
             model: [
             //   { // 1080p 추가하면 인코딩 과부하 걸림...
             //     ab: '128k',                // 오디오 비트레이트
-            //     vb: '2000k',               // 비디오 비트레이트 (5 Mbps)
+            //     vb: '2000k',               // 비디오 비트레이트 (2 Mbps)
             //     vs: '1920x1080',           // 비디오 해상도
-            //     vf: '30',                  // 프레임 레이트 (30 fps)
+            //     vf: '30',                  // 프레임 레이트 (초당 프레임수, 30 fps)
             // },
               {
                 ab: '128k',
@@ -167,14 +166,14 @@ export class LiveService {
         }
         const time = new Date();
         const diff = Math.abs(time.getTime() - live.createdAt.getTime()) / 1000;
-        // if (diff > 6000) {
-        //   // 1분 이내에 스트림키 입력 후 방송 시작이 돼야함
-        //   console.log('-------------에러------------');
-        //   console.log('라이브 스트림키의 유효기간이 만료되었습니다.');
-        //   session.reject((reason: string) => {
-        //     console.log(reason);
-        //   });
-        // }
+        if (diff > 6000) {
+          // 1분 이내에 스트림키 입력 후 방송 시작이 돼야함
+          console.log('-------------에러------------');
+          console.log('라이브 스트림키의 유효기간이 만료되었습니다.');
+          session.reject((reason: string) => {
+            console.log(reason);
+          });
+        }
         console.log('------------------------방송시작?------------------');
       },
     );
@@ -191,7 +190,6 @@ export class LiveService {
           where: { streamKey },
         });
 
-        console.log(__dirname, '../../media/live', streamKey);
         // const liveDirectory = path.join(
         //   __dirname,
         //   '../../media/live',
@@ -243,23 +241,6 @@ export class LiveService {
         }
       },
     );
-    this.nodeMediaServer.on('postPublish', (id, StreamPath, args) => {
-      console.log('[NodeEvent on postPublish]');
-    });
-
-    this.nodeMediaServer.on('prePlay', (id, StreamPath, args) => {
-      console.log('[NodeEvent on prePlay]');
-      // let session = nms.getSession(id);
-      // session.reject();
-    });
-
-    this.nodeMediaServer.on('postPlay', (id, StreamPath, args) => {
-      console.log('[NodeEvent on postPlay]');
-    });
-
-    this.nodeMediaServer.on('donePlay', (id, StreamPath, args) => {
-      console.log('[NodeEvent on donePlay]');
-    });
   }
 
   async liveRecordingToS3(
