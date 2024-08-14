@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { CommunityUser } from '../../community/community-user/entities/communityUser.entity';
 import { Artist } from '../../admin/entities/artist.entity';
+import { Like } from 'src/like/entities/like.entity';
 //import { Post } from 'src/post/entities/post.entity';
 
 @Entity('comments')
@@ -63,4 +64,7 @@ export class Comment {
     onDelete: 'CASCADE',
   })
   parent: Comment | null;
+
+  @OneToMany(() => Like, (like) => like.post)
+  likes: Like[];
 }

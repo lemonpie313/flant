@@ -1,8 +1,10 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { LikeStatus } from '../types/likeStatus.types';
 import { ItemType } from '../types/itemType.types';
 import { IsNotEmpty, IsNumber } from 'class-validator';
 import { MESSAGES } from 'src/constants/message.constant';
+import { Post } from 'src/post/entities/post.entity';
+import { Comment } from 'src/comment/entities/comment.entity';
 
 @Entity('like')
 export class Like {
@@ -41,4 +43,16 @@ export class Like {
   @IsNumber()
   @Column()
   status: LikeStatus;
+
+  @ManyToOne(() => Post, (post) => post.likes, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'post_id' })
+  post: Post;
+
+  @ManyToOne(() => Comment, (comment) => comment.likes, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'comment_id' })
+  comment: Comment;
 }
