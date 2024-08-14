@@ -16,7 +16,7 @@ async function bootstrap() {
   });
   // CORS 설정
   app.enableCors({
-    origin: 'http://localhost:3001', // 프론트엔드 주소
+    origin: 'http://localhost:3000', // 프론트엔드 주소
     credentials: true,
   });
 
