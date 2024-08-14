@@ -110,4 +110,14 @@ export class CommentController {
       ItemType.COMMENT,
     );
   }
+
+  @Get(':id/likes')
+  async countLikesOnComment(
+    @Param('id', ParseIntPipe) id: number,
+  ){
+    return this.likeService.countLikes(
+      id,
+      ItemType.COMMENT,
+    )
+  }
 }

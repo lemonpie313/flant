@@ -1,6 +1,8 @@
 cert.pem
 key.pem
 
+/src/configs/artillery.config.ts
+
 # compiled output
 /dist
 /node_modules

@@ -274,11 +274,16 @@ export class MediaService implements OnModuleInit {
       const mediaId = mediaData.mediaId
       recentMediaIds.push(mediaId)
 
-      const cachingData = await this.mediaRepository.findOne({ 
+      const Data = await this.mediaRepository.findOne({ 
         where: { mediaId: mediaId }, 
         relations: ['mediaFiles']
       })
-      await this.cacheManager.set(`${mediaId}`, cachingData, 0)
+      const cachingData = {
+        status: HttpStatus.OK,
+        message: MESSAGES.MEDIA.FINDONE.SUCCEED,
+        data: Data
+      }
+      await this.cacheManager.set(`mediaId_${mediaId}`, cachingData, 0)
     }
     await this.cacheManager.set('cachedMediaIds', recentMediaIds, 0)
   }
@@ -289,15 +294,12 @@ export class MediaService implements OnModuleInit {
 
     const recentMediaIds: number[] = await this.cacheManager.get('cachedMediaIds')
     
-    await this.cacheManager.del(`${recentMediaIds[0]}`)
+    await this.cacheManager.del(`mediaId_${recentMediaIds[0]}`)
 
-    recentMediaIds.unshift()
-    recentMediaIds.push(newData.mediaId)
+    recentMediaIds.pop()
+    recentMediaIds.unshift(newData.mediaId)
 
-    await this.cacheManager.set(`${newData.mediaId}`, newData, 0)
+    await this.cacheManager.set(`mediaId_${newData.mediaId}`, newData, 0)
     await this.cacheManager.set('cachedMediaIds', recentMediaIds, 0)
   }
-
-
-  
 }
