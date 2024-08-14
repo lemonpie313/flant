@@ -29,7 +29,8 @@ import { CommunityUserModule } from './community/community-user/community-user.m
 import { CacheModule } from '@nestjs/cache-manager';
 import { RedisClientOptions } from 'redis';
 import { redisStore } from 'cache-manager-redis-yet'
-
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { SentryWebhookInterceptor } from './webhook.interceptor';
 @Module({
   imports: [
     ScheduleModule.forRoot(),
@@ -73,6 +74,13 @@ import { redisStore } from 'cache-manager-redis-yet'
     CommunityUserModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      // centry가 전역에 사용될수있도록 설정
+      provide: APP_INTERCEPTOR,
+      useClass: SentryWebhookInterceptor,
+    },
+  ],
 })
 export class AppModule {}

@@ -21,6 +21,9 @@ export class Order {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
+  @Column({unsigned: true})
+  userId: number;
+
   @IsNumber()
   @Column()
   totalPrice: number;
@@ -36,6 +39,7 @@ export class Order {
 
   //유저연결
   @ManyToOne(() => User, (user) => user.order, { onDelete: 'CASCADE' })
+  @JoinColumn({name: 'user_id'})
   user: User;
 
   //카트연결
@@ -44,5 +48,5 @@ export class Order {
 
   //orderItem 연결
   @OneToMany(() => OrderItem, (orderItem) => orderItem.order)
-  orderItem: OrderItem;
+  orderItem: OrderItem[];
 }
