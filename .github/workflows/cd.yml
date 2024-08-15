@@ -73,6 +73,9 @@ jobs:
             echo "REDIS_PORT=${{secrets.REDIS_PORT}}" >> .env
             echo "REDIS_HOST=${{secrets.REDIS_HOST}}" >> .env
             echo "REDIS_PASSWORD=${{secrets.REDIS_PASSWORD}}" >> .env
+            echo "FRONTEND_URL=${{secrets.FRONTEND_URL}}" >> .env
+            echo "CORS_ENABLED=${{secrets.CORS_ENABLED}}" >> .env
+            echo "API_TIMEOUT=${{secrets.API_TIMEOUT}}" >> .env
 
 
 
