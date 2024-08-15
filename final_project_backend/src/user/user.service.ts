@@ -31,10 +31,11 @@ export class UserService {
 
   // 내 정보 조회
   async findMe(userId: number) {
+    console.log(userId);
     const user = await this.userRepository.findOne({
       where: { userId: userId },
     });
-
+    console.log(user);
     if (!user) {
       throw new NotFoundException(MESSAGES.USER.COMMON.NOT_FOUND);
     }

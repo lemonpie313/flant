@@ -37,6 +37,8 @@ export class UserController {
    */
   @Get('/me')
   async findOne(@UserInfo() user: PartialUser) {
+    console.log("------------------------------user")
+    console.log(user);
     const data = await this.userService.findMe(user.id);
     return {
       statusCode: HttpStatus.OK,
