@@ -1,8 +1,11 @@
 import axios, { AxiosInstance } from "axios";
 
 // 환경 변수에서 API_BASE_URL을 가져옵니다.
-const REACT_APP_BACKEND_API_URL = process.env.REACT_APP_BACKEND_API_URL || 'http://localhost:3000/api';
-const REACT_APP_API_TIMEOUT = Number(process.env.REACT_APP_API_TIMEOUT || '5000');
+const REACT_APP_BACKEND_API_URL =
+  process.env.REACT_APP_BACKEND_API_URL || "http://localhost:3000/api";
+const REACT_APP_API_TIMEOUT = Number(
+  process.env.REACT_APP_API_TIMEOUT || "5000"
+);
 
 console.log("BACKEND_API_URL:", REACT_APP_BACKEND_API_URL);
 console.log("API_TIMEOUT:", REACT_APP_API_TIMEOUT);
@@ -34,9 +37,12 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       const refreshToken = localStorage.getItem("refreshToken");
       try {
-        const res = await axios.post(`${REACT_APP_BACKEND_API_URL}/auth/refresh`, {
-          refreshToken,
-        });
+        const res = await axios.post(
+          `${REACT_APP_BACKEND_API_URL}/auth/refresh`,
+          {
+            refreshToken,
+          }
+        );
         if (res.status === 200) {
           localStorage.setItem("token", res.data.token);
           return api(originalRequest);

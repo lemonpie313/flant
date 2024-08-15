@@ -10,12 +10,12 @@ import { AllExceptionsFilter } from './all-exceptions.filter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
-  
+
   // sentry 초기 설정
   Sentry.init({
     dsn: configService.get<string>('SENTRY_DSN'),
   });
-  
+
   // CORS 설정
   const corsEnabled = configService.get<string>('CORS_ENABLED') === 'true';
   if (corsEnabled) {
@@ -54,7 +54,7 @@ async function bootstrap() {
       operationsSorter: 'alpha',
     },
   });
-  
+
   app.useGlobalFilters(new AllExceptionsFilter()); // 에러 문 처리
   await app.listen(port);
 }
