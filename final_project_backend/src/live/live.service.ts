@@ -55,7 +55,7 @@ export class LiveService {
       },
       http: {
         port: 8000,
-        mediaroot: path.join(__dirname, '../../media'),
+        mediaroot: '../media', // path.join(__dirname, '../../media'),
         webroot: './www',
         allow_origin: '*',
       },
@@ -66,20 +66,69 @@ export class LiveService {
       // },
       trans: {
         ffmpeg: '/usr/bin/ffmpeg',
-        // '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+          // '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
-            ac: 'aac',
+            vc: 'libx264', // x264 비디오 코덱 사용 (H.264는 인코딩 시 그래픽카드의 GPU 사용 > 사양 좋아야함.. x264는 CPU 사용)
+            vcParam: [
+              '-crf',
+              '18', // CRF 값 (인코딩시 사용되는 품질 기준값, 18은 거의 무손실, 23은 기본값)
+              '-preset',
+              'slow', // 인코딩 프리셋 (한 프레임을 만드는 데에 얼마나 CPU 자원을 사용할지, 느려질수록 같은 비트레이트에서 더 나은  품질)
+              '-b:v',
+              '4M', // 비디오스트림 비트레이트 (초당 비트 전송률, 즉 1초당 용량, 4M는 4 Mbps)
+              '-maxrate',
+              '4M', // 최대 비트레이트
+              '-bufsize',
+              '8M', // 버퍼(임시 저장공간?) 사이즈 (8MB)
+            ],
+            ac: 'copy',
+            // acParam: ['-ab', '64k', '-ac', '1', '-ar', '44100'],
             hls: true,
             hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
-            hlsKeep: true, // to prevent hls file delete after end the stream
-            ffmpegParams: '-loglevel debug -report', // FFmpeg 로그 기록
-          },
-          {
-            app: 'live',
+            // hlsKeep: true, // to prevent hls file delete after end the stream
+            // ffmpegParams: '-loglevel debug -report', // FFmpeg 로그 기록
+            // dash: true,
+            // dashFlags: '[f=dash:window_size=3:extra_window_size=5]',
+            // dashKeep: true, // to prevent dash file delete after end the stream
             mp4: true,
             mp4Flags: '[movflags=frag_keyframe+empty_moov]',
+          },
+        ],
+      },
+      fission: { // 화질별 분할
+        ffmpeg:
+          '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+        tasks: [
+          {
+            rule: 'live/*',
+            model: [
+            //   { // 1080p 추가하면 인코딩 과부하 걸림...
+            //     ab: '128k',                // 오디오 비트레이트
+            //     vb: '2000k',               // 비디오 비트레이트 (2 Mbps)
+            //     vs: '1920x1080',           // 비디오 해상도
+            //     vf: '30',                  // 프레임 레이트 (초당 프레임수, 30 fps)
+            // },
+              {
+                ab: '128k',
+                vb: '1500k',
+                vs: '1280x720',
+                vf: '30',
+              },
+              {
+                ab: '96k',
+                vb: '1000k',
+                vs: '854x480',
+                vf: '24',
+              },
+              {
+                ab: '96k',
+                vb: '600k',
+                vs: '640x360',
+                vf: '20',
+              },
+            ],
           },
         ],
       },
@@ -99,7 +148,7 @@ export class LiveService {
           '-----------------------방송시작직전--------------------------',
         );
         const session = this.nodeMediaServer.getSession(id);
-        const streamKey = streamPath.split('/live/')[1];
+        const streamKey = streamPath.split('/live/')[1].split('_')[0];
 
         const live = await this.liveRepository.findOne({
           where: {
@@ -141,12 +190,12 @@ export class LiveService {
           where: { streamKey },
         });
 
-        console.log(__dirname, '../../media/live', streamKey);
-        const liveDirectory = path.join(
-          __dirname,
-          '../../media/live',
-          streamKey,
-        );
+        // const liveDirectory = path.join(
+        //   __dirname,
+        //   '../../media/live',
+        //   streamKey,
+        // );
+        const liveDirectory = '../media/live/' + streamKey;
         console.log(
           `-------------------------------Reading directory: ${liveDirectory}`,
         );
@@ -212,7 +261,7 @@ export class LiveService {
     try {
       await this.s3Client.send(command);
       // 업로드된 이미지의 URL 반환
-      return `https://s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${process.env.AWS_BUCKET_NAME}/${fileName}`;
+      return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/liveRecordings/${fileName}`;
     } catch (error) {
       console.error('Error uploading file to S3:', error);
       throw error; // 에러를 상위 함수로 전달
@@ -220,7 +269,7 @@ export class LiveService {
   }
 
   async cleanupStreamFolder(streamKey: string) {
-    const folderPath = path.join(__dirname, '../../media/live', streamKey);
+    const folderPath = '../media/live/' + streamKey; //path.join(__dirname, '../../media/live', streamKey);
     console.log('folderPath: ' + folderPath);
     if (fs.existsSync(folderPath)) {
       for (const file of fs.readdirSync(folderPath)) {
