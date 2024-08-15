@@ -22,10 +22,18 @@ export default class MembershipSeeder implements Seeder {
     const communityUserId = communityUser.map((i) => i.communityUserId);
 
     for (let i = 0; i < communityUser.length; i++) {
-      // 매니저가 2명임..
       try {
+        console.log("------")
+        const expiration = new Date();
+        expiration.setFullYear(expiration.getFullYear() + 1); // 배포용
+        expiration.setHours(9);
+        expiration.setMilliseconds(0);
+        expiration.setSeconds(0);
+        expiration.setMinutes(0);
+
         await Factory.save({
           communityUserId: communityUserId[i],
+          expiration,
         });
       } catch (e) {
         i--;
