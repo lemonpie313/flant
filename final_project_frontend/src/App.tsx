@@ -1,12 +1,13 @@
-// src/App.tsx
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import MainPage from "./pages/MainPage";
 import SignUpPage from "./pages/SignUpPage";
 import UserInfoPage from "./pages/UserInfo";
-import ChatComponent from "./components/ChatComponent"; // ChatComponent로 이름 변경
-import { ChatProvider } from './context/ChatContext'; // ChatContext 추가
+import ChatComponent from "./components/ChatComponent";
+import { ChatProvider } from './context/ChatContext';
+import CommunityBoard from './pages/board';
+import LiveStreamingPage from './pages/LiveStreamingPage';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -39,6 +40,8 @@ const App: React.FC = () => {
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/main" element={<ProtectedRoute element={<MainPage isLoggedIn={isLoggedIn} />} />} />
             <Route path="/userinfo" element={<ProtectedRoute element={<UserInfoPage />} />} />
+            <Route path="/communities" element={<ProtectedRoute element={<CommunityBoard />} />} />
+            <Route path="/live" element={<LiveStreamingPage />} />
             <Route path="/" element={<Navigate to="/main" replace />} />
             <Route path="*" element={<Navigate to="/main" replace />} />
           </Routes>

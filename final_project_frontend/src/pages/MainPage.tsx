@@ -63,8 +63,10 @@ const MainPage: React.FC<MainPageProps> = ({ isLoggedIn }) => {
           setMyCommunities(myresponse.data.data);
         }
       } catch (error) {
+        console.log(error)
         alert("Failed to fetch communities");
       }
+      
     };
     fetchCommunities();
   }, []);
