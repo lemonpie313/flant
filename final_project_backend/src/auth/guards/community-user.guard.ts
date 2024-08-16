@@ -73,10 +73,9 @@ export class CommunityUserGuard implements CanActivate {
 
     if (roles.includes(CommunityUserRole.MANAGER)) {
       try {
-        await this.managerService.findByCommunityIdAndUserId(
-          communityId,
-          userId,
-        );
+        const managerInfo =
+          await this.managerService.findByCommunityUserId(communityUserId);
+        request.user.roleInfo = managerInfo;
         hasRole = true;
       } catch (e) {}
     }
