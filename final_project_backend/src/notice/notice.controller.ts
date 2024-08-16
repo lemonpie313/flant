@@ -25,7 +25,7 @@ import { CommunityUserGuard } from 'src/auth/guards/community-user.guard';
 import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 
 @ApiTags('공지사항')
-@Controller('v1/notice')
+@Controller('v1/notices')
 export class NoticeController {
   constructor(private readonly noticeService: NoticeService) {}
 

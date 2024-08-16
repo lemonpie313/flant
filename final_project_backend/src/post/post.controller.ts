@@ -29,7 +29,7 @@ import { postImageUploadFactory } from 'src/util/image-upload/create-s3-storage'
 import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 
 @ApiTags('게시물')
-@Controller('v1/post')
+@Controller('v1/posts')
 export class PostController {
   constructor(
     private readonly postService: PostService,
