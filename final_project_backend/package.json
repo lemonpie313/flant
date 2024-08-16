@@ -50,6 +50,7 @@
     "cookie-parser": "^1.4.6",
     "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
+    "exceljs": "^4.4.0",
     "express-handlebars": "^8.0.1",
     "faker": "^6.6.6",
     "flatted": "^3.3.1",

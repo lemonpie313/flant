@@ -1,31 +1,35 @@
-import { DataSource, Not } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { Seeder, SeederFactoryManager } from 'typeorm-extension';
 import { CommunityUser } from 'src/community/community-user/entities/communityUser.entity';
 import { Community } from 'src/community/entities/community.entity';
 import { User } from 'src/user/entities/user.entity';
+import { Artist } from 'src/admin/entities/artist.entity';
 import { UserRole } from 'src/user/types/user-role.type';
 
-export default class CommunityUserSeeder implements Seeder {
+export default class ArtistSeeder implements Seeder {
   public async run(
     dataSource: DataSource,
     factoryManager: SeederFactoryManager,
   ): Promise<any> {
-    const Factory = factoryManager.get(CommunityUser);
+    const Factory = factoryManager.get(Artist);
     const communityRepository = dataSource.getRepository(Community);
-    const userRepository = dataSource.getRepository(User);
     const communities = await communityRepository.find();
     const communityId = communities.map((i) => i.communityId);
-    const users = await userRepository.find({
+    const communityUserRepository = dataSource.getRepository(CommunityUser);
+    const communityUsers = await communityUserRepository.find({
       where: {
-        role: Not(UserRole.Admin)
+        users: {
+          role: UserRole.User,
+        },
       },
+      take: 4,
     });
-    const userId = users.map((i) => i.userId);
+    const communityUserId = communityUsers.map((i) => i.communityUserId);
 
-    for (let i = 0; i < users.length; i++) {
+    for (let i = 0; i < communityUsers.length; i++) {
       try {
         await Factory.save({
-          userId: userId[i],
+          communityUserId: communityUserId[i],
           communityId: communityId[i % communityId.length],
         });
       } catch (e) {

@@ -21,9 +21,8 @@ export default class MembershipSeeder implements Seeder {
     });
     const communityUserId = communityUser.map((i) => i.communityUserId);
 
-    for (let i = 0; i < communityUser.length; i++) {
+    for (let i = 0; i < communityUser.length/2; i++) {
       try {
-        console.log("------")
         const expiration = new Date();
         expiration.setFullYear(expiration.getFullYear() + 1); // 배포용
         expiration.setHours(9);

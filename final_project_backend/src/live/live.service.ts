@@ -66,7 +66,7 @@ export class LiveService {
       // },
       trans: {
         ffmpeg: '/usr/bin/ffmpeg',
-          // '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+        //'/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
@@ -97,19 +97,20 @@ export class LiveService {
           },
         ],
       },
-      fission: { // 화질별 분할
-        ffmpeg:
-          '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+      fission: {
+        // 화질별 분할
+        ffmpeg: '/usr/bin/ffmpeg',
+          //'/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
             rule: 'live/*',
             model: [
-            //   { // 1080p 추가하면 인코딩 과부하 걸림...
-            //     ab: '128k',                // 오디오 비트레이트
-            //     vb: '2000k',               // 비디오 비트레이트 (2 Mbps)
-            //     vs: '1920x1080',           // 비디오 해상도
-            //     vf: '30',                  // 프레임 레이트 (초당 프레임수, 30 fps)
-            // },
+              //   { // 1080p 추가하면 인코딩 과부하 걸림...
+              //     ab: '128k',                // 오디오 비트레이트
+              //     vb: '2000k',               // 비디오 비트레이트 (2 Mbps)
+              //     vs: '1920x1080',           // 비디오 해상도
+              //     vf: '30',                  // 프레임 레이트 (초당 프레임수, 30 fps)
+              // },
               {
                 ab: '128k',
                 vb: '1500k',
@@ -166,15 +167,15 @@ export class LiveService {
         }
         const time = new Date();
         const diff = Math.abs(time.getTime() - live.createdAt.getTime()) / 1000;
-        if (diff > 6000) {
-          // 1분 이내에 스트림키 입력 후 방송 시작이 돼야함
-          console.log('-------------에러------------');
-          console.log('라이브 스트림키의 유효기간이 만료되었습니다.');
-          session.reject((reason: string) => {
-            console.log(reason);
-          });
-        }
-        console.log('------------------------방송시작?------------------');
+        // if (diff > 6000) {
+        //   // 1분 이내에 스트림키 입력 후 방송 시작이 돼야함
+        //   console.log('-------------에러------------');
+        //   console.log('라이브 스트림키의 유효기간이 만료되었습니다.');
+        //   session.reject((reason: string) => {
+        //     console.log(reason);
+        //   });
+        // }
+        // console.log('------------------------방송시작?------------------');
       },
     );
 
@@ -306,7 +307,11 @@ export class LiveService {
       liveType,
       streamKey,
     });
-    return { liveServer: 'rtmp://flant.club/live', ...live };
+    return {
+      liveServer: 'rtmp://54.180.82.208/live',
+      title: live.title,
+      streamKey: live.streamKey,
+    };
     //return { liveServer: 'rtmp://localhost/live', ...live };
   }
 
