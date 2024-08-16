@@ -133,7 +133,7 @@ export class MediaService {
   }
 
   async update(
-    communityUserId: number,
+    user: PartialUser,
     mediaId: number,
     updateMediaDto: UpdateMediaDto,
     imageUrl: string[] | undefined,
@@ -145,15 +145,7 @@ export class MediaService {
     if (!mediaData) {
       throw new NotFoundException(MESSAGES.MEDIA.UPDATE.NOT_FOUND);
     }
-    const isManager = await this.managerRepository.findOne({
-      where: {
-        communityUserId: communityUserId,
-        communityId: mediaData.communityId,
-      },
-    });
-    if (!isManager) {
-      throw new UnauthorizedException(MESSAGES.MEDIA.UPDATE.UNAUTHORIZED);
-    }
+
     if (_.isEmpty(updateMediaDto)) {
       throw new BadRequestException(MESSAGES.MEDIA.UPDATE.BAD_REQUEST);
     }
@@ -180,7 +172,7 @@ export class MediaService {
     if (updateMediaDto.content != mediaData.content) {
       newData.content = updateMediaDto.content;
     }
-
+    const managerId = user?.roleInfo?.roleId;
     if ((imageUrl && imageUrl.length > 0) || videoUrl) {
       await this.mediaFileRepository
         .createQueryBuilder()
@@ -193,7 +185,7 @@ export class MediaService {
         for (let image of imageUrl) {
           const mediaImageData = {
             mediaId: mediaData.mediaId,
-            managerId: isManager.managerId,
+            managerId: managerId,
             mediaFileUrl: image,
           };
           await this.mediaFileRepository.save(mediaImageData);
@@ -202,7 +194,7 @@ export class MediaService {
       if (videoUrl) {
         const mediaVideoData = {
           mediaId: mediaData.mediaId,
-          managerId: isManager.managerId,
+          managerId: managerId,
           mediaFileUrl: videoUrl,
         };
         await this.mediaFileRepository.save(mediaVideoData);
@@ -221,22 +213,14 @@ export class MediaService {
     };
   }
 
-  async remove(communityUserId: number, mediaId: number) {
+  async remove(mediaId: number) {
     const mediaData = await this.mediaRepository.findOne({
       where: { mediaId: mediaId },
     });
     if (!mediaData) {
       throw new NotFoundException(MESSAGES.MEDIA.REMOVE.NOT_FOUND);
     }
-    const isManager = await this.managerRepository.findOne({
-      where: {
-        communityUserId: communityUserId,
-        communityId: mediaData.communityId,
-      },
-    });
-    if (!isManager) {
-      throw new UnauthorizedException(MESSAGES.MEDIA.REMOVE.UNAUTHORIZED);
-    }
+
     await this.mediaRepository.delete(mediaId);
     return {
       status: HttpStatus.OK,

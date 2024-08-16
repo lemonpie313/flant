@@ -24,6 +24,9 @@ import {
 } from 'src/util/image-upload/create-s3-storage';
 import { CommunityUserGuard } from 'src/auth/guards/community-user.guard';
 import { PartialUser } from 'src/user/interfaces/partial-user.entity';
+import { CommunityUserRole } from 'src/community/community-user/types/community-user-role.type';
+import { CommunityUserRoles } from 'src/auth/decorators/community-user-roles.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @ApiTags('미디어')
 @Controller('v1/media')
@@ -39,7 +42,8 @@ export class MediaController {
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'), CommunityUserGuard)
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @ApiMedia(
     [
       { name: 'mediaImage', maxCount: 3 },
@@ -108,16 +112,16 @@ export class MediaController {
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @Patch(':mediaId/thumbnail')
   @ApiFile('thumbnailImage', thumbnailImageUploadFactory())
   async updateThumbnail(
-    @UserInfo() user,
     @Param('mediaId') mediaId: number,
     @UploadedFile() file: Express.MulterS3.File,
   ) {
-    const userId = user.id;
     const imageUrl = file.location;
-    return this.mediaService.updateThumbnail(+userId, +mediaId, imageUrl);
+    return this.mediaService.updateThumbnail(+mediaId, imageUrl);
   }
 
   /**
@@ -129,6 +133,8 @@ export class MediaController {
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @ApiMedia(
     [
       { name: 'mediaImage', maxCount: 3 },
@@ -143,11 +149,10 @@ export class MediaController {
       mediaImage?: Express.MulterS3.File[];
       mediaVideo?: Express.MulterS3.File[];
     },
-    @UserInfo() user,
+    @UserInfo() user: PartialUser,
     @Param('mediaId') mediaId: number,
     @Body() updateMediaDto: UpdateMediaDto,
   ) {
-    const userId = user.id;
     let imageUrl = undefined;
     let videoUrl = undefined;
     if (files != undefined) {
@@ -161,7 +166,7 @@ export class MediaController {
       }
     }
     return this.mediaService.update(
-      +userId,
+      user,
       +mediaId,
       updateMediaDto,
       imageUrl,
@@ -177,9 +182,10 @@ export class MediaController {
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @Delete(':mediaId')
-  remove(@UserInfo() user, @Param('mediaId') mediaId: number) {
-    const userId = user.id;
-    return this.mediaService.remove(+userId, +mediaId);
+  remove(@Param('mediaId') mediaId: number) {
+    return this.mediaService.remove(+mediaId);
   }
 }
