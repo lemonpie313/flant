@@ -6,7 +6,8 @@ import SignUpPage from "./pages/SignUpPage";
 import UserInfoPage from "./pages/UserInfo";
 import ChatComponent from "./components/ChatComponent";
 import { ChatProvider } from './context/ChatContext';
-import CommunityBoard from './pages/board'; // CommunityBoard 컴포넌트 import
+import CommunityBoard from './pages/board';
+import LiveStreamingPage from './pages/LiveStreamingPage';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -39,7 +40,8 @@ const App: React.FC = () => {
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/main" element={<ProtectedRoute element={<MainPage isLoggedIn={isLoggedIn} />} />} />
             <Route path="/userinfo" element={<ProtectedRoute element={<UserInfoPage />} />} />
-            <Route path="/communities" element={<CommunityBoard />} /> {/* 새로 추가된 라우트 */}
+            <Route path="/communities" element={<ProtectedRoute element={<CommunityBoard />} />} />
+            <Route path="/live" element={<LiveStreamingPage />} />
             <Route path="/" element={<Navigate to="/main" replace />} />
             <Route path="*" element={<Navigate to="/main" replace />} />
           </Routes>
