@@ -13,7 +13,7 @@ const api: AxiosInstance = axios.create({
 
 // 요청 인터셉터를 추가하여 JWT 토큰을 헤더에 포함시킵니다.
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("accessToken");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -84,6 +84,18 @@ export const userApi = {
 };
 
 export const communityApi = {
-  findAll: () => api.get("/community"),
-  findMy: () => api.get("/community/my"),
+  findAll: () => api.get("/communities"),
+  findMy: () => api.get("/communities/me"),
+};
+
+export const postApi = {
+  create: (content: string, image: File | null) => {
+    const formData = new FormData();
+    formData.append('content', content);
+    if (image) formData.append('image', image);
+    return api.post('/posts', formData);
+  },
+  getPosts: () => api.get('/posts'), 
+  like: (postId: string) => api.post(`/posts/${postId}/like`),
+  comment: (postId: string, content: string) => api.post(`/posts/${postId}/comments`, { content }),
 };
