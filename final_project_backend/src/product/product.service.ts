@@ -14,6 +14,7 @@ import { ProductCategory } from './entities/product.category.entity';
 import { Console } from 'console';
 import { FindAllProductDto } from './dto/find-product.dto';
 import { Manager } from 'src/admin/entities/manager.entity';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 
 @Injectable()
 export class ProductService {
@@ -27,16 +28,13 @@ export class ProductService {
   ) {}
 
   //상점 생성
-  async productCreate(
-    createProductDto: CreateProductDto,
-    communityUserId: number,
-  ) {
+  async productCreate(createProductDto: CreateProductDto, user: PartialUser) {
     const { artist, categoryName, detailInfo, name, productCode } =
       createProductDto;
-
+    const managerId = user?.roleInfo?.roleId;
     //매니저 정보 가져오기
     const manager = await this.managerRepository.findOne({
-      where: { communityUserId },
+      where: { managerId },
     });
 
     // 상점 생성
@@ -147,11 +145,11 @@ export class ProductService {
   async update(
     id: number,
     updateProductDto: UpdateProductDto,
-    communityUserId: number,
+    user: PartialUser,
   ) {
     const { name, artist, productCode, detailInfo, categoryName } =
       updateProductDto;
-
+    const managerId = user?.roleInfo?.roleId;
     //상점 유효성 체크
     const product = await this.productRepository.findOne({
       where: { id },
@@ -162,7 +160,7 @@ export class ProductService {
     }
 
     // product 작성자와 수정 요청한 사용자가 일치한지 확인
-    if (product.manager.communityUserId !== communityUserId) {
+    if (product.manager.managerId !== managerId) {
       throw new ForbiddenException('수정 권한이 없습니다.');
     }
 
@@ -191,17 +189,18 @@ export class ProductService {
     };
   }
 
-  async remove(id: number, communityUserId: number) {
+  async remove(id: number, user: PartialUser) {
     const product = await this.productRepository.findOne({
       where: { id },
       relations: ['productCategory', 'manager'],
     });
+    const managerId = user?.roleInfo?.roleId;
     if (!product) {
       throw new NotFoundException('존재하지 않는 상점입니다.');
     }
     console.log(product);
     // product 작성자와 수정 요청한 사용자가 일치한지 확인
-    if (product.manager.communityUserId !== communityUserId) {
+    if (product.manager.managerId !== managerId) {
       throw new ForbiddenException('수정 권한이 없습니다.');
     }
 
