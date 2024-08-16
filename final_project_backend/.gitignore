@@ -1,7 +1,7 @@
 cert.pem
 key.pem
 
-/src/configs/artillery.config.ts
+/src/configs/artillery.config.yaml
 
 # compiled output
 /dist
