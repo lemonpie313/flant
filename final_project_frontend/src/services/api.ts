@@ -100,3 +100,10 @@ export const postApi = {
   like: (postId: string) => api.post(`/posts/${postId}/like`),
   comment: (postId: string, content: string) => api.post(`/posts/${postId}/comments`, { content }),
 };
+
+export const liveApi = {
+  createLive: (artistId: string, title: string, liveType: string) =>
+    api.post('/live', { artistId, title, liveType }),
+  findAllLives: (communityId: string) => api.get(`/live/community/${communityId}`),
+  watchLive: (liveId: number) => api.get(`/live/${liveId}`),
+};
