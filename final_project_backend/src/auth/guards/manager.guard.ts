@@ -29,7 +29,7 @@ export class ManagerGuard implements CanActivate {
       throw new NotFoundException(MESSAGES.AUTH.COMMON.COMMUNITY_USER.NO_USER);
     }
 
-    await this.managerService.findByUserId(userId);
+    //await this.managerService.findByUserId(userId);
 
     return true;
   }

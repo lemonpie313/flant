@@ -72,6 +72,7 @@ export class SentryWebhookInterceptor implements NestInterceptor {
         'http://169.254.169.254/latest/meta-data/local-ipv4',
         { timeout: 1000 },
       );
+      console.log(response);
       instanceDetails = response.data; // EC2 IP 주소
     } catch (e) {
       // EC2가 아니거나, 메타데이터 서버에 접근 불가

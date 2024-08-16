@@ -31,7 +31,7 @@ export class FormService {
   ) {}
 
   //폼 생성
-  async create(createFormDto: CreateFormDto, userId: number) {
+  async create(createFormDto: CreateFormDto, communityUserId: number) {
     const {
       title,
       content,
@@ -53,7 +53,7 @@ export class FormService {
 
     //userId로 매니저 테이블의 정보를 가져와 해당 매니저 등록된 커뮤니티ID 와 입력한 커뮤니티 ID 값이 일치한지 확인
     const manager = await this.managerRepository.findOne({
-      where: { userId },
+      where: { communityUserId },
     });
     if (manager.communityId !== communityId) {
       throw new NotFoundException('해당 커뮤니티에 권한이 없는 매니저입니다.');
@@ -123,7 +123,11 @@ export class FormService {
     };
   }
 
-  async update(formId: number, updateFormDto: UpdateFormDto, userId: number) {
+  async update(
+    formId: number,
+    updateFormDto: UpdateFormDto,
+    communityUserId: number,
+  ) {
     const {
       title,
       content,
@@ -144,7 +148,7 @@ export class FormService {
     }
     console.log(form);
     // form의 작성자와 수정 요청한 사용자가 일치한지 확인
-    if (form.manager.userId !== userId) {
+    if (form.manager.communityUserId !== communityUserId) {
       throw new ForbiddenException('수정 권한이 없습니다.');
     }
 
@@ -194,7 +198,7 @@ export class FormService {
     };
   }
 
-  async remove(formId: number, userId: number) {
+  async remove(formId: number, communityUserId: number) {
     // 폼 유효성 체크
     const form = await this.formRepository.findOne({
       where: { id: formId },
@@ -205,7 +209,7 @@ export class FormService {
     }
 
     // form의 작성자와 삭제 요청한 사용자가 일치한지 확인
-    if (form.manager.userId !== userId) {
+    if (form.manager.communityUserId !== communityUserId) {
       throw new ForbiddenException('수정 권한이 없습니다.');
     }
 

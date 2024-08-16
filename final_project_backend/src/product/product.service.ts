@@ -27,13 +27,16 @@ export class ProductService {
   ) {}
 
   //상점 생성
-  async productCreate(createProductDto: CreateProductDto, userId: number) {
+  async productCreate(
+    createProductDto: CreateProductDto,
+    communityUserId: number,
+  ) {
     const { artist, categoryName, detailInfo, name, productCode } =
       createProductDto;
 
     //매니저 정보 가져오기
     const manager = await this.managerRepository.findOne({
-      where: { userId },
+      where: { communityUserId },
     });
 
     // 상점 생성
@@ -141,7 +144,11 @@ export class ProductService {
   }
 
   //상점 수정
-  async update(id: number, updateProductDto: UpdateProductDto, userId: number) {
+  async update(
+    id: number,
+    updateProductDto: UpdateProductDto,
+    communityUserId: number,
+  ) {
     const { name, artist, productCode, detailInfo, categoryName } =
       updateProductDto;
 
@@ -155,7 +162,7 @@ export class ProductService {
     }
 
     // product 작성자와 수정 요청한 사용자가 일치한지 확인
-    if (product.manager.userId !== userId) {
+    if (product.manager.communityUserId !== communityUserId) {
       throw new ForbiddenException('수정 권한이 없습니다.');
     }
 
@@ -184,7 +191,7 @@ export class ProductService {
     };
   }
 
-  async remove(id: number, userId: number) {
+  async remove(id: number, communityUserId: number) {
     const product = await this.productRepository.findOne({
       where: { id },
       relations: ['productCategory', 'manager'],
@@ -194,7 +201,7 @@ export class ProductService {
     }
     console.log(product);
     // product 작성자와 수정 요청한 사용자가 일치한지 확인
-    if (product.manager.userId !== userId) {
+    if (product.manager.communityUserId !== communityUserId) {
       throw new ForbiddenException('수정 권한이 없습니다.');
     }
 

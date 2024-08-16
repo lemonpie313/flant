@@ -18,8 +18,12 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
 import { ApiFile, ApiMedia } from 'src/util/decorators/api-file.decorator';
-import { mediaFileUploadFactory, thumbnailImageUploadFactory } from 'src/util/image-upload/create-s3-storage';
-
+import {
+  mediaFileUploadFactory,
+  thumbnailImageUploadFactory,
+} from 'src/util/image-upload/create-s3-storage';
+import { CommunityUserGuard } from 'src/auth/guards/community-user.guard';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 
 @ApiTags('미디어')
 @Controller('v1/media')
@@ -28,39 +32,52 @@ export class MediaController {
 
   /**
    * 미디어 등록
-   * @param files 
-   * @param user 
-   * @param communityId 
-   * @param createMediaDto 
-   * @returns 
+   * @param files
+   * @param user
+   * @param communityId
+   * @param createMediaDto
+   * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  @ApiMedia([
-    { name: 'mediaImage', maxCount: 3 },
-    { name: 'mediaVideo', maxCount: 1 }
-  ],
-  mediaFileUploadFactory())
+  @UseGuards(AuthGuard('jwt'), CommunityUserGuard)
+  @ApiMedia(
+    [
+      { name: 'mediaImage', maxCount: 3 },
+      { name: 'mediaVideo', maxCount: 1 },
+    ],
+    mediaFileUploadFactory(),
+  )
   @Post()
   create(
-    @UploadedFiles() files: {mediaImage?: Express.MulterS3.File[], mediaVideo?: Express.MulterS3.File[]},
-    @UserInfo() user,
-    @Query('communityId') communityId: number,
-    @Body() createMediaDto: CreateMediaDto) {
-    const userId = user.id;
-    let imageUrl = undefined
-    let videoUrl = undefined
-    if(files != undefined){
-      if(files.mediaImage && files.mediaImage.length > 0){
-        const imageLocation = files.mediaImage.map(file => file.location);
-        imageUrl = imageLocation
-        }
-      if(files.mediaVideo && files.mediaVideo.length > 0){
-        const videoLocation = files.mediaVideo.map(file => file.location);
-        videoUrl = videoLocation
-        }
+    @UploadedFiles()
+    files: {
+      mediaImage?: Express.MulterS3.File[];
+      mediaVideo?: Express.MulterS3.File[];
+    },
+    @UserInfo() user: PartialUser,
+    //@Query('communityId') communityId: number,
+    @Body() createMediaDto: CreateMediaDto,
+  ) {
+    //const userId = user.id;
+    let imageUrl = undefined;
+    let videoUrl = undefined;
+    if (files != undefined) {
+      if (files.mediaImage && files.mediaImage.length > 0) {
+        const imageLocation = files.mediaImage.map((file) => file.location);
+        imageUrl = imageLocation;
+      }
+      if (files.mediaVideo && files.mediaVideo.length > 0) {
+        const videoLocation = files.mediaVideo.map((file) => file.location);
+        videoUrl = videoLocation;
+      }
     }
-    return this.mediaService.create(+userId, +communityId, createMediaDto, imageUrl, videoUrl);
+    return this.mediaService.create(
+      user,
+      //+communityId,
+      createMediaDto,
+      imageUrl,
+      videoUrl,
+    );
   }
 
   /**
@@ -84,19 +101,23 @@ export class MediaController {
 
   /**
    * 썸네일 이미지 수정
-   * @param user 
-   * @param mediaId 
-   * @param file 
-   * @returns 
+   * @param user
+   * @param mediaId
+   * @param file
+   * @returns
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Patch(':mediaId/thumbnail')
   @ApiFile('thumbnailImage', thumbnailImageUploadFactory())
-  async updateThumbnail(@UserInfo() user, @Param('mediaId') mediaId: number, @UploadedFile() file: Express.MulterS3.File){
-    const userId = user.id
-    const imageUrl = file.location
-    return this.mediaService.updateThumbnail(+userId, +mediaId, imageUrl)
+  async updateThumbnail(
+    @UserInfo() user,
+    @Param('mediaId') mediaId: number,
+    @UploadedFile() file: Express.MulterS3.File,
+  ) {
+    const userId = user.id;
+    const imageUrl = file.location;
+    return this.mediaService.updateThumbnail(+userId, +mediaId, imageUrl);
   }
 
   /**
@@ -108,32 +129,44 @@ export class MediaController {
    */
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @ApiMedia([
-    { name: 'mediaImage', maxCount: 3 },
-    { name: 'mediaVideo', maxCount: 1 }
-  ],
-  mediaFileUploadFactory())
+  @ApiMedia(
+    [
+      { name: 'mediaImage', maxCount: 3 },
+      { name: 'mediaVideo', maxCount: 1 },
+    ],
+    mediaFileUploadFactory(),
+  )
   @Patch(':mediaId')
   update(
-    @UploadedFiles() files: {mediaImage?: Express.MulterS3.File[], mediaVideo?: Express.MulterS3.File[]},
+    @UploadedFiles()
+    files: {
+      mediaImage?: Express.MulterS3.File[];
+      mediaVideo?: Express.MulterS3.File[];
+    },
     @UserInfo() user,
     @Param('mediaId') mediaId: number,
-    @Body() updateMediaDto: UpdateMediaDto
+    @Body() updateMediaDto: UpdateMediaDto,
   ) {
     const userId = user.id;
-    let imageUrl = undefined
-    let videoUrl = undefined
-    if(files != undefined){
-      if(files.mediaImage && files.mediaImage.length > 0){
-        const imageLocation = files.mediaImage.map(file => file.location);
-        imageUrl = imageLocation
-        }
-      if(files.mediaVideo && files.mediaVideo.length > 0){
-        const videoLocation = files.mediaVideo.map(file => file.location);
-        videoUrl = videoLocation
-        }
+    let imageUrl = undefined;
+    let videoUrl = undefined;
+    if (files != undefined) {
+      if (files.mediaImage && files.mediaImage.length > 0) {
+        const imageLocation = files.mediaImage.map((file) => file.location);
+        imageUrl = imageLocation;
+      }
+      if (files.mediaVideo && files.mediaVideo.length > 0) {
+        const videoLocation = files.mediaVideo.map((file) => file.location);
+        videoUrl = videoLocation;
+      }
     }
-    return this.mediaService.update(+userId, +mediaId, updateMediaDto, imageUrl, videoUrl);
+    return this.mediaService.update(
+      +userId,
+      +mediaId,
+      updateMediaDto,
+      imageUrl,
+      videoUrl,
+    );
   }
 
   /**
