@@ -3,6 +3,6 @@ import { Manager } from '../entities/manager.entity';
 
 export class CreateManagerDto extends PickType(Manager, [
   'communityId',
-  'userId',
+  'communityUserId',
   'managerNickname',
 ]) {}
