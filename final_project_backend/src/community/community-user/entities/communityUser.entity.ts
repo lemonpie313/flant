@@ -15,6 +15,7 @@ import { Community } from '../../entities/community.entity';
 import { User } from '../../../user/entities/user.entity';
 import { Comment } from '../../../comment/entities/comment.entity';
 import { Artist } from 'src/admin/entities/artist.entity';
+import { Manager } from './../../../admin/entities/manager.entity';
 
 @Entity('community_users')
 export class CommunityUser {
@@ -64,4 +65,7 @@ export class CommunityUser {
 
   @OneToOne(() => Artist, (artist) => artist.communityUser)
   artist: Artist;
+
+  @OneToOne(() => Manager, (manager) => manager.communityUser)
+  manager: Manager;
 }
