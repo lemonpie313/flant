@@ -89,7 +89,7 @@ export const communityApi = {
 };
 
 export const postApi = {
-  create: (content: string, image: File | null) => {
+  create: (content: string, image?: File) => {
     const formData = new FormData();
     formData.append('content', content);
     if (image) formData.append('image', image);

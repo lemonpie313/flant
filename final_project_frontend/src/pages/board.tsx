@@ -1,4 +1,3 @@
-// src/pages/CommunityBoard.tsx
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { postApi, authApi } from '../services/api';
@@ -13,7 +12,8 @@ const Header: React.FC = () => (
       <img src="/weverse-logo.png" alt="Weverse" />
     </div>
     <nav>
-      <Link to="/feed">Feed</Link>
+      <Link to="/feed" className="active">Feed</Link>
+      <Link to="/artist">Artist</Link>
       <Link to="/media">Media</Link>
       <Link to="/live">LIVE</Link>
       <Link to="/shop">Shop</Link>
@@ -29,22 +29,22 @@ const Header: React.FC = () => (
 
 // 게시물 인터페이스
 interface Post {
-    id: string;
-    author: string;
-    content: string;
-    image?: string;
-    likes: number;
-    comments: Comment[];
-    createdAt: string;
-    isLiked: boolean;
-  }
-  
-  interface Comment {
-    id: string;
-    author: string;
-    content: string;
-    createdAt: string;
-  }
+  id: string;
+  author: string;
+  content: string;
+  image?: string;
+  likes: number;
+  comments: Comment[];
+  createdAt: string;
+  isLiked: boolean;
+}
+
+interface Comment {
+  id: string;
+  author: string;
+  content: string;
+  createdAt: string;
+}
 
 // 토큰 관련 유틸리티 함수들
 const getToken = (): string | null => {
@@ -142,7 +142,6 @@ const PostCard: React.FC<Post & { onLike: (postId: string) => void; onComment: (
 // 게시물 작성 폼 컴포넌트
 const PostForm: React.FC<{ onPostCreated: () => void }> = ({ onPostCreated }) => {
   const [content, setContent] = useState('');
-  const [image, setImage] = useState<File | null>(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -154,9 +153,8 @@ const PostForm: React.FC<{ onPostCreated: () => void }> = ({ onPostCreated }) =>
       const userId = getUserIdFromToken(token);
       if (!userId) throw new Error('유효하지 않은 토큰입니다.');
 
-      await postApi.create(content, image);
+      await postApi.create(content);
       setContent('');
-      setImage(null);
       onPostCreated();
     } catch (error) {
       console.error('게시물 생성 오류:', error);
@@ -171,16 +169,15 @@ const PostForm: React.FC<{ onPostCreated: () => void }> = ({ onPostCreated }) =>
 
   return (
     <form onSubmit={handleSubmit} className="post-form">
-      <textarea 
+      <input 
+        type="text"
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder="플랜트에 포스트를 남겨보세요."
       />
       <div className="form-actions">
-        <input 
-          type="file" 
-          onChange={(e) => setImage(e.target.files ? e.target.files[0] : null)}
-        />
+        <button type="button" className="attach-image">이미지</button>
+        <button type="button" className="attach-video">동영상</button>
         <button type="submit">게시</button>
       </div>
     </form>
@@ -189,28 +186,26 @@ const PostForm: React.FC<{ onPostCreated: () => void }> = ({ onPostCreated }) =>
 
 // 메인 CommunityBoard 컴포넌트
 const CommunityBoard: React.FC = () => {
-    const [posts, setPosts] = useState<Post[]>([]);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-    const navigate = useNavigate();
-  
-    useEffect(() => {
-        const checkAuthAndFetchPosts = async () => {
-          const token = getToken();
-          if (isTokenValid(token)) {
-            setIsLoggedIn(true);
-            await fetchPosts();
-          } else {
-            setIsLoggedIn(false);
-            // 여기서 바로 리다이렉트하지 않습니다.
-            // navigate('/login');
-          }
-        };
-      
-        checkAuthAndFetchPosts();
-      }, []);  // navigate를 의존성 배열에서 제거
-      
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuthAndFetchPosts = async () => {
+      const token = getToken();
+      if (isTokenValid(token)) {
+        setIsLoggedIn(true);
+        await fetchPosts();
+      } else {
+        setIsLoggedIn(false);
+      }
+      setIsLoading(false);
+    };
     
+    checkAuthAndFetchPosts();
+  }, []);
+
   const fetchPosts = async () => {
     try {
       const response = await postApi.getPosts();
@@ -241,7 +236,6 @@ const CommunityBoard: React.FC = () => {
     }
   };
 
-
   const handleComment = async (postId: string, content: string) => {
     try {
       await postApi.comment(postId, content);
@@ -267,34 +261,57 @@ const CommunityBoard: React.FC = () => {
 
   if (isLoading) {
     return <div>로딩 중...</div>;
-}
-
+  }
 
   return (
     <div className="community-board">
       <Header />
-      <main>
-        {isLoggedIn ? (
-          <>
-            <button onClick={handleLogout}>로그아웃</button>
-            <PostForm onPostCreated={fetchPosts} />
-            <div className="posts-container">
-              {posts.map((post) => (
-                <PostCard 
-                  key={post.id} 
-                  {...post} 
-                  onLike={handleLike}
-                  onComment={handleComment}
-                />
-              ))}
+      <main className="main-content">
+        <div className="left-sidebar">
+          {/* 왼쪽 사이드바 내용 */}
+        </div>
+        <div className="center-content">
+          <div className="stories-section">
+            <div className="story-item">
+              <img src="/profile-images/user1.jpg" alt="User 1" />
+              <span>하영</span>
             </div>
-          </>
-        ) : (
-          <div>
-            <p>이 페이지를 보려면 로그인이 필요합니다.</p>
-            <button onClick={() => navigate('/login')}>로그인 페이지로 이동</button>
+            <div className="story-item">
+              <img src="/profile-images/user2.jpg" alt="User 2" />
+              <span>지선</span>
+            </div>
+            {/* 더 많은 스토리 아이템 */}
           </div>
-        )}
+          {isLoggedIn ? (
+            <>
+              <PostForm onPostCreated={fetchPosts} />
+              <div className="posts-container">
+                {posts.map((post) => (
+                  <PostCard 
+                    key={post.id} 
+                    {...post} 
+                    onLike={handleLike}
+                    onComment={handleComment}
+                  />
+                ))}
+              </div>
+            </>
+          ) : (
+            <div>
+              <p>이 페이지를 보려면 로그인이 필요합니다.</p>
+              <button onClick={() => navigate('/login')}>로그인 페이지로 이동</button>
+            </div>
+          )}
+        </div>
+        <div className="right-sidebar">
+          <div className="community-info">
+            <h2>fromis_9</h2>
+            <p>55.2만 members</p>
+            <button className="membership-btn">Membership</button>
+            <p>지금 멤버십에 가입하고 특별한 혜택을 누려보세요.</p>
+            <button className="join-membership-btn">멤버십 가입하기</button>
+          </div>
+        </div>
       </main>
     </div>
   );

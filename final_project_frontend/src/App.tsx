@@ -18,7 +18,6 @@ const App: React.FC = () => {
   }, []);
 
   const ProtectedRoute: React.FC<{ element: React.ReactElement }> = ({ element }) => {
-    console.log("isLoggedIn" , isLoggedIn)
     return isLoggedIn ? element : <Navigate to="/login" replace />;
   };
 
@@ -40,7 +39,7 @@ const App: React.FC = () => {
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/main" element={<ProtectedRoute element={<MainPage isLoggedIn={isLoggedIn} />} />} />
             <Route path="/userinfo" element={<ProtectedRoute element={<UserInfoPage />} />} />
-            <Route path="/communities" element={<ProtectedRoute element={<CommunityBoard/>} />} /> {/* 새로 추가된 라우트 */}
+            <Route path="/communities" element={<CommunityBoard />} /> {/* 새로 추가된 라우트 */}
             <Route path="/" element={<Navigate to="/main" replace />} />
             <Route path="*" element={<Navigate to="/main" replace />} />
           </Routes>
