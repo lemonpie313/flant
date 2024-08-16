@@ -2,7 +2,7 @@ config:
   target: 'https://api.flant.club/api'
   phases:
     - duration: 2
-      arrivalRate: 1000
+      arrivalRate: 2
       name: 'Warm up'
   defaults:
     headers:
@@ -36,7 +36,7 @@ scenarios:
             - json: "$.data.accessToken"
               as: "accessToken"
       - get: 
-          url: '/v1/community/me'
+          url: '/v1/communities/me'
           headers:
             authorization: "Bearer {{accessToken}}"
           capture:

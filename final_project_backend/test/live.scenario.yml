@@ -1,8 +1,8 @@
 config:
-  target: 'http://localhost:8000/live'
+  target: 'http://54.180.82.208:8000/live'
   phases:
     - duration: 2
-      arrivalRate: 2
+      arrivalRate: 1000
       name: 'Warm up'
   defaults:
     headers:
