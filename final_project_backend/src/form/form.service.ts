@@ -16,6 +16,7 @@ import { User } from 'src/user/entities/user.entity';
 import { Community } from 'src/community/entities/community.entity';
 import { number } from 'joi';
 import { ApplyType } from './types/form-apply-type.enum';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 
 @Injectable()
 export class FormService {
@@ -31,7 +32,7 @@ export class FormService {
   ) {}
 
   //폼 생성
-  async create(createFormDto: CreateFormDto, communityUserId: number) {
+  async create(createFormDto: CreateFormDto, user: PartialUser) {
     const {
       title,
       content,
@@ -42,7 +43,7 @@ export class FormService {
       endTime,
       communityId,
     } = createFormDto;
-
+    const managerId = user?.roleInfo?.roleId;
     //커뮤니티 유효성 체크
     const community = await this.communityRepository.findOne({
       where: { communityId },
@@ -53,17 +54,16 @@ export class FormService {
 
     //userId로 매니저 테이블의 정보를 가져와 해당 매니저 등록된 커뮤니티ID 와 입력한 커뮤니티 ID 값이 일치한지 확인
     const manager = await this.managerRepository.findOne({
-      where: { communityUserId },
+      where: { managerId },
     });
     if (manager.communityId !== communityId) {
       throw new NotFoundException('해당 커뮤니티에 권한이 없는 매니저입니다.');
     }
-    console.log('test 코드', title);
     //중복 제목 체크
     const titleCheck = await this.formRepository.findOne({
       where: { title },
     });
-    console.log(titleCheck);
+
     if (titleCheck) {
       throw new BadRequestException('이미 존재하는 제목입니다.');
     }
@@ -126,7 +126,7 @@ export class FormService {
   async update(
     formId: number,
     updateFormDto: UpdateFormDto,
-    communityUserId: number,
+    user: PartialUser,
   ) {
     const {
       title,
@@ -137,7 +137,7 @@ export class FormService {
       startTime,
       endTime,
     } = updateFormDto;
-
+    const managerId = user?.roleInfo?.roleId;
     // 폼 유효성 체크
     const form = await this.formRepository.findOne({
       where: { id: formId },
@@ -148,7 +148,7 @@ export class FormService {
     }
     console.log(form);
     // form의 작성자와 수정 요청한 사용자가 일치한지 확인
-    if (form.manager.communityUserId !== communityUserId) {
+    if (form.manager.managerId !== managerId) {
       throw new ForbiddenException('수정 권한이 없습니다.');
     }
 
@@ -198,7 +198,7 @@ export class FormService {
     };
   }
 
-  async remove(formId: number, communityUserId: number) {
+  async remove(formId: number, user: PartialUser) {
     // 폼 유효성 체크
     const form = await this.formRepository.findOne({
       where: { id: formId },
@@ -207,9 +207,9 @@ export class FormService {
     if (!form) {
       throw new NotFoundException('폼이 존재하지 않습니다.');
     }
-
+    const managerId = user?.roleInfo?.roleId;
     // form의 작성자와 삭제 요청한 사용자가 일치한지 확인
-    if (form.manager.communityUserId !== communityUserId) {
+    if (form.manager.managerId !== managerId) {
       throw new ForbiddenException('수정 권한이 없습니다.');
     }
 
@@ -222,7 +222,7 @@ export class FormService {
     };
   }
 
-  async applyForm(userId: number, formId: number) {
+  async applyForm(user: PartialUser, formId: number) {
     //폼 유효성 검사
     const form = await this.formRepository.findOne({
       where: { id: formId },
@@ -231,7 +231,7 @@ export class FormService {
     if (!form) {
       throw new BadRequestException('폼을 찾을 수 없습니다.');
     }
-
+    const userId = user?.id;
     //중복 신청 검사
     const userCheck = await this.formItemRepository.findOne({
       where: { userId },
