@@ -1,16 +1,13 @@
 import axios, { AxiosInstance } from "axios";
 
-// 환경 변수에서 API_BASE_URL을 가져옵니다.
-const REACT_APP_BACKEND_API_URL = process.env.REACT_APP_BACKEND_API_URL || 'http://localhost:3000/api';
-const REACT_APP_API_TIMEOUT = Number(process.env.REACT_APP_API_TIMEOUT || '5000');
-
-console.log("BACKEND_API_URL:", REACT_APP_BACKEND_API_URL);
-console.log("API_TIMEOUT:", REACT_APP_API_TIMEOUT);
+// 환경 변수에서 설정 가져오기
+const REACT_APP_BACKEND_API_URL = process.env.REACT_APP_BACKEND_API_URL;
+const API_TIMEOUT = Number(process.env.API_TIMEOUT);
 
 // Axios 인스턴스 생성
 const api: AxiosInstance = axios.create({
   baseURL: REACT_APP_BACKEND_API_URL,
-  timeout: REACT_APP_API_TIMEOUT,
+  timeout: API_TIMEOUT,
   withCredentials: true,
 });
 
