@@ -37,7 +37,7 @@ const LiveStreamingPage = () => {
           autoplay: true,
           controls: true,
           sources: [{
-            src: 'http://localhost:8000/live/deneme/index.m3u8',
+            src: 'http://localhost:8000/live/9bb00aedae434cd0b81bd336085127745321cf41/index.m3u8',
             type: 'application/x-mpegURL'
           }]
         });
