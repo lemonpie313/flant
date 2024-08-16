@@ -65,8 +65,9 @@ export class LiveService {
       //   // cert: './cert.pem',
       // },
       trans: {
-        ffmpeg: '/usr/bin/ffmpeg',
-        //'/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+        //'/usr/bin/ffmpeg',
+        ffmpeg:
+          '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
@@ -83,8 +84,8 @@ export class LiveService {
               '-bufsize',
               '8M', // 버퍼(임시 저장공간?) 사이즈 (8MB)
             ],
-            ac: 'copy',
-            // acParam: ['-ab', '64k', '-ac', '1', '-ar', '44100'],
+            ac: 'aac',
+            acParam: ['-ab', '64k', '-ac', '1', '-ar', '44100'],
             hls: true,
             hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
             // hlsKeep: true, // to prevent hls file delete after end the stream
@@ -92,6 +93,9 @@ export class LiveService {
             // dash: true,
             // dashFlags: '[f=dash:window_size=3:extra_window_size=5]',
             // dashKeep: true, // to prevent dash file delete after end the stream
+          },
+          {
+            app: 'live',
             mp4: true,
             mp4Flags: '[movflags=frag_keyframe+empty_moov]',
           },
@@ -99,8 +103,9 @@ export class LiveService {
       },
       fission: {
         // 화질별 분할
-        ffmpeg: '/usr/bin/ffmpeg',
-          //'/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+        //'/usr/bin/ffmpeg',
+        ffmpeg:
+          '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
             rule: 'live/*',
@@ -137,12 +142,12 @@ export class LiveService {
     this.nodeMediaServer = new NodeMediaServer(liveConfig);
   }
 
-  onModuleInit() {
+  async onModuleInit() {
     // 서버 실행하면서 미디어서버도 같이 실행
     this.nodeMediaServer.run();
 
     // 방송 전 키값이 유효한지 검증 (따로 암호화 없음, 유효기간만 검증함)
-    this.nodeMediaServer.on(
+    await this.nodeMediaServer.on(
       'prePublish',
       async (id: string, streamPath: string) => {
         console.log(
@@ -180,7 +185,7 @@ export class LiveService {
     );
 
     // 방송 종료 시 s3에 업로드
-    this.nodeMediaServer.on(
+    await this.nodeMediaServer.on(
       'donePublish',
       async (id: string, streamPath: string) => {
         console.log('---------------------------방송종료?------------------');
@@ -221,25 +226,23 @@ export class LiveService {
           '-------------------------------------------------Reading file:',
           filePath,
         );
+        const file = fs.readFileSync(filePath);
 
-        try {
-          const file = fs.readFileSync(filePath);
+        if (live) {
           const liveVideoUrl = await this.liveRecordingToS3(
             fileName,
             file,
             'mp4',
           );
-          await this.cleanupStreamFolder(streamKey);
-          console.log(
-            '----------------------repository 업데이트-----------------------',
-          );
           await this.liveRepository.update(
             { liveId: live.liveId },
             { liveVideoUrl },
           );
-        } catch (error) {
-          console.error('Error handling live stream file:', error);
         }
+        await this.cleanupStreamFolder(streamKey);
+        console.log(
+          '----------------------repository 업데이트, 삭제 완-----------------------',
+        );
       },
     );
   }
@@ -273,7 +276,8 @@ export class LiveService {
     const folderPath = '../media/live/' + streamKey; //path.join(__dirname, '../../media/live', streamKey);
     console.log('folderPath: ' + folderPath);
     if (fs.existsSync(folderPath)) {
-      for (const file of fs.readdirSync(folderPath)) {
+      const files = fs.readdirSync(folderPath);
+      for (const file of files) {
         const curPath = path.join(folderPath, file);
         fs.unlinkSync(curPath);
       }

@@ -2,7 +2,7 @@ config:
   target: 'https://api.flant.club/api'
   phases:
     - duration: 2
-      arrivalRate: 2
+      arrivalRate: 1000
       name: 'Warm up'
   defaults:
     headers:
