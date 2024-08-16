@@ -1,6 +1,14 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateGoodsShopDto {
+  /**
+   * 커뮤니티 ID
+   * @example "1"
+   */
+  @IsNotEmpty({ message: '커뮤니티 ID를 입력해주세요' })
+  @IsNumber()
+  communityId: number;
+
   /**
    * 상점 코드
    * @example "ABCDEFGHI11"

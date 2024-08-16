@@ -26,14 +26,6 @@ export class UpdateMerchandiseDto {
   thumbnail?: string;
 
   /**
-   * 판매 상품명
-   * @example "수정 판매 상품명"
-   */
-  @IsOptional()
-  @IsString()
-  salesName?: string;
-
-  /**
    * 내용
    * @example "수정 내용"
    */

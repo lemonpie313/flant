@@ -12,6 +12,7 @@ import { CommunityUser } from 'src/community/community-user/entities/communityUs
 
 import { MESSAGES } from 'src/constants/message.constant';
 import { CreateManagerDto } from '../dto/create-manager.dto';
+import { UserRole } from 'src/user/types/user-role.type';
 @Injectable()
 export class AdminManagerService {
   constructor(
@@ -55,6 +56,10 @@ export class AdminManagerService {
       userId,
       managerNickname,
     });
+
+    //user.role을 매니저로 변경하는 로직 추가
+    existedUser.role = UserRole.Manager;
+    await this.userRepository.save(existedUser);
 
     await this.communityUserRepository.save({
       userId,

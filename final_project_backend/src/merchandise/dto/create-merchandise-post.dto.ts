@@ -16,7 +16,6 @@ import { Type } from 'class-transformer';
 export class CreateMerchandiseDto extends PickType(MerchandisePost, [
   'title',
   'thumbnail',
-  'salesName',
   'content',
   'deliveryPrice',
 ]) {

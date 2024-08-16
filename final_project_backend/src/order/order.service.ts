@@ -127,7 +127,6 @@ export class OrderService {
   async findAll(userId: number) {
     const data = await this.orderRepository.find({
       where: { user: { userId } },
-      relations: ['orderItem'],
     });
 
     return {
@@ -139,16 +138,31 @@ export class OrderService {
 
   //주문 상세 조회
   async findOne(id: number, userId: number) {
-    const data = await this.orderRepository.findOne({
+    const order = await this.orderRepository.findOne({
       where: { id, user: { userId } },
+      relations: ['orderItem'],
     });
-    if (!data) {
+    if (!order) {
       throw new NotFoundException('주문이 존재하지 않습니다.');
     }
+
+    const merchandise = await this.merchandisePost.findOne({
+      where: { id: order.orderItem[0].merchandisePostId },
+      relations: ['merchandiseOption'],
+    });
+    const deliveryPrice = merchandise.deliveryPrice;
     return {
       status: HttpStatus.OK,
       message: '주문내역 상세 조회에 성공하였습니다.',
-      data,
+      data: {
+        orderId: order.id,
+        progress: order.progress,
+        deliveryPrice,
+        orderItem: order.orderItem,
+        totalPrice: order.totalPrice,
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt,
+      },
     };
   }
 

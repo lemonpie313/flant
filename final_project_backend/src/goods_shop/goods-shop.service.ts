@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   HttpStatus,
   Injectable,
@@ -13,6 +14,7 @@ import { GoodsShopCategory } from './entities/goods-shop.category.entity';
 import { CreateGoodsShopDto } from './dto/create-goods-shop.dto';
 import { FindAllGoodsShopDto } from './dto/find-goods-shop.dto';
 import { UpdateGoodsShopDto } from './dto/update-goods-shop.dto';
+import { Community } from 'src/community/entities/community.entity';
 
 @Injectable()
 export class GoodsShopService {
@@ -23,6 +25,8 @@ export class GoodsShopService {
     private readonly goodsShopCategoryRepository: Repository<GoodsShopCategory>,
     @InjectRepository(Manager)
     private readonly managerRepository: Repository<Manager>,
+    @InjectRepository(Community)
+    private readonly communityRepository: Repository<Community>,
   ) {}
 
   //상점 생성
@@ -30,16 +34,35 @@ export class GoodsShopService {
     createGoodsShopDto: CreateGoodsShopDto,
     userId: number,
   ) {
-    const { artist, categoryName, detailInfo, name, goodsShopCode } =
-      createGoodsShopDto;
+    const {
+      communityId,
+      artist,
+      categoryName,
+      detailInfo,
+      name,
+      goodsShopCode,
+    } = createGoodsShopDto;
 
-    //매니저 정보 가져오기
+    //커뮤니티 유효성 검증
+    const community = await this.communityRepository.findOne({
+      where: { communityId },
+    });
+    if (!community) {
+      throw new NotFoundException('커뮤니티가 존재하지 않습니다.');
+    }
+    //매니저 정보 가져와서 커뮤니티에 등록되어 있는지 확인
     const manager = await this.managerRepository.findOne({
       where: { userId },
     });
+    if (manager.communityId !== communityId) {
+      throw new BadRequestException(
+        '해당 커뮤니티에 권한이 없는 매니저입니다.',
+      );
+    }
 
     // 상점 생성
     const saveGoodsShop = await this.goodsShopRepository.save({
+      community,
       artist,
       name,
       goodsShopCode,
@@ -49,17 +72,19 @@ export class GoodsShopService {
 
     const saveCategory = await this.goodsShopCategoryRepository.save({
       name: categoryName,
-      GoodsShop: saveGoodsShop,
+      goodsShop: saveGoodsShop,
     });
 
     return {
       status: HttpStatus.CREATED,
       message: '상점 생성에 성공하셨습니다.',
       data: {
+        communityId: communityId,
         shopId: saveGoodsShop.id,
-        //매니저 아이디 추가
+        manager: manager.managerId,
         name: saveGoodsShop.name,
         artist: saveGoodsShop.artist,
+        category: saveCategory.name,
         goodsShopCode: saveGoodsShop.goodsShopCode,
         detailInfo: saveGoodsShop.detailInfo,
         categoryName: saveCategory.name,
@@ -99,8 +124,7 @@ export class GoodsShopService {
       id: goodsShops.id,
       name: goodsShops.name,
       artist: goodsShops.artist,
-      category: goodsShops.goodsShopCategory,
-      // 카테고리 이름만 가져오는 방법은 없을까?
+      category: goodsShops.goodsShopCategory[0].name,
       GoodsShopCode: goodsShops.GoodsShopCode,
       detailInfo: goodsShops.detailInfo,
       createdAt: goodsShops.createdAt,
@@ -118,19 +142,20 @@ export class GoodsShopService {
     // 상품 유효 체크
     const goodsShop = await this.goodsShopRepository.findOne({
       where: { id: goodsShopId },
-      relations: ['goodsShopCategory'],
+      relations: ['goodsShopCategory', 'community'],
     });
 
     if (!goodsShop) {
       throw new NotFoundException('존재하지 않는 상점입니다.');
     }
 
+    console.log(goodsShop);
     return {
       status: HttpStatus.OK,
       message: '상점 상세 조회에 성공하였습니다.',
       data: {
         shopId: goodsShop.id,
-        //매니저 아이디 추가xx > 커뮤니티 ID
+        communityId: goodsShop.community.communityId,
         name: goodsShop.name,
         artist: goodsShop.artist,
         GoodsShopCode: goodsShop.goodsShopCode,
@@ -154,7 +179,7 @@ export class GoodsShopService {
     //상점 유효성 체크
     const goodsShop = await this.goodsShopRepository.findOne({
       where: { id },
-      relations: ['goodsShopCategory', 'manager'],
+      relations: ['goodsShopCategory', 'manager', 'community'],
     });
     if (!goodsShop) {
       throw new NotFoundException('존재하지 않는 상점입니다.');
@@ -186,7 +211,18 @@ export class GoodsShopService {
     return {
       status: HttpStatus.OK,
       message: '수정 완료되었습니다.',
-      goodsShop,
+      data: {
+        communityId: goodsShop.community.communityId,
+        shopId: goodsShop.id,
+        manager: goodsShop.manager.managerId,
+        name: goodsShop.name,
+        artist: goodsShop.artist,
+        goodsShopCode: goodsShop.goodsShopCode,
+        detailInfo: goodsShop.detailInfo,
+        categoryName: goodsShop.goodsShopCategory[0].name,
+        createdAt: goodsShop.createdAt,
+        updatedAt: goodsShop.updatedAt,
+      },
     };
   }
 
@@ -211,7 +247,7 @@ export class GoodsShopService {
 
     return {
       status: HttpStatus.OK,
-      message: '상품 삭제에 성공하였습니다.',
+      message: '상점 삭제에 성공하였습니다.',
       data: { id },
     };
   }

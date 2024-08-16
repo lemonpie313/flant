@@ -42,15 +42,6 @@ export class MerchandisePost {
   thumbnail: string;
 
   /**
-   * 상품 판매명
-   * @example "상품 판매명"
-   */
-  @IsNotEmpty({ message: '상품판매명을 입력해주세요' })
-  @IsString()
-  @Column()
-  salesName: string;
-
-  /**
    * 내용
    * @example "상품 내용"
    */

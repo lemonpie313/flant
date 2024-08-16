@@ -7,10 +7,17 @@ import { GoodsShopService } from './goods-shop.service';
 import { GoodsShopController } from './goods-shop.controller';
 import { GoodsShopCategory } from './entities/goods-shop.category.entity';
 import { GoodsShop } from './entities/goods-shop.entity';
+import { Community } from 'src/community/entities/community.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([GoodsShop, GoodsShopCategory, User, Manager]),
+    TypeOrmModule.forFeature([
+      GoodsShop,
+      GoodsShopCategory,
+      User,
+      Manager,
+      Community,
+    ]),
     OrderModule,
   ],
   controllers: [GoodsShopController],
