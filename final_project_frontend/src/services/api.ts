@@ -1,25 +1,19 @@
 import axios, { AxiosInstance } from "axios";
 
-// 환경 변수에서 API_BASE_URL을 가져옵니다.
-const REACT_APP_BACKEND_API_URL =
-  process.env.REACT_APP_BACKEND_API_URL || "http://localhost:3000/api";
-const REACT_APP_API_TIMEOUT = Number(
-  process.env.REACT_APP_API_TIMEOUT || "5000"
-);
-
-console.log("BACKEND_API_URL:", REACT_APP_BACKEND_API_URL);
-console.log("API_TIMEOUT:", REACT_APP_API_TIMEOUT);
+// 환경 변수에서 설정 가져오기
+const REACT_APP_BACKEND_API_URL = process.env.REACT_APP_BACKEND_API_URL;
+const API_TIMEOUT = Number(process.env.API_TIMEOUT);
 
 // Axios 인스턴스 생성
 const api: AxiosInstance = axios.create({
   baseURL: REACT_APP_BACKEND_API_URL,
-  timeout: REACT_APP_API_TIMEOUT,
+  timeout: API_TIMEOUT,
   withCredentials: true,
 });
 
 // 요청 인터셉터를 추가하여 JWT 토큰을 헤더에 포함시킵니다.
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("accessToken");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -90,6 +84,18 @@ export const userApi = {
 };
 
 export const communityApi = {
-  findAll: () => api.get("/community"),
-  findMy: () => api.get("/community/my"),
+  findAll: () => api.get("/communities"),
+  findMy: () => api.get("/communities/me"),
+};
+
+export const postApi = {
+  create: (content: string, image?: File) => {
+    const formData = new FormData();
+    formData.append('content', content);
+    if (image) formData.append('image', image);
+    return api.post('/posts', formData);
+  },
+  getPosts: () => api.get('/posts'), 
+  like: (postId: string) => api.post(`/posts/${postId}/like`),
+  comment: (postId: string, content: string) => api.post(`/posts/${postId}/comments`, { content }),
 };

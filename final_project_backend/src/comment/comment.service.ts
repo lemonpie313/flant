@@ -64,6 +64,16 @@ export class CommentService {
   }
 
   /**
+ * 새로운 대댓글을 생성합니다.
+ * @param replyData - 생성할 대댓글의 데이터 (parentCommentId 포함)
+ * @returns 생성된 대댓글
+ */
+async createReply(replyData: Partial<Comment>): Promise<Comment> {
+  const reply = this.commentRepository.create(replyData);
+  return this.commentRepository.save(reply);
+}
+
+  /**
    * 특정 댓글에 대한 대댓글을 조회합니다.
    * @param commentId - 대댓글을 조회할 부모 댓글의 ID
    * @returns 해당 댓글에 대한 대댓글 배열

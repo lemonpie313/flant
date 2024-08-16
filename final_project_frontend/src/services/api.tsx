@@ -2,19 +2,19 @@ import axios, { AxiosInstance } from "axios";
 import { UpdateUserDto } from "../types/user";
 
 // 환경 변수에서 설정 가져오기
-const BACKEND_API_URL = process.env.BACKEND_API_URL;
+const REACT_APP_BACKEND_API_URL = process.env.REACT_APP_BACKEND_API_URL;
 const API_TIMEOUT = Number(process.env.API_TIMEOUT);
 
 // Axios 인스턴스 생성
 const api: AxiosInstance = axios.create({
-  baseURL: BACKEND_API_URL,
+  baseURL: REACT_APP_BACKEND_API_URL,
   timeout: API_TIMEOUT,
   withCredentials: true,
 });
 
 // 요청 인터셉터를 추가하여 JWT 토큰을 헤더에 포함시킵니다.
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("accestoken");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -30,7 +30,7 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       const refreshToken = localStorage.getItem("refreshToken");
       try {
-        const res = await axios.post(`${BACKEND_API_URL}/auth/refresh`, {
+        const res = await axios.post(`${REACT_APP_BACKEND_API_URL}/auth/refresh`, {
           refreshToken,
         });
         if (res.status === 200) {

@@ -63,7 +63,7 @@ export class SentryWebhookInterceptor implements NestInterceptor {
     // sentry에 오류 기록
     Sentry.captureException(error);
 
-    const slackWebhook = this.configService.get<string>('SLACK_WEBHOOk');
+    const slackWebhook = this.configService.get<string>('SLACK_WEBHOOK');
     const webhook = new IncomingWebhook(slackWebhook);
     // EC2 메타데이터에서 IP 주소 가져오기
     let instanceDetails = 'local';
