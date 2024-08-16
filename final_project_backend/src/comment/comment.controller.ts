@@ -18,6 +18,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreateReplyDto } from './dto/create-reply.dto';
 
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { CommentCreationGuard } from 'src/auth/guards/comment-creation.guard';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
 import {
   ApiOperation,
@@ -34,8 +35,6 @@ import { Like } from 'src/like/entities/like.entity';
 import { ItemType } from 'src/like/types/itemType.types';
 
 @ApiTags('댓글')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('v1/comments')
 export class CommentController {
   constructor(
@@ -43,61 +42,79 @@ export class CommentController {
     private readonly likeService: LikeService,
   ) {}
 
-  @Post() // POST 요청을 처리하여 댓글을 생성
-  @ApiOperation({ summary: 'Create a comment' }) // Swagger 문서화
+  @Post()
+  @UseGuards(JwtAuthGuard, CommentCreationGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a comment (Membership or Artist Manager required)' })
   @ApiBody({ type: CreateCommentDto })
   async create(@Body() commentData: CreateCommentDto): Promise<Comment> {
     return this.commentService.createComment(commentData);
   }
 
-  @Get() // GET 요청을 처리하여 모든 댓글을 조회
-  @ApiOperation({ summary: 'Get all comments' }) // Swagger 문서화
+  @Get()
+  @ApiOperation({ summary: 'Get all comments' })
   async findAll(): Promise<Comment[]> {
     return this.commentService.findAll();
   }
 
-  @Get(':id') // 특정 ID의 댓글을 조회
-  @ApiOperation({ summary: 'Get a comment by ID' }) // Swagger 문서화
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a comment by ID' })
   @ApiParam({ name: 'id', type: Number })
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Comment> {
     return this.commentService.findOne(id);
   }
 
-  @Patch(':id') // PATCH 요청을 처리하여 댓글을 업데이트
-  @ApiOperation({ summary: 'Update a comment' }) // Swagger 문서화
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard, CommentCreationGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update a comment' })
   @ApiParam({ name: 'id', type: Number })
-  @ApiBody({ type: UpdateCommentDto }) // 수정된 부분
+  @ApiBody({ type: UpdateCommentDto })
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() commentData: UpdateCommentDto, // 수정된 부분
+    @Body() commentData: UpdateCommentDto,
   ): Promise<void> {
     return this.commentService.update(id, commentData);
   }
 
-  @Delete(':id') // DELETE 요청을 처리하여 댓글을 삭제
-  @ApiOperation({ summary: 'Delete a comment' }) // Swagger 문서화
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, CommentCreationGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete a comment' })
   @ApiParam({ name: 'id', type: Number })
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.commentService.remove(id);
   }
 
-  // 특정 게시물의 댓글들 조회
   @Get('post/:postId')
+  @ApiOperation({ summary: 'Get comments by post ID' })
   async findCommentsByPost(
     @Param('postId', ParseIntPipe) postId: number,
   ): Promise<Comment[]> {
     return this.commentService.findCommentsByPost(postId);
   }
 
-  // 특정 댓글의 대댓글들 조회
-  @Get('reply/:commentId')
-  async findRepliesByComment(
+  @Post('reply/:commentId')
+  @UseGuards(JwtAuthGuard, CommentCreationGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a reply (Membership or Artist Manager required)' })
+  @ApiParam({ name: 'commentId', type: Number })
+  @ApiBody({ type: CreateReplyDto })
+  async createReply(
     @Param('commentId', ParseIntPipe) commentId: number,
-  ): Promise<Comment[]> {
-    return this.commentService.findRepliesByComment(commentId);
+    @Body() replyData: CreateReplyDto
+  ): Promise<Comment> {
+    const completeReplyData = {
+      ...replyData,
+      parentCommentId: commentId
+    };
+    return this.commentService.createReply(completeReplyData);
   }
 
   @Put(':id/likes')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update like status for a comment' })
   async updateLikeStatus(
     @UserInfo() user,
     @Param('id', ParseIntPipe) id: number,
