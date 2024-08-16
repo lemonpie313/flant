@@ -18,7 +18,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
     try {
       const token = await authApi.signIn(email, password); // axios를 사용하여 로그인 요청을 보냄
       const { accessToken, refreshToken } = token.data.data;
-
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
       alert("로그인이 정상적으로 되었습니다.");

@@ -14,12 +14,14 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
+    "noImplicitAny": false,
     "jsx": "react-jsx",
-    "types": ["node"],
     "baseUrl": "src",
     "paths": {
       "@/*": ["*"]
-    }
+    },
+    "typeRoots": ["node_modules/@types", "src/types"],
+    "types": ["node", "react-scripts"]
   },
-  "include": ["src","types"]
+  "include": ["src", "types"]
 }

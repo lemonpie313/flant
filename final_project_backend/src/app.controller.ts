@@ -11,6 +11,8 @@ export class AppController {
   }
   @Get('error')
   getError() {
-    throw new Error('this is error!!');
+    // throw new Error('this is error!!');
+    const lsw = null;
+    return lsw.Tostring();
   }
 }

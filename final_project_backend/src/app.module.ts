@@ -77,7 +77,7 @@ import { SentryWebhookInterceptor } from './webhook.interceptor';
   providers: [
     AppService,
     {
-      // centry가 전역에 사용될수있도록 설정
+      // sentry가 전역에 사용될수있도록 설정
       provide: APP_INTERCEPTOR,
       useClass: SentryWebhookInterceptor,
     },
