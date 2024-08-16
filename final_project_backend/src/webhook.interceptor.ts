@@ -13,6 +13,7 @@ import { catchError, Observable, throwError } from 'rxjs';
 import { TimeoutError } from 'rxjs/internal/operators/timeout';
 import { QueryFailedError } from 'typeorm';
 import * as axios from 'axios';
+import * as ip from 'ip';
 
 @Injectable()
 export class SentryWebhookInterceptor implements NestInterceptor {
@@ -91,9 +92,9 @@ export class SentryWebhookInterceptor implements NestInterceptor {
               short: true, // 에러 로그 (true면 간략하게, false는 자세하게)
             },
             {
-              title: `Instance: ${instanceDetails}`,
+              title: `Instance: ${ip.address()}`,
               value: error.stack, // 에러 발생 경로
-              short: false,
+              short: true, // 에러 로그 (true면 간략하게, false는 자세하게)
             },
           ],
           ts: Math.floor(new Date().getTime() / 1000).toString(), // 타임스탬프
