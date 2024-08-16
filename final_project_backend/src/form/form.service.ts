@@ -146,7 +146,6 @@ export class FormService {
     if (!form) {
       throw new NotFoundException('폼이 존재하지 않습니다.');
     }
-    console.log(form);
     // form의 작성자와 수정 요청한 사용자가 일치한지 확인
     if (form.manager.managerId !== managerId) {
       throw new ForbiddenException('수정 권한이 없습니다.');

@@ -104,6 +104,6 @@ export class Community {
   @OneToMany(() => Live, (live) => live.community)
   live: Live[];
 
-  @OneToMany(() => Manager, (community) => community.community)
+  @OneToMany(() => Manager, (manager) => manager.community)
   manager: Manager[];
 }

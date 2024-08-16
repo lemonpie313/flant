@@ -59,7 +59,6 @@ export class MediaController {
       mediaVideo?: Express.MulterS3.File[];
     },
     @UserInfo() user: PartialUser,
-    //@Query('communityId') communityId: number,
     @Body() createMediaDto: CreateMediaDto,
   ) {
     //const userId = user.id;
@@ -75,13 +74,7 @@ export class MediaController {
         videoUrl = videoLocation;
       }
     }
-    return this.mediaService.create(
-      user,
-      //+communityId,
-      createMediaDto,
-      imageUrl,
-      videoUrl,
-    );
+    return this.mediaService.create(user, createMediaDto, imageUrl, videoUrl);
   }
 
   /**
@@ -111,7 +104,6 @@ export class MediaController {
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
   @CommunityUserRoles(CommunityUserRole.MANAGER)
   @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @Patch(':mediaId/thumbnail')

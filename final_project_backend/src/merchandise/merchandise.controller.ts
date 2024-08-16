@@ -8,18 +8,12 @@ import {
   Delete,
   Query,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { MerchandiseService } from './merchandise.service';
 import { CreateMerchandiseDto } from './dto/create-merchandise-post.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { userInfo } from 'os';
 import { FindAllmerchandiseDto } from './dto/find-merchandise.dto';
 import { UpdateMerchandiseDto } from './dto/update-merchandise.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { Roles } from 'src/auth/decorators/roles.decorator';
-import { UserRole } from 'src/user/types/user-role.type';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { CommunityUserGuard } from 'src/auth/guards/community-user.guard';
 import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 import { CommunityUserRole } from 'src/community/community-user/types/community-user-role.type';

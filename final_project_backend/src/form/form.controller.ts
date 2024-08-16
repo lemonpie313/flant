@@ -99,9 +99,9 @@ export class FormController {
   @UseGuards(JwtAuthGuard)
   @Post('/:formId')
   async applyForm(
-    @Param('formId', ParseIntPipe) formId: string,
+    @Param('formId', ParseIntPipe) formId: number,
     @UserInfo() user: PartialUser,
   ) {
-    return await this.formService.applyForm(user, +formId);
+    return await this.formService.applyForm(user, formId);
   }
 }

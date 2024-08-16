@@ -23,12 +23,9 @@ export class MediaService {
     private readonly mediaRepository: Repository<Media>,
     @InjectRepository(MediaFile)
     private readonly mediaFileRepository: Repository<MediaFile>,
-    @InjectRepository(Manager)
-    private readonly managerRepository: Repository<Manager>,
   ) {}
   async create(
     user: PartialUser,
-    //communityId: number,
     createMediaDto: CreateMediaDto,
     imageUrl: string[] | undefined,
     videoUrl: string | undefined,
