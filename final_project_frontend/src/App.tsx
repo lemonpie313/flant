@@ -8,6 +8,7 @@ import ChatComponent from "./components/ChatComponent";
 import { ChatProvider } from './context/ChatContext';
 import CommunityBoard from './pages/board';
 import LiveStreamingPage from './pages/LiveStreamingPage';
+import LiveListPage from './pages/LiveListPage';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -40,8 +41,9 @@ const App: React.FC = () => {
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/main" element={<ProtectedRoute element={<MainPage isLoggedIn={isLoggedIn} />} />} />
             <Route path="/userinfo" element={<ProtectedRoute element={<UserInfoPage />} />} />
-            <Route path="/communities" element={<ProtectedRoute element={<CommunityBoard />} />} />
-            <Route path="/live" element={<LiveStreamingPage />} />
+            <Route path="/communities" element={<CommunityBoard  />} />
+            <Route path="/live" element={<LiveListPage  />} />
+            <Route path="/live/:liveId" element={<LiveStreamingPage />} />
             <Route path="/" element={<Navigate to="/main" replace />} />
             <Route path="*" element={<Navigate to="/main" replace />} />
           </Routes>
