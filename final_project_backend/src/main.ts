@@ -4,19 +4,29 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import * as Sentry from '@sentry/node';
+import { AllExceptionsFilter } from './all-exceptions.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+
+  // sentry 초기 설정
+  Sentry.init({
+    dsn: configService.get<string>('SENTRY_DSN'),
+  });
 
   // CORS 설정
-  app.enableCors({
-    origin: 'http://localhost:3001', // 프론트엔드 주소
-    credentials: true,
-  });
+  const corsEnabled = configService.get<string>('CORS_ENABLED') === 'true';
+  if (corsEnabled) {
+    app.enableCors({
+      origin: configService.get<string>('FRONTEND_URL'),
+      credentials: true,
+    });
+  }
 
   app.use(cookieParser());
 
-  const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT') || 3001;
 
   // 글로벌 URL 프리픽스 설정
@@ -39,12 +49,13 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document, {
     swaggerOptions: {
-      persistAuthorization: true, // 새로고침 시에도 JWT 유지
-      tagsSorter: 'alpha', // API 그룹 정렬 알파벳순
-      operationsSorter: 'alpha', // API 그룹내에서도 정렬 알파벳순
+      persistAuthorization: true,
+      tagsSorter: 'alpha',
+      operationsSorter: 'alpha',
     },
   });
 
+  app.useGlobalFilters(new AllExceptionsFilter()); // 에러 문 처리
   await app.listen(port);
 }
 

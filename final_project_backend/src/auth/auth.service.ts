@@ -39,11 +39,11 @@ export class AuthService {
 
   // 회원가입
   async signUp({
+    name,
     email,
     password,
     passwordConfirm,
-    name,
-    profileImage,
+    //profileImage,
   }: SignUpDto) {
     // 기존 이메일로 가입된 이력이 있을 경우 False
     const existedEmail = await this.userRepository.findOneBy({ email });
@@ -70,7 +70,7 @@ export class AuthService {
       email,
       password: hashedPassword,
       name,
-      profileImage,
+      // profileImage,
     });
     delete user.password;
 
