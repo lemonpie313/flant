@@ -10,6 +10,7 @@ import CommunityBoard from './pages/board';
 import LiveStreamingPage from './pages/LiveStreamingPage';
 import LiveListPage from './pages/LiveListPage';
 import { userApi } from './services/api';  // authApi 대신 userApi 사용
+import ProductMainPage from "./pages/productMainPage";
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -52,6 +53,7 @@ const App: React.FC = () => {
             <Route path="/communities" element={<ProtectedRoute><CommunityBoard /></ProtectedRoute>} />
             <Route path="/live" element={<ProtectedRoute><LiveListPage /></ProtectedRoute>} />
             <Route path="/live/:liveId" element={<ProtectedRoute><LiveStreamingPage /></ProtectedRoute>} />
+            <Route path="/product" element={<ProtectedRoute><ProductMainPage /></ProtectedRoute>} />
             <Route path="/" element={<Navigate to="/main" replace />} />
             <Route path="*" element={<Navigate to="/main" replace />} />
           </Routes>
