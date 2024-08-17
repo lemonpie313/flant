@@ -1,15 +1,16 @@
-// LiveStreamingPage.tsx
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { liveApi } from '../services/api';
+import videojs from 'video.js';
+import 'video.js/dist/video-js.css';
+import 'videojs-contrib-hls';
 
 interface LiveData {
   liveId: number;
   title: string;
   artistId: number;
   liveHls: string;
-  communityId : number;
+  communityId: number;
   // 기타 필요한 필드들...
 }
 
@@ -18,6 +19,7 @@ const LiveStreamingPage: React.FC = () => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const { liveId } = useParams<{ liveId: string }>();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const playerRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -40,10 +42,28 @@ const LiveStreamingPage: React.FC = () => {
   }, [liveId]);
 
   useEffect(() => {
-    if (videoRef.current && liveData?.liveHls) {
-      videoRef.current.src = liveData.liveHls;
-      videoRef.current.play().catch(error => console.error('비디오 재생 실패:', error));
+    if (liveData?.liveHls && videoRef.current) {
+      const videoJsOptions = {
+        autoplay: false,
+        controls: true,
+        responsive: true,
+        fluid: true,
+        sources: [{
+          src: liveData.liveHls,
+          type: 'application/x-mpegURL'
+        }]
+      };
+
+      playerRef.current = videojs(videoRef.current, videoJsOptions, function onPlayerReady() {
+        console.log('Player is ready');
+      });
     }
+
+    return () => {
+      if (playerRef.current) {
+        playerRef.current.dispose();
+      }
+    };
   }, [liveData]);
 
   const toggleFullScreen = () => {
@@ -64,20 +84,19 @@ const LiveStreamingPage: React.FC = () => {
         </h1>
         <button 
           onClick={toggleFullScreen}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
         >
           {isFullScreen ? '작게 보기' : '크게 보기'}
         </button>
       </div>
-      <div className="flex-grow flex items-center justify-center bg-black">
+      <div className="flex-grow flex items-center justify-center bg-black relative">
         {liveData?.liveHls ? (
-          <video
-            ref={videoRef}
-            className="w-full h-full object-contain"
-            controls
-            autoPlay
-            playsInline
-          />
+          <div data-vjs-player>
+            <video
+              ref={videoRef}
+              className="video-js vjs-default-skin vjs-big-play-centered"
+            />
+          </div>
         ) : (
           <p className="text-white text-xl">라이브 스트리밍 데이터를 불러오는 중...</p>
         )}
