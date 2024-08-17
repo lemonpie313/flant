@@ -23,7 +23,7 @@ import { UserInfo } from 'src/util/decorators/user-info.decorator';
 import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 
 @ApiTags('live')
-@Controller('live')
+@Controller('/v1/live')
 export class LiveController {
   constructor(private readonly liveService: LiveService) {}
 
