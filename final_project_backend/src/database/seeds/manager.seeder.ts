@@ -21,17 +21,17 @@ export default class ManagerSeeder implements Seeder {
     const userId = users.map((i) => i.userId);
     const configService = new ConfigService();
     const hashRound = parseInt(configService.get('PASSWORD_HASH'));
-    await repository.insert([
-      {
-        userId: userId[0],
-        communityId: communityId[0],
-        managerNickname: 'manager1',
-      },
-      {
-        userId: userId[1],
-        communityId: communityId[1],
-        managerNickname: 'manager2',
-      },
-    ]);
+  //   await repository.insert([
+  //     {
+  //       userId: userId[0],
+  //       communityId: communityId[0],
+  //       managerNickname: 'manager1',
+  //     },
+  //     {
+  //       userId: userId[1],
+  //       communityId: communityId[1],
+  //       managerNickname: 'manager2',
+  //     },
+  //   ]);
   }
 }

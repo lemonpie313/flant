@@ -59,11 +59,11 @@ export class LiveService {
         webroot: './www',
         allow_origin: '*',
       },
-      // https: {
-      //   port: 8443,
-      //   // key: './key.pem',
-      //   // cert: './cert.pem',
-      // },
+      https: {
+        port: 8443,
+        // key: './key.pem',
+        // cert: './cert.pem',
+      },
       trans: {
         
         ffmpeg: '/usr/bin/ffmpeg',
@@ -352,7 +352,7 @@ export class LiveService {
       artistId: live.artistId,
       // artistNickname: live.artist.artistNickname,
       title: live.title,
-      liveHls: `https://localhost:8443/live/${live.streamKey}/index.m3u8`,
+      liveHls: `https://localhost:8000/live/${live.streamKey}/index.m3u8`,
       // liveHls: `https://flant.club:8443/live/${live.streamKey}/index.m3u8`,
     };
   }
