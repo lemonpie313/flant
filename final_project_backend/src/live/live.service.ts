@@ -61,8 +61,8 @@ export class LiveService {
       },
       https: {
         port: 8443,
-        // key: './key.pem',
-        // cert: './cert.pem',
+        key: './key.pem',
+        cert: './cert.pem',
       },
       trans: {
         
