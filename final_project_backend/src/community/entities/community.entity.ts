@@ -21,6 +21,7 @@ import { MembershipPayment } from 'src/membership/entities/membership-payment.en
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Artist } from 'src/admin/entities/artist.entity';
 import { Live } from 'src/live/entities/live.entity';
+import { Manager } from './../../admin/entities/manager.entity';
 
 @Entity('communities')
 export class Community {
@@ -100,9 +101,9 @@ export class Community {
   @OneToMany(() => Artist, (artist) => artist.community)
   artist: Artist[];
 
-  @OneToMany(
-    () => Live,
-    (live) => live.community,
-  )
+  @OneToMany(() => Live, (live) => live.community)
   live: Live[];
+
+  @OneToMany(() => Manager, (manager) => manager.community)
+  manager: Manager[];
 }

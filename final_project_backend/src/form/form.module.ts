@@ -7,10 +7,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Manager } from 'src/admin/entities/manager.entity';
 import { Community } from 'src/community/entities/community.entity';
+import { AuthModule } from 'src/auth/auth.module';
+import { CommunityUserModule } from 'src/community/community-user/community-user.module';
+import { AdminModule } from 'src/admin/admin.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Form, FormItem, User, Manager, Community]),
+    CommunityUserModule,
+    AdminModule,
   ],
   controllers: [FormController],
   providers: [FormService],

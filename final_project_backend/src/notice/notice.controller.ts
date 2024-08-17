@@ -18,9 +18,14 @@ import { AuthGuard } from '@nestjs/passport';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
 import { ApiFiles } from 'src/util/decorators/api-file.decorator';
 import { noticeImageUploadFactory } from 'src/util/image-upload/create-s3-storage';
+import { CommunityUserRoles } from 'src/auth/decorators/community-user-roles.decorator';
+import { CommunityUserRole } from 'src/community/community-user/types/community-user-role.type';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { CommunityUserGuard } from 'src/auth/guards/community-user.guard';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 
 @ApiTags('공지사항')
-@Controller('v1/notice')
+@Controller('v1/notices')
 export class NoticeController {
   constructor(private readonly noticeService: NoticeService) {}
 
@@ -33,21 +38,28 @@ export class NoticeController {
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @ApiFiles('noticeImage', 3, noticeImageUploadFactory())
   @Post()
   create(
-    @UploadedFiles() files: {noticeImage?: Express.MulterS3.File[]},
-    @UserInfo() user,
+    @UploadedFiles() files: { noticeImage?: Express.MulterS3.File[] },
+    @UserInfo() user: PartialUser,
     @Query('communityId') communityId: number,
-    @Body() createNoticeDto: CreateNoticeDto) {
-      let imageUrl = undefined
-      if(files && files.noticeImage && files.noticeImage.length != 0){
-        const imageLocation = files.noticeImage.map(file => file.location);
-        imageUrl = imageLocation
-      }
-    const userId = user.id;
-    return this.noticeService.create(+userId, +communityId, createNoticeDto, imageUrl);
+    @Body() createNoticeDto: CreateNoticeDto,
+  ) {
+    let imageUrl = undefined;
+    if (files && files.noticeImage && files.noticeImage.length != 0) {
+      const imageLocation = files.noticeImage.map((file) => file.location);
+      imageUrl = imageLocation;
+    }
+
+    return this.noticeService.create(
+      user,
+      +communityId,
+      createNoticeDto,
+      imageUrl,
+    );
   }
 
   /**
@@ -77,22 +89,21 @@ export class NoticeController {
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @ApiFiles('noticeImage', 3, noticeImageUploadFactory())
   @Patch(':noticeId')
   update(
-    @UploadedFiles() files: {noticeImage?: Express.MulterS3.File[]},
-    @UserInfo() user,
+    @UploadedFiles() files: { noticeImage?: Express.MulterS3.File[] },
     @Param('noticeId') noticeId: number,
     @Body() updateNoticeDto: UpdateNoticeDto,
   ) {
-    const userId = user.id;
-    let imageUrl = undefined
-    if(files && files.noticeImage && files.noticeImage.length != 0){
-      const imageLocation = files.noticeImage.map(file => file.location);
-      imageUrl = imageLocation
+    let imageUrl = undefined;
+    if (files && files.noticeImage && files.noticeImage.length != 0) {
+      const imageLocation = files.noticeImage.map((file) => file.location);
+      imageUrl = imageLocation;
     }
-    return this.noticeService.update(+userId, +noticeId, updateNoticeDto, imageUrl);
+    return this.noticeService.update(+noticeId, updateNoticeDto, imageUrl);
   }
 
   /**
@@ -102,10 +113,10 @@ export class NoticeController {
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @Delete(':noticeId')
-  remove(@UserInfo() user, @Param('noticeId') noticeId: string) {
-    const userId = user.id;
-    return this.noticeService.remove(+userId, +noticeId);
+  remove(@Param('noticeId') noticeId: string) {
+    return this.noticeService.remove(+noticeId);
   }
 }
