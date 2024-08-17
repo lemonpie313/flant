@@ -9,6 +9,7 @@ import { communityApi } from "../services/api";
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { authApi } from "../services/api";
+import CommunityList from "../components/CommunityList";
 interface MainPageProps {
   isLoggedIn: boolean;
 }
@@ -70,6 +71,18 @@ const MainPage: React.FC<MainPageProps> = ({ isLoggedIn }) => {
     };
     fetchCommunities();
   }, []);
+
+  const handleCommunityClick = async (communityId: number) => {
+    try {
+      const response = await communityApi.findById(communityId);
+      navigate(`/communities/${communityId}`, { state: { community: response.data.data } });
+    } catch (error) {
+      console.log(error);
+      alert("Failed to fetch community details");
+    }
+  };
+
+
   return (
     <div className="main-page">
       <header>
@@ -77,7 +90,7 @@ const MainPage: React.FC<MainPageProps> = ({ isLoggedIn }) => {
           <Link to="/main" className="header-box-logo">
             <img
               className="header-box-logo-image"
-              src="/TGSrd-removebg-preview.png"
+              src="/favicon.ico"
               alt="logo"
             />
           </Link>
@@ -131,50 +144,19 @@ const MainPage: React.FC<MainPageProps> = ({ isLoggedIn }) => {
       <div className="mainPage-main">
         {isLoggedIn && (
           <div className="mainPage-main-my">
-            <Row>
-              <div>
-                <h1>나의 커뮤니티</h1>
-              </div>
-              {mycommunities.map((mycommunity) => (
-                <Col key={mycommunity.communityId} md={3}>
-                  <div className="figure">
-                    <img
-                      style={{ width: "300px", height: "400px" }}
-                      src={
-                        mycommunity.communityCoverImage ||
-                        "https://picsum.photos/id/475/250/300"
-                      }
-                      alt={mycommunity.communityName}
-                    />
-                    <figcaption>{mycommunity.communityName}</figcaption>
-                  </div>
-                </Col>
-              ))}
-            </Row>
+               <CommunityList
+            title="나의 커뮤니티"
+            communities={mycommunities}
+            onCommunityClick={handleCommunityClick}
+          />
           </div>
         )}
-
         <div className="mainPage-main-all">
-          <Row className="mainPage-main-all">
-            <div>
-              <h1>모든 커뮤니티</h1>
-            </div>
-            {communities.map((community) => (
-              <Col key={community.communityId} md={3}>
-                <div className="figure">
-                  <img
-                    style={{ width: "300px", height: "400px" }}
-                    src={
-                      community.communityCoverImage ||
-                      "https://picsum.photos/id/475/250/300"
-                    }
-                    alt={community.communityName}
-                  />
-                  <figcaption>{community.communityName}</figcaption>
-                </div>
-              </Col>
-            ))}
-          </Row>
+            <CommunityList
+          title="모든 커뮤니티"
+          communities={communities}
+          onCommunityClick={handleCommunityClick}
+        />  
         </div>
       </div>
       <footer></footer>
