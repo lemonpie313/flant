@@ -44,7 +44,7 @@ const Header: React.FC = () => {
 
 // 토큰 관련 유틸리티 함수들 (변경 없음)
 const getToken = (): string | null => {
-  return localStorage.getItem('token');
+  return localStorage.getItem("accessToken");
 };
 
 const isTokenValid = (token: string | null): boolean => {
