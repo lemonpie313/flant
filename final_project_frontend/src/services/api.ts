@@ -85,6 +85,7 @@ export const userApi = {
 
 export const communityApi = {
   findAll: () => api.get("/communities"),
+  findById: (id:number) => api.get(`/communities/${id}`),
   findMy: () => api.get("/communities/me"),
 };
 
