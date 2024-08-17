@@ -13,8 +13,10 @@ interface LiveData {
 
 const LiveStreamingPage: React.FC = () => {
   const [liveData, setLiveData] = useState<LiveData | null>(null);
+  const [isFullScreen, setIsFullScreen] = useState(false);
   const { liveId } = useParams<{ liveId: string }>();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchLiveData = async () => {
@@ -42,22 +44,40 @@ const LiveStreamingPage: React.FC = () => {
     }
   }, [liveData]);
 
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      containerRef.current?.requestFullscreen();
+      setIsFullScreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullScreen(false);
+    }
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">
-        라이브 스트리밍 {liveData?.title ? `- ${liveData.title}` : `#${liveId}`}
-      </h1>
-      <div className="w-full mx-auto" style={{ maxWidth: '1200px' }}>
+    <div ref={containerRef} className="w-full h-screen bg-gray-100 flex flex-col">
+      <div className="flex justify-between items-center p-4 bg-white shadow">
+        <h1 className="text-2xl font-bold">
+          라이브 스트리밍 {liveData?.title ? `- ${liveData.title}` : `#${liveId}`}
+        </h1>
+        <button 
+          onClick={toggleFullScreen}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          {isFullScreen ? '작게 보기' : '크게 보기'}
+        </button>
+      </div>
+      <div className="flex-grow flex items-center justify-center bg-black">
         {liveData?.streamUrl ? (
           <video
             ref={videoRef}
-            className="w-full aspect-video"
+            className="w-full h-full object-contain"
             controls
             autoPlay
             playsInline
           />
         ) : (
-          <p>라이브 스트리밍 데이터를 불러오는 중...</p>
+          <p className="text-white text-xl">라이브 스트리밍 데이터를 불러오는 중...</p>
         )}
       </div>
     </div>

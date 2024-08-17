@@ -42,7 +42,7 @@ const App: React.FC = () => {
             <Route path="/main" element={<ProtectedRoute element={<MainPage isLoggedIn={isLoggedIn} />} />} />
             <Route path="/userinfo" element={<ProtectedRoute element={<UserInfoPage />} />} />
             <Route path="/communities" element={<CommunityBoard  />} />
-            <Route path="/live" element={<LiveListPage  />} />
+            <Route path="/live" element={<LiveListPage />} />
             <Route path="/live/:liveId" element={<LiveStreamingPage />} />
             <Route path="/" element={<Navigate to="/main" replace />} />
             <Route path="*" element={<Navigate to="/main" replace />} />
