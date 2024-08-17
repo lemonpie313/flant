@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, IsUrl } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -23,31 +23,22 @@ export class MerchandisePost {
   id: number;
 
   /**
-   * 제목
-   * @example "상품 제목"
+   * 상품 이름
+   * @example "상품 이름"
    */
-  @IsNotEmpty({ message: '제목을 입력해주세요' })
+  @IsNotEmpty({ message: '상품 이름을 입력해주세요' })
   @IsString()
   @Column()
-  title: string;
+  productName: string;
 
   /**
-   * 썸네일
+   * 상품 썸네일
    * @example "thunbnail.jpg"
    */
-  @IsNotEmpty({ message: '썸네일 URL을 입력해주세요' })
-  @IsString()
+  @IsNotEmpty({ message: '상품 썸네일 URL을 입력해주세요' })
+  @IsUrl()
   @Column()
   thumbnail: string;
-
-  /**
-   * 상품 판매명
-   * @example "상품 판매명"
-   */
-  @IsNotEmpty({ message: '상품판매명을 입력해주세요' })
-  @IsString()
-  @Column()
-  salesName: string;
 
   /**
    * 내용
@@ -59,13 +50,13 @@ export class MerchandisePost {
   content: string;
 
   /**
-   * 배송비
-   * @example 3000
+   * 가격
+   * @example 10000
    */
-  @IsNotEmpty({ message: '배송비를 입력해주세요' })
+  @IsNotEmpty({ message: '가격을 입력해주세요' })
   @IsNumber()
   @Column()
-  deliveryPrice: number;
+  price: number;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -34,8 +34,9 @@ export class MerchandiseController {
   @ApiBearerAuth()
   @CommunityUserRoles(CommunityUserRole.MANAGER)
   @UseGuards(JwtAuthGuard, CommunityUserGuard)
-  @Post()
+  @Post('/')
   async create(
+    @Query('artistId') artistId: number,
     @Body() createMerchandiseDto: CreateMerchandiseDto,
     @UserInfo() user: PartialUser,
   ) {

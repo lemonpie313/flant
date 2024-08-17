@@ -15,7 +15,7 @@ import { Console } from 'console';
 import { FindAllProductDto } from './dto/find-product.dto';
 import { Manager } from 'src/admin/entities/manager.entity';
 import { PartialUser } from 'src/user/interfaces/partial-user.entity';
-
+ 
 @Injectable()
 export class ProductService {
   constructor(

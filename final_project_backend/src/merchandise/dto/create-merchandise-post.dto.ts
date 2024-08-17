@@ -14,11 +14,10 @@ import {
 import { Type } from 'class-transformer';
 
 export class CreateMerchandiseDto extends PickType(MerchandisePost, [
-  'title',
+  'productName',
   'thumbnail',
-  'salesName',
   'content',
-  'deliveryPrice',
+  'price',
 ]) {
   @IsNotEmpty({ message: 'productId를 입력해주세요' })
   @IsNumber()
