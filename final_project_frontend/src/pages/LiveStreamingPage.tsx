@@ -6,7 +6,6 @@ import 'video.js/dist/video-js.css'; // Video.js CSS
 
 interface LiveData {
   liveId: number;
-  liveId: number;
   title: string;
   artistId: number;
   liveHls: string;
