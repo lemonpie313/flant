@@ -66,8 +66,8 @@ export class LiveService {
       },
       trans: {
         
-        ffmpeg: '/usr/bin/ffmpeg',
-          //'/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+        ffmpeg: //'/usr/bin/ffmpeg',
+          '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
@@ -101,7 +101,7 @@ export class LiveService {
           },
         ],
       },
-      // fission: {
+      // fission: { 
       //   // 화질별 분할
       //   //'/usr/bin/ffmpeg',
       //   ffmpeg:
@@ -352,7 +352,7 @@ export class LiveService {
       artistId: live.artistId,
       // artistNickname: live.artist.artistNickname,
       title: live.title,
-      liveHls: `https://localhost:8000/live/${live.streamKey}/index.m3u8`,
+      liveHls: `http://localhost:8000/live/${live.streamKey}/index.m3u8`,
       // liveHls: `https://flant.club:8443/live/${live.streamKey}/index.m3u8`,
     };
   }
