@@ -1,10 +1,9 @@
-import { PickType } from "@nestjs/swagger";
-import { Media } from "../entities/media.entity";
-import { IsNumber, Max, Min } from "class-validator";
-import { Transform } from "class-transformer";
+import { PickType } from '@nestjs/swagger';
+import { Media } from '../entities/media.entity';
+import { IsNotEmpty, IsNumber, Max, Min } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateMediaDto extends PickType(Media, ['title', 'content']) {
-
   /**
    * 공개 년도
    * @example 2024
@@ -13,7 +12,7 @@ export class CreateMediaDto extends PickType(Media, ['title', 'content']) {
   @IsNumber()
   @Min(1900)
   @Max(2100)
-  year: number
+  year: number;
 
   /**
    * 공개 월
@@ -23,7 +22,7 @@ export class CreateMediaDto extends PickType(Media, ['title', 'content']) {
   @IsNumber()
   @Min(1)
   @Max(12)
-  month: number
+  month: number;
 
   /**
    * 공개 일
@@ -33,7 +32,7 @@ export class CreateMediaDto extends PickType(Media, ['title', 'content']) {
   @IsNumber()
   @Min(1)
   @Max(31)
-  day: number
+  day: number;
 
   /**
    * 공개 시간(시)
@@ -43,7 +42,7 @@ export class CreateMediaDto extends PickType(Media, ['title', 'content']) {
   @IsNumber()
   @Min(0)
   @Max(23)
-  hour: number
+  hour: number;
 
   /**
    * 공개 시간(분)
@@ -53,5 +52,9 @@ export class CreateMediaDto extends PickType(Media, ['title', 'content']) {
   @IsNumber()
   @Min(0)
   @Max(59)
-  minute: number
+  minute: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  communityId: number;
 }

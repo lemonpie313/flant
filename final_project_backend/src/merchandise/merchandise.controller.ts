@@ -8,18 +8,18 @@ import {
   Delete,
   Query,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { MerchandiseService } from './merchandise.service';
 import { CreateMerchandiseDto } from './dto/create-merchandise-post.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { userInfo } from 'os';
 import { FindAllmerchandiseDto } from './dto/find-merchandise.dto';
 import { UpdateMerchandiseDto } from './dto/update-merchandise.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { Roles } from 'src/auth/decorators/roles.decorator';
-import { UserRole } from 'src/user/types/user-role.type';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { CommunityUserGuard } from 'src/auth/guards/community-user.guard';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
+import { CommunityUserRole } from 'src/community/community-user/types/community-user-role.type';
+import { CommunityUserRoles } from 'src/auth/decorators/community-user-roles.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { UserInfo } from 'src/util/decorators/user-info.decorator';
 
 @ApiTags('상품')
 @Controller('v1/merchandise')
@@ -32,15 +32,16 @@ export class MerchandiseController {
    * @returns
    */
   @ApiBearerAuth()
-  @Roles(UserRole.Manager)
-  @UseGuards(AuthGuard('jwt'))
-  @UseGuards(RolesGuard)
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @Post()
-  async create(@Body() createMerchandiseDto: CreateMerchandiseDto, @Req() req) {
-    const userId = req.user.id;
+  async create(
+    @Body() createMerchandiseDto: CreateMerchandiseDto,
+    @UserInfo() user: PartialUser,
+  ) {
     const data = await this.merchandiseService.create(
       createMerchandiseDto,
-      userId,
+      user,
     );
     return data;
   }
@@ -75,19 +76,17 @@ export class MerchandiseController {
    */
   @ApiBearerAuth()
   @Patch('/:merchandiseId')
-  @Roles(UserRole.Manager)
-  @UseGuards(AuthGuard('jwt'))
-  @UseGuards(RolesGuard)
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
   async update(
     @Param('merchandiseId') merchandiseId: string,
     @Body() updateMerchandiseDto: UpdateMerchandiseDto,
-    @Req() req,
+    @UserInfo() user: PartialUser,
   ) {
-    const userId = req.user.id;
     const data = await this.merchandiseService.update(
       +merchandiseId,
       updateMerchandiseDto,
-      userId,
+      user,
     );
     return data;
   }
@@ -99,16 +98,13 @@ export class MerchandiseController {
    */
   @ApiBearerAuth()
   @Delete('/:merchandiseId')
-  @Roles(UserRole.Manager)
-  @UseGuards(AuthGuard('jwt'))
-  @UseGuards(RolesGuard)
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
   async remove(
     @Param('merchandiseId')
     merchandiseId: string,
-    @Req() req,
+    @UserInfo() user: PartialUser,
   ) {
-    const userId = req.user.id;
-
-    return await this.merchandiseService.remove(+merchandiseId, userId);
+    return await this.merchandiseService.remove(+merchandiseId, user);
   }
 }

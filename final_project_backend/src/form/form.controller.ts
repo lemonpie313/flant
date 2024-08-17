@@ -19,6 +19,9 @@ import { UserRole } from 'src/user/types/user-role.type';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
 import { PartialUser } from 'src/user/interfaces/partial-user.entity';
+import { CommunityUserRoles } from 'src/auth/decorators/community-user-roles.decorator';
+import { CommunityUserRole } from 'src/community/community-user/types/community-user-role.type';
+import { CommunityUserGuard } from 'src/auth/guards/community-user.guard';
 
 @ApiTags('Forms')
 @Controller('v1/forms')
@@ -31,11 +34,14 @@ export class FormController {
    * @returns
    */
   @ApiBearerAuth()
-  @Roles(UserRole.Manager)
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @Post()
-  async create(@UserInfo() user, @Body() createFormDto: CreateFormDto) {
-    return await this.formService.create(createFormDto, user.id);
+  async create(
+    @UserInfo() user: PartialUser,
+    @Body() createFormDto: CreateFormDto,
+  ) {
+    return await this.formService.create(createFormDto, user);
   }
 
   /**
@@ -56,14 +62,14 @@ export class FormController {
    */
   @ApiBearerAuth()
   @Patch('/:formId')
-  @Roles(UserRole.Manager)
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
   async update(
     @Param('formId', ParseIntPipe) formId: number,
     @Body() updateFormDto: UpdateFormDto,
-    @UserInfo() user,
+    @UserInfo() user: PartialUser,
   ) {
-    return await this.formService.update(formId, updateFormDto, user.id);
+    return await this.formService.update(formId, updateFormDto, user);
   }
 
   /**
@@ -73,13 +79,13 @@ export class FormController {
    */
   @ApiBearerAuth()
   @Delete('/:formId')
-  @Roles(UserRole.Manager)
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
   async remove(
     @Param('formId', ParseIntPipe) formId: number,
-    @UserInfo() user,
+    @UserInfo() user: PartialUser,
   ) {
-    return await this.formService.remove(formId, user.id);
+    return await this.formService.remove(formId, user);
   }
 
   /**
@@ -93,9 +99,9 @@ export class FormController {
   @UseGuards(JwtAuthGuard)
   @Post('/:formId')
   async applyForm(
-    @Param('formId', ParseIntPipe) formId: string,
+    @Param('formId', ParseIntPipe) formId: number,
     @UserInfo() user: PartialUser,
   ) {
-    return await this.formService.applyForm(user.id, +formId);
+    return await this.formService.applyForm(user, formId);
   }
 }
