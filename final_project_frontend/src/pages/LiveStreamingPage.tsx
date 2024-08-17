@@ -5,9 +5,11 @@ import { useParams } from 'react-router-dom';
 import { liveApi } from '../services/api';
 
 interface LiveData {
-  id: number;
+  liveId: number;
   title: string;
-  streamUrl: string;
+  artistId: number;
+  liveHls: string;
+  communityId : number;
   // 기타 필요한 필드들...
 }
 
@@ -38,8 +40,8 @@ const LiveStreamingPage: React.FC = () => {
   }, [liveId]);
 
   useEffect(() => {
-    if (videoRef.current && liveData?.streamUrl) {
-      videoRef.current.src = liveData.streamUrl;
+    if (videoRef.current && liveData?.liveHls) {
+      videoRef.current.src = liveData.liveHls;
       videoRef.current.play().catch(error => console.error('비디오 재생 실패:', error));
     }
   }, [liveData]);
@@ -68,7 +70,7 @@ const LiveStreamingPage: React.FC = () => {
         </button>
       </div>
       <div className="flex-grow flex items-center justify-center bg-black">
-        {liveData?.streamUrl ? (
+        {liveData?.liveHls ? (
           <video
             ref={videoRef}
             className="w-full h-full object-contain"

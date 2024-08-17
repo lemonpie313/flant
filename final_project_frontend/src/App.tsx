@@ -19,10 +19,6 @@ const App: React.FC = () => {
     setIsLoggedIn(loggedIn);
   }, []);
 
-  const ProtectedRoute: React.FC<{ element: React.ReactElement }> = ({ element }) => {
-    return isLoggedIn ? element : <Navigate to="/login" replace />;
-  };
-
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
   };
@@ -39,9 +35,9 @@ const App: React.FC = () => {
               }
             />
             <Route path="/signup" element={<SignUpPage />} />
-            <Route path="/main" element={<ProtectedRoute element={<MainPage isLoggedIn={isLoggedIn} />} />} />
-            <Route path="/userinfo" element={<ProtectedRoute element={<UserInfoPage />} />} />
-            <Route path="/communities" element={<CommunityBoard  />} />
+            <Route path="/main" element={<MainPage isLoggedIn={isLoggedIn} />} />
+            <Route path="/userinfo" element={<UserInfoPage />} />
+            <Route path="/communities" element={<CommunityBoard />} />
             <Route path="/live" element={<LiveListPage />} />
             <Route path="/live/:liveId" element={<LiveStreamingPage />} />
             <Route path="/" element={<Navigate to="/main" replace />} />
