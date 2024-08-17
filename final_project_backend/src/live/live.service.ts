@@ -65,9 +65,9 @@ export class LiveService {
       //   // cert: './cert.pem',
       // },
       trans: {
-        //'/usr/bin/ffmpeg',
-        ffmpeg:
-          '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+        
+        ffmpeg: '/usr/bin/ffmpeg',
+          //'/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
@@ -101,43 +101,43 @@ export class LiveService {
           },
         ],
       },
-      fission: {
-        // 화질별 분할
-        //'/usr/bin/ffmpeg',
-        ffmpeg:
-          '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
-        tasks: [
-          {
-            rule: 'live/*',
-            model: [
-              //   { // 1080p 추가하면 인코딩 과부하 걸림...
-              //     ab: '128k',                // 오디오 비트레이트
-              //     vb: '2000k',               // 비디오 비트레이트 (2 Mbps)
-              //     vs: '1920x1080',           // 비디오 해상도
-              //     vf: '30',                  // 프레임 레이트 (초당 프레임수, 30 fps)
-              // },
-              {
-                ab: '128k',
-                vb: '1500k',
-                vs: '1280x720',
-                vf: '30',
-              },
-              {
-                ab: '96k',
-                vb: '1000k',
-                vs: '854x480',
-                vf: '24',
-              },
-              {
-                ab: '96k',
-                vb: '600k',
-                vs: '640x360',
-                vf: '20',
-              },
-            ],
-          },
-        ],
-      },
+      // fission: {
+      //   // 화질별 분할
+      //   //'/usr/bin/ffmpeg',
+      //   ffmpeg:
+      //     '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+      //   tasks: [
+      //     {
+      //       rule: 'live/*',
+      //       model: [
+      //         //   { // 1080p 추가하면 인코딩 과부하 걸림...
+      //         //     ab: '128k',                // 오디오 비트레이트
+      //         //     vb: '2000k',               // 비디오 비트레이트 (2 Mbps)
+      //         //     vs: '1920x1080',           // 비디오 해상도
+      //         //     vf: '30',                  // 프레임 레이트 (초당 프레임수, 30 fps)
+      //         // },
+      //         {
+      //           ab: '128k',
+      //           vb: '1500k',
+      //           vs: '1280x720',
+      //           vf: '30',
+      //         },
+      //         {
+      //           ab: '96k',
+      //           vb: '1000k',
+      //           vs: '854x480',
+      //           vf: '24',
+      //         },
+      //         {
+      //           ab: '96k',
+      //           vb: '600k',
+      //           vs: '640x360',
+      //           vf: '20',
+      //         },
+      //       ],
+      //     },
+      //   ],
+      // },
     };
     this.nodeMediaServer = new NodeMediaServer(liveConfig);
   }
