@@ -59,14 +59,14 @@ export class LiveService {
         webroot: './www',
         allow_origin: '*',
       },
-      https: {
-        port: 8443,
-        key: './key.pem',
-        cert: './cert.pem',
-      },
+      // https: {
+      //   port: 8443,
+      //   key: './key.pem',
+      //   cert: './cert.pem',
+      // },
       trans: {
-        
-        ffmpeg: //'/usr/bin/ffmpeg',
+        //'/usr/bin/ffmpeg',
+        ffmpeg:
           '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
@@ -101,7 +101,7 @@ export class LiveService {
           },
         ],
       },
-      // fission: { 
+      // fission: {
       //   // 화질별 분할
       //   //'/usr/bin/ffmpeg',
       //   ffmpeg:
