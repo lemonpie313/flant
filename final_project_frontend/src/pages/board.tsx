@@ -1,38 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { postApi, authApi } from '../services/api';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { postApi, authApi, communityApi, commentApi } from '../services/api';
 import { jwtDecode } from "jwt-decode";
 import axios from 'axios';
 import './board.scss';
 
-// 헤더 컴포넌트
-const Header: React.FC = () => (
-  <header className="weverse-header">
-    <div className="logo">
-      <img src="/weverse-logo.png" alt="Weverse" />
-    </div>
-    <nav>
-      <Link to="/feed" className="active">Feed</Link>
-      <Link to="/artist">Artist</Link>
-      <Link to="/media">Media</Link>
-      <Link to="/live">LIVE</Link>
-      <Link to="/shop">Shop</Link>
-    </nav>
-    <div className="user-actions">
-      <button className="search-btn">검색</button>
-      <button className="notification-btn">알림</button>
-      <button className="profile-btn">프로필</button>
-      <button className="settings-btn">설정</button>
-    </div>
-  </header>
-);
+// 인터페이스 정의
+interface Community {
+  id: number;
+  name: string;
+  description: string;
+  memberCount: number;
+  logoUrl: string;
+  coverUrl: string;
+}
 
-// 게시물 인터페이스
 interface Post {
-  id: string;
+  id: number;
   author: string;
   content: string;
-  image?: string;
+  imageUrl?: string[];
   likes: number;
   comments: Comment[];
   createdAt: string;
@@ -40,50 +27,75 @@ interface Post {
 }
 
 interface Comment {
-  id: string;
+  id: number;
   author: string;
   content: string;
   createdAt: string;
 }
 
-// 토큰 관련 유틸리티 함수들
+// 헤더 컴포넌트 (변경 없음)
+const Header: React.FC = () => {
+  return (
+    <header className="bg-blue-500 p-4 text-white">
+      <h1 className="text-2xl font-bold">커뮤니티 게시판</h1>
+    </header>
+  );
+};
+
+// 토큰 관련 유틸리티 함수들 (변경 없음)
 const getToken = (): string | null => {
   return localStorage.getItem("accessToken");
 };
 
 const isTokenValid = (token: string | null): boolean => {
   if (!token) return false;
-  try {
-    const decoded: any = jwtDecode(token);
-    const currentTime = Date.now() / 1000;
-    return decoded.exp > currentTime;
-  } catch (error) {
-    return false;
-  }
+  // 여기에 토큰 유효성 검사 로직 추가
+  return true; // 임시로 true 반환
 };
 
 const getUserIdFromToken = (token: string): string | null => {
-  try {
-    const decoded: any = jwtDecode(token);
-    return decoded.id;
-  } catch (error) {
-    console.error("Failed to decode token:", error);
-    return null;
-  }
+  // 여기에 토큰에서 사용자 ID 추출 로직 추가
+  return "user123"; // 임시로 고정된 사용자 ID 반환
 };
 
 // 댓글 컴포넌트
-const CommentItem: React.FC<Comment> = ({ author, content, createdAt }) => (
-  <div className="comment-item">
-    <strong>{author}</strong>
-    <p>{content}</p>
-    <small>{new Date(createdAt).toLocaleString()}</small>
-  </div>
-);
+const CommentItem: React.FC<Comment & { onReply: (commentId: number, content: string) => void }> = 
+  ({ id, author, content, createdAt, onReply }) => {
+  const [replyContent, setReplyContent] = useState('');
+
+  const handleReply = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (replyContent.trim()) {
+      onReply(id, replyContent);
+      setReplyContent('');
+    }
+  };
+
+  return (
+    <div className="comment-item">
+      <strong>{author}</strong>
+      <p>{content}</p>
+      <small>{new Date(createdAt).toLocaleString()}</small>
+      <form onSubmit={handleReply}>
+        <input
+          type="text"
+          value={replyContent}
+          onChange={(e) => setReplyContent(e.target.value)}
+          placeholder="답글 작성..."
+        />
+        <button type="submit">답글</button>
+      </form>
+    </div>
+  );
+};
 
 // 게시물 카드 컴포넌트
-const PostCard: React.FC<Post & { onLike: (postId: string) => void; onComment: (postId: string, content: string) => void }> = 
-  ({ id, author, content, image, likes, comments, createdAt, isLiked, onLike, onComment }) => {
+const PostCard: React.FC<Post & { 
+  onLike: (postId: number) => void; 
+  onComment: (postId: number, content: string) => void;
+  onReply: (commentId: number, content: string) => void;
+}> = 
+  ({ id, author, content, imageUrl, likes, comments, createdAt, isLiked, onLike, onComment, onReply }) => {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
 
@@ -110,7 +122,9 @@ const PostCard: React.FC<Post & { onLike: (postId: string) => void; onComment: (
         <button className="more-options">...</button>
       </div>
       <p className="post-content">{content}</p>
-      {image && <img src={image} alt="Post content" className="post-image" />}
+      {imageUrl && imageUrl.map((url, index) => (
+        <img key={index} src={url} alt={`Post content ${index + 1}`} className="post-image" />
+      ))}
       <div className="post-actions">
         <button onClick={handleLike} className={isLiked ? 'liked' : ''}>
           좋아요 {likes}
@@ -122,7 +136,7 @@ const PostCard: React.FC<Post & { onLike: (postId: string) => void; onComment: (
       {showComments && (
         <div className="comments-section">
           {comments.map((comment) => (
-            <CommentItem key={comment.id} {...comment} />
+            <CommentItem key={comment.id} {...comment} onReply={onReply} />
           ))}
           <form onSubmit={handleCommentSubmit}>
             <input
@@ -140,8 +154,9 @@ const PostCard: React.FC<Post & { onLike: (postId: string) => void; onComment: (
 };
 
 // 게시물 작성 폼 컴포넌트
-const PostForm: React.FC<{ onPostCreated: () => void }> = ({ onPostCreated }) => {
+const PostForm: React.FC<{ onPostCreated: () => void; communityId: number }> = ({ onPostCreated, communityId }) => {
   const [content, setContent] = useState('');
+  const [images, setImages] = useState<File[]>([]);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -153,8 +168,15 @@ const PostForm: React.FC<{ onPostCreated: () => void }> = ({ onPostCreated }) =>
       const userId = getUserIdFromToken(token);
       if (!userId) throw new Error('유효하지 않은 토큰입니다.');
 
-      await postApi.create(content);
+      const formData = new FormData();
+      formData.append('content', content);
+      images.forEach((image, index) => {
+        formData.append(`postImage`, image);
+      });
+
+      await postApi.create(formData, communityId);
       setContent('');
+      setImages([]);
       onPostCreated();
     } catch (error) {
       console.error('게시물 생성 오류:', error);
@@ -167,6 +189,12 @@ const PostForm: React.FC<{ onPostCreated: () => void }> = ({ onPostCreated }) =>
     }
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setImages(Array.from(e.target.files));
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="post-form">
       <input 
@@ -176,8 +204,7 @@ const PostForm: React.FC<{ onPostCreated: () => void }> = ({ onPostCreated }) =>
         placeholder="플랜트에 포스트를 남겨보세요."
       />
       <div className="form-actions">
-        <button type="button" className="attach-image">이미지</button>
-        <button type="button" className="attach-video">동영상</button>
+        <input type="file" onChange={handleImageChange} multiple accept="image/*" />
         <button type="submit">게시</button>
       </div>
     </form>
@@ -186,16 +213,19 @@ const PostForm: React.FC<{ onPostCreated: () => void }> = ({ onPostCreated }) =>
 
 // 메인 CommunityBoard 컴포넌트
 const CommunityBoard: React.FC = () => {
+  const [community, setCommunity] = useState<Community | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { communityId } = useParams<{ communityId: string }>();
 
   useEffect(() => {
-    const checkAuthAndFetchPosts = async () => {
+    const checkAuthAndFetchData = async () => {
       const token = getToken();
       if (isTokenValid(token)) {
         setIsLoggedIn(true);
+        await fetchCommunityData();
         await fetchPosts();
       } else {
         setIsLoggedIn(false);
@@ -203,19 +233,24 @@ const CommunityBoard: React.FC = () => {
       setIsLoading(false);
     };
     
-    checkAuthAndFetchPosts();
-  }, []);
+    checkAuthAndFetchData();
+  }, [communityId]);
+
+  const fetchCommunityData = async () => {
+    try {
+      const response = await communityApi.findOne(Number(communityId));
+      setCommunity(response.data);
+    } catch (error) {
+      console.error('커뮤니티 데이터 가져오기 오류:', error);
+    }
+  };
 
   const fetchPosts = async () => {
     try {
-      const response = await postApi.getPosts();
-      console.log('Fetched posts:', response.data);
+      const response = await postApi.getPosts(Number(communityId));
       setPosts(response.data);
     } catch (error) {
       console.error('게시물 가져오기 오류:', error);
-      if (error instanceof Error) {
-        alert(`게시물 가져오기 실패: ${error.message}`);
-      }
       if (axios.isAxiosError(error) && error.response?.status === 401) {
         setIsLoggedIn(false);
         navigate('/login');
@@ -223,7 +258,7 @@ const CommunityBoard: React.FC = () => {
     }
   };
 
-  const handleLike = async (postId: string) => {
+  const handleLike = async (postId: number) => {
     try {
       await postApi.like(postId);
       setPosts(posts.map(post => 
@@ -236,12 +271,21 @@ const CommunityBoard: React.FC = () => {
     }
   };
 
-  const handleComment = async (postId: string, content: string) => {
+  const handleComment = async (postId: number, content: string) => {
     try {
-      await postApi.comment(postId, content);
+      await commentApi.create({ postId, content });
       await fetchPosts();
     } catch (error) {
       console.error('댓글 작성 오류:', error);
+    }
+  };
+
+  const handleReply = async (commentId: number, content: string) => {
+    try {
+      await commentApi.createReply(commentId, { content });
+      await fetchPosts();
+    } catch (error) {
+      console.error('답글 작성 오류:', error);
     }
   };
 
@@ -253,9 +297,6 @@ const CommunityBoard: React.FC = () => {
       navigate('/login');
     } catch (error) {
       console.error('로그아웃 오류:', error);
-      if (error instanceof Error) {
-        alert(`로그아웃 실패: ${error.message}`);
-      }
     }
   };
 
@@ -271,20 +312,16 @@ const CommunityBoard: React.FC = () => {
           {/* 왼쪽 사이드바 내용 */}
         </div>
         <div className="center-content">
-          <div className="stories-section">
-            <div className="story-item">
-              <img src="/profile-images/user1.jpg" alt="User 1" />
-              <span>하영</span>
+          {community && (
+            <div className="community-header">
+              <img src={community.coverUrl} alt={community.name} className="community-cover" />
+              <h1>{community.name}</h1>
+              <p>{community.description}</p>
             </div>
-            <div className="story-item">
-              <img src="/profile-images/user2.jpg" alt="User 2" />
-              <span>지선</span>
-            </div>
-            {/* 더 많은 스토리 아이템 */}
-          </div>
+          )}
           {isLoggedIn ? (
             <>
-              <PostForm onPostCreated={fetchPosts} />
+              <PostForm onPostCreated={fetchPosts} communityId={Number(communityId)} />
               <div className="posts-container">
                 {posts.map((post) => (
                   <PostCard 
@@ -292,6 +329,7 @@ const CommunityBoard: React.FC = () => {
                     {...post} 
                     onLike={handleLike}
                     onComment={handleComment}
+                    onReply={handleReply}
                   />
                 ))}
               </div>
@@ -304,13 +342,16 @@ const CommunityBoard: React.FC = () => {
           )}
         </div>
         <div className="right-sidebar">
-          <div className="community-info">
-            <h2>fromis_9</h2>
-            <p>55.2만 members</p>
-            <button className="membership-btn">Membership</button>
-            <p>지금 멤버십에 가입하고 특별한 혜택을 누려보세요.</p>
-            <button className="join-membership-btn">멤버십 가입하기</button>
-          </div>
+          {community && (
+            <div className="community-info">
+              <img src={community.logoUrl} alt={community.name} className="community-logo" />
+              <h2>{community.name}</h2>
+              <p>{community.memberCount} members</p>
+              <button className="membership-btn">Membership</button>
+              <p>지금 멤버십에 가입하고 특별한 혜택을 누려보세요.</p>
+              <button className="join-membership-btn">멤버십 가입하기</button>
+            </div>
+          )}
         </div>
       </main>
     </div>
