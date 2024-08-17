@@ -26,9 +26,10 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ApiFiles } from 'src/util/decorators/api-file.decorator';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
 import { postImageUploadFactory } from 'src/util/image-upload/create-s3-storage';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 
 @ApiTags('게시물')
-@Controller('v1/post')
+@Controller('v1/posts')
 export class PostController {
   constructor(
     private readonly postService: PostService,
@@ -44,22 +45,27 @@ export class PostController {
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @ApiFiles('postImage', 3, postImageUploadFactory())
   @Post()
   async create(
-    @UploadedFiles() files: { postImage?: Express.MulterS3.File[] } ,
-    @UserInfo() user,
+    @UploadedFiles() files: { postImage?: Express.MulterS3.File[] },
+    @UserInfo() user: PartialUser,
     @Query('communityId') communityId: number,
     @Body() createPostDto: CreatePostDto,
   ) {
-    let imageUrl = undefined
-    if(files && files.postImage && files.postImage.length > 0){
-      const imageLocation = files.postImage.map(file=> file.location);
-      imageUrl = imageLocation
+    let imageUrl = undefined;
+    if (files && files.postImage && files.postImage.length > 0) {
+      const imageLocation = files.postImage.map((file) => file.location);
+      imageUrl = imageLocation;
     }
     const userId = user.id;
-    return await this.postService.create(+userId, +communityId, createPostDto, imageUrl);
+    return await this.postService.create(
+      +userId,
+      +communityId,
+      createPostDto,
+      imageUrl,
+    );
   }
 
   /**
@@ -96,22 +102,27 @@ export class PostController {
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @ApiFiles('postImage', 3, postImageUploadFactory())
   @Patch(':postId')
   async update(
     @UploadedFiles() files: { postImage?: Express.MulterS3.File[] },
-    @UserInfo() user,
+    @UserInfo() user: PartialUser,
     @Param('postId') postId: number,
     @Body() updatePostDto: UpdatePostDto,
   ) {
-    let imageUrl = undefined
-    if(files && files.postImage && files.postImage.length > 0){
-      const imageLocation = files.postImage.map(file=> file.location);
-      imageUrl = imageLocation
+    let imageUrl = undefined;
+    if (files && files.postImage && files.postImage.length > 0) {
+      const imageLocation = files.postImage.map((file) => file.location);
+      imageUrl = imageLocation;
     }
     const userId = user.id;
-    return await this.postService.update(+userId, +postId, updatePostDto, imageUrl);
+    return await this.postService.update(
+      +userId,
+      +postId,
+      updatePostDto,
+      imageUrl,
+    );
   }
 
   /**
@@ -121,18 +132,17 @@ export class PostController {
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Delete(':postId')
-  async remove(@UserInfo() user, @Param('postId') postId: number) {
-    const userId = user.id;
-    return await this.postService.remove(+userId, +postId);
+  async remove(@UserInfo() user: PartialUser, @Param('postId') postId: number) {
+    return await this.postService.remove(user, +postId);
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Put(':id/likes')
   async updateLikeStatus(
-    @UserInfo() user,
+    @UserInfo() user: PartialUser,
     @Param('id', ParseIntPipe) id: number,
     @Body() createLikeDto: CreateLikeDto,
   ): Promise<ApiResponse<Like>> {

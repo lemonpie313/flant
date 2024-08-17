@@ -17,6 +17,7 @@ import _ from 'lodash';
 import { User } from 'src/user/entities/user.entity';
 import { Manager } from 'src/admin/entities/manager.entity';
 import { MESSAGES } from 'src/constants/message.constant';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 
 @Injectable()
 export class PostService {
@@ -48,9 +49,12 @@ export class PostService {
       throw new BadRequestException(MESSAGES.POST.CREATE.BAD_REQUEST);
     }
     const isArtist = await this.artistRepository.findOne({
-      where: { communityUserId: communityUser.communityUserId, communityId: communityId },
+      where: {
+        communityUserId: communityUser.communityUserId,
+        communityId: communityId,
+      },
     });
-    
+
     let artistId: number;
     if (isArtist) {
       artistId = isArtist.artistId;
@@ -184,7 +188,9 @@ export class PostService {
     };
   }
 
-  async remove(userId: number, postId: number) {
+  async remove(user: PartialUser, postId: number) {
+    const userId = user.id;
+    const managerId = user?.roleInfo?.roleId;
     const postData = await this.postRepository.findOne({
       where: { postId: postId },
     });
@@ -195,7 +201,7 @@ export class PostService {
       where: { userId: userId },
     });
     const isManager = await this.managerRepository.findOne({
-      where: { userId: userId },
+      where: { managerId: managerId },
     });
     if (
       postData.communityUserId == userData.communityUserId ||

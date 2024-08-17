@@ -28,6 +28,7 @@ import { LiveModule } from './live/live.module';
 import { CommunityUserModule } from './community/community-user/community-user.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { SentryWebhookInterceptor } from './webhook.interceptor';
+
 @Module({
   imports: [
     ScheduleModule.forRoot(),

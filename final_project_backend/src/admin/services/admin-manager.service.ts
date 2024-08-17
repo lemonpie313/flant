@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Community } from './../../community/entities/community.entity';
 import { CommunityUser } from 'src/community/community-user/entities/communityUser.entity';
-
+import { CommunityUserRole } from 'src/community/community-user/types/community-user-role.type';
 import { MESSAGES } from 'src/constants/message.constant';
 import { CreateManagerDto } from '../dto/create-manager.dto';
 @Injectable()
@@ -43,23 +43,25 @@ export class AdminManagerService {
     if (!existedUser)
       throw new NotFoundException(MESSAGES.USER.COMMON.NOT_FOUND);
 
+    // 매니저가 해당 그룹의 커뮤니티 가입
+    const managerCommunityUser = await this.communityUserRepository.save({
+      userId,
+      communityId,
+      nickName: managerNickname,
+    });
+    const communityUserId = managerCommunityUser.communityUserId;
+
     //이미 user_id로 가입된 매니저라면 false반환
     const exsitedManager = await this.managerRepository.findOneBy({
-      managerNickname,
+      communityUserId,
     });
     if (exsitedManager)
       throw new ConflictException(MESSAGES.MANAGER.COMMON.DUPLICATED);
 
     const manager = await this.managerRepository.save({
       communityId,
-      userId,
+      communityUserId,
       managerNickname,
-    });
-
-    await this.communityUserRepository.save({
-      userId,
-      communityId,
-      nickName: managerNickname,
     });
 
     return manager;
@@ -76,37 +78,26 @@ export class AdminManagerService {
 
     // 해당 매니저 삭제 로직
     await this.managerRepository.delete({ managerId });
-    await this.userRepository.delete({ userId: existedManagewr.userId });
+    await this.communityUserRepository.delete({
+      communityUserId: existedManagewr.communityUserId,
+    });
 
     return true;
   }
 
-  async findByCommunityIdAndUserId(communityId: number, userId: number) {
-    const exsitedManager = await this.managerRepository.findOne({
+  async findByCommunityUserId(communityUserId: number) {
+    const existedManager = await this.managerRepository.findOne({
       where: {
-        communityId,
-        userId,
+        communityUserId,
       },
     });
 
-    if (!exsitedManager)
-      throw new NotFoundException(
-        MESSAGES.AUTH.COMMON.COMMUNITY_USER.NOT_MANAGER,
-      );
-
-    return true;
-  }
-
-  async findByUserId(userId: number) {
-    const exsitedManager = await this.managerRepository.findOne({
-      where: {
-        userId,
-      },
-    });
-
-    if (!exsitedManager)
+    if (!existedManager)
       throw new NotFoundException(MESSAGES.MANAGER.COMMON.NOT_FOUND);
 
-    return true;
+    return {
+      roleId: existedManager.managerId,
+      role: CommunityUserRole.MANAGER,
+    };
   }
 }

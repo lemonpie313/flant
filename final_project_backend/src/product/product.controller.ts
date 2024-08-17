@@ -19,6 +19,12 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRole } from 'src/user/types/user-role.type';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
+import { UserInfo } from 'src/util/decorators/user-info.decorator';
+import { CommunityUserRole } from 'src/community/community-user/types/community-user-role.type';
+import { CommunityUserRoles } from 'src/auth/decorators/community-user-roles.decorator';
+import { CommunityUserGuard } from 'src/auth/guards/community-user.guard';
 
 @ApiTags('굿즈 샵 API')
 @Controller('v1/products')
@@ -31,15 +37,16 @@ export class ProductController {
    * @returns
    */
   @ApiBearerAuth()
-  @Roles(UserRole.Manager)
-  @UseGuards(RolesGuard)
-  @UseGuards(AuthGuard('jwt'))
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post()
-  async productCreate(@Req() req, @Body() createProductDto: CreateProductDto) {
-    const userId = req.user.id;
+  async productCreate(
+    @UserInfo() user: PartialUser,
+    @Body() createProductDto: CreateProductDto,
+  ) {
     const data = await this.productService.productCreate(
       createProductDto,
-      userId,
+      user,
     );
     return data;
   }
@@ -50,7 +57,7 @@ export class ProductController {
    * @returns
    */
   @Get()
-  async findAll(@Query() findAllProductDto: FindAllProductDto) {
+  async findAll(@Body() findAllProductDto: FindAllProductDto) {
     const data = await this.productService.findAll(findAllProductDto);
     return data;
   }
@@ -73,16 +80,14 @@ export class ProductController {
    */
   @ApiBearerAuth()
   @Patch(':productId')
-  @Roles(UserRole.Manager)
-  @UseGuards(AuthGuard('jwt'))
-  @UseGuards(RolesGuard)
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
   update(
     @Param('productId') productId: string,
     @Body() updateProductDto: UpdateProductDto,
-    @Req() req,
+    @UserInfo() user: PartialUser,
   ) {
-    const userId = req.user.id;
-    return this.productService.update(+productId, updateProductDto, userId);
+    return this.productService.update(+productId, updateProductDto, user);
   }
 
   /**
@@ -92,11 +97,9 @@ export class ProductController {
    */
   @ApiBearerAuth()
   @Delete('/:productId')
-  @Roles(UserRole.Manager)
-  @UseGuards(RolesGuard)
-  @UseGuards(AuthGuard('jwt'))
-  remove(@Param('productId') productId: string, @Req() req) {
-    const userId = req.user.id;
-    return this.productService.remove(+productId, userId);
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
+  remove(@Param('productId') productId: string, @UserInfo() user: PartialUser) {
+    return this.productService.remove(+productId, user);
   }
 }
