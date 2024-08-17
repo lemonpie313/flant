@@ -106,3 +106,22 @@ export const liveApi = {
   findAllLives: (communityId: string) => api.get(`/live/community/${communityId}`),
   watchLive: (liveId: number) => api.get(`/live/${liveId}`),
 };
+
+export interface LiveData {
+  id: number;
+  title: string;
+  streamUrl: string;
+  artistId: string;
+  liveType: string;
+  status: string;
+  viewerCount: number;
+  startTime: string;
+  endTime?: string;
+  // 기타 필요한 필드들...
+}
+
+export interface ApiResponse<T> {
+  status: number;
+  data: T;
+  message?: string;
+}
