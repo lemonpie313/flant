@@ -26,6 +26,7 @@ const LiveStreamingPage: React.FC = () => {
     const fetchLiveData = async () => {
       try {
         const response = await liveApi.watchLive(Number(liveId));
+        console.log(response.data);
         if (response.data.status === 200) {
           setLiveData(response.data.data);
         } else {

@@ -1,4 +1,4 @@
-// src/pages/MainPage.tsx
+// src/pages/MainPage.tsx 
 import React from "react";
 import "./UserInfo.scss";
 import { Link, useNavigate } from "react-router-dom";
