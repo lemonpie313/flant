@@ -1,89 +1,58 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+// LiveStreamingPage.tsx
+
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { liveApi, ApiResponse, LiveData } from '../services/api';
+import { liveApi } from '../services/api';
+
+interface LiveData {
+  id: number;
+  title: string;
+  streamUrl: string;
+  // 기타 필요한 필드들...
+}
 
 const LiveStreamingPage: React.FC = () => {
   const [liveData, setLiveData] = useState<LiveData | null>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const { liveId } = useParams<{ liveId: string }>();
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const fetchLiveData = useCallback(async () => {
-    if (!liveId) return;
-    
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response: ApiResponse<LiveData> = await liveApi.watchLive(Number(liveId));
-      if (response.status === 200) {
-        setLiveData(response.data);
-      } else {
-        setError(response.message || '라이브 데이터를 가져오는데 실패했습니다.');
+  useEffect(() => {
+    const fetchLiveData = async () => {
+      try {
+        const response = await liveApi.watchLive(Number(liveId));
+        if (response.data.status === 200) {
+          setLiveData(response.data.data);
+        } else {
+          console.error('라이브 데이터를 가져오는데 실패했습니다:', response.data.message);
+        }
+      } catch (error) {
+        console.error('라이브 데이터를 가져오는데 실패했습니다:', error);
       }
-    } catch (error) {
-      setError('라이브 데이터를 가져오는데 실패했습니다. 네트워크 연결을 확인해주세요.');
-      console.error('라이브 데이터를 가져오는데 실패했습니다:', error);
-    } finally {
-      setIsLoading(false);
+    };
+
+    if (liveId) {
+      fetchLiveData();
     }
   }, [liveId]);
 
   useEffect(() => {
-    fetchLiveData();
-  }, [fetchLiveData]);
-
-  useEffect(() => {
     if (videoRef.current && liveData?.streamUrl) {
       videoRef.current.src = liveData.streamUrl;
-      videoRef.current.play().catch(error => {
-        console.error('비디오 재생 실패:', error);
-        setError('비디오 재생에 실패했습니다. 잠시 후 다시 시도해주세요.');
-      });
+      videoRef.current.play().catch(error => console.error('비디오 재생 실패:', error));
     }
   }, [liveData]);
 
   const toggleFullScreen = () => {
     if (!document.fullscreenElement) {
-      if (containerRef.current?.requestFullscreen) {
-        containerRef.current.requestFullscreen();
-      } else if ((containerRef.current as any).webkitRequestFullscreen) {
-        (containerRef.current as any).webkitRequestFullscreen();
-      } else if ((containerRef.current as any).msRequestFullscreen) {
-        (containerRef.current as any).msRequestFullscreen();
-      }
+      containerRef.current?.requestFullscreen();
       setIsFullScreen(true);
     } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if ((document as any).webkitExitFullscreen) {
-        (document as any).webkitExitFullscreen();
-      } else if ((document as any).msExitFullscreen) {
-        (document as any).msExitFullscreen();
-      }
+      document.exitFullscreen();
       setIsFullScreen(false);
     }
   };
-
-  if (isLoading) {
-    return <div className="w-full h-screen flex items-center justify-center">로딩 중...</div>;
-  }
-
-  if (error) {
-    return (
-      <div className="w-full h-screen flex flex-col items-center justify-center">
-        <p className="text-red-500 mb-4">{error}</p>
-        <button 
-          onClick={fetchLiveData}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          다시 시도
-        </button>
-      </div>
-    );
-  }
 
   return (
     <div ref={containerRef} className="w-full h-screen bg-gray-100 flex flex-col">
@@ -108,7 +77,7 @@ const LiveStreamingPage: React.FC = () => {
             playsInline
           />
         ) : (
-          <p className="text-white text-xl">라이브 스트리밍을 불러올 수 없습니다.</p>
+          <p className="text-white text-xl">라이브 스트리밍 데이터를 불러오는 중...</p>
         )}
       </div>
     </div>
