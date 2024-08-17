@@ -105,26 +105,3 @@ export const liveApi = {
   findAllLives: (communityId: string) => api.get(`/live/community/${communityId}`).catch(handleApiError),
   watchLive: (liveId: number) => api.get(`/live/${liveId}`).catch(handleApiError),
 };
-
-// productApi 추가
-export const productApi = {
-  // 상품 목록 조회
-  getProducts: async (artist: string, category?: string) => {
-    const params: { artist: string; category?: string } = { artist };
-    if (category) {
-      params.category = category;
-    }
-
-    return api
-      .get("/products", { params })
-      .then((response: AxiosResponse) => {
-        // 상품 응답 데이터 가공
-        return response.data.map((product: any) => ({
-          ...product,
-          imageUrl: 'https://cdn-contents.weverseshop.io/public/shop/0c3743744decd6aef2ca40c5e1450af9.png?q=95&w=320',
-          price: 10000,
-        }));
-      })
-      .catch(handleApiError);
-  },
-};
