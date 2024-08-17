@@ -6,7 +6,7 @@ import { communityApi, authApi } from "../services/api";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./MainPage.scss";
 
-interface MainPageProps {
+interface MainPage {
   isLoggedIn: boolean;
 }
 
@@ -32,7 +32,7 @@ const getUserIdFromToken = (token: string): string | null => {
   }
 };
 
-const MainPage: React.FC<MainPageProps> = ({ isLoggedIn }) => {
+const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
   const navigate = useNavigate();
   const [communities, setCommunities] = useState<Community[]>([]);
   const [mycommunities, setMyCommunities] = useState<Community[]>([]);

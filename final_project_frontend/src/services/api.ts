@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 
 // 환경 변수에서 설정 가져오기
 const REACT_APP_BACKEND_API_URL = process.env.REACT_APP_BACKEND_API_URL;
@@ -11,7 +11,7 @@ const api: AxiosInstance = axios.create({
   withCredentials: true,
 });
 
-// 요청 인터셉터를 추가하여 JWT 토큰을 헤더에 포함시킵니다.
+// 요청 인터셉터
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("accessToken");
   if (token) {
@@ -22,28 +22,21 @@ api.interceptors.request.use((config) => {
 
 // 응답 인터셉터 - 토큰 만료 시 리프레시 토큰으로 갱신
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       const refreshToken = localStorage.getItem("refreshToken");
       try {
-        const res = await axios.post(
-          `${REACT_APP_BACKEND_API_URL}/auth/refresh`,
-          {
-            refreshToken,
-          }
-        );
+        const res = await axios.post(`${REACT_APP_BACKEND_API_URL}/auth/refresh`, { refreshToken });
         if (res.status === 200) {
-          localStorage.setItem("token", res.data.token);
+          localStorage.setItem("accessToken", res.data.accessToken);
           return api(originalRequest);
         }
       } catch (refreshError) {
         console.error("Unable to refresh token", refreshError);
-        localStorage.removeItem("token");
+        localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         window.location.href = "/login";
       }
@@ -52,58 +45,63 @@ api.interceptors.response.use(
   }
 );
 
+// 공통 에러 처리 함수
+const handleApiError = (error: any) => {
+  if (axios.isAxiosError(error)) {
+    console.error("API Error:", error.response?.data);
+    // 여기에 사용자에게 에러 메시지를 표시하는 로직 추가
+  } else {
+    console.error("Unexpected error:", error);
+  }
+  throw error;
+};
+
 export const authApi = {
   signIn: (email: string, password: string) =>
-    api.post("/auth/sign-in", { email, password }),
-  signUp: (
-    name: string,
-    email: string,
-    password: string,
-    passwordConfirm: string
-  ) =>
-    api.post("/auth/sign-up", {
-      name,
-      email,
-      password,
-      passwordConfirm,
-    }),
-  googleLogin: (token: string) => api.post("/auth/google", { token }),
-  signOut: () => api.post("/auth/sign-out"),
+    api.post("/auth/sign-in", { email, password }).catch(handleApiError),
+  signUp: (name: string, email: string, password: string, passwordConfirm: string) =>
+    api.post("/auth/sign-up", { name, email, password, passwordConfirm }).catch(handleApiError),
+  googleLogin: (token: string) => api.post("/auth/google", { token }).catch(handleApiError),
+  signOut: () => api.post("/auth/sign-out").catch(handleApiError),
 };
 
 export const userApi = {
-  findMy: () => api.get("/users/me"),
-  update: (
-    newUserName: string,
-    newPassword: string,
-    confirmNewPassword: string
-  ) => api.patch("/users/me", { newUserName, newPassword, confirmNewPassword }),
+  findMy: () => api.get("/users/me").catch(handleApiError),
+  update: (newUserName: string, newPassword: string, confirmNewPassword: string) =>
+    api.patch("/users/me", { newUserName, newPassword, confirmNewPassword }).catch(handleApiError),
   checkPassword: (password: string) =>
-    api.post("/users/check-password", { password }),
-  delete: () => api.delete("/users/me"),
+    api.post("/users/check-password", { password }).catch(handleApiError),
+  delete: () => api.delete("/users/me").catch(handleApiError),
 };
 
 export const communityApi = {
-  findAll: () => api.get("/communities"),
-  findById: (id:number) => api.get(`/communities/${id}`),
-  findMy: () => api.get("/communities/me"),
+  findAll: () => api.get("/communities").catch(handleApiError),
+  findOne: (id: number) => api.get(`/communities/${id}`).catch(handleApiError),
+  findMy: () => api.get("/communities/me").catch(handleApiError),
 };
 
 export const postApi = {
-  create: (content: string, image?: File) => {
-    const formData = new FormData();
-    formData.append('content', content);
-    if (image) formData.append('image', image);
-    return api.post('/posts', formData);
-  },
-  getPosts: () => api.get('/posts'), 
-  like: (postId: string) => api.post(`/posts/${postId}/like`),
-  comment: (postId: string, content: string) => api.post(`/posts/${postId}/comments`, { content }),
+  create: (formData: FormData, communityId: number) =>
+    api.post(`/communities/${communityId}/posts`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }).catch(handleApiError),
+  getPosts: (communityId: number, page = 1, limit = 10) =>
+    api.get(`/communities/${communityId}/posts`, { params: { page, limit } }).catch(handleApiError),
+  like: (postId: number) => api.post(`/posts/${postId}/like`).catch(handleApiError),
+};
+
+export const commentApi = {
+  create: ({ postId, content }: { postId: number; content: string }) =>
+    api.post(`/posts/${postId}/comments`, { content }).catch(handleApiError),
+  createReply: (commentId: number, { content }: { content: string }) =>
+    api.post(`/comments/${commentId}/replies`, { content }).catch(handleApiError),
+  getComments: (postId: number, page = 1, limit = 10) =>
+    api.get(`/posts/${postId}/comments`, { params: { page, limit } }).catch(handleApiError),
 };
 
 export const liveApi = {
   createLive: (artistId: string, title: string, liveType: string) =>
-    api.post('/live', { artistId, title, liveType }),
-  findAllLives: (communityId: string) => api.get(`/live/community/${communityId}`),
-  watchLive: (liveId: number) => api.get(`/live/${liveId}`),
+    api.post('/live', { artistId, title, liveType }).catch(handleApiError),
+  findAllLives: (communityId: string) => api.get(`/live/community/${communityId}`).catch(handleApiError),
+  watchLive: (liveId: number) => api.get(`/live/${liveId}`).catch(handleApiError),
 };
