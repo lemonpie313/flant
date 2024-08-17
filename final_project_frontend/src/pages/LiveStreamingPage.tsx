@@ -13,6 +13,16 @@ interface LiveData {
   communityId: number;
 }
 
+const getToken = (): string | null => {
+  return localStorage.getItem("accessToken");
+};
+
+const isTokenValid = (token: string | null): boolean => {
+  if (!token) return false;
+  // 여기에 토큰 유효성 검사 로직 추가
+  return true; // 임시로 true 반환
+};
+
 const LiveStreamingPage: React.FC = () => {
   const [liveData, setLiveData] = useState<LiveData | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
