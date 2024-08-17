@@ -20,7 +20,8 @@ const App: React.FC = () => {
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        await userApi.findMy(); // authApi.findMy() 대신 userApi.findMy() 사용
+        window.location
+        // await userApi.findMy(); // authApi.findMy() 대신 userApi.findMy() 사용
         setIsLoggedIn(true);
       } catch (error) {
         setIsLoggedIn(false);
