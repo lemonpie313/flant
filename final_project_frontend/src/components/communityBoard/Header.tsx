@@ -19,18 +19,22 @@ const Header: React.FC<HeaderProps> = ({ communityName, isLoggedIn, handleLogout
         <div className="header-box-user">
           {isLoggedIn ? (
             <div className="header-box-user-info">
-              <button>
-                <img className="header-notification-icon" src="/images/notification.png" alt="notification" />
-              </button>
-              <button>
-                <img className="header-user-icon" src="/images/user.png" alt="user" />
+              <div>
+                <button>
+                  <img className="header-notification-icon" src="/images/notification.png" alt="notification" />
+                </button>
+              </div>
+              <div className="header-box-user-dropdown-container">
+                <button>
+                  <img className="header-user-icon" src="/images/user.png" alt="user" />
+                </button>
                 <div className="header-user-dropdown">
                   <Link to="/userinfo">내 정보</Link>
                   <Link to="/membership">멤버십</Link>
                   <Link to="/payment-history">결제내역</Link>
                   <button onClick={handleLogout}>로그아웃</button>
                 </div>
-              </button>
+              </div>
             </div>
           ) : (
             <div className="header-box-login">

@@ -264,7 +264,7 @@ const CommunityBoard: React.FC = () => {
 
   const handleLike = async (postId: number) => {
     try {
-      await postApi.like(postId);
+      // await postApi.like(postId);
       setPosts(posts.map(post => 
         post.id === postId 
           ? { ...post, likes: post.isLiked ? post.likes - 1 : post.likes + 1, isLiked: !post.isLiked } 

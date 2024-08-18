@@ -33,6 +33,7 @@ import { CreateLikeDto } from 'src/like/dto/create-like.dto';
 import { ApiResponse } from 'src/util/api-response.interface';
 import { Like } from 'src/like/entities/like.entity';
 import { ItemType } from 'src/like/types/itemType.types';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 
 @ApiTags('댓글')
 @Controller('v1/comments')
@@ -45,7 +46,9 @@ export class CommentController {
   @Post()
   @UseGuards(JwtAuthGuard, CommentCreationGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create a comment (Membership or Artist Manager required)' })
+  @ApiOperation({
+    summary: 'Create a comment (Membership or Artist Manager required)',
+  })
   @ApiBody({ type: CreateCommentDto })
   async create(@Body() commentData: CreateCommentDto): Promise<Comment> {
     return this.commentService.createComment(commentData);
@@ -97,16 +100,18 @@ export class CommentController {
   @Post('reply/:commentId')
   @UseGuards(JwtAuthGuard, CommentCreationGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create a reply (Membership or Artist Manager required)' })
+  @ApiOperation({
+    summary: 'Create a reply (Membership or Artist Manager required)',
+  })
   @ApiParam({ name: 'commentId', type: Number })
   @ApiBody({ type: CreateReplyDto })
   async createReply(
     @Param('commentId', ParseIntPipe) commentId: number,
-    @Body() replyData: CreateReplyDto
+    @Body() replyData: CreateReplyDto,
   ): Promise<Comment> {
     const completeReplyData = {
       ...replyData,
-      parentCommentId: commentId
+      parentCommentId: commentId,
     };
     return this.commentService.createReply(completeReplyData);
   }
@@ -129,12 +134,17 @@ export class CommentController {
   }
 
   @Get(':id/likes')
-  async countLikesOnComment(
+  async countLikesOnComment(@Param('id', ParseIntPipe) id: number) {
+    return this.likeService.countLikes(id, ItemType.COMMENT);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/likes/my')
+  async checkIfUserLikedComment(
+    @UserInfo() user: PartialUser,
     @Param('id', ParseIntPipe) id: number,
-  ){
-    return this.likeService.countLikes(
-      id,
-      ItemType.COMMENT,
-    )
+  ) {
+    return this.likeService.checkIfUserLiked(user.id, id, ItemType.COMMENT);
   }
 }

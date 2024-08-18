@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import { communityApi, authApi } from "../services/api";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./MainPage.scss";
+import CommunityList from "../components/CommunityList";
 
 interface MainPage {
   isLoggedIn: boolean;
@@ -24,7 +25,6 @@ const getToken = () => {
 const getUserIdFromToken = (token: string): string | null => {
   try {
     const decoded: any = jwtDecode(token);
-    console.log(decoded);
     return decoded.id;
   } catch (error) {
     console.error("Failed to decode token:", error);
@@ -61,6 +61,7 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
         } else {
           const response = await communityApi.findAll();
           const myresponse = await communityApi.findMy();
+          
           setCommunities(response.data.data);
           setMyCommunities(myresponse.data.data);
         }
@@ -137,7 +138,7 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
       <div className="mainPage-main">
         {isLoggedIn && (
           <div className="mainPage-main-my">
-            <Row>
+            {/* <Row>
               <div>
                 <h1>나의 커뮤니티</h1>
               </div>
@@ -160,12 +161,17 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
                   </div>
                 </Col>
               ))}
-            </Row>
+            </Row> */}
+            <CommunityList
+              title="나의 커뮤니티"
+              communities={mycommunities}
+              onCommunityClick={handleCommunityClick}
+            />
           </div>
         )}
 
         <div className="mainPage-main-all">
-          <Row className="mainPage-main-all">
+          {/* <Row className="mainPage-main-all">
             <div>
               <h1>모든 커뮤니티</h1>
             </div>
@@ -184,7 +190,12 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
                 </div>
               </Col>
             ))}
-          </Row>
+          </Row> */}
+          <CommunityList
+            title="모든 커뮤니티"
+            communities={communities}
+            onCommunityClick={handleCommunityClick}
+          />  
         </div>
       </div>
       <footer></footer>

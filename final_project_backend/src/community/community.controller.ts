@@ -34,7 +34,7 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiTags('커뮤니티')
 @Controller('v1/communities')
-@UseInterceptors(CacheInterceptor)
+// @UseInterceptors(CacheInterceptor)
 export class CommunityController {
   constructor(private readonly communityService: CommunityService) {}
 
@@ -80,7 +80,7 @@ export class CommunityController {
    */
   @Get()
   async findAll() {
-    console.log("/communities")
+    console.log('/communities');
     return await this.communityService.findAll();
   }
 
