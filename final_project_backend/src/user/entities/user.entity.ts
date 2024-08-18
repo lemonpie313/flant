@@ -71,7 +71,6 @@ export class User {
    * 이미지URL
    * @example "https://i.namu.wiki/i/egdn5_REUgKuBUNPwkOg3inD6mLWMntHc-kXttvomkvaTMsWISF5sQqpHsfGJ8OUVqWRmV5xkUyRpD2U6g_oO03po08TisY6pAj5PXunSWaOHtGwrvXdHcL3p9_9-ZPryAadFZUE2rAxiK9vo5cv7w.svg"
    */
-  @IsNotEmpty({ message: MESSAGES.AUTH.COMMON.PROFILE.REQUIRED })
   @IsString()
   @Column()
   profileImage?: string;

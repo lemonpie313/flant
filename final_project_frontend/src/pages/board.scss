@@ -1,90 +1,181 @@
 .community-board {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.weverse-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #fff;
+  border-bottom: 1px solid #e0e0e0;
+
+  .logo img {
+    height: 30px;
+  }
+
+  nav {
+    display: flex;
+    gap: 20px;
+
+    a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+
+      &.active {
+        color: #ff0000;
+      }
+    }
+  }
+
+  .user-actions {
+    display: flex;
+    gap: 10px;
+  }
+}
+
+.main-content {
+  display: flex;
+  flex-direction: row; /* 수평 배치 */
+  justify-content: space-around;
+  gap: 10px; /* 섹션 간의 간격 */
+}
+
+.center-content {
+  flex: 1; /* 중앙 콘텐츠가 더 넓게 차지하도록 설정 */
+  margin-left: 580px;
+}
+
+.right-sidebar {
+  flex: 1; /* 오른쪽 사이드바를 상대적으로 좁게 설정 */
+  max-width: 300px; /* 오른쪽 사이드바 최대 너비 */
+}
+
+.left-sidebar,
+.right-sidebar {
+  width: 250px;
+}
+
+.stories-section {
+  display: flex;
+  overflow-x: auto;
+  padding: 10px 0;
+  margin-bottom: 20px;
+
+  .story-item {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    align-items: center;
+    margin-right: 15px;
+
+    img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 3px solid #ff0000;
+    }
+
+    span {
+      margin-top: 5px;
+      font-size: 12px;
+    }
   }
-  
-  .weverse-header {
+}
+
+.post-form {
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+
+  input {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 10px;
+  }
+
+  .form-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
     background-color: #fff;
     border-bottom: 1px solid #e0e0e0;
-  
+
     .logo img {
       height: 30px;
     }
-  
+
     nav {
       display: flex;
       gap: 20px;
-  
+
       a {
         text-decoration: none;
         color: #333;
         font-weight: bold;
-  
+
         &.active {
           color: #ff0000;
         }
       }
     }
-  
+
     .user-actions {
       display: flex;
       gap: 10px;
     }
   }
-  
+
   .main-content {
     display: flex;
     flex: 1;
     padding: 20px;
     background-color: white;
   }
-  
-  .left-sidebar, .right-sidebar {
+
+  .left-sidebar,
+  .right-sidebar {
     width: 250px;
   }
-  
-  .center-content {
-    flex: 1;
-    margin: 0 20px;
-  }
-  
+
   .stories-section {
     display: flex;
     overflow-x: auto;
     padding: 10px 0;
     margin-bottom: 20px;
-  
+
     .story-item {
       display: flex;
       flex-direction: column;
       align-items: center;
       margin-right: 15px;
-  
+
       img {
         width: 60px;
         height: 60px;
         border-radius: 50%;
         border: 3px solid #ff0000;
       }
-  
+
       span {
         margin-top: 5px;
         font-size: 12px;
       }
     }
   }
-  
+
   .post-form {
     background-color: #fff;
     padding: 15px;
     border-radius: 8px;
     margin-bottom: 20px;
-  
+
     input {
       width: 100%;
       padding: 10px;
@@ -92,11 +183,11 @@
       border-bottom: 1px solid #e0e0e0;
       margin-bottom: 10px;
     }
-  
+
     .form-actions {
       display: flex;
       justify-content: space-between;
-  
+
       button {
         padding: 5px 10px;
         border: none;
@@ -104,7 +195,7 @@
         color: #333;
         border-radius: 5px;
         cursor: pointer;
-  
+
         &[type="submit"] {
           background-color: #ff0000;
           color: #fff;
@@ -112,26 +203,122 @@
       }
     }
   }
-  
+
   .community-info {
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;
-  
+
     h2 {
       margin-bottom: 10px;
     }
-  
-    .membership-btn, .join-membership-btn {
+
+    .membership-btn,
+    .join-membership-btn {
       display: block;
       width: 100%;
       padding: 10px;
       margin-top: 10px;
       border: none;
+      background-color: #f0f2f5;
+      color: #333;
       border-radius: 5px;
-      background-color: #ff0000;
-      color: #fff;
       cursor: pointer;
+
+      &[type="submit"] {
+        background-color: #ff0000;
+        color: #fff;
+      }
     }
   }
-  
+}
+
+.community-info {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+
+  h2 {
+    margin-bottom: 10px;
+  }
+
+  .membership-btn,
+  .join-membership-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ff0000;
+    color: #fff;
+    cursor: pointer;
+  }
+}
+
+// 성운 start
+.right-sidebar {
+  width: 300px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+}
+
+.right-sidebar-profile-card {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.right-sidebar-profile-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.right-sidebar-profile-info h2 {
+  margin: 10px 0;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.right-sidebar-membership {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.right-sidebar-membership-button,
+.right-sidebar-join-button,
+.right-sidebar-dm-button {
+  background-color: #ff7e86;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.right-sidebar-dm-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.right-sidebar-user-info {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.right-sidebar-user-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-bottom: 5px;
+}
+
+.right-sidebar-community-notice {
+  padding: 10px;
+  background-color: #ffefef;
+  border-radius: 10px;
+}
+// 성운 end
