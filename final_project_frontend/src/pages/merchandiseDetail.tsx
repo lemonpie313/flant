@@ -18,9 +18,9 @@ interface MerchandiseDetail {
   merchandiseName: string;
   thumbnail: string;
   price: number;
-  content: string;
+  content: string; // 상품 상세 설명
   merchandiseImage: MerchandiseImage[];
-  merchandiseOption: MerchandiseOption[];
+  merchandiseOption: MerchandiseOption[]; // 옵션 추가
 }
 
 const MerchandiseDetail: React.FC = () => {
@@ -44,12 +44,24 @@ const MerchandiseDetail: React.FC = () => {
     }
   }, [merchandiseId]);
 
-  const handleOptionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedOption(Number(event.target.value));
-  };
+  const handleAddToCart = async () => {
+    if (!merchandise || selectedOption === null || quantity <= 0) {
+      alert("옵션을 선택하고 수량을 올바르게 입력해 주세요.");
+      return;
+    }
 
-  const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setQuantity(Number(event.target.value));
+    try {
+      const response = await merchandiseApi.addToCart(
+        merchandise.merchandiseId,
+        selectedOption,
+        quantity
+      );
+      console.log(response.data.data);
+      alert(response.data.message); // API 응답 메시지 표시
+    } catch (error) {
+      console.error("장바구니 추가 실패:", error);
+      alert("장바구니 추가에 실패했습니다.");
+    }
   };
 
   if (!merchandise) {
@@ -58,55 +70,49 @@ const MerchandiseDetail: React.FC = () => {
 
   return (
     <div className="merchandise-detail">
-      <div className="product-info">
-        <div className="thumbnail">
-          <img src={merchandise.thumbnail} alt={merchandise.merchandiseName} />
-        </div>
-        <h2>{merchandise.merchandiseName}</h2>
-        <p className="price">Price: {merchandise.price} 원</p>
-        <div className="options-quantity">
-          {merchandise.merchandiseOption.length > 0 && (
-            <>
-              <label htmlFor="option-select">Option:</label>
-              <select
-                id="option-select"
-                value={selectedOption ?? ""}
-                onChange={handleOptionChange}
-              >
-                <option value="">Select an option</option>
-                {merchandise.merchandiseOption.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.optionName}
-                  </option>
-                ))}
-              </select>
-            </>
-          )}
-
-          <label htmlFor="quantity-input">Quantity:</label>
-          <input
-            id="quantity-input"
-            type="number"
-            min="1"
-            value={quantity}
-            onChange={handleQuantityChange}
-          />
-
-          <div className="buttons">
-            <button className="add-to-cart">Add to Cart</button>
-            <button className="checkout">Checkout</button>
-          </div>
-        </div>
+      <div className="thumbnail">
+        <img src={merchandise.thumbnail} alt={merchandise.merchandiseName} />
       </div>
+      <h2>{merchandise.merchandiseName}</h2>
+      <p className="price">Price: {merchandise.price} 원</p>
+
+      <div className="options">
+        <label htmlFor="option">Option:</label>
+        <select
+          id="option"
+          value={selectedOption ?? ""}
+          onChange={(e) => setSelectedOption(Number(e.target.value))}
+        >
+          <option value="" disabled>Select an option</option>
+          {merchandise.merchandiseOption.map(option => (
+            <option key={option.id} value={option.id}>
+              {option.optionName}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="quantity">
+        <label htmlFor="quantity">Quantity:</label>
+        <input
+          type="number"
+          id="quantity"
+          min="1"
+          value={quantity}
+          onChange={(e) => setQuantity(Number(e.target.value))}
+        />
+      </div>
+
+      <button onClick={handleAddToCart}>Add to Cart</button>
 
       <div className="content">
         {merchandise.merchandiseImage.length > 0 ? (
           merchandise.merchandiseImage.map((image) => (
-            <img
-              key={image.merchandiseImageId}
-              src={image.url}
-              alt={`Image ${image.merchandiseImageId}`}
-              className="detail-image"
+            <img 
+              key={image.merchandiseImageId} 
+              src={image.url} 
+              alt={`Image ${image.merchandiseImageId}`} 
+              className="detail-image" 
             />
           ))
         ) : (

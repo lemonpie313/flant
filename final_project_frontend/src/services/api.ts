@@ -121,4 +121,9 @@ export const merchandiseApi = {
   // 상품 상세 조회 API
   fetchMerchandiseDetail: (merchandiseId: number) =>
     api.get(`/merchandise/${merchandiseId}`),
+
+  // 장바구니 추가 API
+  addToCart: (merchandiseId: number, merchandiseOptionId: number, quantity: number) =>
+    api.post('/carts', { merchandiseId, merchandiseOptionId, quantity })
+      .catch(handleApiError), // 공통 에러 처리 함수 사용
 };

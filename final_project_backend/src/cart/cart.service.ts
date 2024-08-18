@@ -66,7 +66,7 @@ export class CartService {
     if (quantity <= 0) {
       throw new BadRequestException('수량을 입력해주세요');
     }
-
+    console.log('--------------------------------------')
     //트랜잭션 시작
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.startTransaction();
@@ -95,7 +95,7 @@ export class CartService {
             merchandise: { merchandiseId: createCartDto.merchandiseId },
             merchandiseOption: { id: createCartDto.merchandiseOptionId },
           },
-          relations: ['merchandisePost', 'merchandiseOption'],
+          relations: ['merchandise', 'merchandiseOption'],
         });
 
         // 있다면 수량만 추가 , 없다면 새로 카트에 저장
@@ -105,33 +105,27 @@ export class CartService {
           cartItem = await queryRunner.manager.save(CartItem, merchandiseCheck);
         } else {
           cartItem = await queryRunner.manager.save(CartItem, {
-            merchandisePost: merchandise,
+            merchandiseId,
             merchandiseOption,
             quantity,
             cart,
           });
         }
 
-        //트랜잭션 종료
-        await queryRunner.commitTransaction();
-
         // 총 금액 합계
         const totalPrice =
-          cartItem.merchandiseOption.optionPrice * cartItem.quantity +
-          cartItem.merchandisePost.deliveryPrice;
-
+          merchandise.price * cartItem.quantity;
+        console.log("----------------------------------------")
         return {
           status: HttpStatus.OK,
           message: '카트 저장에 성공했습니다.',
           data: {
             cartId: cart.id,
-            merchandisePostId: cartItem.merchandisePost.id,
-            merchandiseTitle: cartItem.merchandisePost.title,
+            merchandiseId: merchandise.merchandiseId,
+            merchandiseName: merchandise.merchandiseName,
             merchandiseOptionId: cartItem.merchandiseOption.id,
             merchandiseOptionName: cartItem.merchandiseOption.optionName,
-            merchandiseOptionPrice: cartItem.merchandiseOption.optionPrice,
             quantity: cartItem.quantity,
-            deliveryPrice: cartItem.merchandisePost.deliveryPrice,
             totalPrice,
           },
         };
@@ -200,12 +194,13 @@ export class CartService {
         where: { cart }, // cartId로 CartItem을 조회
         relations: ['merchandise', 'merchandiseOption'],
       });
-
+      console.log(cartItem)
       const cartItems = cartItem.map((cartItem) => ({
         cartItemId: cartItem.id,
         merchandiseId: cartItem.merchandise.merchandiseId,
-        merchandiseTitle: cartItem.merchandise.merchandiseName,
+        merchandiseName: cartItem.merchandise.merchandiseName,
         price: cartItem.merchandise.price,
+        merchandiseOptionId: cartItem.merchandiseOption.id,
         merchandiseOptionName: cartItem.merchandiseOption.optionName,
         quantity: cartItem.quantity,
       }));
