@@ -1,48 +1,54 @@
+/* merchandiseDetail.scss */
 .merchandise-detail {
-  display: flex;
-  flex-direction: column;
-  padding: 16px;
-}
+  padding: 150px 16px 16px; // 상단 여백을 추가하여 헤더와 겹치지 않게 함
 
-.thumbnail {
-  text-align: center;
-  margin-bottom: 16px;
-}
+  .thumbnail {
+    text-align: center;
+    margin-bottom: 16px;
 
-.thumbnail img {
-  width: 100%;
-  height: auto;
-  max-width: 300px;
-  object-fit: cover;
-}
+    img {
+      width: 400px;   // 원하는 썸네일의 크기
+      height: 400px;  // 원하는 썸네일의 크기
+      object-fit: cover; // 가로세로 비율을 유지하며 자르기
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+  }
 
-.options, .quantity {
-  margin-bottom: 16px;
-}
+  h2 {
+    font-size: 1.8rem;
+    margin-bottom: 16px;
+    color: #333;
+  }
 
-.options label, .quantity label {
-  margin-right: 8px;
-}
+  .price {
+    font-size: 1.2rem;
+    color: #007aff;
+    margin-bottom: 16px;
+  }
 
-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-  border-radius: 4px;
-}
+  .options, .quantity {
+    margin-bottom: 16px;
+  }
 
-button:hover {
-  background-color: #0056b3;
-}
+  .content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
 
-.content {
-  margin-top: 16px;
-}
+    .detail-image {
+      max-width: 600px;  // 원하는 추가 이미지의 최대 너비
+      width: auto;
+      height: auto;
+      border-radius: 8px;
+      object-fit: contain; // 이미지가 비율에 맞춰 보이게 설정
+      border: 1px solid #ddd;
+    }
 
-.detail-image {
-  max-width: 100%;
-  height: auto;
-  margin-top: 8px;
+    p {
+      text-align: center;
+      color: #333;
+    }
+  }
 }

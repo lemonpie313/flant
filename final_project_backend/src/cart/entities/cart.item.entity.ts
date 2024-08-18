@@ -24,7 +24,7 @@ export class CartItem {
   // 카트 연결
   @ManyToOne(() => Cart, (cart) => cart.cartItem, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'cart_id' })
-  cart: Cart;
+  cart: Cart; 
 
   //상품 연결
   @ManyToOne(

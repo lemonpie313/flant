@@ -13,6 +13,7 @@ import { userApi } from './services/api';
 import CommunityBoardTest from "./pages/CommunityBoardTest";
 import MerchandiseList from "./pages/merchandiseList";
 import MerchandiseDetail from "./pages/merchandiseDetail";
+import Cart from "./pages/cart";
 
 
 
@@ -146,8 +147,9 @@ const App: React.FC = () => {
             <Route path="/communitiess" element={<CommunityBoardTest />} />
             <Route path="/live" element={<ProtectedRoute><LiveListPage /></ProtectedRoute>} />
             <Route path="/live/:liveId" element={<ProtectedRoute><LiveStreamingPage /></ProtectedRoute>} />
-            <Route path="/merchandise" element={<ProtectedRoute><MerchandiseList communityId={1} /></ProtectedRoute>} />
+            <Route path="communities/:communityId/merchandise" element={<ProtectedRoute><MerchandiseList /></ProtectedRoute>} />
             <Route path="/merchandise/:merchandiseId" element={<ProtectedRoute><MerchandiseDetail /></ProtectedRoute>} />
+            <Route path="/cart" element={<Cart />} />
             <Route path="/" element={<Navigate to="/main" replace />} />
             <Route path="*" element={<Navigate to="/main" replace />} />
           </Routes>
