@@ -14,8 +14,10 @@ import {
 import { Community } from '../../entities/community.entity';
 import { User } from '../../../user/entities/user.entity';
 import { Comment } from '../../../comment/entities/comment.entity';
-import { Manager } from 'src/admin/entities/manager.entity';
 import { Artist } from 'src/admin/entities/artist.entity';
+import { Manager } from './../../../admin/entities/manager.entity';
+import { Post } from 'src/post/entities/post.entity';
+
 
 @Entity('community_users')
 export class CommunityUser {
@@ -68,4 +70,7 @@ export class CommunityUser {
 
   @OneToOne(() => Manager, (manager) => manager.communityUser)
   manager: Manager;
+
+  @OneToMany(() => Post, (post) => post.communityUser)
+  posts: Post[];
 }

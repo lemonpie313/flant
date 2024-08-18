@@ -171,6 +171,9 @@ export const MESSAGES = {
     UPDATE_STATUS: {
       SECCEED: '좋아요 상태 수정에 성공했습니다.',
     },
+    GETCOUNT: {
+      SUCCEED: '좋아요 수 조회에 성공했습니다.'
+    }
   },
   CUSTOM_DECORATOR: {
     IS_NOT_EMPTY: '값을 입력해주세요.',

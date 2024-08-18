@@ -38,12 +38,11 @@ export class PostService {
 
   async create(
     userId: number,
-    communityId: number,
-    createPostDto: CreatePostDto,
+    createPostDto,
     imageUrl: string[] | undefined,
   ) {
     const communityUser = await this.communityUserRepository.findOne({
-      where: { userId: userId, communityId: communityId },
+      where: { userId: userId, communityId: +createPostDto.communityId },
     });
     if (!communityUser) {
       throw new BadRequestException(MESSAGES.POST.CREATE.BAD_REQUEST);
@@ -51,7 +50,7 @@ export class PostService {
     const isArtist = await this.artistRepository.findOne({
       where: {
         communityUserId: communityUser.communityUserId,
-        communityId: communityId,
+        communityId: +createPostDto.communityId,
       },
     });
 
@@ -60,9 +59,8 @@ export class PostService {
       artistId = isArtist.artistId;
     }
     const saveData = await this.postRepository.save({
-      communityId: communityId,
+      communityId: +createPostDto.communityId,
       communityUserId: communityUser.communityUserId,
-      title: createPostDto.title,
       content: createPostDto.content,
       artistId: artistId,
     });
@@ -82,28 +80,43 @@ export class PostService {
     };
   }
 
-  async findPosts(artistId: number | null, communityId: number) {
+  async findPosts(artistId: number | null, communityId: number, page: number, limit: number) {
+    // 페이지네이션을 위한 오프셋과 제한 설정
+    const offset = (page - 1) * limit;
+  
     if (!artistId) {
-      const allPosts = await this.postRepository.find({
+      const [allPosts, total] = await this.postRepository.findAndCount({
         where: { communityId: communityId },
         relations: ['postImages'],
+        skip: offset,
+        take: limit,
+        order: { createdAt: 'DESC' }, // 최신 게시물 순으로 정렬 (필요 시 추가)
       });
-
+  
       return {
         status: HttpStatus.OK,
         message: MESSAGES.POST.FINDPOSTS.SUCCEED,
         data: allPosts,
+        total, // 총 게시물 수 반환
+        page,  // 현재 페이지 반환
+        limit, // 한 페이지에 보여줄 게시물 수 반환
       };
-    } else if (artistId) {
-      const artistPosts = await this.postRepository.find({
+    } else {
+      const [artistPosts, total] = await this.postRepository.findAndCount({
         where: { artistId: artistId, communityId: communityId },
         relations: ['postImages'],
+        skip: offset,
+        take: limit,
+        order: { createdAt: 'DESC' }, // 최신 게시물 순으로 정렬 (필요 시 추가)
       });
-
+  
       return {
         status: HttpStatus.OK,
         message: MESSAGES.POST.FINDPOSTS.ARTIST,
         data: artistPosts,
+        total, // 총 게시물 수 반환
+        page,  // 현재 페이지 반환
+        limit, // 한 페이지에 보여줄 게시물 수 반환
       };
     }
   }
@@ -141,17 +154,13 @@ export class PostService {
     if (!communityUser) {
       throw new UnauthorizedException(MESSAGES.POST.UPDATE.UNAUTHORIZED);
     }
-    if (_.isEmpty(updatePostDto.title && updatePostDto.content)) {
+    if (_.isEmpty(updatePostDto.content)) {
       throw new BadRequestException(MESSAGES.POST.UPDATE.BAD_REQUEST);
     }
 
     const newData = {
-      title: postData.title,
       content: postData.content,
     };
-    if (updatePostDto.title != postData.title) {
-      newData.title = updatePostDto.title;
-    }
     if (updatePostDto.content != postData.content) {
       newData.content = updatePostDto.content;
     }

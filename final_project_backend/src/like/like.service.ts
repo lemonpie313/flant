@@ -71,6 +71,36 @@ export class LikeService {
     );
   }
 
+  async countLikes(itemId: number, itemType: ItemType) {
+    let existedItem;
+    let responseType;
+
+    if (itemType === ItemType.POST) {
+      existedItem = await this.findPostById(itemId);
+      responseType = 'post'
+    } else if (itemType === ItemType.COMMENT) {
+      existedItem = await this.findCommentById(itemId);
+      responseType = 'comment'
+    }
+
+    if (!existedItem) {
+      throw new NotFoundException(MESSAGES.LIKE.ITEMID.NOT_FOUND);
+    }
+
+    const countLikes = await this.likeRepository.findAndCount({where: { itemId, itemType }})
+
+    const responseData = {
+      itemId : `${responseType}_${itemId}`,
+      likesCount : countLikes[1]
+    }
+    
+    return {
+      status: HttpStatus.OK,
+      message: MESSAGES.LIKE.GETCOUNT.SUCCEED,
+      data: responseData,
+    }
+  }
+
   async findPostById(postId: number) {
     return await this.postRepository.findOne({ where: { postId } });
   }

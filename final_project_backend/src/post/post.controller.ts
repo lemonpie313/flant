@@ -11,6 +11,7 @@ import {
   UploadedFiles,
   Put,
   ParseIntPipe,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -27,9 +28,11 @@ import { ApiFiles } from 'src/util/decorators/api-file.decorator';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
 import { postImageUploadFactory } from 'src/util/image-upload/create-s3-storage';
 import { PartialUser } from 'src/user/interfaces/partial-user.entity';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiTags('게시물')
 @Controller('v1/posts')
+@UseInterceptors(CacheInterceptor)
 export class PostController {
   constructor(
     private readonly postService: PostService,
@@ -51,8 +54,7 @@ export class PostController {
   async create(
     @UploadedFiles() files: { postImage?: Express.MulterS3.File[] },
     @UserInfo() user: PartialUser,
-    @Query('communityId') communityId: number,
-    @Body() createPostDto: CreatePostDto,
+    @Body() createPostDto,
   ) {
     let imageUrl = undefined;
     if (files && files.postImage && files.postImage.length > 0) {
@@ -62,7 +64,6 @@ export class PostController {
     const userId = user.id;
     return await this.postService.create(
       +userId,
-      +communityId,
       createPostDto,
       imageUrl,
     );
@@ -80,8 +81,10 @@ export class PostController {
   async findPosts(
     @Query('artistId') artistId: number,
     @Query('communityId') communityId: number,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
   ) {
-    return await this.postService.findPosts(+artistId, +communityId);
+    return await this.postService.findPosts(+artistId, +communityId, +page, +limit);
   }
 
   /**
@@ -152,5 +155,15 @@ export class PostController {
       createLikeDto,
       ItemType.POST,
     );
+  }
+
+  @Get(':id/likes')
+  async countLikesOnPost(
+    @Param('id', ParseIntPipe) id: number,
+  ){
+    return this.likeService.countLikes(
+      id,
+      ItemType.POST,
+    )
   }
 }
