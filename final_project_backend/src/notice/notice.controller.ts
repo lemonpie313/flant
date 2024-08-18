@@ -9,6 +9,7 @@ import {
   UseGuards,
   Query,
   UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { NoticeService } from './notice.service';
 import { CreateNoticeDto } from './dto/create-notice.dto';
@@ -23,9 +24,11 @@ import { CommunityUserRole } from 'src/community/community-user/types/community-
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CommunityUserGuard } from 'src/auth/guards/community-user.guard';
 import { PartialUser } from 'src/user/interfaces/partial-user.entity';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiTags('공지사항')
 @Controller('v1/notices')
+@UseInterceptors(CacheInterceptor)
 export class NoticeController {
   constructor(private readonly noticeService: NoticeService) {}
 
@@ -45,7 +48,6 @@ export class NoticeController {
   create(
     @UploadedFiles() files: { noticeImage?: Express.MulterS3.File[] },
     @UserInfo() user: PartialUser,
-    @Query('communityId') communityId: number,
     @Body() createNoticeDto: CreateNoticeDto,
   ) {
     let imageUrl = undefined;
@@ -56,7 +58,6 @@ export class NoticeController {
 
     return this.noticeService.create(
       user,
-      +communityId,
       createNoticeDto,
       imageUrl,
     );

@@ -10,6 +10,7 @@ import {
   Query,
   UploadedFiles,
   UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { MediaService } from './media.service';
 import { CreateMediaDto } from './dto/create-media.dto';
@@ -27,9 +28,11 @@ import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 import { CommunityUserRole } from 'src/community/community-user/types/community-user-role.type';
 import { CommunityUserRoles } from 'src/auth/decorators/community-user-roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiTags('미디어')
 @Controller('v1/media')
+@UseInterceptors(CacheInterceptor)
 export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
 

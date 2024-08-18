@@ -6,6 +6,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import * as Sentry from '@sentry/node';
 import { AllExceptionsFilter } from './all-exceptions.filter';
+import { urlToHttpOptions } from 'url';
+import { urlencoded } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -26,6 +28,7 @@ async function bootstrap() {
   }
 
   app.use(cookieParser());
+  app.use(urlencoded({ extended: true }))
 
   const port = configService.get<number>('PORT') || 3001;
 
