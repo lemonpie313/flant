@@ -14,7 +14,6 @@ const SignUpPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      console.log(email, password, passwordConfirm, name)
       await authApi.signUp(email, password, passwordConfirm, name); // axios를 사용하여 로그인 요청을 보냄
       alert("회원가입이 정상적으로 완료되었습니다.");
       localStorage.setItem("isLoggedIn", "true");
@@ -31,7 +30,7 @@ const SignUpPage: React.FC = () => {
         <header>
           <img
             className="main-box-logo"
-            src="/TGSrd-removebg-preview.png"
+            src="/favicon.ico"
             alt="logo"
           ></img>
         </header>

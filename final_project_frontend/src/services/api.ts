@@ -108,9 +108,12 @@ export const postApi = {
     api
       .get(`/posts`, { params: { communityId, page, limit } })
       .catch(handleApiError),
-  like: (postId: number) =>
-    api.post(`/posts/${postId}/like`).catch(handleApiError),
+  like: (postId: number, { status }: { status: number }) =>
+    api.put(`/posts/${postId}/likes`, { status }).catch(handleApiError),
+  checkIfUserLikedPost: (id: number) =>
+    api.get(`/posts/${id}/likes/my`).catch(handleApiError),
 };
+
 export const commentApi = {
   create: ({ postId, content }: { postId: number; content: string }) =>
     api.post(`/posts/${postId}/comments`, { content }).catch(handleApiError),
@@ -122,6 +125,10 @@ export const commentApi = {
     api
       .get(`/posts/${postId}/comments`, { params: { page, limit } })
       .catch(handleApiError),
+  like: (id: number, { status }: { status: number }) =>
+    api.put(`/comments/${id}/likes`, { status }).catch(handleApiError),
+  checkIfUserLikedComment: (id: number) =>
+    api.get(`/comments/${id}/likes/my`).catch(handleApiError),
 };
 
 export const liveApi = {
@@ -131,6 +138,11 @@ export const liveApi = {
     api.get(`/live/community/${communityId}`).catch(handleApiError),
   watchLive: (liveId: number) =>
     api.get(`/live/${liveId}`).catch(handleApiError),
+};
+
+export const communityUserApi = {
+  findCommunityUser: (communityId: number) =>
+    api.post(`/communities/userInfo/${communityId}`).catch(handleApiError),
 };
 
 export const merchandiseApi = {

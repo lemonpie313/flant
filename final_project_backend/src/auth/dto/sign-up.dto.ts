@@ -3,12 +3,7 @@ import { IsNotEmpty, IsStrongPassword } from 'class-validator';
 import { MESSAGES } from 'src/constants/message.constant';
 import { User } from 'src/user/entities/user.entity';
 
-export class SignUpDto extends PickType(User, [
-  'email',
-  'password',
-  'name',
-  'profileImage',
-]) {
+export class SignUpDto extends PickType(User, ['email', 'password', 'name']) {
   /**
    *  비밀번호 확인
    * @example "Example1!"

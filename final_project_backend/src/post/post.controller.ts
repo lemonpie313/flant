@@ -32,7 +32,7 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiTags('게시물')
 @Controller('v1/posts')
-@UseInterceptors(CacheInterceptor)
+// @UseInterceptors(CacheInterceptor)
 export class PostController {
   constructor(
     private readonly postService: PostService,
@@ -62,11 +62,7 @@ export class PostController {
       imageUrl = imageLocation;
     }
     const userId = user.id;
-    return await this.postService.create(
-      +userId,
-      createPostDto,
-      imageUrl,
-    );
+    return await this.postService.create(+userId, createPostDto, imageUrl);
   }
 
   /**
@@ -84,7 +80,12 @@ export class PostController {
     @Query('page') page: number,
     @Query('limit') limit: number,
   ) {
-    return await this.postService.findPosts(+artistId, +communityId, +page, +limit);
+    return await this.postService.findPosts(
+      +artistId,
+      +communityId,
+      +page,
+      +limit,
+    );
   }
 
   /**
@@ -158,12 +159,23 @@ export class PostController {
   }
 
   @Get(':id/likes')
-  async countLikesOnPost(
+  async countLikesOnPost(@Param('id', ParseIntPipe) id: number) {
+    return this.likeService.countLikes(id, ItemType.POST);
+  }
+
+  /**
+   * 게시글 좋아요 확인
+   * @param user
+   * @param id
+   * @returns
+   */
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/likes/my')
+  async checkIfUserLikedPost(
+    @UserInfo() user: PartialUser,
     @Param('id', ParseIntPipe) id: number,
-  ){
-    return this.likeService.countLikes(
-      id,
-      ItemType.POST,
-    )
+  ) {
+    return await this.likeService.checkIfUserLiked(user.id, id, ItemType.POST);
   }
 }
