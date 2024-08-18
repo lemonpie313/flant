@@ -26,11 +26,12 @@ const CommunityBoardTest: React.FC = () => {
   useEffect(() => {
     const checkAuthAndFetchData = async () => {
       const token = localStorage.getItem("accessToken");
+      console.log();
       if (token) {
         setIsLoggedIn(true);
         await fetchCommunityData();
         await fetchPosts();
-        await fetchUsers();
+        await fetchCommunityUsers();
       } else {
         setIsLoggedIn(false);
       }
@@ -49,7 +50,7 @@ const CommunityBoardTest: React.FC = () => {
     }
   };
 
-  const fetchUsers = async () => {
+  const fetchCommunityUsers = async () => {
     try {
       const response = await communityUserApi.findCommunityUser(
         communityId,
