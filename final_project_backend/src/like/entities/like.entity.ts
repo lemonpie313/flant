@@ -12,7 +12,7 @@ export class Like {
    */
   @IsNotEmpty({ message: MESSAGES.LIKE.ITEMID.REQUIRED })
   @IsNumber()
-  @PrimaryColumn()
+  @PrimaryColumn({unsigned: true})
   itemId: number;
 
   /**

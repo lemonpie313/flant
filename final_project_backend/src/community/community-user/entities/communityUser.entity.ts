@@ -14,8 +14,8 @@ import {
 import { Community } from '../../entities/community.entity';
 import { User } from '../../../user/entities/user.entity';
 import { Comment } from '../../../comment/entities/comment.entity';
+import { Manager } from 'src/admin/entities/manager.entity';
 import { Artist } from 'src/admin/entities/artist.entity';
-import { Manager } from './../../../admin/entities/manager.entity';
 
 @Entity('community_users')
 export class CommunityUser {

@@ -22,7 +22,7 @@ const CommunityBoardTest: React.FC = () => {
       if (token) {
         setIsLoggedIn(true);
         await fetchCommunityData();
-        await fetchPosts();
+        // await fetchPosts();
       } else {
         setIsLoggedIn(false);
       }
@@ -34,7 +34,8 @@ const CommunityBoardTest: React.FC = () => {
   const fetchCommunityData = async () => {
     try {
       const response = await communityApi.findOne(Number(communityId));
-      setCommunity(response.data);
+      setCommunity(response.data.data);
+      if(response.data.data?.posts) setPosts(response.data.data?.posts)
     } catch (error) {
       console.error('커뮤니티 데이터 가져오기 오류:', error);
     }
@@ -42,8 +43,9 @@ const CommunityBoardTest: React.FC = () => {
 
   const fetchPosts = async () => {
     try {
-      const response = await postApi.getPosts(Number(communityId));
-      setPosts(response.data);
+      const response = await postApi.getPosts(Number(3));
+      const postsData = response.data.data as Post[]; // 타입 명시
+      setPosts(postsData);
     } catch (error) {
       console.error('게시물 가져오기 오류:', error);
       if (axios.isAxiosError(error) && error.response?.status === 401) {
@@ -57,7 +59,7 @@ const CommunityBoardTest: React.FC = () => {
     try {
       await postApi.like(postId);
       setPosts(posts.map(post => 
-        post.id === postId 
+        post.postId === postId 
           ? { ...post, likes: post.isLiked ? post.likes - 1 : post.likes + 1, isLiked: !post.isLiked } 
           : post
       ));
@@ -107,16 +109,21 @@ const CommunityBoardTest: React.FC = () => {
             <>
               <PostForm onPostCreated={fetchPosts} communityId={Number(communityId)} />
               <div className="posts-container">
-                {posts.map((post) => (
+              {posts.length > 0 ? (
+                posts.map((post) => (
                   <PostCard 
-                    key={post.id} 
+                    key={post.postId} 
                     {...post} 
+                    
                     onLike={handleLike}
                     onComment={handleComment}
                     onReply={handleReply}
                   />
-                ))}
-              </div>
+                ))
+              ) : (
+                <p>게시물이 없습니다.</p>
+              )}
+            </div>
             </>
           ) : (
             <div>

@@ -1,0 +1,96 @@
+.merchandise-detail {
+    padding: 16px;
+  
+    .product-info {
+      margin-bottom: 24px;
+  
+      .thumbnail {
+        text-align: center;
+        margin-bottom: 16px;
+  
+        img {
+          width: 200px; // 썸네일 크기 조정
+          height: 200px;
+          object-fit: cover;
+          border-radius: 8px;
+          border: 1px solid #ddd;
+        }
+      }
+  
+      h2 {
+        font-size: 1.8rem;
+        margin-bottom: 8px;
+        color: #333;
+      }
+  
+      .price {
+        font-size: 1.2rem;
+        color: #007aff;
+        margin-bottom: 16px;
+      }
+  
+      .options-quantity {
+        margin-bottom: 24px;
+  
+        label {
+          display: block;
+          margin-bottom: 8px;
+          font-weight: bold;
+        }
+  
+        select,
+        input {
+          display: block;
+          margin-bottom: 16px;
+          padding: 8px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 1rem;
+        }
+  
+        .buttons {
+          display: flex;
+          gap: 16px;
+          justify-content: center;
+  
+          button {
+            padding: 12px 24px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+  
+            &.add-to-cart {
+              background-color: #007aff;
+              color: #fff;
+  
+              &:hover {
+                background-color: #005bb5;
+              }
+            }
+  
+            &.checkout {
+              background-color: #ff3b30;
+              color: #fff;
+  
+              &:hover {
+                background-color: #c62828;
+              }
+            }
+          }
+        }
+      }
+    }
+  
+    .content {
+      .detail-image {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        margin-bottom: 16px;
+      }
+    }
+  }
+  

@@ -8,7 +8,7 @@ interface CommentItemProps extends Comment {
 const CommentItem: React.FC<CommentItemProps> = ({ id, author, content, createdAt, onReply }) => {
   const [replyContent, setReplyContent] = useState('');
 
-  const handleReply = (e: React.FormEvent) => {
+  const handleReplySubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (replyContent.trim()) {
       onReply(id, replyContent);
@@ -18,18 +18,25 @@ const CommentItem: React.FC<CommentItemProps> = ({ id, author, content, createdA
 
   return (
     <div className="comment-item">
-      <strong>{author}</strong>
-      <p>{content}</p>
-      <small>{new Date(createdAt).toLocaleString()}</small>
-      <form onSubmit={handleReply}>
-        <input
-          type="text"
-          value={replyContent}
-          onChange={(e) => setReplyContent(e.target.value)}
-          placeholder="답글 작성..."
-        />
-        <button type="submit">답글</button>
-      </form>
+      <div className="comment-header">
+        <strong>{author}</strong>
+        <span>{new Date(createdAt).toLocaleString()}</span>
+      </div>
+      <p className="comment-content">{content}</p>
+      <button onClick={() => setReplyContent('답글')} className="reply-button">
+        답글
+      </button>
+      {replyContent && (
+        <form onSubmit={handleReplySubmit} className="reply-form">
+          <input
+            type="text"
+            value={replyContent}
+            onChange={(e) => setReplyContent(e.target.value)}
+            placeholder="답글을 입력하세요..."
+          />
+          <button type="submit">답글 작성</button>
+        </form>
+      )}
     </div>
   );
 };
