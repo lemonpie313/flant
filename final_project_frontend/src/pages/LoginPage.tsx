@@ -36,7 +36,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
         <header>
           <img
             className="main-box-logo"
-            src="/favicon.ico"
+            src="/TGSrd-removebg-preview.png"
             alt="logo"
           ></img>
         </header>

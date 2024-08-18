@@ -30,13 +30,18 @@ import {
   coverImageUploadFactory,
   logoImageUploadFactory,
 } from 'src/util/image-upload/create-s3-storage';
+import { CommunityUserService } from './community-user/community-user.service';
+import { FindCommunityUserDto } from './dto/find-community-user.dto';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiTags('커뮤니티')
 @Controller('v1/communities')
-@UseInterceptors(CacheInterceptor)
+// @UseInterceptors(CacheInterceptor)
 export class CommunityController {
-  constructor(private readonly communityService: CommunityService) {}
+  constructor(
+    private readonly communityService: CommunityService,
+    private readonly communityUserService: CommunityUserService,
+  ) {}
 
   /**
    * 커뮤니티 생성
@@ -52,6 +57,28 @@ export class CommunityController {
     return await this.communityService.create(createCommunityDto);
   }
 
+  /**
+   * 커뮤니티 유저 정보 조회
+   * @param communityId
+   * @param FindCommunityUserDto
+   * @returns
+   */
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post('userInfo/:communityId')
+  getCommunityUserInfo(
+    @Param('communityId', ParseIntPipe) communityId: number,
+    @UserInfo() user: PartialUser,
+  ) {
+    console.log(communityId, user.id);
+    console.log('zeoll');
+    const userInfo = this.communityUserService.findByCommunityIdAndUserId(
+      communityId,
+      user.id,
+    );
+
+    return userInfo;
+  }
   /**
    * 커뮤니티 가입
    * @param userId
@@ -80,7 +107,6 @@ export class CommunityController {
    */
   @Get()
   async findAll() {
-    console.log("/communities")
     return await this.communityService.findAll();
   }
 

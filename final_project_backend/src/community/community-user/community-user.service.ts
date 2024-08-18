@@ -39,7 +39,8 @@ export class CommunityUserService {
         communityId,
       },
     });
-
+    console.log('zff');
+    console.log(existedCommunityUser);
     if (!existedCommunityUser) {
       throw new NotFoundException(MESSAGES.COMMUNITY_USER.COMMON.NOT_FOUND);
     }

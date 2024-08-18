@@ -79,7 +79,6 @@ export class CommunityService {
     const allCommunities = await this.communityRepository.find({
       select: ['communityLogoImage', 'communityName', 'communityCoverImage'],
     });
-    console.log("allCommunities",allCommunities)
     return {
       status: HttpStatus.OK,
       message: MESSAGES.COMMUNITY.FIND.SUCCEED,
@@ -96,7 +95,6 @@ export class CommunityService {
     const myData = myCommunities.map(
       (communityUser) => communityUser?.community,
     );
-    console.log("myData" , myData)
 
 
     return {
