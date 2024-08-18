@@ -186,10 +186,7 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/communitiess/:communityId"
-              element={<CommunityBoardTest />}
-            />
+            <Route path="/communitiess" element={<CommunityBoardTest />} />
             <Route
               path="/live"
               element={

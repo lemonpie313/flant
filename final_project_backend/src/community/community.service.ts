@@ -133,6 +133,7 @@ export class CommunityService {
       communityId: existedCommunity.communityId,
       communityName: existedCommunity.communityName,
       communityLogoImage: existedCommunity.communityLogoImage,
+      communityCoverImage: existedCommunity.communityCoverImage,
       membershipPrice: existedCommunity.membershipPrice,
       createdAt: existedCommunity.createdAt,
       updatedAt: existedCommunity.updatedAt,
