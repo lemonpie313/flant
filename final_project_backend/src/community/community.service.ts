@@ -101,12 +101,14 @@ export class CommunityService {
   async findOne(communityId: number) {
     const existedCommunity = await this.communityRepository.findOne({
       where: { communityId: communityId },
-      relations: ['posts', 'posts.postImages'],
+      relations: ['posts', 'posts.communityUser', 'posts.postImages', 'posts.communityUser.users'],
     });
 
     if (!existedCommunity) {
       throw new NotFoundException(MESSAGES.COMMUNITY.COMMON.NOT_FOUND);
     }
+    
+    existedCommunity.posts.map(post => post.communityUser.nickName)
 
     return {
       status: HttpStatus.OK,
