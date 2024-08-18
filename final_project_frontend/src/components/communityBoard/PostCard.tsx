@@ -1,61 +1,69 @@
-
 import React, { useState } from 'react';
-import { Comment } from './types';  // Comment 타입은 별도 types 파일에서 관리
+import { Comment, Post } from './types';
 import CommentItem from './CommentItem';
+import "../../styles/PostCard.scss"
 
-interface PostCardProps {
-  id: number;
-  author: string;
-  content: string;
-  imageUrl?: string[];
-  likes: number;
-  comments: Comment[];
-  createdAt: string;
-  isLiked: boolean;
+interface PostCardProps extends Post {
   onLike: (postId: number) => void;
   onComment: (postId: number, content: string) => void;
   onReply: (commentId: number, content: string) => void;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
-  id, author, content, imageUrl, likes, comments, createdAt, isLiked,
+  postId, communityUserId, content, postImages = [], likes, comments, createdAt, isLiked,
   onLike, onComment, onReply
 }) => {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
 
   const handleLike = () => {
-    onLike(id);
+    onLike(postId);
   };
 
   const handleCommentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (newComment.trim()) {
-      onComment(id, newComment);
+      onComment(postId, newComment);
       setNewComment('');
     }
   };
 
+  // 날짜 형식 지정 (MM. DD. HH:MM)
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return `${(date.getMonth() + 1).toString().padStart(2, '0')}. ${date.getDate().toString().padStart(2, '0')}. ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+  };
+
+
   return (
     <div className="post-card">
       <div className="post-header">
-        <img src={`/profile-images/${author}.jpg`} alt={author} className="author-image" />
         <div className="author-info">
-          <h3>{author}</h3>
-          <span>{new Date(createdAt).toLocaleString()}</span>
+          <img 
+            src={`/profile-images/${communityUserId}`} 
+            alt={communityUserId+"임시(이름)"} 
+            className="author-image" 
+            onError={(e) => { e.currentTarget.src = '/default-profile.png'; }} 
+          />
+          <div className="author-details">
+            <h3>{communityUserId + "이름"}</h3>
+            <span>{formatDate(createdAt)}</span>
+          </div>
         </div>
-        <button className="more-options">...</button>
+        {/* <button className="more-options">...</button> */}
       </div>
       <p className="post-content">{content}</p>
-      {imageUrl && imageUrl.map((url, index) => (
-        <img key={index} src={url} alt={`Post content ${index + 1}`} className="post-image" />
-      ))}
+      {postImages.length > 0 && (
+        postImages.map((image) => (
+          <img key={image.postImageId} src={image.postImageUrl} alt="Post" />
+        ))
+      )}
       <div className="post-actions">
         <button onClick={handleLike} className={isLiked ? 'liked' : ''}>
-          좋아요 {likes}
+          <span className="material-symbols-outlined">favorite</span> {likes}
         </button>
         <button onClick={() => setShowComments(!showComments)}>
-          댓글 {comments.length}
+          <span className="material-symbols-outlined">comment</span>
         </button>
       </div>
       {showComments && (
