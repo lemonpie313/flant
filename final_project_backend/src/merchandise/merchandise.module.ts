@@ -2,28 +2,26 @@ import { Module } from '@nestjs/common';
 import { MerchandiseService } from './merchandise.service';
 import { MerchandiseController } from './merchandise.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
 import { MerchandiseImage } from './entities/merchandise-image.entity';
 import { MerchandiseOption } from './entities/marchandise-option.entity';
-import { MerchandisePost } from './entities/merchandise-post.entity';
-import { Product } from 'src/product/entities/product.entity';
+import { Merchandise } from './entities/merchandise.entity';
 import { Manager } from 'src/admin/entities/manager.entity';
 import { User } from 'src/user/entities/user.entity';
-import { CommunityUserService } from 'src/community/community-user/community-user.service';
-import { AuthModule } from 'src/auth/auth.module';
-import { CommunityModule } from 'src/community/community.module';
 import { CommunityUserModule } from 'src/community/community-user/community-user.module';
 import { AdminModule } from 'src/admin/admin.module';
+import { MerchandiseCategory } from './entities/merchandise-category.entity';
+import { Community } from 'src/community/entities/community.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
+      MerchandiseCategory,
       MerchandiseImage,
       MerchandiseOption,
-      MerchandisePost,
-      Product,
+      Merchandise,
       Manager,
       User,
+      Community
     ]),
 
     CommunityUserModule,

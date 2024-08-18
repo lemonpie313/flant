@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -54,5 +55,6 @@ export class Notice {
   noticeImages: NoticeImage[];
 
   @ManyToOne(() => Manager, (manager) => manager.notice)
+  @JoinColumn({name: 'manager_id'})
   manager: Manager;
 }

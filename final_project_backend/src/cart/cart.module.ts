@@ -5,7 +5,7 @@ import { User } from 'src/user/entities/user.entity';
 import { CartItem } from './entities/cart.item.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Cart } from './entities/cart.entity';
-import { MerchandisePost } from 'src/merchandise/entities/merchandise-post.entity';
+import { Merchandise } from 'src/merchandise/entities/merchandise.entity';
 import { MerchandiseOption } from 'src/merchandise/entities/marchandise-option.entity';
 
 @Module({
@@ -14,7 +14,7 @@ import { MerchandiseOption } from 'src/merchandise/entities/marchandise-option.e
       Cart,
       CartItem,
       User,
-      MerchandisePost,
+      Merchandise,
       MerchandiseOption,
     ]),
   ],

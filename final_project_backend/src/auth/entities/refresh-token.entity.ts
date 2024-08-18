@@ -21,7 +21,7 @@ export class Refreshtoken {
    */
   @IsNotEmpty({ message: `유저 ID 입력해 주세요.` })
   @IsString()
-  @Column()
+  @Column({unsigned: true})
   userId: number;
   /**
    * 액세스 토큰값

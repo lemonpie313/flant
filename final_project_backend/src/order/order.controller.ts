@@ -7,19 +7,20 @@ import {
   Param,
   Delete,
   UseGuards,
-  Req,
   Query,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
+import { UserInfo } from 'src/util/decorators/user-info.decorator';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @ApiTags('order')
 @ApiBearerAuth()
 @Controller('v1/orders')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(JwtAuthGuard)
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
@@ -29,20 +30,17 @@ export class OrderController {
    * @returns
    */
   @Post()
-  async create(@Req() req) {
-    const userId = req.user.id;
-    return await this.orderService.create(+userId);
+  async create(@UserInfo() user: PartialUser) {
+    return await this.orderService.create(+user.id);
   }
 
   /**
    * 주문내역 전체 조회
-   * @param req
    * @returns
    */
   @Get()
-  async findAll(@Req() req) {
-    const userId = req.user.id;
-    return this.orderService.findAll(userId);
+  async findAll(@UserInfo() user: PartialUser) {
+    return this.orderService.findAll(user.id);
   }
 
   /**
@@ -51,9 +49,8 @@ export class OrderController {
    * @returns
    */
   @Get(':id')
-  findOne(@Param('id') id: string, @Req() req) {
-    const userId = req.user.id;
-    return this.orderService.findOne(+id, userId);
+  findOne(@Param('id') id: string, @UserInfo() user: PartialUser) {
+    return this.orderService.findOne(+id, user.id);
   }
 
   /**
