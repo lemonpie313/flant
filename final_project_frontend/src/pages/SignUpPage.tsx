@@ -31,7 +31,7 @@ const SignUpPage: React.FC = () => {
         <header>
           <img
             className="main-box-logo"
-            src="/TGSrd-removebg-preview.png"
+            src="/favicon.ico"
             alt="logo"
           ></img>
         </header>

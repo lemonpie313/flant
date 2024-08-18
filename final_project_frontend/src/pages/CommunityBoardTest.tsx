@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { communityApi, postApi, commentApi } from '../services/api';
+import { authApi, communityApi, postApi, commentApi } from '../services/api';
 import axios from 'axios';
 import Header from '../components/communityBoard/Header';
 import PostForm from '../components/communityBoard/PostForm';
 import PostCard from '../components/communityBoard/PostCard';
 import { Community,Post } from '../components/communityBoard/types';
 import './board.scss';
+import CommunityNavigationHeader from '../components/communityBoard/CommunityNavigationHeader';
 
 const CommunityBoardTest: React.FC = () => {
   const [community, setCommunity] = useState<Community | null>(null);
@@ -55,6 +56,20 @@ const CommunityBoardTest: React.FC = () => {
     }
   };
 
+  const handleLogout = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      localStorage.removeItem("isLoggedIn");
+      await authApi.signOut();
+      localStorage.clear();
+      alert("로그아웃이 성공적으로 되었습니다.");
+      navigate("/main");
+      window.location.reload(); // 상태 갱신을 위해 페이지 리로드
+    } catch (error) {
+      alert("LogOut failed.");
+    }
+  };
+
   const handleLike = async (postId: number) => {
     try {
       await postApi.like(postId);
@@ -92,19 +107,28 @@ const CommunityBoardTest: React.FC = () => {
 
   return (
     <div className="community-board">
-      <Header />
+        {community && (
+          <>
+        <Header 
+          communityName={community.name} 
+          isLoggedIn={isLoggedIn} 
+          handleLogout={handleLogout} 
+        />
+        <CommunityNavigationHeader />
+        </>
+      )}
       <main className="main-content">
         <div className="left-sidebar">
           {/* 왼쪽 사이드바 내용 */}
         </div>
         <div className="center-content">
-          {community && (
+          {/* {community && (
             <div className="community-header">
               <img src={community.coverUrl} alt={community.name} className="community-cover" />
               <h1>{community.name}</h1>
               <p>{community.description}</p>
             </div>
-          )}
+          )} */}
           {isLoggedIn ? (
             <>
               <PostForm onPostCreated={fetchPosts} communityId={Number(communityId)} />
