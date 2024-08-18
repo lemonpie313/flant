@@ -21,6 +21,9 @@ export class Form {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
+  @Column({unsigned: true})
+  managerId: number;
+
   @Column()
   title: string;
 

@@ -1,6 +1,6 @@
 import { PickType } from '@nestjs/swagger';
 
-import { MerchandisePost } from '../entities/merchandise-post.entity';
+import { Merchandise } from '../entities/merchandise.entity';
 
 import {
   ArrayNotEmpty,
@@ -13,15 +13,14 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class CreateMerchandiseDto extends PickType(MerchandisePost, [
-  'title',
+export class CreateMerchandiseDto extends PickType(Merchandise, [
+  'merchandiseName',
   'thumbnail',
   'content',
-  'deliveryPrice',
+  'price',
+  'communityId',
+  'merchandiseCategoryId'
 ]) {
-  @IsNotEmpty({ message: 'goodsShopId를 입력해주세요' })
-  @IsNumber()
-  goodsShopId: number;
 
   /**
    * 이미지 URL
@@ -39,14 +38,5 @@ export class CreateMerchandiseDto extends PickType(MerchandisePost, [
   @IsArray({ message: '옵션은 배열로 넣어주세요' })
   @ArrayNotEmpty({ message: '옵션을 입력해주세요 ' })
   @IsString({ each: true, message: '옵션은 문자열이어야 합니다' })
-  option: string[];
-
-  /**
-   * 상품 옵션별 가격
-   * @example [2000,5000,10000]
-   */
-  @IsArray({ message: '옵션 가격은 배열로 넣어주세요' })
-  @ArrayNotEmpty({ message: '옵션 가격은을 입력해주세요 ' })
-  @IsInt({ each: true, message: '옵션 가격은 정수여야 합니다' })
-  optionPrice: number[];
+  options: string[];
 }

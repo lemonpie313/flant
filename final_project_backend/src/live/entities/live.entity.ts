@@ -11,6 +11,7 @@ import { LiveTypes } from '../types/live-types.enum';
 import {
   IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   IsUrl,
@@ -27,6 +28,8 @@ export class Live {
    *  커뮤니티 ID
    * @example 1
    */
+  @IsNumber()
+  @IsNotEmpty()
   @Column({ type: 'int', unsigned: true })
   communityId: number;
 

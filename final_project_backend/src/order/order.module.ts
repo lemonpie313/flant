@@ -8,7 +8,7 @@ import { Order } from './entities/order.entity';
 import { MerchandiseModule } from 'src/merchandise/merchandise.module';
 import { User } from 'src/user/entities/user.entity';
 import { OrderItem } from './entities/orderItem.entity';
-import { MerchandisePost } from 'src/merchandise/entities/merchandise-post.entity';
+import { Merchandise } from 'src/merchandise/entities/merchandise.entity';
 import { MerchandiseOption } from 'src/merchandise/entities/marchandise-option.entity';
 
 @Module({
@@ -19,7 +19,7 @@ import { MerchandiseOption } from 'src/merchandise/entities/marchandise-option.e
       Order,
       OrderItem,
       User,
-      MerchandisePost,
+      Merchandise,
       MerchandiseOption,
     ]),
   ],

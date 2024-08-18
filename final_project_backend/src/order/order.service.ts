@@ -14,7 +14,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Cart } from '../cart/entities/cart.entity';
 import { CartItem } from '../cart/entities/cart.item.entity';
 import { OrderItem } from './entities/orderItem.entity';
-import { MerchandisePost } from 'src/merchandise/entities/merchandise-post.entity';
+import { Merchandise } from 'src/merchandise/entities/merchandise.entity';
 import { MerchandiseOption } from 'src/merchandise/entities/marchandise-option.entity';
 
 @Injectable()
@@ -30,8 +30,8 @@ export class OrderService {
     private readonly cartItemRepository: Repository<CartItem>,
     @InjectRepository(OrderItem)
     private readonly orderItemRepository: Repository<OrderItem>,
-    @InjectRepository(MerchandisePost)
-    private readonly merchandisePost: Repository<MerchandisePost>,
+    @InjectRepository(Merchandise)
+    private readonly merchandise: Repository<Merchandise>,
     @InjectRepository(MerchandiseOption)
     private readonly merchandiseOption: Repository<MerchandiseOption>,
     private dataSource: DataSource,
@@ -50,7 +50,7 @@ export class OrderService {
     //카트 아이템 데이터 가져오기
     const cartItem = await this.cartItemRepository.find({
       where: { cart: user.cart }, // cartId로 CartItem을 조회
-      relations: ['merchandisePost', 'merchandiseOption'],
+      relations: ['merchandise', 'merchandiseOption'],
     });
 
     //트랜잭션 처리
@@ -62,31 +62,30 @@ export class OrderService {
       const plusMerchandisePosts = new Map();
       let totalPrice = 0;
 
-      cartItem.forEach((item) => {
-        const merchandisePostId = item.merchandisePost.id;
+    cartItem.forEach((item) => {
+      const merchandisePostId = item.merchandise.merchandiseId;
 
-        // 상품 id 당 배달비는 1번만 계산
-        if (!plusMerchandisePosts.has(merchandisePostId)) {
-          totalPrice += item.merchandisePost.deliveryPrice;
-          plusMerchandisePosts.set(merchandisePostId, {});
-        }
+      // // 상품 id 당 배달비는 1번만 계산
+      // if (!plusMerchandisePosts.has(merchandisePostId)) {
+      //   totalPrice += item.merchandise.deliveryPrice;
+      //   plusMerchandisePosts.set(merchandisePostId, {});
+      // }
 
-        // 옵션 * 수량 가격 추가
-        if (item.merchandiseOption) {
-          totalPrice += item.merchandiseOption.optionPrice * item.quantity;
-        }
-      });
+      // 옵션 * 수량 가격 추가
+      if (item.merchandiseOption) {
+        totalPrice += item.merchandise.price * item.quantity;
+      }
+    });
 
       //order 생성
       const order = await queryRunner.manager.save(Order, { totalPrice, user });
 
-      let orderItems = cartItem.map((item) => ({
-        order: order, // 위 생성된 주문
-        merchandisePostId: item.merchandisePost.id,
-        merchandiseOption: item.merchandiseOption.id,
-        merchandiseOptionPrice: item.merchandiseOption.optionPrice,
-        quantity: item.quantity,
-      }));
+    let orderItems = cartItem.map((item) => ({
+      order: order, // 이미 저장된 주문
+      merchandisePostId: item.merchandise.merchandiseId,
+      merchandiseOption: item.merchandiseOption.merchandiseId,
+      quantity: item.quantity,
+    }));
 
       // 생성된  OrderItem 저장
       await queryRunner.manager.save(OrderItem, orderItems);

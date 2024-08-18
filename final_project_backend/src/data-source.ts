@@ -20,7 +20,7 @@ import { ApplyUser } from './form/entities/apply-user.entity';
 import { Like } from './like/entities/like.entity';
 import { Media } from './media/entities/media.entity';
 import { MediaFile } from './media/entities/media-file.entity';
-import { MerchandisePost } from './merchandise/entities/merchandise-post.entity';
+import { Merchandise } from './merchandise/entities/merchandise.entity';
 import { MerchandiseImage } from './merchandise/entities/merchandise-image.entity';
 import { MerchandiseOption } from './merchandise/entities/marchandise-option.entity';
 import { Notice } from './notice/entities/notice.entity';
@@ -28,8 +28,6 @@ import { NoticeImage } from './notice/entities/notice-image.entity';
 import { Order } from './order/entities/order.entity';
 import { Post } from './post/entities/post.entity';
 import { PostImage } from './post/entities/post-image.entity';
-import { GoodsShop } from './goods_shop/entities/goods-shop.entity';
-import { GoodsShopCategory } from './goods_shop/entities/goods-shop.category.entity';
 import { OrderItem } from './order/entities/orderItem.entity';
 import { Refreshtoken } from './auth/entities/refresh-token.entity';
 import { Live } from './live/entities/live.entity';
@@ -39,6 +37,8 @@ import CommunityUserSeeder from './database/seeds/community-user.seeder';
 import CommunitySeeder from './database/seeds/community.seeder';
 import MembershipSeeder from './database/seeds/membership.seeder';
 import ArtistSeeder from './database/seeds/artist.seeder';
+import { MerchandiseCategory } from './merchandise/entities/merchandise-category.entity';
+import ManagerSeeder from './database/seeds/manager.seeder';
 config();
 const configService = new ConfigService();
 const options: DataSourceOptions & SeederOptions = {
@@ -71,31 +71,23 @@ const options: DataSourceOptions & SeederOptions = {
     Comment,
     Artist,
     Manager,
-    MerchandisePost,
+    Merchandise,
     MerchandiseImage,
     MerchandiseOption,
+    MerchandiseCategory,
     Notice,
     NoticeImage,
     Order,
     OrderItem,
     Post,
     PostImage,
-    GoodsShop,
-    GoodsShopCategory,
     Refreshtoken,
     User,
     OrderItem,
     Refreshtoken,
   ],
   seedTracking: true, // seed데이터가 이미 있다면 삽입 x. 중복 삽입 방지
-  seeds: [
-    AdminSeeder,
-    UserSeeder,
-    CommunitySeeder,
-    CommunityUserSeeder,
-    ArtistSeeder,
-    MembershipSeeder,
-  ],
+  seeds: [AdminSeeder, UserSeeder, CommunitySeeder, CommunityUserSeeder, ArtistSeeder, ManagerSeeder, MembershipSeeder],
 };
 
 export const dataSource = new DataSource(options);

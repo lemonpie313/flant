@@ -23,6 +23,7 @@ import { Artist } from 'src/admin/entities/artist.entity';
 import { GoodsShop } from 'src/goods_shop/entities/goods-shop.entity';
 import { Live } from 'src/live/entities/live.entity';
 import { Manager } from './../../admin/entities/manager.entity';
+import { Merchandise } from 'src/merchandise/entities/merchandise.entity';
 
 @Entity('communities')
 export class Community {
@@ -109,4 +110,7 @@ export class Community {
 
   @OneToMany(() => Manager, (manager) => manager.community)
   manager: Manager[];
+
+  @OneToMany(() => Merchandise, (merchandise) => merchandise.community)
+  merchandise: Merchandise[];
 }

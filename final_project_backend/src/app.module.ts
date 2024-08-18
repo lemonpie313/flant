@@ -42,7 +42,7 @@ import { SentryWebhookInterceptor } from './webhook.interceptor';
       rootPath: join(__dirname, '../..', 'final_project_frontend'),
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
-    GoodsShopModule,
+    // ProductModule,
     OrderModule,
     AuthModule,
     UserModule,

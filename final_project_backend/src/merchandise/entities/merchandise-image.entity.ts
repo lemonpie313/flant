@@ -9,12 +9,15 @@ import {
 } from 'typeorm';
 
 import { IsArray, IsNotEmpty, IsString } from 'class-validator';
-import { MerchandisePost } from './merchandise-post.entity';
+import { Merchandise } from './merchandise.entity';
 
 @Entity('merchandise_image')
 export class MerchandiseImage {
   @PrimaryGeneratedColumn({ unsigned: true })
-  id: number;
+  merchandiseImageId: number;
+
+  @Column({ unsigned: true })
+  merchandiseId: number;
 
   @Column()
   url: string;
@@ -27,10 +30,10 @@ export class MerchandiseImage {
 
   // 상품게시물 연결
   @ManyToOne(
-    () => MerchandisePost,
-    (merchandisePost) => merchandisePost.merchandiseImage,
+    () => Merchandise,
+    (merchandise) => merchandise.merchandiseImage,
     { onDelete: 'CASCADE' },
   )
-  @JoinColumn({ name: 'merchandisePost_id' })
-  merchandisePost: MerchandisePost;
+  @JoinColumn({ name: 'merchandise_id' })
+  merchandisePost: Merchandise;
 }
