@@ -29,7 +29,10 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       const refreshToken = localStorage.getItem("refreshToken");
       try {
-        const res = await axios.post(`${REACT_APP_BACKEND_API_URL}/auth/refresh`, { refreshToken });
+        const res = await axios.post(
+          `${REACT_APP_BACKEND_API_URL}/auth/refresh`,
+          { refreshToken }
+        );
         if (res.status === 200) {
           localStorage.setItem("accessToken", res.data.accessToken);
           return api(originalRequest);
@@ -59,16 +62,30 @@ const handleApiError = (error: any) => {
 export const authApi = {
   signIn: (email: string, password: string) =>
     api.post("/auth/sign-in", { email, password }).catch(handleApiError),
-  signUp: (name: string, email: string, password: string, passwordConfirm: string) =>
-    api.post("/auth/sign-up", { name, email, password, passwordConfirm }).catch(handleApiError),
-  googleLogin: (token: string) => api.post("/auth/google", { token }).catch(handleApiError),
+  signUp: (
+    name: string,
+    email: string,
+    password: string,
+    passwordConfirm: string
+  ) =>
+    api
+      .post("/auth/sign-up", { name, email, password, passwordConfirm })
+      .catch(handleApiError),
+  googleLogin: (token: string) =>
+    api.post("/auth/google", { token }).catch(handleApiError),
   signOut: () => api.post("/auth/sign-out").catch(handleApiError),
 };
 
 export const userApi = {
   findMy: () => api.get("/users/me").catch(handleApiError),
-  update: (newUserName: string, newPassword: string, confirmNewPassword: string) =>
-    api.patch("/users/me", { newUserName, newPassword, confirmNewPassword }).catch(handleApiError),
+  update: (
+    newUserName: string,
+    newPassword: string,
+    confirmNewPassword: string
+  ) =>
+    api
+      .patch("/users/me", { newUserName, newPassword, confirmNewPassword })
+      .catch(handleApiError),
   checkPassword: (password: string) =>
     api.post("/users/check-password", { password }).catch(handleApiError),
   delete: () => api.delete("/users/me").catch(handleApiError),
@@ -82,26 +99,44 @@ export const communityApi = {
 
 export const postApi = {
   create: (formData: FormData, communityId: number) =>
-    api.post(`/communities/${communityId}/posts`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    }).catch(handleApiError),
+    api
+      .post(`/communities/${communityId}/posts`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      .catch(handleApiError),
   getPosts: (communityId: number, page = 1, limit = 10) =>
-    api.get(`/communities/${communityId}/posts`, { params: { page, limit } }).catch(handleApiError),
-  like: (postId: number) => api.post(`/posts/${postId}/like`).catch(handleApiError),
+    api
+      .get(`/communities/${communityId}/posts`, { params: { page, limit } })
+      .catch(handleApiError),
+  like: (postId: number) =>
+    api.post(`/posts/${postId}/like`).catch(handleApiError),
 };
 
 export const commentApi = {
   create: ({ postId, content }: { postId: number; content: string }) =>
     api.post(`/posts/${postId}/comments`, { content }).catch(handleApiError),
   createReply: (commentId: number, { content }: { content: string }) =>
-    api.post(`/comments/${commentId}/replies`, { content }).catch(handleApiError),
+    api
+      .post(`/comments/${commentId}/replies`, { content })
+      .catch(handleApiError),
   getComments: (postId: number, page = 1, limit = 10) =>
-    api.get(`/posts/${postId}/comments`, { params: { page, limit } }).catch(handleApiError),
+    api
+      .get(`/posts/${postId}/comments`, { params: { page, limit } })
+      .catch(handleApiError),
 };
 
 export const liveApi = {
   createLive: (artistId: string, title: string, liveType: string) =>
-    api.post('/live', { artistId, title, liveType }).catch(handleApiError),
-  findAllLives: (communityId: string) => api.get(`/live/community/${communityId}`).catch(handleApiError),
-  watchLive: (liveId: number) => api.get(`/live/${liveId}`).catch(handleApiError),
+    api.post("/live", { artistId, title, liveType }).catch(handleApiError),
+  findAllLives: (communityId: string) =>
+    api.get(`/live/community/${communityId}`).catch(handleApiError),
+  watchLive: (liveId: number) =>
+    api.get(`/live/${liveId}`).catch(handleApiError),
+};
+
+export const communityUserApi = {
+  findCommunityUser: (communityId: number, userId: number) =>
+    api
+      .post(`/communities/userInfo/${communityId}`, { userId })
+      .catch(handleApiError),
 };
