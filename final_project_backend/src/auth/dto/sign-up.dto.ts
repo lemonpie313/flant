@@ -7,7 +7,6 @@ export class SignUpDto extends PickType(User, [
   'email',
   'password',
   'name',
-  'profileImage',
 ]) {
   /**
    *  비밀번호 확인
