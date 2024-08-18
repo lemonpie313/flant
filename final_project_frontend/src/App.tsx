@@ -11,7 +11,7 @@ import LiveStreamingPage from './pages/LiveStreamingPage';
 import LiveListPage from './pages/LiveListPage';
 import { userApi } from './services/api';
 import CommunityBoardTest from "./pages/CommunityBoardTest";
-import ProductMainPage from "./pages/productMainPage";
+import MerchandiseHome from "./pages/merchandiseHome";
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -64,7 +64,7 @@ const App: React.FC = () => {
             <Route path="/communitiess" element={<CommunityBoardTest />} />
             <Route path="/live" element={<ProtectedRoute><LiveListPage /></ProtectedRoute>} />
             <Route path="/live/:liveId" element={<ProtectedRoute><LiveStreamingPage /></ProtectedRoute>} />
-            <Route path="/product" element={<ProtectedRoute><ProductMainPage /></ProtectedRoute>} />
+            <Route path="/merchandise" element={<ProtectedRoute><MerchandiseHome /></ProtectedRoute>} />
             <Route path="/" element={<Navigate to="/main" replace />} />
             <Route path="*" element={<Navigate to="/main" replace />} />
           </Routes>

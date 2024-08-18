@@ -9,22 +9,22 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { MerchandisePost } from './merchandise-post.entity';
+import { Merchandise } from './merchandise.entity';
 import { CartItem } from 'src/cart/entities/cart.item.entity';
 
 @Entity('merchandise_option')
 export class MerchandiseOption {
-  forEach(arg0: (option: any) => void) {
-    throw new Error('Method not implemented.');
-  }
+  // forEach(arg0: (option: any) => void) {
+  //   throw new Error('Method not implemented.');
+  // }
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
-  @Column()
-  optionName: string;
+  @Column({ unsigned: true })
+  merchandiseId: number;
 
   @Column()
-  optionPrice: number;
+  optionName: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -34,12 +34,12 @@ export class MerchandiseOption {
 
   //상품 연결
   @ManyToOne(
-    () => MerchandisePost,
-    (merchandisePost) => merchandisePost.merchandiseOption,
+    () => Merchandise,
+    (merchandise) => merchandise.merchandiseOption,
     { onDelete: 'CASCADE' },
   )
-  @JoinColumn({ name: 'merchandisePost_id' })
-  merchandisePost: MerchandisePost;
+  @JoinColumn({ name: 'merchandise_id' })
+  merchandise: Merchandise;
 
   // 주문 연결
   @OneToMany(() => CartItem, (cartItem) => cartItem.merchandiseOption, {

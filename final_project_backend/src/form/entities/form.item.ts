@@ -15,7 +15,7 @@ export class FormItem {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
-  @Column()
+  @Column({unsigned: true})
   userId: number;
 
   @Column({ type: 'enum', enum: ApplyType })

@@ -11,7 +11,7 @@ import { Cart } from './entities/cart.entity';
 import { CartItem } from './entities/cart.item.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MerchandisePost } from 'src/merchandise/entities/merchandise-post.entity';
+import { Merchandise } from 'src/merchandise/entities/merchandise.entity';
 import { MerchandiseOption } from 'src/merchandise/entities/marchandise-option.entity';
 import { stat } from 'fs';
 import { query } from 'express';
@@ -26,8 +26,8 @@ export class CartService {
     private readonly cartRepository: Repository<Cart>,
     @InjectRepository(CartItem)
     private readonly cartItemRepository: Repository<CartItem>,
-    @InjectRepository(MerchandisePost)
-    private readonly merchandisePostRepository: Repository<MerchandisePost>,
+    @InjectRepository(Merchandise)
+    private readonly merchandisePostRepository: Repository<Merchandise>,
     @InjectRepository(MerchandiseOption)
     private readonly merchandiseOptionRepository: Repository<MerchandiseOption>,
   ) {}
@@ -38,7 +38,7 @@ export class CartService {
 
     //상품 유효성 체크
     const merchandise = await this.merchandisePostRepository.findOne({
-      where: { id: merchandiseId },
+      where: { merchandiseId },
     });
 
     // 추가하려는 상품이 없을 경우 반환
@@ -49,13 +49,13 @@ export class CartService {
     //상품 옵션 가져오기
     const merchandiseOption = await this.merchandiseOptionRepository.findOne({
       where: { id: merchandiseOptionId },
-      relations: ['merchandisePost'],
+      relations: ['merchandise'],
     });
 
     //상품 id 안에 있는 옵션 id가 맞는지 유효성 체크
     if (
       !merchandiseOption ||
-      merchandiseOption.merchandisePost.id !== merchandise.id
+      merchandiseOption.merchandise.merchandiseId !== merchandise.merchandiseId
     ) {
       throw new NotFoundException('해당 상품 내 옵션이 존재하지 않습니다.');
     }
@@ -85,14 +85,14 @@ export class CartService {
         });
 
         await this.cartItemRepository.save({
-          merchandisePost: merchandise,
+          merchandise: merchandise,
           merchandiseOption,
           quantity,
           cart: userCart,
         });
       } else {
         userCart = await this.cartItemRepository.save({
-          merchandisePost: merchandise,
+          merchandise: merchandise,
           merchandiseOption,
           quantity,
           cart,
@@ -103,8 +103,8 @@ export class CartService {
         status: HttpStatus.OK,
         message: '카트 저장에 성공했습니다.',
         data: {
-          merchandisePostId: userCart.merchandisePost.id,
-          merchandiseTitle: userCart.merchandisePost.title,
+          merchandisePostId: userCart.merchandise.id,
+          merchandiseTitle: userCart.merchandise.title,
           merchandiseOption: userCart.merchandiseOption.optionName,
           merchandiseOptionPrice: userCart.merchandiseOption.optionPrice,
           quantity: userCart.quantity,
@@ -122,11 +122,11 @@ export class CartService {
           guestCart.length > 0
             ? guestCart[guestCart.length - 1].cartItemId + 1
             : 1,
-        merchandisePostId: merchandise.id,
-        merchandiseTitle: merchandise.title,
+        merchandisePostId: merchandise.merchandiseId,
+        merchandiseName: merchandise.merchandiseName,
+        price: merchandise.price,
         merchandiseOptionId: merchandiseOption.id,
         merchandiseOptionName: merchandiseOption.optionName,
-        merchandiseOptionPrice: merchandiseOption.optionPrice,
         quantity,
       });
 
@@ -153,15 +153,15 @@ export class CartService {
       console.log(cart);
       const cartItem = await this.cartItemRepository.find({
         where: { cart }, // cartId로 CartItem을 조회
-        relations: ['merchandisePost', 'merchandiseOption'],
+        relations: ['merchandise', 'merchandiseOption'],
       });
 
       const cartItems = cartItem.map((cartItem) => ({
         cartItemId: cartItem.id,
-        merchandiseId: cartItem.merchandisePost.id,
-        merchandiseTitle: cartItem.merchandisePost.title,
+        merchandiseId: cartItem.merchandise.merchandiseId,
+        merchandiseTitle: cartItem.merchandise.merchandiseName,
+        price: cartItem.merchandise.price,
         merchandiseOptionName: cartItem.merchandiseOption.optionName,
-        merchandiseOptionPrice: cartItem.merchandiseOption.optionPrice,
         quantity: cartItem.quantity,
       }));
 
@@ -202,7 +202,7 @@ export class CartService {
       // 조회된 cart와 입력한 cartId를 통해 CartItem을 조회
       const cartItem = await this.cartItemRepository.findOne({
         where: { cart, id: cartItemId },
-        relations: ['merchandisePost', 'merchandiseOption'],
+        relations: ['merchandise', 'merchandiseOption'],
       });
 
       if (!cartItem) {
@@ -273,9 +273,9 @@ export class CartService {
 
     // 쿠키 내 각 상품 id + 옵션 id 데이터를 추출하여 userCartItem에 저장하기
     for (const item of guestCart) {
-      // merchandisePost 추출
-      const merchandisePost = await this.merchandisePostRepository.findOne({
-        where: { id: item.merchandisePostId },
+      // merchandise 추출
+      const merchandise = await this.merchandisePostRepository.findOne({
+        where: { merchandiseId: item.merchandisePostId },
       });
       // merchandiseOption 추출
       const merchandiseOption = await this.merchandiseOptionRepository.findOne({
@@ -284,7 +284,7 @@ export class CartService {
       // userCart에 저장
       await this.cartItemRepository.save({
         cart,
-        merchandisePost,
+        merchandise,
         merchandiseOption,
         quantity: item.quantity,
       });

@@ -5,7 +5,6 @@ import { ConfigModule } from '@nestjs/config';
 import { configModuleValidationSchema } from './configs/env-validation.config';
 import { typeOrmModuleOptions } from './configs/database.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
@@ -41,7 +40,7 @@ import { SentryWebhookInterceptor } from './webhook.interceptor';
       rootPath: join(__dirname, '../..', 'final_project_frontend'),
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
-    ProductModule,
+    // ProductModule,
     OrderModule,
     AuthModule,
     UserModule,

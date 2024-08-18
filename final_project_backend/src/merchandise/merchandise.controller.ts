@@ -12,7 +12,6 @@ import {
 import { MerchandiseService } from './merchandise.service';
 import { CreateMerchandiseDto } from './dto/create-merchandise-post.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { FindAllmerchandiseDto } from './dto/find-merchandise.dto';
 import { UpdateMerchandiseDto } from './dto/update-merchandise.dto';
 import { CommunityUserGuard } from 'src/auth/guards/community-user.guard';
 import { PartialUser } from 'src/user/interfaces/partial-user.entity';
@@ -20,11 +19,44 @@ import { CommunityUserRole } from 'src/community/community-user/types/community-
 import { CommunityUserRoles } from 'src/auth/decorators/community-user-roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
+import { CreateCategoryDto } from './dto/create-category.dto';
 
 @ApiTags('상품')
 @Controller('v1/merchandise')
 export class MerchandiseController {
   constructor(private readonly merchandiseService: MerchandiseService) {}
+
+  /**
+   * 상품 카테고리 등록
+   * @param createCategoryDto
+   * @returns
+   */
+  @ApiBearerAuth()
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
+  @Post('/category')
+  async createCategory(
+    @Body() createCategoryDto: CreateCategoryDto,
+    @UserInfo() user: PartialUser,
+  ) {
+    const data =
+      await this.merchandiseService.createCategory(createCategoryDto);
+    return data;
+  }
+
+  /**
+   * 상품 카테고리 조회
+   * @param createCategoryDto
+   * @returns
+   */
+  @Get('/category')
+  async findCategory(
+    @Query('communityId') communityId: number,
+  ) {
+    const data =
+      await this.merchandiseService.findCategory(communityId);
+    return data;
+  }
 
   /**
    * 상품 등록
@@ -36,7 +68,6 @@ export class MerchandiseController {
   @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @Post('/')
   async create(
-    @Query('artistId') artistId: number,
     @Body() createMerchandiseDto: CreateMerchandiseDto,
     @UserInfo() user: PartialUser,
   ) {
@@ -53,8 +84,8 @@ export class MerchandiseController {
    * @returns
    */
   @Get()
-  async findAll(@Query() findAllmerchandiseDto: FindAllmerchandiseDto) {
-    const data = await this.merchandiseService.findAll(findAllmerchandiseDto);
+  async findAll(@Query('communityId') communityId: number, @Query('merchandiseCategoryId') merchandiseCategoryId: number) {
+    const data = await this.merchandiseService.findAll(communityId, merchandiseCategoryId);
     return data;
   }
 

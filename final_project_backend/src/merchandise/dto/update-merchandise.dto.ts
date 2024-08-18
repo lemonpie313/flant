@@ -10,12 +10,12 @@ import {
 
 export class UpdateMerchandiseDto {
   /**
-   * 제목
-   * @example "수정 제목"
+   * 이름
+   * @example "수정 이름"
    */
   @IsOptional()
   @IsString()
-  title?: string;
+  merchandiseName?: string;
 
   /**
    * 썸네일
@@ -24,14 +24,6 @@ export class UpdateMerchandiseDto {
   @IsOptional()
   @IsString()
   thumbnail?: string;
-
-  /**
-   * 판매 상품명
-   * @example "수정 판매 상품명"
-   */
-  @IsOptional()
-  @IsString()
-  salesName?: string;
 
   /**
    * 내용
@@ -47,7 +39,7 @@ export class UpdateMerchandiseDto {
    */
   @IsOptional()
   @IsNumber()
-  deliveryPrice?: number;
+  price?: number;
 
   /**
    * 이미지
@@ -66,13 +58,4 @@ export class UpdateMerchandiseDto {
   @IsArray({ message: '옵션은 배열로 넣어주세요' })
   @IsString({ each: true, message: '옵션은 문자열이어야 합니다' })
   optionName?: string[];
-
-  /**
-   * 옵션 가격
-   * @example [2000,5000,10000]
-   */
-  @IsOptional()
-  @IsArray({ message: '옵션 가격은 배열로 넣어주세요' })
-  @IsInt({ each: true, message: '옵션 가격은 정수여야 합니다' })
-  optionPrice?: number[];
 }

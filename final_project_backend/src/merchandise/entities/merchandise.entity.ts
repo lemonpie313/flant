@@ -10,17 +10,35 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Product } from '../../product/entities/product.entity';
-
 import { MerchandiseOption } from './marchandise-option.entity';
 import { MerchandiseImage } from './merchandise-image.entity';
 import { CartItem } from 'src/cart/entities/cart.item.entity';
-import { Manager } from 'src/admin/entities/manager.entity';
+import { Community } from 'src/community/entities/community.entity';
+import { MerchandiseCategory } from './merchandise-category.entity';
 
-@Entity('merchandise_post')
-export class MerchandisePost {
+@Entity('merchandise')
+export class Merchandise {
   @PrimaryGeneratedColumn({ unsigned: true })
-  id: number;
+  merchandiseId: number;
+
+  /**
+   * 커뮤니티 id
+   * @example 1
+   */
+  @IsNotEmpty({ message: '커뮤니티 id를 입력해주세요' })
+  @IsNumber()
+  @Column({ unsigned: true })
+  communityId: number;
+
+  /**
+   * 카테고리 id
+   * @example 1
+   */
+  @IsNotEmpty({ message: '카테고리 id를 입력해주세요' })
+  @IsNumber()
+  @Column({ unsigned: true })
+  @Column({ unsigned: true })
+  merchandiseCategoryId: number;
 
   /**
    * 상품 이름
@@ -29,7 +47,7 @@ export class MerchandisePost {
   @IsNotEmpty({ message: '상품 이름을 입력해주세요' })
   @IsString()
   @Column()
-  productName: string;
+  merchandiseName: string;
 
   /**
    * 상품 썸네일
@@ -64,10 +82,15 @@ export class MerchandisePost {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  // 굿즈샵 연결
-  @ManyToOne(() => Product, (product) => product.merchandisePosts)
-  @JoinColumn({ name: 'product_id' })
-  product: Product;
+  // 커뮤니티와 연결
+  @ManyToOne(() => Community, (community) => community.merchandise)
+  @JoinColumn({ name: 'community_id' })
+  community: Community;
+
+  // 카테고리와 연결
+  @ManyToOne(() => MerchandiseCategory, (merchandiseCategory) => merchandiseCategory.merchandise)
+  @JoinColumn({ name: 'merchandise_category_id' })
+  merchandiseCategory: MerchandiseCategory;
 
   // 상품 이미지 연결
   @OneToMany(
@@ -80,20 +103,14 @@ export class MerchandisePost {
   // 옵션 연결
   @OneToMany(
     () => MerchandiseOption,
-    (merchandiseOption) => merchandiseOption.merchandisePost,
+    (merchandiseOption) => merchandiseOption.merchandise,
     { onDelete: 'CASCADE' },
   )
   merchandiseOption: MerchandiseOption[];
 
   // 주문 연결
-  @OneToMany(() => CartItem, (cartItem) => cartItem.merchandisePost, {
+  @OneToMany(() => CartItem, (cartItem) => cartItem.merchandise, {
     onDelete: 'CASCADE',
   })
   cartItems: CartItem[];
-
-  //매니저 연결
-  @ManyToOne(() => Manager, (manager) => manager.merchandisePost, {
-    onDelete: 'CASCADE',
-  })
-  manager: Manager;
 }

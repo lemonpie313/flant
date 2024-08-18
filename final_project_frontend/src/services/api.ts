@@ -105,3 +105,20 @@ export const liveApi = {
   findAllLives: (communityId: string) => api.get(`/live/community/${communityId}`).catch(handleApiError),
   watchLive: (liveId: number) => api.get(`/live/${liveId}`).catch(handleApiError),
 };
+
+
+export const merchandiseApi = {
+  // 카테고리 조회 API
+  fetchCategories: (communityId: number) =>
+    api.get(`/v1/merchandise/category`, { params: { communityId } }),
+
+  // 상품 전체 조회 API
+  fetchMerchandises: (communityId: number, merchandiseCategoryId: number) =>
+    api.get(`/v1/merchandise`, {
+      params: { communityId, merchandiseCategoryId },
+    }),
+
+  // 상품 상세 조회 API
+  fetchMerchandiseDetail: (merchandiseId: number) =>
+    api.get(`/v1/merchandise/${merchandiseId}`),
+};
