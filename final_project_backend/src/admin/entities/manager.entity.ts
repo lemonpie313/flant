@@ -1,6 +1,5 @@
 import { Form } from 'src/form/entities/form.entity';
 import { MerchandisePost } from 'src/merchandise/entities/merchandise-post.entity';
-import { Product } from 'src/product/entities/product.entity';
 import { IsInt, IsNotEmpty, IsString, Validate } from 'class-validator';
 import { MESSAGES } from 'src/constants/message.constant';
 import { IsNotEmptyConstraint } from 'src/util/decorators/is-not-emtpy-constraint.decorator';
@@ -15,6 +14,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { GoodsShop } from 'src/goods_shop/entities/goods-shop.entity';
 import { CommunityUser } from 'src/community/community-user/entities/communityUser.entity';
 import { Community } from './../../community/entities/community.entity';
 import { Notice } from './../../notice/entities/notice.entity';
@@ -59,14 +59,8 @@ export class Manager {
   @OneToMany(() => Form, (form) => form.manager)
   form: Form[];
 
-  @OneToMany(() => Product, (product) => product.manager)
-  product: Product[];
-
-  @OneToMany(
-    () => MerchandisePost,
-    (merchandisePost) => merchandisePost.manager,
-  )
-  merchandisePost: MerchandisePost[];
+  @OneToMany(() => GoodsShop, (goodsShop) => goodsShop.manager)
+  goodsShop: GoodsShop[];
 
   @OneToOne(() => CommunityUser, (communityUser) => communityUser.manager)
   communityUser: CommunityUser;

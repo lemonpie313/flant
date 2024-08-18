@@ -10,11 +10,11 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
-import { ProductService } from './product.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { GoodsShopService } from './goods-shop.service';
+import { CreateGoodsShopDto } from './dto/create-goods-shop.dto';
+import { UpdateGoodsShopDto } from './dto/update-goods-shop.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { FindAllProductDto } from './dto/find-product.dto';
+import { FindAllGoodsShopDto } from './dto/find-goods-shop.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRole } from 'src/user/types/user-role.type';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -27,25 +27,25 @@ import { CommunityUserRoles } from 'src/auth/decorators/community-user-roles.dec
 import { CommunityUserGuard } from 'src/auth/guards/community-user.guard';
 
 @ApiTags('굿즈 샵 API')
-@Controller('v1/products')
-export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+@Controller('v1/GoodsShops')
+export class GoodsShopController {
+  constructor(private readonly goodsShopService: GoodsShopService) {}
 
   /**
    * 상점 생성
-   * @param createProductDto
+   * @param createGoodsShopDto
    * @returns
    */
   @ApiBearerAuth()
   @CommunityUserRoles(CommunityUserRole.MANAGER)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Post()
-  async productCreate(
+  async goodsShopCreate(
     @UserInfo() user: PartialUser,
-    @Body() createProductDto: CreateProductDto,
+    @Body() createGoodsShopDto: CreateGoodsShopDto,
   ) {
-    const data = await this.productService.productCreate(
-      createProductDto,
+    const data = await this.goodsShopService.goodsShopCreate(
+      createGoodsShopDto,
       user,
     );
     return data;
@@ -53,53 +53,60 @@ export class ProductController {
 
   /**
    * 상점 전체 조회
-   * @param findAllProductDto
+   * @param findAllGoodsShopDto
    * @returns
    */
   @Get()
-  async findAll(@Body() findAllProductDto: FindAllProductDto) {
-    const data = await this.productService.findAll(findAllProductDto);
+  async findAll(@Body() findAllGoodsShopDto: FindAllGoodsShopDto) {
+    const data = await this.goodsShopService.findAll(findAllGoodsShopDto);
     return data;
   }
 
   /**
    * 상점 상세 조회
-   * @param productId
+   * @param goodsShopId
    * @returns
    */
-  @Get(':productId')
-  findOne(@Param('productId') productId: string) {
-    return this.productService.findOne(+productId);
+  @Get(':goodsShopId')
+  async findOne(@Param('goodsShopId') goodsShopId: string) {
+    return await this.goodsShopService.findOne(+goodsShopId);
   }
 
   /**
    * 상점 수정 (작성하였던 매니저만)
-   * @param productId
-   * @param updateProductDto
+   * @param goodsShopId
+   * @param updateGoodsShopDto
    * @returns
    */
   @ApiBearerAuth()
-  @Patch(':productId')
+  @Patch(':goodsShopId')
   @CommunityUserRoles(CommunityUserRole.MANAGER)
   @UseGuards(JwtAuthGuard, CommunityUserGuard)
-  update(
-    @Param('productId') productId: string,
-    @Body() updateProductDto: UpdateProductDto,
+  async update(
+    @Param('goodsShopId') goodsShopId: string,
+    @Body() updateGoodsShopDto: UpdateGoodsShopDto,
     @UserInfo() user: PartialUser,
   ) {
-    return this.productService.update(+productId, updateProductDto, user);
+    return await this.goodsShopService.update(
+      +goodsShopId,
+      updateGoodsShopDto,
+      user,
+    );
   }
 
   /**
    * 상품삭제 (작성하였던 매니저만)
-   * @param productId
+   * @param goodsShopId
    * @returns
    */
   @ApiBearerAuth()
-  @Delete('/:productId')
+  @Delete('/:goodsShopId')
   @CommunityUserRoles(CommunityUserRole.MANAGER)
   @UseGuards(JwtAuthGuard, CommunityUserGuard)
-  remove(@Param('productId') productId: string, @UserInfo() user: PartialUser) {
-    return this.productService.remove(+productId, user);
+  async remove(
+    @Param('goodsShopId') goodsShopId: string,
+    @UserInfo() user: PartialUser,
+  ) {
+    return await this.goodsShopService.remove(+goodsShopId, user);
   }
 }

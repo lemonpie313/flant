@@ -36,7 +36,6 @@ export class MerchandiseOption {
   @ManyToOne(
     () => MerchandisePost,
     (merchandisePost) => merchandisePost.merchandiseOption,
-    { onDelete: 'CASCADE' },
   )
   @JoinColumn({ name: 'merchandisePost_id' })
   merchandisePost: MerchandisePost;

@@ -8,18 +8,19 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ProductCategory } from './product.category.entity';
+import { GoodsShopCategory } from './goods-shop.category.entity';
 import { MerchandiseImage } from 'src/merchandise/entities/merchandise-image.entity';
 import { MerchandisePost } from '../../merchandise/entities/merchandise-post.entity';
 import { Manager } from 'src/admin/entities/manager.entity';
+import { Community } from 'src/community/entities/community.entity';
 
-@Entity('products')
-export class Product {
+@Entity('goods_shop')
+export class GoodsShop {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
   @Column()
-  productCode: string;
+  goodsShopCode: string;
 
   @Column()
   name: string;
@@ -37,29 +38,35 @@ export class Product {
   updatedAt: Date;
 
   //매니저 연결
-  @ManyToOne(() => Manager, (manager) => manager.product, {
+  @ManyToOne(() => Manager, (manager) => manager.goodsShop, {
     onDelete: 'CASCADE',
   })
   manager: Manager;
 
+  //커뮤니티 연결
+  @ManyToOne(() => Community, (community) => community.goodsShop, {
+    onDelete: 'CASCADE',
+  })
+  community: Community;
+
   //상품 게시물 연결
   @OneToMany(
     () => MerchandisePost,
-    (merchandisePost) => merchandisePost.product,
+    (merchandisePost) => merchandisePost.goodsShop,
     {
       cascade: true,
     },
   )
-  merchandisePosts: MerchandisePost[];
+  merchandisePost: MerchandisePost[];
 
   //카테고리 연결
 
   @OneToMany(
-    () => ProductCategory,
-    (productCategory) => productCategory.product,
+    () => GoodsShopCategory,
+    (goodsShopCategory) => goodsShopCategory.goodsShop,
     {
       cascade: true,
     },
   )
-  productCategory: ProductCategory[];
+  goodsShopCategory: GoodsShopCategory[];
 }

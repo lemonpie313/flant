@@ -1,6 +1,6 @@
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 
-export class FindAllProductDto {
+export class FindAllGoodsShopDto {
   /**
    * 검색상점명
    * @example "상점명"

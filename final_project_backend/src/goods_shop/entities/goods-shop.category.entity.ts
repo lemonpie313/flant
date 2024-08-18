@@ -8,10 +8,10 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Product } from './product.entity';
+import { GoodsShop } from './goods-shop.entity';
 
-@Entity('product_categorys')
-export class ProductCategory {
+@Entity('goods_shop_categorys')
+export class GoodsShopCategory {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
@@ -34,9 +34,9 @@ export class ProductCategory {
   /**
    * 굿즈샵 연결
    */
-  @ManyToOne(() => Product, (Product) => Product.productCategory, {
+  @ManyToOne(() => GoodsShop, (GoodsShop) => GoodsShop.goodsShopCategory, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'product_id' })
-  product: Product;
+  @JoinColumn({ name: 'goodsShop_id' })
+  goodsShop: GoodsShop;
 }

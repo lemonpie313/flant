@@ -9,11 +9,10 @@ import {
 
 import { User } from 'src/user/entities/user.entity';
 import { Order } from './entities/order.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cart } from '../cart/entities/cart.entity';
 import { CartItem } from '../cart/entities/cart.item.entity';
-import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 import { OrderItem } from './entities/orderItem.entity';
 import { MerchandisePost } from 'src/merchandise/entities/merchandise-post.entity';
 import { MerchandiseOption } from 'src/merchandise/entities/marchandise-option.entity';
@@ -35,6 +34,7 @@ export class OrderService {
     private readonly merchandisePost: Repository<MerchandisePost>,
     @InjectRepository(MerchandiseOption)
     private readonly merchandiseOption: Repository<MerchandiseOption>,
+    private dataSource: DataSource,
   ) {}
 
   async create(userId: number) {
@@ -47,73 +47,83 @@ export class OrderService {
       throw new NotAcceptableException('카트가 존재하지 않습니다.');
     }
 
-    //카트 아이템 조회
+    //카트 아이템 데이터 가져오기
     const cartItem = await this.cartItemRepository.find({
       where: { cart: user.cart }, // cartId로 CartItem을 조회
       relations: ['merchandisePost', 'merchandiseOption'],
     });
 
-    // 각 상품의 옵션별 가격 + 배송비 합산을 계산, 새로은 Map을 만들어 저장
-    const plusMerchandisePosts = new Map();
-    let totalPrice = 0;
+    //트랜잭션 처리
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.startTransaction();
 
-    cartItem.forEach((item) => {
-      const merchandisePostId = item.merchandisePost.id;
+    try {
+      // 각 상품의 옵션별 가격 + 배송비 합산을 계산, 새로은 Map을 만들어 저장
+      const plusMerchandisePosts = new Map();
+      let totalPrice = 0;
 
-      // 상품 id 당 배달비는 1번만 계산
-      if (!plusMerchandisePosts.has(merchandisePostId)) {
-        totalPrice += item.merchandisePost.deliveryPrice;
-        plusMerchandisePosts.set(merchandisePostId, {});
+      cartItem.forEach((item) => {
+        const merchandisePostId = item.merchandisePost.id;
+
+        // 상품 id 당 배달비는 1번만 계산
+        if (!plusMerchandisePosts.has(merchandisePostId)) {
+          totalPrice += item.merchandisePost.deliveryPrice;
+          plusMerchandisePosts.set(merchandisePostId, {});
+        }
+
+        // 옵션 * 수량 가격 추가
+        if (item.merchandiseOption) {
+          totalPrice += item.merchandiseOption.optionPrice * item.quantity;
+        }
+      });
+
+      //order 생성
+      const order = await queryRunner.manager.save(Order, { totalPrice, user });
+
+      let orderItems = cartItem.map((item) => ({
+        order: order, // 위 생성된 주문
+        merchandisePostId: item.merchandisePost.id,
+        merchandiseOption: item.merchandiseOption.id,
+        merchandiseOptionPrice: item.merchandiseOption.optionPrice,
+        quantity: item.quantity,
+      }));
+
+      // 생성된  OrderItem 저장
+      await queryRunner.manager.save(OrderItem, orderItems);
+
+      //포인트 부족 시 오류 반환
+      if (user.point < totalPrice) {
+        throw new BadRequestException('포인트가 부족합니다.');
       }
 
-      // 옵션 * 수량 가격 추가
-      if (item.merchandiseOption) {
-        totalPrice += item.merchandiseOption.optionPrice * item.quantity;
-      }
-    });
+      //유저 포인트에서 합산 금액 차감
+      user.point -= totalPrice;
+      await queryRunner.manager.save(user);
 
-    //order 먼저 생성
-    const order = await this.orderRepository.save({ totalPrice, user });
-
-    let orderItems = cartItem.map((item) => ({
-      order: order, // 이미 저장된 주문
-      merchandisePostId: item.merchandisePost.id,
-      merchandiseOption: item.merchandiseOption.id,
-      merchandiseOptionPrice: item.merchandiseOption.optionPrice,
-      quantity: item.quantity,
-    }));
-
-    // 생성된 배열 OrderItem 저장
-    await this.orderItemRepository.save(orderItems);
-
-    //포인트 부족 시 오류 반환
-    if (user.point < totalPrice) {
-      throw new BadRequestException('포인트가 부족합니다.');
+      //기존 카트 삭제
+      await queryRunner.manager.delete(Cart, user.cart.id);
+      await queryRunner.commitTransaction();
+      return {
+        status: HttpStatus.CREATED,
+        message: '주문이 완료되었습니다.',
+        data: {
+          orderId: order.id,
+          totalPrice: order.totalPrice,
+          process: order.progress,
+        },
+      };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
     }
-
-    //유저 포인트에서 합산 금액 차감
-    user.point -= totalPrice;
-    await this.userRepository.save(user);
-
-    //기존 카트 삭제
-    await this.cartRepository.delete(user.cart.id);
-
-    return {
-      status: HttpStatus.CREATED,
-      message: '주문이 완료되었습니다.',
-      data: {
-        orderId: order.id,
-        totalPrice: order.totalPrice,
-        process: order.progress,
-      },
-    };
   }
 
   //주문 전체 조회
   async findAll(userId: number) {
     const data = await this.orderRepository.find({
       where: { user: { userId } },
-      relations: ['orderItem'],
     });
 
     return {
@@ -125,16 +135,31 @@ export class OrderService {
 
   //주문 상세 조회
   async findOne(id: number, userId: number) {
-    const data = await this.orderRepository.findOne({
+    const order = await this.orderRepository.findOne({
       where: { id, user: { userId } },
+      relations: ['orderItem'],
     });
-    if (!data) {
+    if (!order) {
       throw new NotFoundException('주문이 존재하지 않습니다.');
     }
+
+    const merchandise = await this.merchandisePost.findOne({
+      where: { id: order.orderItem[0].merchandisePostId },
+      relations: ['merchandiseOption'],
+    });
+    const deliveryPrice = merchandise.deliveryPrice;
     return {
       status: HttpStatus.OK,
       message: '주문내역 상세 조회에 성공하였습니다.',
-      data,
+      data: {
+        orderId: order.id,
+        progress: order.progress,
+        deliveryPrice,
+        orderItem: order.orderItem,
+        totalPrice: order.totalPrice,
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt,
+      },
     };
   }
 
@@ -154,6 +179,9 @@ export class OrderService {
     // if (data.progress == 'ready') {
     //   throw new NotFoundException('주문 취소가 불가능합니다.');
     // }
+
+    // 주문 취소 요청 시 어디로 요청이 가야하지?
+    // 취소가 완료 시 point도 재지급 되어야 함 / api 추가 ? or 다른방법?
 
     return {
       statsu: HttpStatus.OK,
