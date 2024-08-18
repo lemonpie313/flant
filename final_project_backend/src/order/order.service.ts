@@ -9,16 +9,13 @@ import {
 
 import { User } from 'src/user/entities/user.entity';
 import { Order } from './entities/order.entity';
-import { DataSource, getConnection, QueryRunner, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cart } from '../cart/entities/cart.entity';
 import { CartItem } from '../cart/entities/cart.item.entity';
-import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 import { OrderItem } from './entities/orderItem.entity';
 import { MerchandisePost } from 'src/merchandise/entities/merchandise-post.entity';
 import { MerchandiseOption } from 'src/merchandise/entities/marchandise-option.entity';
-import { dataSource } from 'src/data-source';
-import { error } from 'console';
 
 @Injectable()
 export class OrderService {

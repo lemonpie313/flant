@@ -22,6 +22,8 @@ import { UserRole } from 'src/user/types/user-role.type';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from '../auth/guards/optionaljwtauthguard ';
+import { UserInfo } from 'src/util/decorators/user-info.decorator';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 
 @ApiTags('카트 API')
 @ApiBearerAuth()
@@ -37,11 +39,15 @@ export class CartController {
    * @returns
    */
   @Post()
-  async create(@Body() createCartDto: CreateCartDto, @Req() req, @Res() res) {
-    const userId = req.user?.id;
+  async create(
+    @Body() createCartDto: CreateCartDto,
+    @UserInfo() user: PartialUser,
+    @Req() req,
+    @Res() res,
+  ) {
     const cookies = req.cookies || {};
 
-    const data = await this.cartService.create(createCartDto, userId, cookies);
+    const data = await this.cartService.create(createCartDto, user.id, cookies);
 
     if (data.data.guestCart) {
       res.cookie('guestCart', JSON.stringify(data.data.guestCart), {
@@ -57,13 +63,12 @@ export class CartController {
    * @returns 카트 전체 조회
    */
   @Get()
-  async findAll(@Req() req, @Res() res) {
+  async findAll(@UserInfo() user: PartialUser, @Req() req, @Res() res) {
     //user가 없을 경우 null
-    const userId = req.user?.id;
     const cookies = req.cookies || {};
     const guestCart = cookies['guestCart'] || null;
 
-    const data = await this.cartService.findAll(userId, guestCart);
+    const data = await this.cartService.findAll(user.id, guestCart);
     return res.json(data);
   }
 
@@ -74,13 +79,12 @@ export class CartController {
    * @returns
    */
   @Post('/test')
-  async notUserCartSave(@Req() req, @Res() res) {
-    const userId = req.user.id;
+  async notUserCartSave(@UserInfo() user: PartialUser, @Req() req, @Res() res) {
     const cookies = req.cookies || {};
 
     //user 로그인 api에 로그인 성공 시 아래 코드 적용될 수 있도록 수정
     // 카트 이전 서비스 호출
-    const data = await this.cartService.notUserCartSave(userId, cookies);
+    const data = await this.cartService.notUserCartSave(user.id, cookies);
 
     // 로그인 성공 응답
     return res.json({
@@ -100,17 +104,17 @@ export class CartController {
   @Delete('/items/:cartItemId')
   async remove(
     @Param('cartItemId') cartItemId: string,
+    @UserInfo() user: PartialUser,
     @Req() req,
     @Res() res,
   ) {
-    const userId = req.user?.id;
     const cookies = req.cookies || {};
 
     // 서비스 호출하여 로직 처리
-    const data = await this.cartService.remove(userId, +cartItemId, cookies);
+    const data = await this.cartService.remove(user.id, +cartItemId, cookies);
 
     // 비회원의 경우 쿠키 업데이트
-    if (!userId) {
+    if (!user.id) {
       res.cookie('guestCart', JSON.stringify(data.updateCart), {
         maxAge: 24 * 60 * 60 * 1000, // 1일 동안 유지
       });
@@ -130,23 +134,23 @@ export class CartController {
   // @Patch('/items/:cartItemId')
   // async cartQuantity(
   //   @Param('cartItemId') cartItemId: string,
+  //   @UserInfo() user: PartialUser,
   //   @Body() updateCadrDto: UpdateCartDto,
   //   @Req() req,
   //   @Res() res,
   // ) {
-  //   const userId = req.user?.id;
   //   const cookies = req.cookies || {};
 
   //   // 서비스 호출하여 로직 처리
   //   const data = await this.cartService.cartQuantity(
-  //     userId,
+  //     user.id,
   //     +cartItemId,
   //     cookies,
   //     updateCadrDto,
   //   );
 
   //   // 비회원의 경우 쿠키 업데이트
-  //   if (!userId) {
+  //   if (!user.id) {
   //     res.cookie('guestCart', JSON.stringify(data.data.updateCart), {
   //       maxAge: 24 * 60 * 60 * 1000, // 1일 동안 유지
   //     });

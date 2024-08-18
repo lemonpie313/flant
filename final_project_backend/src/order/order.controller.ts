@@ -15,6 +15,8 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { UserInfo } from 'src/util/decorators/user-info.decorator';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 
 @ApiTags('order')
 @ApiBearerAuth()
@@ -29,9 +31,8 @@ export class OrderController {
    * @returns
    */
   @Post()
-  async create(@Req() req) {
-    const userId = req.user.id;
-    return await this.orderService.create(+userId);
+  async create(@UserInfo() user: PartialUser) {
+    return await this.orderService.create(+user.id);
   }
 
   /**
@@ -40,9 +41,8 @@ export class OrderController {
    * @returns
    */
   @Get()
-  async findAll(@Req() req) {
-    const userId = req.user.id;
-    return this.orderService.findAll(userId);
+  async findAll(@UserInfo() user: PartialUser) {
+    return this.orderService.findAll(user.id);
   }
 
   /**
@@ -51,9 +51,8 @@ export class OrderController {
    * @returns
    */
   @Get(':id')
-  findOne(@Param('id') id: string, @Req() req) {
-    const userId = req.user.id;
-    return this.orderService.findOne(+id, userId);
+  findOne(@Param('id') id: string, @UserInfo() user: PartialUser) {
+    return this.orderService.findOne(+id, user.id);
   }
 
   /**
