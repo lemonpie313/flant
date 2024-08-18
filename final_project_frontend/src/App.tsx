@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import MainPage from "./pages/MainPage";
 import SignUpPage from "./pages/SignUpPage";
@@ -9,26 +9,34 @@ import { ChatProvider } from './context/ChatContext';
 import CommunityBoard from './pages/board';
 import LiveStreamingPage from './pages/LiveStreamingPage';
 import LiveListPage from './pages/LiveListPage';
-import { userApi } from './services/api';  // authApi 대신 userApi 사용
+import { userApi } from './services/api';
 import CommunityBoardTest from "./pages/CommunityBoardTest";
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
 
-  useEffect(() => {
-    const checkAuthStatus = async () => {
-      try {
-        await userApi.findMy(); // authApi.findMy() 대신 userApi.findMy() 사용
-        setIsLoggedIn(true);
-      } catch (error) {
-        setIsLoggedIn(false);
-        localStorage.removeItem("accessToken");
-      }
-    };
+  const AuthChecker: React.FC = () => {
+    const location = useLocation();
 
-    checkAuthStatus();
-  }, []);
+    useEffect(() => {
+      const checkAuthStatus = async () => {
+        if (location.pathname !== "/login" && location.pathname !== "/signup" ) {
+          try {
+            await userApi.findMy();
+            setIsLoggedIn(true);
+          } catch (error) {
+            setIsLoggedIn(false);
+            localStorage.removeItem("accessToken");
+          }
+        }
+      };
+
+      checkAuthStatus();
+    }, [location.pathname]);
+
+    return null;
+  };
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
@@ -44,6 +52,7 @@ const App: React.FC = () => {
   return (
     <ChatProvider>
       <Router>
+        <AuthChecker />
         <div>
           <Routes>
             <Route path="/login" element={isLoggedIn ? <Navigate to="/main" replace /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />} />
@@ -51,7 +60,7 @@ const App: React.FC = () => {
             <Route path="/main" element={<ProtectedRoute><MainPage isLoggedIn={isLoggedIn} /></ProtectedRoute>} />
             <Route path="/userinfo" element={<ProtectedRoute><UserInfoPage /></ProtectedRoute>} />
             <Route path="/communities" element={<ProtectedRoute><CommunityBoard /></ProtectedRoute>} />
-            <Route path="/communitiess" element={<CommunityBoardTest />} />
+            <Route path="/communitiess/:communityId" element={<CommunityBoardTest />} />
             <Route path="/live" element={<ProtectedRoute><LiveListPage /></ProtectedRoute>} />
             <Route path="/live/:liveId" element={<ProtectedRoute><LiveStreamingPage /></ProtectedRoute>} />
             <Route path="/" element={<Navigate to="/main" replace />} />
