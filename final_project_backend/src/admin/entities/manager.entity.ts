@@ -14,6 +14,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { GoodsShop } from 'src/goods_shop/entities/goods-shop.entity';
 import { CommunityUser } from 'src/community/community-user/entities/communityUser.entity';
 import { Community } from './../../community/entities/community.entity';
 import { Notice } from './../../notice/entities/notice.entity';

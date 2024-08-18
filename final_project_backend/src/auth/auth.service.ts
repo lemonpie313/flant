@@ -14,6 +14,10 @@ import { Res } from '@nestjs/common';
 import { Response } from 'express';
 import { hash } from 'bcrypt';
 import { Refreshtoken } from './entities/refresh-token.entity';
+import { Cart } from 'src/cart/entities/cart.entity';
+import { CartItem } from 'src/cart/entities/cart.item.entity';
+import { MerchandisePost } from 'src/merchandise/entities/merchandise-post.entity';
+import { MerchandiseOption } from 'src/merchandise/entities/marchandise-option.entity';
 
 @Injectable()
 export class AuthService {
@@ -23,6 +27,14 @@ export class AuthService {
     private readonly jwtService: JwtService,
     @InjectRepository(Refreshtoken)
     private readonly refreshtokenRepository: Repository<Refreshtoken>,
+    @InjectRepository(Cart)
+    private readonly cartRepository: Repository<Cart>,
+    @InjectRepository(CartItem)
+    private readonly cartItemRepository: Repository<CartItem>,
+    @InjectRepository(MerchandisePost)
+    private readonly merchandisePostRepository: Repository<MerchandisePost>,
+    @InjectRepository(MerchandiseOption)
+    private readonly merchandiseOptionRepository: Repository<MerchandiseOption>,
   ) {}
 
   // 회원가입
@@ -58,7 +70,7 @@ export class AuthService {
       email,
       password: hashedPassword,
       name,
-      //profileImage,
+      // profileImage,
     });
     delete user.password;
 
@@ -66,14 +78,22 @@ export class AuthService {
   }
 
   // 로그인
-  async signIn(userId: number, @Res({ passthrough: true }) res: Response) {
+  async signIn(
+    userId: number,
+    @Res({ passthrough: true }) res: Response,
+    cookies: any,
+  ) {
     const { accessToken, ...accessOption } = this.createAccessToken(userId);
     const { refreshToken, ...refreshOption } = this.createRefreshToken(userId);
 
+    await this.notUserCartSave(userId, cookies);
     await this.setCurrentRefreshToken(refreshToken, accessToken, userId);
     console.log(accessToken);
     res.cookie('Authentication', accessToken, accessOption);
     res.cookie('Refresh', refreshToken, refreshOption);
+
+    // 쿠키 삭제
+    res.clearCookie('guestCart');
 
     return { accessToken, refreshToken };
   }
@@ -261,5 +281,50 @@ export class AuthService {
     // 만료되었다면 재발급
     const accesstoken = this.createAccessToken(userId);
     return accesstoken;
+  }
+
+  //비회원 카트 이전
+  async notUserCartSave(userId: number, cookies: any) {
+    const guestCart = cookies['guestCart']
+      ? JSON.parse(cookies['guestCart'])
+      : [];
+
+    // 유저 추출 및 카트 유효성 검사
+    const user = await this.userRepository.findOne({
+      where: { userId },
+    });
+
+    let cart = await this.cartRepository.findOne({
+      where: { user: { userId } },
+      relations: ['user'],
+    });
+
+    //유저 카트가 없다면 카트 생성
+
+    if (!cart) {
+      cart = await this.cartRepository.save({
+        user,
+      });
+    }
+
+    // 쿠키 내 각 상품 id + 옵션 id 데이터를 추출하여 userCartItem에 저장하기
+    for (const item of guestCart) {
+      // merchandisePost 추출
+      const merchandisePost = await this.merchandisePostRepository.findOne({
+        where: { id: item.merchandisePostId },
+      });
+      // merchandiseOption 추출
+      const merchandiseOption = await this.merchandiseOptionRepository.findOne({
+        where: { id: item.merchandiseOptionId },
+      });
+      // userCart에 저장
+      await this.cartItemRepository.save({
+        cart,
+        merchandisePost,
+        merchandiseOption,
+        quantity: item.quantity,
+      });
+    }
+    console.log('test');
   }
 }

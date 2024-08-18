@@ -8,7 +8,7 @@ import {
 import { CreateMerchandiseDto } from './dto/create-merchandise-post.dto';
 import { Merchandise } from './entities/merchandise.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { DataSource, Like, Repository } from 'typeorm';
 import { MerchandiseImage } from './entities/merchandise-image.entity';
 import { MerchandiseOption } from './entities/marchandise-option.entity';
 import { UpdateMerchandiseDto } from './dto/update-merchandise.dto';

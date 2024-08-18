@@ -16,7 +16,7 @@ import { Artist } from './admin/entities/artist.entity';
 import { Cart } from './cart/entities/cart.entity';
 import { CartItem } from './cart/entities/cart.item.entity';
 import { Form } from './form/entities/form.entity';
-import { FormItem } from './form/entities/form.item';
+import { ApplyUser } from './form/entities/apply-user.entity';
 import { Like } from './like/entities/like.entity';
 import { Media } from './media/entities/media.entity';
 import { MediaFile } from './media/entities/media-file.entity';
@@ -31,6 +31,7 @@ import { PostImage } from './post/entities/post-image.entity';
 import { OrderItem } from './order/entities/orderItem.entity';
 import { Refreshtoken } from './auth/entities/refresh-token.entity';
 import { Live } from './live/entities/live.entity';
+import { FormQuestion } from './form/entities/form-question.entity';
 import UserSeeder from './database/seeds/user.seeder';
 import CommunityUserSeeder from './database/seeds/community-user.seeder';
 import CommunitySeeder from './database/seeds/community.seeder';
@@ -56,7 +57,8 @@ const options: DataSourceOptions & SeederOptions = {
     Community,
     CommunityUser,
     Form,
-    FormItem,
+    ApplyUser,
+    FormQuestion,
     Like,
     Live,
     Manager,

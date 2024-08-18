@@ -7,22 +7,26 @@ import {
 } from 'typeorm';
 
 import { Form } from './form.entity';
-import { IsDate, IsEnum, IsNumber, IsOptional } from 'class-validator';
 import { ApplyType } from '../types/form-apply-type.enum';
 
-@Entity('form_item')
-export class FormItem {
+@Entity('apply_user')
+export class ApplyUser {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
   @Column({unsigned: true})
   userId: number;
 
+  @Column()
+  question: string;
+
   @Column({ type: 'enum', enum: ApplyType })
   applyType: ApplyType;
 
   // form 연결
-  @ManyToOne(() => Form, (form) => form.formItem)
+  @ManyToOne(() => Form, (form) => form.applyUser, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'form_id' })
   form: Form;
 }

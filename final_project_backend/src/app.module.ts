@@ -25,6 +25,8 @@ import { NoticeModule } from './notice/notice.module';
 import { MediaModule } from './media/media.module';
 import { LiveModule } from './live/live.module';
 import { CommunityUserModule } from './community/community-user/community-user.module';
+import { GoodsShopModule } from './goods_shop/goods-shop.module';
+
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { SentryWebhookInterceptor } from './webhook.interceptor';
 
