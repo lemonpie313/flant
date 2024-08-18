@@ -36,9 +36,6 @@ export function ApiFiles(fieldName: string, maxCount: number, localOptions: Mult
               format: 'binary',
             }
           },
-          title: {
-            type: 'string'
-          },
           content: {
             type: 'string'
           }

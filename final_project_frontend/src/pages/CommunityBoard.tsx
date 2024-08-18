@@ -9,7 +9,7 @@ import { Community,Post,User } from '../components/communityBoard/types';
 import './board.scss';
 import CommunityNavigationHeader from '../components/communityBoard/CommunityNavigationHeader';
 
-const CommunityBoardTest: React.FC = () => {
+const CommunityBoard: React.FC = () => {
   const [community, setCommunity] = useState<Community | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -63,7 +63,7 @@ const CommunityBoardTest: React.FC = () => {
 
   const fetchPosts = async () => {
     try {
-      const response = await postApi.getPosts(Number(3));
+      const response = await postApi.getPosts(Number(communityId));
       const postsData = response.data.data as Post[]; // 타입 명시
       setPosts(postsData);
     } catch (error) {
@@ -189,4 +189,4 @@ const CommunityBoardTest: React.FC = () => {
   );
 };
 
-export default CommunityBoardTest;
+export default CommunityBoard;

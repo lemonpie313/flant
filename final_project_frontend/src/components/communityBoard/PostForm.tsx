@@ -25,6 +25,7 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated }) => {
     try {
       const token = localStorage.getItem("accessToken");
       if (!token) throw new Error('로그인이 필요합니다.');
+console.log('communityId', communityId)
 
       const formData = new FormData();
       formData.append('content', content);
