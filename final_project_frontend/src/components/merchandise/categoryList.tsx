@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { merchandiseApi } from '../services/api';
+import { merchandiseApi } from '../../services/api';
 
 interface Category {
   categoryId: number;

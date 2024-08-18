@@ -3,12 +3,23 @@ import {
   IsArray,
   IsEnum,
   IsInt,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
+import { Column } from 'typeorm';
 
 export class UpdateMerchandiseDto {
+  /**
+   * 커뮤니티 id
+   * @example 1
+   */
+  @IsNotEmpty({ message: '커뮤니티 id를 입력해주세요' })
+  @IsNumber()
+  @Column({ unsigned: true })
+  communityId: number;
+  
   /**
    * 이름
    * @example "수정 이름"

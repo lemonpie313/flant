@@ -75,7 +75,7 @@ export class MerchandiseService {
       data: {
         categories,
       },
-    }
+    };
   }
 
   // 상품 생성 API
@@ -135,7 +135,7 @@ export class MerchandiseService {
       const saveImage = await this.merchandiseImageRepository.save({
         merchandiseId: merchandise.merchandiseId,
         url,
-      })
+      });
     }
 
     //상품 생성 후 옵션 데이터 저장
@@ -143,8 +143,7 @@ export class MerchandiseService {
       const saveOption = await this.merchandiseOptionRepository.save({
         merchandiseId: merchandise.merchandiseId,
         optionName: option,
-
-      })
+      });
     }
 
     return {
@@ -253,7 +252,7 @@ export class MerchandiseService {
     //이미지 입력경우
     if (imageUrl !== undefined) {
       // 기존 이미지 삭제
-      await this.merchandiseImageRepository.softDelete({
+      await this.merchandiseImageRepository.delete({
         merchandiseId,
       });
 
@@ -268,15 +267,16 @@ export class MerchandiseService {
 
     if (optionName !== undefined) {
       // 기존 옵션 삭제
+      console.log('---------');
       await this.merchandiseOptionRepository.delete({
         merchandiseId,
       });
-
+      console.log('---');
       // 옵션 재생성
       await this.merchandiseOptionRepository.save(
         optionName.map((optionName, price) => ({
           optionName,
-          merchandisePost: merchandise,
+          merchandiseId,
         })),
       );
     }
@@ -284,7 +284,7 @@ export class MerchandiseService {
     return {
       status: HttpStatus.OK,
       message: '수정 완료되었습니다.',
-      merchandise,
+      updatedMerchandise,
       imageUrl,
       optionName,
     };
