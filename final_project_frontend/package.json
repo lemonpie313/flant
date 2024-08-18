@@ -23,6 +23,7 @@
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.417.0",
+    "next-tick": "^1.1.0",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.4",
     "react-dom": "^18.3.1",
@@ -30,6 +31,7 @@
     "react-scripts": "5.0.1",
     "sass": "^1.77.8",
     "tailwind-merge": "^2.4.0",
+    "video.js": "^8.17.3",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -58,7 +60,7 @@
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",
-    "@types/node": "^22.2.0",
+    "@types/node": "^22.4.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0"
   }

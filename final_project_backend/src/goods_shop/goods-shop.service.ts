@@ -15,6 +15,7 @@ import { CreateGoodsShopDto } from './dto/create-goods-shop.dto';
 import { FindAllGoodsShopDto } from './dto/find-goods-shop.dto';
 import { UpdateGoodsShopDto } from './dto/update-goods-shop.dto';
 import { Community } from 'src/community/entities/community.entity';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 
 @Injectable()
 export class GoodsShopService {
@@ -32,7 +33,7 @@ export class GoodsShopService {
   //상점 생성
   async goodsShopCreate(
     createGoodsShopDto: CreateGoodsShopDto,
-    userId: number,
+    user: PartialUser,
   ) {
     const {
       communityId,
@@ -50,9 +51,11 @@ export class GoodsShopService {
     if (!community) {
       throw new NotFoundException('커뮤니티가 존재하지 않습니다.');
     }
+
     //매니저 정보 가져와서 커뮤니티에 등록되어 있는지 확인
+    const managerId = user?.roleInfo?.roleId;
     const manager = await this.managerRepository.findOne({
-      where: { userId },
+      where: { managerId },
     });
     if (manager.communityId !== communityId) {
       throw new BadRequestException(
@@ -171,8 +174,9 @@ export class GoodsShopService {
   async update(
     id: number,
     updateGoodsShopDto: UpdateGoodsShopDto,
-    userId: number,
+    user: PartialUser,
   ) {
+    const managerId = user?.roleInfo?.roleId;
     const { name, artist, goodsShopCode, detailInfo, categoryName } =
       updateGoodsShopDto;
 
@@ -186,7 +190,7 @@ export class GoodsShopService {
     }
 
     // GoodsShop 작성자와 수정 요청한 사용자가 일치한지 확인
-    if (goodsShop.manager.userId !== userId) {
+    if (goodsShop.manager.managerId !== managerId) {
       throw new ForbiddenException('수정 권한이 없습니다.');
     }
 
@@ -226,7 +230,7 @@ export class GoodsShopService {
     };
   }
 
-  async remove(id: number, userId: number) {
+  async remove(id: number, user: PartialUser) {
     const goodsShop = await this.goodsShopRepository.findOne({
       where: { id },
       relations: ['goodsShopCategory', 'manager'],
@@ -235,7 +239,8 @@ export class GoodsShopService {
       throw new NotFoundException('존재하지 않는 상점입니다.');
     }
     // goodsShop 작성자와 수정 요청한 사용자가 일치한지 확인
-    if (goodsShop.manager.userId !== userId) {
+    const managerId = user?.roleInfo?.roleId;
+    if (goodsShop.manager.managerId !== managerId) {
       throw new ForbiddenException('수정 권한이 없습니다.');
     }
 

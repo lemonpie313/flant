@@ -1,15 +1,12 @@
-// src/pages/MainPage.tsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
+import { Row, Col } from "react-bootstrap";
+import { jwtDecode } from "jwt-decode";
+import { communityApi, authApi } from "../services/api";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./MainPage.scss";
-import { Row, Col } from "react-bootstrap";
-import { communityApi } from "../services/api";
-import { useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode";
-import { authApi } from "../services/api";
-interface MainPageProps {
+
+interface MainPage {
   isLoggedIn: boolean;
 }
 
@@ -19,9 +16,11 @@ interface Community {
   communityLogoImage: string | null;
   communityCoverImage: string | null;
 }
+
 const getToken = () => {
   return localStorage.getItem("accessToken");
 };
+
 const getUserIdFromToken = (token: string): string | null => {
   try {
     const decoded: any = jwtDecode(token);
@@ -32,10 +31,12 @@ const getUserIdFromToken = (token: string): string | null => {
     return null;
   }
 };
-const MainPage: React.FC<MainPageProps> = ({ isLoggedIn }) => {
+
+const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
   const navigate = useNavigate();
   const [communities, setCommunities] = useState<Community[]>([]);
   const [mycommunities, setMyCommunities] = useState<Community[]>([]);
+
   const handleLogout = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -49,6 +50,7 @@ const MainPage: React.FC<MainPageProps> = ({ isLoggedIn }) => {
       alert("LogOut failed.");
     }
   };
+
   useEffect(() => {
     const fetchCommunities = async () => {
       try {
@@ -66,10 +68,10 @@ const MainPage: React.FC<MainPageProps> = ({ isLoggedIn }) => {
         console.log(error)
         alert("Failed to fetch communities");
       }
-      
     };
     fetchCommunities();
   }, []);
+
   return (
     <div className="main-page">
       <header>
@@ -90,14 +92,14 @@ const MainPage: React.FC<MainPageProps> = ({ isLoggedIn }) => {
                     className="header-notification-icon"
                     src="/images/notification.png"
                     alt="notification"
-                  ></img>
+                  />
                 </button>
                 <button>
                   <img
                     className="header-user-icon"
                     src="/images/user.png"
                     alt="user"
-                  ></img>
+                  />
                   <div className="header-user-dropdown">
                     <Link to="/userinfo">내 정보</Link>
                     <Link to="/membership">멤버십</Link>
@@ -122,7 +124,7 @@ const MainPage: React.FC<MainPageProps> = ({ isLoggedIn }) => {
                   className="header-box-shop-image"
                   src="/green-cart.png"
                   alt="green-cart"
-                ></img>
+                />
               </Link>
             </div>
           </div>

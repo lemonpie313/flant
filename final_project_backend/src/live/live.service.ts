@@ -61,12 +61,13 @@ export class LiveService {
       },
       // https: {
       //   port: 8443,
-      //   // key: './key.pem',
-      //   // cert: './cert.pem',
+      //   key: './key.pem',
+      //   cert: './cert.pem',
       // },
       trans: {
-        ffmpeg: '/usr/bin/ffmpeg',
-        // '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+        //'/usr/bin/ffmpeg',
+        ffmpeg:
+          '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
@@ -83,8 +84,8 @@ export class LiveService {
               '-bufsize',
               '8M', // 버퍼(임시 저장공간?) 사이즈 (8MB)
             ],
-            ac: 'copy',
-            // acParam: ['-ab', '64k', '-ac', '1', '-ar', '44100'],
+            ac: 'aac',
+            acParam: ['-ab', '64k', '-ac', '1', '-ar', '44100'],
             hls: true,
             hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
             // hlsKeep: true, // to prevent hls file delete after end the stream
@@ -92,57 +93,61 @@ export class LiveService {
             // dash: true,
             // dashFlags: '[f=dash:window_size=3:extra_window_size=5]',
             // dashKeep: true, // to prevent dash file delete after end the stream
+          },
+          {
+            app: 'live',
             mp4: true,
             mp4Flags: '[movflags=frag_keyframe+empty_moov]',
           },
         ],
       },
-      fission: {
-        // 화질별 분할
-        ffmpeg:
-          '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
-        tasks: [
-          {
-            rule: 'live/*',
-            model: [
-              //   { // 1080p 추가하면 인코딩 과부하 걸림...
-              //     ab: '128k',                // 오디오 비트레이트
-              //     vb: '2000k',               // 비디오 비트레이트 (2 Mbps)
-              //     vs: '1920x1080',           // 비디오 해상도
-              //     vf: '30',                  // 프레임 레이트 (초당 프레임수, 30 fps)
-              // },
-              {
-                ab: '128k',
-                vb: '1500k',
-                vs: '1280x720',
-                vf: '30',
-              },
-              {
-                ab: '96k',
-                vb: '1000k',
-                vs: '854x480',
-                vf: '24',
-              },
-              {
-                ab: '96k',
-                vb: '600k',
-                vs: '640x360',
-                vf: '20',
-              },
-            ],
-          },
-        ],
-      },
+      // fission: {
+      //   // 화질별 분할
+      //   //'/usr/bin/ffmpeg',
+      //   ffmpeg:
+      //     '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+      //   tasks: [
+      //     {
+      //       rule: 'live/*',
+      //       model: [
+      //         //   { // 1080p 추가하면 인코딩 과부하 걸림...
+      //         //     ab: '128k',                // 오디오 비트레이트
+      //         //     vb: '2000k',               // 비디오 비트레이트 (2 Mbps)
+      //         //     vs: '1920x1080',           // 비디오 해상도
+      //         //     vf: '30',                  // 프레임 레이트 (초당 프레임수, 30 fps)
+      //         // },
+      //         {
+      //           ab: '128k',
+      //           vb: '1500k',
+      //           vs: '1280x720',
+      //           vf: '30',
+      //         },
+      //         {
+      //           ab: '96k',
+      //           vb: '1000k',
+      //           vs: '854x480',
+      //           vf: '24',
+      //         },
+      //         {
+      //           ab: '96k',
+      //           vb: '600k',
+      //           vs: '640x360',
+      //           vf: '20',
+      //         },
+      //       ],
+      //     },
+      //   ],
+      // },
     };
     this.nodeMediaServer = new NodeMediaServer(liveConfig);
   }
 
-  onModuleInit() {
+  async onModuleInit() {
     // 서버 실행하면서 미디어서버도 같이 실행
     this.nodeMediaServer.run();
 
     // 방송 전 키값이 유효한지 검증 (따로 암호화 없음, 유효기간만 검증함)
-    this.nodeMediaServer.on(
+    await this.nodeMediaServer.on(
       'prePublish',
       async (id: string, streamPath: string) => {
         console.log(
@@ -167,20 +172,20 @@ export class LiveService {
         }
         const time = new Date();
         const diff = Math.abs(time.getTime() - live.createdAt.getTime()) / 1000;
-        if (diff > 6000) {
-          // 1분 이내에 스트림키 입력 후 방송 시작이 돼야함
-          console.log('-------------에러------------');
-          console.log('라이브 스트림키의 유효기간이 만료되었습니다.');
-          session.reject((reason: string) => {
-            console.log(reason);
-          });
-        }
-        console.log('------------------------방송시작?------------------');
+        // if (diff > 6000) {
+        //   // 1분 이내에 스트림키 입력 후 방송 시작이 돼야함
+        //   console.log('-------------에러------------');
+        //   console.log('라이브 스트림키의 유효기간이 만료되었습니다.');
+        //   session.reject((reason: string) => {
+        //     console.log(reason);
+        //   });
+        // }
+        // console.log('------------------------방송시작?------------------');
       },
     );
 
     // 방송 종료 시 s3에 업로드
-    this.nodeMediaServer.on(
+    await this.nodeMediaServer.on(
       'donePublish',
       async (id: string, streamPath: string) => {
         console.log('---------------------------방송종료?------------------');
@@ -221,25 +226,23 @@ export class LiveService {
           '-------------------------------------------------Reading file:',
           filePath,
         );
+        const file = fs.readFileSync(filePath);
 
-        try {
-          const file = fs.readFileSync(filePath);
+        if (live) {
           const liveVideoUrl = await this.liveRecordingToS3(
             fileName,
             file,
             'mp4',
           );
-          await this.cleanupStreamFolder(streamKey);
-          console.log(
-            '----------------------repository 업데이트-----------------------',
-          );
           await this.liveRepository.update(
             { liveId: live.liveId },
             { liveVideoUrl },
           );
-        } catch (error) {
-          console.error('Error handling live stream file:', error);
         }
+        await this.cleanupStreamFolder(streamKey);
+        console.log(
+          '----------------------repository 업데이트, 삭제 완-----------------------',
+        );
       },
     );
   }
@@ -273,7 +276,8 @@ export class LiveService {
     const folderPath = '../media/live/' + streamKey; //path.join(__dirname, '../../media/live', streamKey);
     console.log('folderPath: ' + folderPath);
     if (fs.existsSync(folderPath)) {
-      for (const file of fs.readdirSync(folderPath)) {
+      const files = fs.readdirSync(folderPath);
+      for (const file of files) {
         const curPath = path.join(folderPath, file);
         fs.unlinkSync(curPath);
       }
@@ -307,7 +311,11 @@ export class LiveService {
       liveType,
       streamKey,
     });
-    return { liveServer: 'rtmp://flant.club/live', ...live };
+    return {
+      liveServer: 'rtmp://54.180.82.208/live',
+      title: live.title,
+      streamKey: live.streamKey,
+    };
     //return { liveServer: 'rtmp://localhost/live', ...live };
   }
 
@@ -344,7 +352,7 @@ export class LiveService {
       artistId: live.artistId,
       // artistNickname: live.artist.artistNickname,
       title: live.title,
-      liveHls: `https://localhost:8443/live/${live.streamKey}/index.m3u8`,
+      liveHls: `http://localhost:8000/live/${live.streamKey}/index.m3u8`,
       // liveHls: `https://flant.club:8443/live/${live.streamKey}/index.m3u8`,
     };
   }

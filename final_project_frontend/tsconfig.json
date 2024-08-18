@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "es6",
+    "lib": ["dom", "dom.iterable", "esnext", "es2015"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -14,13 +14,15 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
+    "noImplicitAny": false,
     "jsx": "react-jsx",
     "baseUrl": "src",
     "paths": {
       "@/*": ["*"]
     },
-    "typeRoots": ["node_modules/@types", "src/types"],
+    "typeRoots": ["./node_modules/@types", "./src/types"],
     "types": ["node", "react-scripts"]
   },
-  "include": ["src", "types"]
+  "include": ["src", "src/types"],
+  "exclude": ["node_modules"]
 }

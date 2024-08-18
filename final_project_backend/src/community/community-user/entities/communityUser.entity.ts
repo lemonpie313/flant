@@ -63,11 +63,9 @@ export class CommunityUser {
   @OneToMany(() => Comment, (comment) => comment.communityUser)
   comments: Comment[]; // 커뮤니티와 댓글 관계
 
-  @OneToOne(() => Manager, (manager) => manager.communityUser, {
-    cascade: true,
-  })
-  manager: Manager;
-
   @OneToOne(() => Artist, (artist) => artist.communityUser)
   artist: Artist;
+
+  @OneToOne(() => Manager, (manager) => manager.communityUser)
+  manager: Manager;
 }

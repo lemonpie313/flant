@@ -15,6 +15,7 @@ import { Manager } from 'src/admin/entities/manager.entity';
 import { NoticeImage } from './entities/notice-image.entity';
 import _ from 'lodash';
 import { MESSAGES } from 'src/constants/message.constant';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 
 @Injectable()
 export class NoticeService {
@@ -25,28 +26,29 @@ export class NoticeService {
     private readonly noticeImageRepository: Repository<NoticeImage>,
     @InjectRepository(Manager)
     private readonly managerRepository: Repository<Manager>,
-  ){}
-  async create(userId: number, communityId: number, createNoticeDto: CreateNoticeDto, imageUrl: string[] | undefined) {
-    const isManager = await this.managerRepository.findOne({where: {userId: userId, communityId: communityId}})
-    if(!isManager){
-      throw new UnauthorizedException(MESSAGES.NOTICE.CREATE.UNAUTHORIZED)
-    }
-
+  ) {}
+  async create(
+    user: PartialUser,
+    communityId: number,
+    createNoticeDto: CreateNoticeDto,
+    imageUrl: string[] | undefined,
+  ) {
+    const managerId = user?.roleInfo?.roleId;
     const createdData = await this.noticeRepository.save({
       communityId: communityId,
-      managerId: isManager.managerId,
+      managerId: managerId,
       title: createNoticeDto.title,
       content: createNoticeDto.content,
-    })
+    });
 
     if (imageUrl && imageUrl.length > 0) {
-      for(let image of imageUrl){
+      for (let image of imageUrl) {
         const noticeImageData = {
           noticeId: createdData.noticeId,
-          managerId: isManager.managerId,
-          noticeImageUrl: image
-        }
-        await this.noticeImageRepository.save(noticeImageData)
+          managerId: managerId,
+          noticeImageUrl: image,
+        };
+        await this.noticeImageRepository.save(noticeImageData);
       }
     }
     return {
@@ -82,7 +84,6 @@ export class NoticeService {
   }
 
   async update(
-    userId: number,
     noticeId: number,
     updateNoticeDto: UpdateNoticeDto,
     imageUrl: string[] | undefined,
@@ -93,15 +94,7 @@ export class NoticeService {
     if (!noticeData) {
       throw new NotFoundException(MESSAGES.NOTICE.UPDATE.NOT_FOUND);
     }
-    const isManager = await this.managerRepository.findOne({
-      where: {
-        userId: userId,
-        communityId: noticeData.communityId,
-      },
-    });
-    if (!isManager) {
-      throw new UnauthorizedException(MESSAGES.NOTICE.UPDATE.UNAUTHORIZED);
-    }
+
     if (_.isEmpty(updateNoticeDto.title && updateNoticeDto.content)) {
       throw new BadRequestException(MESSAGES.NOTICE.UPDATE.BAD_REQUEST);
     }
@@ -109,38 +102,34 @@ export class NoticeService {
     const newData = {
       title: noticeData.title,
       content: noticeData.content,
+    };
+    if (updateNoticeDto.title != noticeData.title) {
+      newData.title = updateNoticeDto.title;
     }
-    if(updateNoticeDto.title != noticeData.title){
-      newData.title = updateNoticeDto.title
+    if (updateNoticeDto.content != noticeData.content) {
+      newData.content = updateNoticeDto.content;
     }
-    if(updateNoticeDto.content != noticeData.content){
-      newData.content = updateNoticeDto.content
-    }    
 
-    await this.noticeRepository.update(
-      { noticeId: noticeId },
-      newData,
-    );
-
+    await this.noticeRepository.update({ noticeId: noticeId }, newData);
 
     //입력된 imageUrl이 있을 경우에
     if (imageUrl && imageUrl.length > 0) {
       //postId에 연결된 모든 postImage 데이터 삭제
       //의도 : DELETE FROM post_image WHERE notice_id = noticeId
       await this.noticeImageRepository
-      .createQueryBuilder()
-      .delete() 
-      .from(NoticeImage)
-      .where('notice_id = :noticeId', { noticeId })
-      .execute();
+        .createQueryBuilder()
+        .delete()
+        .from(NoticeImage)
+        .where('notice_id = :noticeId', { noticeId })
+        .execute();
 
       //업로드된 이미지 숫자만큼 다시 생성
-      for(let image of imageUrl){
+      for (let image of imageUrl) {
         const noticeImageData = {
           noticeId: noticeData.noticeId,
-          postImageUrl: image
-        }
-        await this.noticeImageRepository.save(noticeImageData)
+          postImageUrl: image,
+        };
+        await this.noticeImageRepository.save(noticeImageData);
       }
     }
 
@@ -154,19 +143,14 @@ export class NoticeService {
     };
   }
 
-  async remove(userId: number, noticeId: number) {
+  async remove(noticeId: number) {
     const noticeData = await this.noticeRepository.findOne({
       where: { noticeId: noticeId },
     });
     if (!noticeData) {
       throw new NotFoundException(MESSAGES.NOTICE.REMOVE.NOT_FOUND);
     }
-    const isManager = await this.managerRepository.findOne({
-      where: { userId: userId, communityId: noticeData.communityId },
-    });
-    if (!isManager) {
-      throw new UnauthorizedException(MESSAGES.NOTICE.REMOVE.UNAUTHORIZED);
-    }
+
     await this.noticeRepository.delete(noticeId);
     return {
       status: HttpStatus.OK,

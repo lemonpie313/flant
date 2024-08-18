@@ -23,7 +23,7 @@ import { UserInfo } from 'src/util/decorators/user-info.decorator';
 import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 
 @ApiTags('live')
-@Controller('live')
+@Controller('/v1/live')
 export class LiveController {
   constructor(private readonly liveService: LiveService) {}
 
@@ -51,12 +51,11 @@ export class LiveController {
    *
    * @returns
    */
-  // @ApiBearerAuth()
-  // @Roles(UserRole.User)
-  // @UseGuards(RolesGuard)
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Get('/')
   async findAllLives(
-    @Request() req,
+    @UserInfo() user: PartialUser,
     @Query('communityId') communityId: number,
   ) {
     const lives = await this.liveService.findAllLives(communityId);
@@ -73,10 +72,9 @@ export class LiveController {
    * @returns
    */
   // @ApiBearerAuth()
-  // @Roles(UserRole.User)
-  // @UseGuards(RolesGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get('/:liveId')
-  async watchLive(@Request() req, @Param('liveId') liveId: number) {
+  async watchLive(@UserInfo() user: PartialUser, @Param('liveId') liveId: number) {
     const live = await this.liveService.watchLive(liveId);
     return {
       status: HttpStatus.OK,
@@ -91,11 +89,10 @@ export class LiveController {
    * @returns
    */
   @ApiBearerAuth()
-  @Roles(UserRole.User)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('/:liveId/recordings')
   async watchRecordedLive(
-    @Request() req,
+    @UserInfo() user: PartialUser,
     @Param('liveId') liveId: number,
   ) {
     const live = await this.liveService.watchRecordedLive(liveId);

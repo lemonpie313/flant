@@ -29,6 +29,7 @@ import { GoodsShopModule } from './goods_shop/goods-shop.module';
 
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { SentryWebhookInterceptor } from './webhook.interceptor';
+
 @Module({
   imports: [
     ScheduleModule.forRoot(),

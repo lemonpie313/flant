@@ -9,12 +9,15 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { GoodsShop } from 'src/goods_shop/entities/goods-shop.entity';
 import { CommunityUser } from 'src/community/community-user/entities/communityUser.entity';
+import { Community } from './../../community/entities/community.entity';
+import { Notice } from './../../notice/entities/notice.entity';
 
 @Entity('managers')
 export class Manager {
@@ -35,7 +38,7 @@ export class Manager {
   @IsNotEmpty({ message: MESSAGES.USER.COMMON.USERID.REQUIRED })
   @IsInt()
   @Column()
-  userId: number;
+  communityUserId: number;
 
   /**
    * 매니저 닉네임
@@ -61,4 +64,10 @@ export class Manager {
 
   @OneToOne(() => CommunityUser, (communityUser) => communityUser.manager)
   communityUser: CommunityUser;
+
+  @ManyToOne(() => Community, (community) => community.manager)
+  community: Community;
+
+  @OneToMany(() => Notice, (notice) => notice.manager)
+  notice: Notice[];
 }

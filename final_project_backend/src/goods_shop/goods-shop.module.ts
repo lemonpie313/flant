@@ -8,6 +8,9 @@ import { GoodsShopController } from './goods-shop.controller';
 import { GoodsShopCategory } from './entities/goods-shop.category.entity';
 import { GoodsShop } from './entities/goods-shop.entity';
 import { Community } from 'src/community/entities/community.entity';
+import { AuthModule } from 'src/auth/auth.module';
+import { CommunityUserModule } from 'src/community/community-user/community-user.module';
+import { AdminModule } from 'src/admin/admin.module';
 
 @Module({
   imports: [
@@ -19,6 +22,8 @@ import { Community } from 'src/community/entities/community.entity';
       Community,
     ]),
     OrderModule,
+    CommunityUserModule,
+    AdminModule,
   ],
   controllers: [GoodsShopController],
   providers: [GoodsShopService],

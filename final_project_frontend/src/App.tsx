@@ -1,52 +1,78 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import MainPage from "./pages/MainPage";
 import SignUpPage from "./pages/SignUpPage";
 import UserInfoPage from "./pages/UserInfo";
 import ChatComponent from "./components/ChatComponent";
 import { ChatProvider } from './context/ChatContext';
-import CommunityBoard from './pages/board'; // CommunityBoard 컴포넌트 import
+import CommunityBoard from './pages/board';
+import LiveStreamingPage from './pages/LiveStreamingPage';
+import LiveListPage from './pages/LiveListPage';
+import { userApi } from './services/api';
+import CommunityBoardTest from "./pages/CommunityBoardTest";
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
 
-  useEffect(() => {
-    const loggedIn = localStorage.getItem("isLoggedIn") === "true";
-    setIsLoggedIn(loggedIn);
-  }, []);
+  const AuthChecker: React.FC = () => {
+    const location = useLocation();
 
-  const ProtectedRoute: React.FC<{ element: React.ReactElement }> = ({ element }) => {
-    return isLoggedIn ? element : <Navigate to="/login" replace />;
+    useEffect(() => {
+      const checkAuthStatus = async () => {
+        if (location.pathname !== "/login" && location.pathname !== "/signup" ) {
+          try {
+            await userApi.findMy();
+            setIsLoggedIn(true);
+          } catch (error) {
+            setIsLoggedIn(false);
+            localStorage.removeItem("accessToken");
+          }
+        }
+      };
+
+      checkAuthStatus();
+    }, [location.pathname]);
+
+    return null;
   };
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
   };
 
+  const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+    if (!isLoggedIn) {
+      return <Navigate to="/login" replace />;
+    }
+    return children;
+  };
+
   return (
     <ChatProvider>
       <Router>
+        <AuthChecker />
         <div>
           <Routes>
-            <Route
-              path="/login"
-              element={
-                isLoggedIn ? <Navigate to="/main" replace /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />
-              }
-            />
+            <Route path="/login" element={isLoggedIn ? <Navigate to="/main" replace /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />} />
             <Route path="/signup" element={<SignUpPage />} />
-            <Route path="/main" element={<ProtectedRoute element={<MainPage isLoggedIn={isLoggedIn} />} />} />
-            <Route path="/userinfo" element={<ProtectedRoute element={<UserInfoPage />} />} />
-            <Route path="/communities" element={<CommunityBoard />} /> {/* 새로 추가된 라우트 */}
+            <Route path="/main" element={<ProtectedRoute><MainPage isLoggedIn={isLoggedIn} /></ProtectedRoute>} />
+            <Route path="/userinfo" element={<ProtectedRoute><UserInfoPage /></ProtectedRoute>} />
+            <Route path="/communities" element={<ProtectedRoute><CommunityBoard /></ProtectedRoute>} />
+            <Route path="/communitiess" element={<CommunityBoardTest />} />
+            <Route path="/live" element={<ProtectedRoute><LiveListPage /></ProtectedRoute>} />
+            <Route path="/live/:liveId" element={<ProtectedRoute><LiveStreamingPage /></ProtectedRoute>} />
             <Route path="/" element={<Navigate to="/main" replace />} />
             <Route path="*" element={<Navigate to="/main" replace />} />
           </Routes>
 
           {isLoggedIn && (
             <>
-              <button onClick={toggleChat} className="fixed bottom-5 right-5 z-50 p-2 bg-blue-500 text-white rounded-full">
+              <button 
+                onClick={toggleChat} 
+                className="fixed bottom-5 right-5 z-50 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
+              >
                 {isChatOpen ? '채팅 닫기' : '채팅 열기'}
               </button>
               {isChatOpen && (

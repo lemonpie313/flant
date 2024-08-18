@@ -19,6 +19,12 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRole } from 'src/user/types/user-role.type';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
+import { UserInfo } from 'src/util/decorators/user-info.decorator';
+import { CommunityUserRole } from 'src/community/community-user/types/community-user-role.type';
+import { CommunityUserRoles } from 'src/auth/decorators/community-user-roles.decorator';
+import { CommunityUserGuard } from 'src/auth/guards/community-user.guard';
 
 @ApiTags('굿즈 샵 API')
 @Controller('v1/GoodsShops')
@@ -31,18 +37,16 @@ export class GoodsShopController {
    * @returns
    */
   @ApiBearerAuth()
-  @Roles(UserRole.Manager)
-  @UseGuards(RolesGuard)
-  @UseGuards(AuthGuard('jwt'))
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post()
   async goodsShopCreate(
-    @Req() req,
+    @UserInfo() user: PartialUser,
     @Body() createGoodsShopDto: CreateGoodsShopDto,
   ) {
-    const userId = req.user.id;
     const data = await this.goodsShopService.goodsShopCreate(
       createGoodsShopDto,
-      userId,
+      user,
     );
     return data;
   }
@@ -53,7 +57,7 @@ export class GoodsShopController {
    * @returns
    */
   @Get()
-  async findAll(@Query() findAllGoodsShopDto: FindAllGoodsShopDto) {
+  async findAll(@Body() findAllGoodsShopDto: FindAllGoodsShopDto) {
     const data = await this.goodsShopService.findAll(findAllGoodsShopDto);
     return data;
   }
@@ -64,8 +68,8 @@ export class GoodsShopController {
    * @returns
    */
   @Get(':goodsShopId')
-  findOne(@Param('goodsShopId') goodsShopId: string) {
-    return this.goodsShopService.findOne(+goodsShopId);
+  async findOne(@Param('goodsShopId') goodsShopId: string) {
+    return await this.goodsShopService.findOne(+goodsShopId);
   }
 
   /**
@@ -76,19 +80,17 @@ export class GoodsShopController {
    */
   @ApiBearerAuth()
   @Patch(':goodsShopId')
-  @Roles(UserRole.Manager)
-  @UseGuards(AuthGuard('jwt'))
-  @UseGuards(RolesGuard)
-  update(
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
+  async update(
     @Param('goodsShopId') goodsShopId: string,
     @Body() updateGoodsShopDto: UpdateGoodsShopDto,
-    @Req() req,
+    @UserInfo() user: PartialUser,
   ) {
-    const userId = req.user.id;
-    return this.goodsShopService.update(
+    return await this.goodsShopService.update(
       +goodsShopId,
       updateGoodsShopDto,
-      userId,
+      user,
     );
   }
 
@@ -99,11 +101,12 @@ export class GoodsShopController {
    */
   @ApiBearerAuth()
   @Delete('/:goodsShopId')
-  @Roles(UserRole.Manager)
-  @UseGuards(RolesGuard)
-  @UseGuards(AuthGuard('jwt'))
-  remove(@Param('goodsShopId') goodsShopId: string, @Req() req) {
-    const userId = req.user.id;
-    return this.goodsShopService.remove(+goodsShopId, userId);
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
+  async remove(
+    @Param('goodsShopId') goodsShopId: string,
+    @UserInfo() user: PartialUser,
+  ) {
+    return await this.goodsShopService.remove(+goodsShopId, user);
   }
 }

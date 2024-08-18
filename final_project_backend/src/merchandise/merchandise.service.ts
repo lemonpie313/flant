@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   HttpStatus,
   Injectable,
   NotFoundException,
@@ -14,6 +15,7 @@ import { FindAllmerchandiseDto } from './dto/find-merchandise.dto';
 import { UpdateMerchandiseDto } from './dto/update-merchandise.dto';
 import { Manager } from 'src/admin/entities/manager.entity';
 import { GoodsShop } from 'src/goods_shop/entities/goods-shop.entity';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 
 @Injectable()
 export class MerchandiseService {
@@ -32,10 +34,10 @@ export class MerchandiseService {
   ) {}
 
   // 상품 생성 API
-  async create(createMerchandiseDto: CreateMerchandiseDto, userId: number) {
+  async create(createMerchandiseDto: CreateMerchandiseDto, user: PartialUser) {
     const { goodsShopId, imageUrl, option, optionPrice, ...merchandiseData } =
       createMerchandiseDto;
-
+    const managerId = user?.roleInfo?.roleId;
     // 상점 유효성 체크
     const goodsShop = await this.goodsShopRepository.findOne({
       where: { id: goodsShopId },
@@ -65,7 +67,7 @@ export class MerchandiseService {
     try {
       //매니저 정보 가져오기
       const manager = await this.managerRepository.findOne({
-        where: { userId },
+        where: { managerId },
       });
 
       // 상점 아이디가 있을 경우 생성
@@ -175,7 +177,7 @@ export class MerchandiseService {
   async update(
     id: number,
     updateMerchandiseDto: UpdateMerchandiseDto,
-    userId: number,
+    user: PartialUser,
   ) {
     const {
       title,
@@ -186,7 +188,7 @@ export class MerchandiseService {
       optionName,
       optionPrice,
     } = updateMerchandiseDto;
-
+    const managerId = user?.roleInfo?.roleId;
     //상품 유효성 체크
     const merchandise = await this.merchandiseRepository.findOne({
       where: { id },
@@ -202,8 +204,9 @@ export class MerchandiseService {
       relations: ['manager'],
     });
 
-    if (goodsShop.manager.userId !== userId) {
-      throw new BadRequestException('수정 권한이 없습니다');
+    // product 생성자와 수정 요청한 사용자가 일치한지 확인
+    if (goodsShop.manager.managerId !== managerId) {
+      throw new ForbiddenException('수정 권한이 없습니다.');
     }
 
     //트랙잭션 처리
@@ -278,12 +281,12 @@ export class MerchandiseService {
   }
 
   //상품 삭제 API
-  async remove(merchandiseId: number, userId: number) {
-    //상품 유효성 체크
+  async remove(merchandiseId: number, user: PartialUser) {
     const merchandise = await this.merchandiseRepository.findOne({
       where: { id: merchandiseId },
       relations: ['merchandiseImage', 'merchandiseOption', 'goodsShop'],
     });
+    const managerId = user?.roleInfo?.roleId;
     if (!merchandise) {
       throw new NotFoundException('존재하지 않는 상품입니다.');
     }
@@ -294,8 +297,9 @@ export class MerchandiseService {
       relations: ['manager'],
     });
 
-    if (goodsShop.manager.userId !== userId) {
-      throw new BadRequestException('수정 권한이 없습니다');
+    // product 생성자와 수정 요청한 사용자가 일치한지 확인
+    if (goodsShop.manager.managerId !== managerId) {
+      throw new ForbiddenException('수정 권한이 없습니다.');
     }
 
     //트랙잭션 처리

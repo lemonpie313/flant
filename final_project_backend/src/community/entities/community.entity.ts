@@ -22,6 +22,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Artist } from 'src/admin/entities/artist.entity';
 import { GoodsShop } from 'src/goods_shop/entities/goods-shop.entity';
 import { Live } from 'src/live/entities/live.entity';
+import { Manager } from './../../admin/entities/manager.entity';
 
 @Entity('communities')
 export class Community {
@@ -105,4 +106,7 @@ export class Community {
   goodsShop: GoodsShop[];
   @OneToMany(() => Live, (live) => live.community)
   live: Live[];
+
+  @OneToMany(() => Manager, (manager) => manager.community)
+  manager: Manager[];
 }
