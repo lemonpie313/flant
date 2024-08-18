@@ -151,4 +151,14 @@ export class PostController {
       ItemType.POST,
     );
   }
+
+  @Get(':id/likes')
+  async countLikesOnPost(
+    @Param('id', ParseIntPipe) id: number,
+  ){
+    return this.likeService.countLikes(
+      id,
+      ItemType.POST,
+    )
+  }
 }
