@@ -7,21 +7,20 @@ import {
   Param,
   Delete,
   UseGuards,
-  Req,
   Query,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
 import { PartialUser } from 'src/user/interfaces/partial-user.entity';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @ApiTags('order')
 @ApiBearerAuth()
 @Controller('v1/orders')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(JwtAuthGuard)
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
@@ -37,7 +36,6 @@ export class OrderController {
 
   /**
    * 주문내역 전체 조회
-   * @param req
    * @returns
    */
   @Get()
