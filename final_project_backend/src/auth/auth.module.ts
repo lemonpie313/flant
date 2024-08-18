@@ -12,6 +12,10 @@ import { GoogleStrategy } from './strategies/google.strategy';
 import { configModuleGoogleValidationSchema } from './../configs/google-env-validation.config';
 import { Refreshtoken } from './entities/refresh-token.entity';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh-token.strategy';
+import { Cart } from 'src/cart/entities/cart.entity';
+import { Merchandise } from 'src/merchandise/entities/merchandise.entity';
+import { MerchandiseOption } from 'src/merchandise/entities/marchandise-option.entity';
+import { CartItem } from 'src/cart/entities/cart.item.entity';
 
 @Module({
   imports: [
@@ -19,7 +23,14 @@ import { JwtRefreshStrategy } from './strategies/jwt-refresh-token.strategy';
       isGlobal: true,
       validationSchema: configModuleGoogleValidationSchema,
     }),
-    TypeOrmModule.forFeature([User, Refreshtoken]),
+    TypeOrmModule.forFeature([
+      User,
+      Refreshtoken,
+      Cart,
+      CartItem,
+      Merchandise,
+      MerchandiseOption,
+    ]),
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

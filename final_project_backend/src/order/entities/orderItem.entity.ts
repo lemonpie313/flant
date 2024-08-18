@@ -12,7 +12,7 @@ export class OrderItem {
   orderId: number;
 
   @IsNumber()
-  @Column()
+  @Column({ unsigned: true })
   merchandisePostId: number;
 
   @IsNumber()
