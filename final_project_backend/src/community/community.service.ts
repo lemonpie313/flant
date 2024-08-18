@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   HttpStatus,
   Injectable,
   NotFoundException,
@@ -44,6 +45,13 @@ export class CommunityService {
     communityId: number,
     communityAssignDto: CommunityAssignDto,
   ) {
+    const existedData = await this.communityUserRepository.findOne({
+      where: { userId :userId, communityId: communityId }
+    })
+    if(existedData){
+      throw new ConflictException('이미 가입된 사용자입니다.')
+    }
+
     const assignData = await this.communityUserRepository.save({
       userId: userId,
       communityId: communityId,

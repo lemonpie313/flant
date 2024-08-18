@@ -78,6 +78,7 @@ export const communityApi = {
   findAll: () => api.get("/communities").catch(handleApiError),
   findOne: (id: number) => api.get(`/communities/${id}`).catch(handleApiError),
   findMy: () => api.get("/communities/me").catch(handleApiError),
+  assign: (communityId : number) => api.post(`/communities/${communityId}/assign`).catch(handleApiError)
 };
 
 export const postApi = {

@@ -1,0 +1,29 @@
+.floating-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #38c172;
+    color: white;
+    padding: 10px 60px; /* 세로 길이를 줄이기 위해 패딩 조정 */
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    z-index: 10000;
+    justify-content: center;
+    height: auto; /* 버튼의 높이를 자동으로 조정 */
+  
+    &:hover {
+      background-color: darken(#38c172, 10%);
+      transform: scale(1.05);
+    }
+  }
+  
+  .assign-btn {
+    background-color: #1d72b8; /* 가입하기 버튼의 색상 */
+    &:hover {
+      background-color: darken(#1d72b8, 10%);
+    }
+  }
