@@ -27,6 +27,9 @@ import { LiveModule } from './live/live.module';
 import { CommunityUserModule } from './community/community-user/community-user.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { SentryWebhookInterceptor } from './webhook.interceptor';
+import { RedisClientOptions } from 'redis';
+import { redisStore } from 'cache-manager-redis-yet';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -38,6 +41,16 @@ import { SentryWebhookInterceptor } from './webhook.interceptor';
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '../..', 'final_project_frontend'),
+    }),
+    CacheModule.register<RedisClientOptions>({
+      store: redisStore,
+      password: process.env.REDIS_PASSWORD,
+      socket: {
+        port: parseInt(process.env.REDIS_PORT),
+        host: process.env.REDIS_HOST,
+      },
+      isGlobal: true,
+      ttl: 180 * 1000,
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     // ProductModule,

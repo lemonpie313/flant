@@ -107,7 +107,7 @@ const CommunityBoardTest: React.FC = () => {
           )}
           {isLoggedIn ? (
             <>
-              <PostForm onPostCreated={fetchPosts} communityId={Number(communityId)} />
+              <PostForm onPostCreated={fetchPosts} />
               <div className="posts-container">
               {posts.length > 0 ? (
                 posts.map((post) => (

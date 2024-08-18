@@ -101,17 +101,34 @@ export class CommunityService {
   async findOne(communityId: number) {
     const existedCommunity = await this.communityRepository.findOne({
       where: { communityId: communityId },
-      relations: ['posts', 'posts.postImages'],
+      relations: ['posts', 'posts.communityUser', 'posts.postImages', 'posts.communityUser.users'],
     });
 
     if (!existedCommunity) {
       throw new NotFoundException(MESSAGES.COMMUNITY.COMMON.NOT_FOUND);
     }
 
+    const processedPosts = existedCommunity.posts.map(post => {
+      return {
+        postId: post.postId,
+        nickname: post.communityUser.nickName,
+        profileImage: post.communityUser.users.profileImage,
+        isArtist: post.artistId !== null,  // artistId가 존재하면 아티스트로 간주
+        content: post.content,
+        createdAt: post.createdAt,
+        updatedAt: post.updatedAt,
+        postImages: post.postImages.map(image => ({
+          postImageId: image.postImageId,
+          postImageUrl: image.postImageUrl,
+        })),
+      };
+    });
+  
+
     return {
       status: HttpStatus.OK,
       message: MESSAGES.COMMUNITY.FINDONE.SUCCEED,
-      data: existedCommunity,
+      data: processedPosts,
     };
   }
 

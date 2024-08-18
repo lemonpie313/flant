@@ -15,6 +15,7 @@ import { Community } from 'src/community/entities/community.entity';
 import { Exclude } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Artist } from './../../admin/entities/artist.entity';
+import { CommunityUser } from 'src/community/community-user/entities/communityUser.entity';
 
 @Entity()
 export class Post {
@@ -37,15 +38,6 @@ export class Post {
   @IsNumber()
   @Column({ unsigned: true, nullable: true })
   artistId: number | null;
-
-  /**
-   * 게시글 제목
-   * @example '오늘의 활동 정리'
-   */
-  @IsNotEmpty()
-  @IsString()
-  @Column()
-  title: string;
 
   /**
    * 게시글 내용
@@ -77,4 +69,10 @@ export class Post {
 
   @ManyToOne(() => Artist, (artist) => artist.posts)
   artist: Artist;
+
+  @ManyToOne(() => CommunityUser, (communityUser) => communityUser.posts,{
+    onDelete: 'CASCADE'
+  })
+  @JoinColumn({ name: 'community_user_id'})
+  communityUser: CommunityUser;
 }
