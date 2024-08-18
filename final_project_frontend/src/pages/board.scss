@@ -1,0 +1,137 @@
+.community-board {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  
+  .weverse-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #fff;
+    border-bottom: 1px solid #e0e0e0;
+  
+    .logo img {
+      height: 30px;
+    }
+  
+    nav {
+      display: flex;
+      gap: 20px;
+  
+      a {
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+  
+        &.active {
+          color: #ff0000;
+        }
+      }
+    }
+  
+    .user-actions {
+      display: flex;
+      gap: 10px;
+    }
+  }
+  
+  .main-content {
+    display: flex;
+    flex: 1;
+    padding: 20px;
+    background-color: white;
+  }
+  
+  .left-sidebar, .right-sidebar {
+    width: 250px;
+  }
+  
+  .center-content {
+    flex: 1;
+    margin: 0 20px;
+  }
+  
+  .stories-section {
+    display: flex;
+    overflow-x: auto;
+    padding: 10px 0;
+    margin-bottom: 20px;
+  
+    .story-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-right: 15px;
+  
+      img {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 3px solid #ff0000;
+      }
+  
+      span {
+        margin-top: 5px;
+        font-size: 12px;
+      }
+    }
+  }
+  
+  .post-form {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  
+    input {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-bottom: 1px solid #e0e0e0;
+      margin-bottom: 10px;
+    }
+  
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+  
+      button {
+        padding: 5px 10px;
+        border: none;
+        background-color: #f0f2f5;
+        color: #333;
+        border-radius: 5px;
+        cursor: pointer;
+  
+        &[type="submit"] {
+          background-color: #ff0000;
+          color: #fff;
+        }
+      }
+    }
+  }
+  
+  .community-info {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+  
+    h2 {
+      margin-bottom: 10px;
+    }
+  
+    .membership-btn, .join-membership-btn {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #ff0000;
+      color: #fff;
+      cursor: pointer;
+    }
+  }
+  
