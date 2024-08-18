@@ -44,7 +44,7 @@ const CommunityBoardTest: React.FC = () => {
 
   const fetchPosts = async () => {
     try {
-      const response = await postApi.getPosts(Number(3));
+      const response = await postApi.getPosts(Number(communityId));
       const postsData = response.data.data as Post[]; // 타입 명시
       setPosts(postsData);
     } catch (error) {
