@@ -10,7 +10,7 @@ import {
 import axios from "axios";
 import Header from "../components/communityBoard/Header";
 import PostForm from "../components/communityBoard/PostForm";
-import PostCard from "../components/communityBoard/PostCard";
+import PostCard from "./../components/communityBoard/PostCard";
 import {
   Community,
   Post,
@@ -26,8 +26,8 @@ const CommunityBoard: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  const communityId = 1;
-  const userId = 3;
+  const { communityId } = useParams<{ communityId: string }>();
+
   useEffect(() => {
     const checkAuthAndFetchData = async () => {
       const token = localStorage.getItem("accessToken");
@@ -35,7 +35,7 @@ const CommunityBoard: React.FC = () => {
       if (token) {
         setIsLoggedIn(true);
         await fetchCommunityData();
-        await fetchPosts();
+        //await fetchPosts();
         await fetchCommunityUsers();
       } else {
         setIsLoggedIn(false);
@@ -67,7 +67,9 @@ const CommunityBoard: React.FC = () => {
 
   const fetchCommunityUsers = async () => {
     try {
-      const response = await communityUserApi.findCommunityUser(communityId);
+      const response = await communityUserApi.findCommunityUser(
+        Number(communityId)
+      );
       setCommunityUser(response.data);
     } catch (error) {
       console.error("커뮤니티유저 데이터 가져오기 오류:", error);
