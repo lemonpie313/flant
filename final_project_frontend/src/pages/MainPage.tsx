@@ -171,16 +171,20 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
             </div>
             {communities.map((community) => (
               <Col key={community.communityId} md={3}>
-                <div className="figure">
+                <div 
+                  className="figure"
+                  onClick={() => handleCommunityClick(community.communityId)}
+                  style={{ cursor: 'pointer' }}
+                >
                   <img
                     style={{ width: "300px", height: "400px" }}
                     src={
                       community.communityCoverImage ||
                       "https://picsum.photos/id/475/250/300"
                     }
-                    alt={community.communityName}
+                    alt={community.communityName || `Community ${community.communityId}`}
                   />
-                  <figcaption>{community.communityName}</figcaption>
+                  <figcaption>{community.communityName || `Community ${community.communityId}` }</figcaption>
                 </div>
               </Col>
             ))}
