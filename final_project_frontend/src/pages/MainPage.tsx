@@ -83,7 +83,7 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
           <Link to="/main" className="header-box-logo">
             <img
               className="header-box-logo-image"
-              src="/TGSrd-removebg-preview.png"
+              src="/favicon.ico"
               alt="logo"
             />
           </Link>
