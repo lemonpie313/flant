@@ -147,7 +147,6 @@ const CommunityBoard: React.FC = () => {
         </>
       )}
       <main className="main-content">
-        <div className="left-sidebar">{/* 왼쪽 사이드바 내용 */}</div>
         <div className="center-content">
           {/* {community && (
             <div className="community-header">

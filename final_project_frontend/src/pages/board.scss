@@ -39,19 +39,24 @@
 
 .main-content {
   display: flex;
-  flex: 1;
-  padding: 20px;
-  background-color: #f0f2f5;
+  flex-direction: row; /* 수평 배치 */
+  justify-content: space-around;
+  gap: 10px; /* 섹션 간의 간격 */
+}
+
+.center-content {
+  flex: 1; /* 중앙 콘텐츠가 더 넓게 차지하도록 설정 */
+  margin-left: 580px;
+}
+
+.right-sidebar {
+  flex: 1; /* 오른쪽 사이드바를 상대적으로 좁게 설정 */
+  max-width: 300px; /* 오른쪽 사이드바 최대 너비 */
 }
 
 .left-sidebar,
 .right-sidebar {
   width: 250px;
-}
-
-.center-content {
-  flex: 1;
-  margin: 0 20px;
 }
 
 .stories-section {
@@ -137,11 +142,6 @@
   .left-sidebar,
   .right-sidebar {
     width: 250px;
-  }
-
-  .center-content {
-    flex: 1;
-    margin: 0 20px;
   }
 
   .stories-section {
