@@ -5,6 +5,10 @@ import { jwtDecode } from "jwt-decode";
 import axios from 'axios';
 import './board.scss';
 
+interface MainPage {
+  isLoggedIn: boolean;
+}
+
 // 인터페이스 정의
 interface Community {
   id: number;
