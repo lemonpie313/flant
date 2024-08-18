@@ -45,7 +45,6 @@ export class NoticeController {
   create(
     @UploadedFiles() files: { noticeImage?: Express.MulterS3.File[] },
     @UserInfo() user: PartialUser,
-    @Query('communityId') communityId: number,
     @Body() createNoticeDto: CreateNoticeDto,
   ) {
     let imageUrl = undefined;
@@ -56,7 +55,6 @@ export class NoticeController {
 
     return this.noticeService.create(
       user,
-      +communityId,
       createNoticeDto,
       imageUrl,
     );

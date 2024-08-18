@@ -51,8 +51,7 @@ export class PostController {
   async create(
     @UploadedFiles() files: { postImage?: Express.MulterS3.File[] },
     @UserInfo() user: PartialUser,
-    @Query('communityId') communityId: number,
-    @Body() createPostDto: CreatePostDto,
+    @Body() createPostDto,
   ) {
     let imageUrl = undefined;
     if (files && files.postImage && files.postImage.length > 0) {
@@ -62,7 +61,6 @@ export class PostController {
     const userId = user.id;
     return await this.postService.create(
       +userId,
-      +communityId,
       createPostDto,
       imageUrl,
     );

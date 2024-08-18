@@ -38,12 +38,11 @@ export class PostService {
 
   async create(
     userId: number,
-    communityId: number,
-    createPostDto: CreatePostDto,
+    createPostDto,
     imageUrl: string[] | undefined,
   ) {
     const communityUser = await this.communityUserRepository.findOne({
-      where: { userId: userId, communityId: communityId },
+      where: { userId: userId, communityId: +createPostDto.communityId },
     });
     if (!communityUser) {
       throw new BadRequestException(MESSAGES.POST.CREATE.BAD_REQUEST);
@@ -51,7 +50,7 @@ export class PostService {
     const isArtist = await this.artistRepository.findOne({
       where: {
         communityUserId: communityUser.communityUserId,
-        communityId: communityId,
+        communityId: +createPostDto.communityId,
       },
     });
 
@@ -60,9 +59,8 @@ export class PostService {
       artistId = isArtist.artistId;
     }
     const saveData = await this.postRepository.save({
-      communityId: communityId,
+      communityId: +createPostDto.communityId,
       communityUserId: communityUser.communityUserId,
-      title: createPostDto.title,
       content: createPostDto.content,
       artistId: artistId,
     });
@@ -141,17 +139,13 @@ export class PostService {
     if (!communityUser) {
       throw new UnauthorizedException(MESSAGES.POST.UPDATE.UNAUTHORIZED);
     }
-    if (_.isEmpty(updatePostDto.title && updatePostDto.content)) {
+    if (_.isEmpty(updatePostDto.content)) {
       throw new BadRequestException(MESSAGES.POST.UPDATE.BAD_REQUEST);
     }
 
     const newData = {
-      title: postData.title,
       content: postData.content,
     };
-    if (updatePostDto.title != postData.title) {
-      newData.title = updatePostDto.title;
-    }
     if (updatePostDto.content != postData.content) {
       newData.content = updatePostDto.content;
     }

@@ -33,7 +33,7 @@ const CommunityBoardTest: React.FC = () => {
 
   const fetchCommunityData = async () => {
     try {
-      const response = await communityApi.findOne(Number(communityId));
+      const response = await communityApi.findOne(Number(1));
       setCommunity(response.data);
     } catch (error) {
       console.error('커뮤니티 데이터 가져오기 오류:', error);
@@ -42,7 +42,7 @@ const CommunityBoardTest: React.FC = () => {
 
   const fetchPosts = async () => {
     try {
-      const response = await postApi.getPosts(Number(communityId));
+      const response = await postApi.getPosts(Number(3));
       setPosts(response.data);
     } catch (error) {
       console.error('게시물 가져오기 오류:', error);

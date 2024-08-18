@@ -29,13 +29,12 @@ export class NoticeService {
   ) {}
   async create(
     user: PartialUser,
-    communityId: number,
     createNoticeDto: CreateNoticeDto,
     imageUrl: string[] | undefined,
   ) {
     const managerId = user?.roleInfo?.roleId;
     const createdData = await this.noticeRepository.save({
-      communityId: communityId,
+      communityId: createNoticeDto.communityId,
       managerId: managerId,
       title: createNoticeDto.title,
       content: createNoticeDto.content,

@@ -81,12 +81,12 @@ export const communityApi = {
 };
 
 export const postApi = {
-  create: (formData: FormData, communityId: number) =>
-    api.post(`/communities/${communityId}/posts`, formData, {
+  create: (formData: FormData) =>
+    api.post(`/posts`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     }).catch(handleApiError),
   getPosts: (communityId: number, page = 1, limit = 10) =>
-    api.get(`/communities/${communityId}/posts`, { params: { page, limit } }).catch(handleApiError),
+    api.get(`posts`, { params: { page, limit } }).catch(handleApiError),
   like: (postId: number) => api.post(`/posts/${postId}/like`).catch(handleApiError),
 };
 

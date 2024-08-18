@@ -39,15 +39,6 @@ export class Post {
   artistId: number | null;
 
   /**
-   * 게시글 제목
-   * @example '오늘의 활동 정리'
-   */
-  @IsNotEmpty()
-  @IsString()
-  @Column()
-  title: string;
-
-  /**
    * 게시글 내용
    * @example '13:00 음악방송, 15:00 개인방송'
    */
