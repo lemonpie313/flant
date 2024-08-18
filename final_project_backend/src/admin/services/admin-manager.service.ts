@@ -12,6 +12,7 @@ import { CommunityUser } from 'src/community/community-user/entities/communityUs
 import { CommunityUserRole } from 'src/community/community-user/types/community-user-role.type';
 import { MESSAGES } from 'src/constants/message.constant';
 import { CreateManagerDto } from '../dto/create-manager.dto';
+import { UserRole } from 'src/user/types/user-role.type';
 @Injectable()
 export class AdminManagerService {
   constructor(

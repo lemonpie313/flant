@@ -1,14 +1,15 @@
 import { PickType } from '@nestjs/swagger';
 
 import {
+  IsArray,
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   Matches,
 } from 'class-validator';
 
-import { Form } from '../entities/form.entity';
 import { FormType } from '../types/form-type.enum';
 
 export class CreateFormDto {
@@ -43,6 +44,15 @@ export class CreateFormDto {
   @IsNotEmpty({ message: '커뮤니티 ID를 입력해주세요' })
   @IsNumber()
   communityId: number;
+
+  /**
+   * 질문 리스트
+   * @example ["이름", "나이", "지역", "신청 이유"]
+   */
+  @IsOptional()
+  @IsArray({ message: '질문은 배열로 입력해주세요' })
+  @IsString({ each: true }) //문자열 확인
+  question?: string[];
 
   /**
    * 선착순 인원
