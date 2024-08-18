@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { merchandiseApi } from '../services/api';
-import './merchandiseDetail.scss'; // CSS 파일 추가
 import { authApi } from '../services/api'; // 로그아웃 API 가져오기
+import './merchandiseDetail.scss'; // CSS 파일 추가
+import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
 
 interface MerchandiseImage {
   merchandiseImageId: number;
@@ -145,6 +146,9 @@ const MerchandiseDetail: React.FC = () => {
           </div>
         </div>
       </header>
+
+      {/* Navigation Bar (Community) */}
+      <CommunityNavigationHeader /> {/* 커뮤니티 네비게이션 추가 */}
 
       {/* Main Content */}
       <div className="merchandise-detail">

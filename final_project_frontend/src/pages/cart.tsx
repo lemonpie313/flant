@@ -83,7 +83,7 @@ const Cart: React.FC = () => {
       navigate(`/order/${response.data.data.orderId}`); // 주문 상세 페이지로 이동
     } catch (error) {
       console.error("결제 실패:", error);
-      alert("결제에 실패했습니다.");
+      alert("결제 기능은 지원하지 않습니다.");
     }
   };
 
