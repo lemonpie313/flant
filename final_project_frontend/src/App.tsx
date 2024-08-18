@@ -69,6 +69,7 @@ const App: React.FC = () => {
             <Route path="/userinfo" element={<ProtectedRoute><UserInfoPage /></ProtectedRoute>} />
             <Route path="/communities" element={<ProtectedRoute><CommunityBoard /></ProtectedRoute>} />
             <Route path="/communities/:communityId" element={<ProtectedRoute><CommunityBoard /></ProtectedRoute>} />
+            <Route path="/communitiess/:communityId" element={<CommunityBoard />} />
             <Route path="/live" element={<ProtectedRoute><LiveListPage /></ProtectedRoute>} />
             <Route path="/live/:liveId" element={<ProtectedRoute><LiveStreamingPage /></ProtectedRoute>} />
             <Route path="/merchandise" element={<ProtectedRoute><MerchandiseList communityId={1} /></ProtectedRoute>} />

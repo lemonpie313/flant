@@ -4,20 +4,20 @@ import CommentItem from './CommentItem';
 import "../../styles/PostCard.scss"
 
 interface PostCardProps extends Post {
-  onLike: (postId: number) => void;
+  onLike: (postId: number,likeStatus:boolean) => void;
   onComment: (postId: number, content: string) => void;
   onReply: (commentId: number, content: string) => void;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
-  postId, communityUserId, content, postImages = [], likes, comments, createdAt, isLiked,
+  postId, nickname, content, profileImage, postImages = [], likes, comments, createdAt, isLiked,
   onLike, onComment, onReply
 }) => {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
 
   const handleLike = () => {
-    onLike(postId);
+    onLike(postId,!isLiked);
   };
 
   const handleCommentSubmit = (e: React.FormEvent) => {
@@ -54,13 +54,13 @@ const PostCard: React.FC<PostCardProps> = ({
       <div className="post-header">
         <div className="author-info">
           <img 
-            src={`/profile-images/${communityUserId}`} 
-            alt={communityUserId+"임시(이름)"} 
+            src={profileImage} 
+            alt={nickname} 
             className="author-image" 
             onError={(e) => { e.currentTarget.src = '/default-profile.png'; }} 
           />
           <div className="author-details">
-            <h3>{communityUserId + "이름"}</h3>
+            <h3>{nickname}</h3>
             <span>{formatDate(createdAt)}</span>
           </div>
         </div>
@@ -93,7 +93,7 @@ const PostCard: React.FC<PostCardProps> = ({
       )}
       <div className="post-actions">
         <button onClick={handleLike} className={isLiked ? 'liked' : ''}>
-          <span className="material-symbols-outlined">favorite</span> {likes}
+          <span className="material-symbols-outlined">favorite</span>
         </button>
         <button onClick={() => setShowComments(!showComments)}>
           <span className="material-symbols-outlined">comment</span>

@@ -87,7 +87,8 @@ export const postApi = {
     }).catch(handleApiError),
   getPosts: (communityId: number, page = 1, limit = 10) =>
     api.get(`/posts`, { params: { communityId, page, limit } }).catch(handleApiError),
-  like: (postId: number) => api.post(`/posts/${postId}/like`).catch(handleApiError),
+  like: (postId: number,{ status }: { status: number }) => api.put(`/posts/${postId}/likes`,{status}).catch(handleApiError),
+  checkIfUserLikedPost: (id: number) => api.get(`/posts/${id}/likes/my`).catch(handleApiError),
 };
 
 export const commentApi = {
@@ -97,6 +98,8 @@ export const commentApi = {
     api.post(`/comments/${commentId}/replies`, { content }).catch(handleApiError),
   getComments: (postId: number, page = 1, limit = 10) =>
     api.get(`/posts/${postId}/comments`, { params: { page, limit } }).catch(handleApiError),
+  like: (id: number,{ status }: { status: number }) => api.put(`/comments/${id}/likes`,{status}).catch(handleApiError),
+  checkIfUserLikedComment: (id: number) => api.get(`/comments/${id}/likes/my`).catch(handleApiError),
 };
 
 export const liveApi = {

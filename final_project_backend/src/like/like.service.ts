@@ -9,6 +9,8 @@ import { MESSAGES } from 'src/constants/message.constant';
 import { ApiResponse } from 'src/util/api-response.interface';
 import { createResponse } from 'src/util/response-util';
 import { Comment } from 'src/comment/entities/comment.entity';
+import { LikeStatus } from './types/likeStatus.types';
+import { date } from 'joi';
 
 @Injectable()
 export class LikeService {
@@ -63,12 +65,6 @@ export class LikeService {
       MESSAGES.LIKE.UPDATE_STATUS.SECCEED,
       savedLike,
     );
-
-    return createResponse(
-      HttpStatus.OK,
-      MESSAGES.LIKE.UPDATE_STATUS.SECCEED,
-      like,
-    );
   }
 
   async countLikes(itemId: number, itemType: ItemType) {
@@ -77,28 +73,41 @@ export class LikeService {
 
     if (itemType === ItemType.POST) {
       existedItem = await this.findPostById(itemId);
-      responseType = 'post'
+      responseType = 'post';
     } else if (itemType === ItemType.COMMENT) {
       existedItem = await this.findCommentById(itemId);
-      responseType = 'comment'
+      responseType = 'comment';
     }
 
     if (!existedItem) {
       throw new NotFoundException(MESSAGES.LIKE.ITEMID.NOT_FOUND);
     }
 
-    const countLikes = await this.likeRepository.findAndCount({where: { itemId, itemType }})
+    const countLikes = await this.likeRepository.findAndCount({
+      where: { itemId, itemType },
+    });
 
     const responseData = {
-      itemId : `${responseType}_${itemId}`,
-      likesCount : countLikes[1]
-    }
-    
+      itemId: `${responseType}_${itemId}`,
+      likesCount: countLikes[1],
+    };
+
     return {
       status: HttpStatus.OK,
       message: MESSAGES.LIKE.GETCOUNT.SUCCEED,
       data: responseData,
-    }
+    };
+  }
+
+  async checkIfUserLiked(userId: number, itemId: number, itemType: ItemType) {
+    // DB에서 기존 Like 엔티티 조회
+    let like = await this.likeRepository.findOne({
+      where: { userId, itemId, itemType, status: LikeStatus.LIKED },
+    });
+
+    return createResponse(HttpStatus.OK, MESSAGES.LIKE.MY.SUCCEED, {
+      status: like ? true : false,
+    });
   }
 
   async findPostById(postId: number) {

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { authApi, communityApi, postApi, commentApi } from '../services/api';
+import { authApi,userApi, communityApi, postApi, commentApi } from '../services/api';
 import axios from 'axios';
 import Header from '../components/communityBoard/Header';
 import PostForm from '../components/communityBoard/PostForm';
 import PostCard from '../components/communityBoard/PostCard';
-import { Community,Post } from '../components/communityBoard/types';
+import { Community,Post,User } from '../components/communityBoard/types';
 import './board.scss';
 import CommunityNavigationHeader from '../components/communityBoard/CommunityNavigationHeader';
 
@@ -23,7 +23,6 @@ const CommunityBoard: React.FC = () => {
       if (token) {
         setIsLoggedIn(true);
         await fetchCommunityData();
-        // await fetchPosts();
       } else {
         setIsLoggedIn(false);
       }
@@ -35,10 +34,30 @@ const CommunityBoard: React.FC = () => {
   const fetchCommunityData = async () => {
     try {
       const response = await communityApi.findOne(Number(communityId));
-      setCommunity(response.data.data);
-      if(response.data.data?.posts) setPosts(response.data.data?.posts)
+      const communityData = response.data.data
+      setCommunity(communityData);
+
+      if(communityData?.posts) {
+        const postsWithLikes = await Promise.all(
+          communityData.posts.map(async (post: Post) => {
+            const isLiked = await fetchMyLikePost(post.postId);
+            return { ...post, isLiked };
+          })
+        );
+        setPosts(postsWithLikes)
+      }
     } catch (error) {
       console.error('커뮤니티 데이터 가져오기 오류:', error);
+    }
+  };
+
+  const fetchMyLikePost= async (id:number) => {
+    try {
+      const response = await postApi.checkIfUserLikedPost(id);
+      return response.data.data.status
+    } catch (error) {
+      console.error('로그인 유저 정보 가져오기 오류:', error);
+      return false;
     }
   };
 
@@ -70,14 +89,20 @@ const CommunityBoard: React.FC = () => {
     }
   };
 
-  const handleLike = async (postId: number) => {
+  function booleanToNumber(value: boolean): number {
+    return value ? 1 : 0;
+  }
+
+  const handleLike = async (postId: number,likeStatus:boolean) => {
     try {
-      await postApi.like(postId);
+      const status = booleanToNumber(likeStatus);
+      await postApi.like(postId,{status});
       setPosts(posts.map(post => 
         post.postId === postId 
-          ? { ...post, likes: post.isLiked ? post.likes - 1 : post.likes + 1, isLiked: !post.isLiked } 
+          ? { ...post, likes: likeStatus ? post.likes - 1 : post.likes + 1, isLiked: likeStatus } 
           : post
       ));
+      // await fetchCommunityData();
     } catch (error) {
       console.error('좋아요 오류:', error);
     }
@@ -110,7 +135,7 @@ const CommunityBoard: React.FC = () => {
         {community && (
           <>
         <Header 
-          communityName={community.name} 
+          communityName={community.communityName} 
           isLoggedIn={isLoggedIn} 
           handleLogout={handleLogout} 
         />
@@ -122,13 +147,6 @@ const CommunityBoard: React.FC = () => {
           {/* 왼쪽 사이드바 내용 */}
         </div>
         <div className="center-content">
-          {/* {community && (
-            <div className="community-header">
-              <img src={community.coverUrl} alt={community.name} className="community-cover" />
-              <h1>{community.name}</h1>
-              <p>{community.description}</p>
-            </div>
-          )} */}
           {isLoggedIn ? (
             <>
               <PostForm onPostCreated={fetchPosts} />
@@ -138,7 +156,6 @@ const CommunityBoard: React.FC = () => {
                   <PostCard 
                     key={post.postId} 
                     {...post} 
-                    
                     onLike={handleLike}
                     onComment={handleComment}
                     onReply={handleReply}
@@ -159,9 +176,8 @@ const CommunityBoard: React.FC = () => {
         <div className="right-sidebar">
           {community && (
             <div className="community-info">
-              <img src={community.logoUrl} alt={community.name} className="community-logo" />
-              <h2>{community.name}</h2>
-              <p>{community.memberCount} members</p>
+              <img src={community.communityLogoImage} alt={community.communityName} className="community-logo" />
+              <h2>{community.communityName}</h2>
               <button className="membership-btn">Membership</button>
               <p>지금 멤버십에 가입하고 특별한 혜택을 누려보세요.</p>
               <button className="join-membership-btn">멤버십 가입하기</button>
