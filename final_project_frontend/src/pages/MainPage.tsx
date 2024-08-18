@@ -72,6 +72,10 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
     fetchCommunities();
   }, []);
 
+  const handleCommunityClick = (communityId: number) => {
+    navigate(`/communities/${communityId}`);
+  };
+
   return (
     <div className="main-page">
       <header>
@@ -79,7 +83,7 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
           <Link to="/main" className="header-box-logo">
             <img
               className="header-box-logo-image"
-              src="/TGSrd-removebg-preview.png"
+              src="/favicon.ico"
               alt="logo"
             />
           </Link>
@@ -139,7 +143,11 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
               </div>
               {mycommunities.map((mycommunity) => (
                 <Col key={mycommunity.communityId} md={3}>
-                  <div className="figure">
+                  <div 
+                    className="figure"
+                    onClick={() => handleCommunityClick(mycommunity.communityId)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <img
                       style={{ width: "300px", height: "400px" }}
                       src={

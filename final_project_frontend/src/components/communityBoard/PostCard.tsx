@@ -28,12 +28,26 @@ const PostCard: React.FC<PostCardProps> = ({
     }
   };
 
-  // 날짜 형식 지정 (MM. DD. HH:MM)
+  // 게시글 날짜 형식 지정 (MM. DD. HH:MM)
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return `${(date.getMonth() + 1).toString().padStart(2, '0')}. ${date.getDate().toString().padStart(2, '0')}. ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
   };
 
+  // 게시글 이미지 layout 설정
+  const getImageLayout = () => {
+    if (postImages.length === 1) {
+      return 'single';
+    } else if (postImages.length === 2) {
+      return 'two';
+    } else if (postImages.length === 3) {
+      return 'three';
+    } else {
+      return 'none';
+    }
+  };
+
+  const imageLayout = getImageLayout();
 
   return (
     <div className="post-card">
@@ -53,10 +67,29 @@ const PostCard: React.FC<PostCardProps> = ({
         {/* <button className="more-options">...</button> */}
       </div>
       <p className="post-content">{content}</p>
-      {postImages.length > 0 && (
-        postImages.map((image) => (
-          <img key={image.postImageId} src={image.postImageUrl} alt="Post" />
-        ))
+      {imageLayout === 'single' && (
+        <div className="post-images single">
+          <img src={postImages[0].postImageUrl} alt="Post" />
+        </div>
+      )}
+      {imageLayout === 'two' && (
+        <div className="post-images two">
+          {postImages.map((image) => (
+            <img key={image.postImageId} src={image.postImageUrl} alt="Post" />
+          ))}
+        </div>
+      )}
+       {imageLayout === 'three' && (
+        <div className="post-images three">
+          <div className="left-image">
+            <img src={postImages[0].postImageUrl} alt="Post" />
+          </div>
+          <div className="right-images">
+            {postImages.slice(1).map((image) => (
+              <img key={image.postImageId} src={image.postImageUrl} alt="Post" />
+            ))}
+          </div>
+        </div>
       )}
       <div className="post-actions">
         <button onClick={handleLike} className={isLiked ? 'liked' : ''}>
