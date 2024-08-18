@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { MerchandisePost } from '../../merchandise/entities/merchandise-post.entity';
+import { Merchandise } from '../../merchandise/entities/merchandise.entity';
 
 import {
   Column,
@@ -15,7 +15,7 @@ import { MerchandiseOption } from 'src/merchandise/entities/marchandise-option.e
 
 @Entity('cart_items')
 export class CartItem {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ unsigned: true})
   id: number;
 
   // 카트 연결
@@ -25,11 +25,11 @@ export class CartItem {
 
   //상품 연결
   @ManyToOne(
-    () => MerchandisePost,
-    (merchandisePost) => merchandisePost.cartItems,
+    () => Merchandise,
+    (merchandise) => merchandise.cartItems,
     { onDelete: 'CASCADE' },
   )
-  merchandisePost: MerchandisePost;
+  merchandise: Merchandise;
 
   //상품 옵션 연결
   @ManyToOne(() => MerchandiseOption, (option) => option.cartItem, {

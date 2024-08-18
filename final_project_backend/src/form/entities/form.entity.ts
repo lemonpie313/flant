@@ -9,17 +9,20 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { FormItem } from './form.item';
+import { ApplyUser } from './apply-user.entity';
 import { IsEnum, IsNotEmpty } from 'class-validator';
-import { Exclude } from 'class-transformer';
 import { Manager } from 'src/admin/entities/manager.entity';
 import { Community } from 'src/community/entities/community.entity';
 import { FormType } from '../types/form-type.enum';
+import { FormQuestion } from './form-question.entity';
 
 @Entity('form')
 export class Form {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
+
+  @Column({unsigned: true})
+  managerId: number;
 
   @Column()
   title: string;
@@ -55,11 +58,13 @@ export class Form {
   @DeleteDateColumn({ nullable: true })
   deletedAt: Date;
 
-  //form-item 연결
-  @OneToMany(() => FormItem, (formItem) => formItem.form, {
-    onDelete: 'CASCADE',
-  })
-  formItem: FormItem[];
+  //apply_user 연결
+  @OneToMany(() => ApplyUser, (applyUser) => applyUser.form)
+  applyUser: ApplyUser[];
+
+  //form_question 연결
+  @OneToMany(() => FormQuestion, (formQuestion) => formQuestion.form)
+  formQuestion: FormQuestion[];
 
   // 매니저 연결
   @ManyToOne(() => Manager, (manager) => manager.form, {

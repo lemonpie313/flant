@@ -54,6 +54,7 @@ export class CreateMediaDto extends PickType(Media, ['title', 'content']) {
   @Max(59)
   minute: number;
 
+  @Transform(({ value }) => Number(value))
   @IsNotEmpty()
   @IsNumber()
   communityId: number;

@@ -14,7 +14,7 @@ export class Cart {
   map(cart: Cart) {
     throw new Error('Method not implemented.');
   }
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({unsigned: true})
   id: number;
 
   // 카트아이템 연결

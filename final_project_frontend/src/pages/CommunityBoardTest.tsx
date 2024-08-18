@@ -11,12 +11,11 @@ import axios from "axios";
 import Header from "../components/communityBoard/Header";
 import PostForm from "../components/communityBoard/PostForm";
 import PostCard from "../components/communityBoard/PostCard";
-import { Community, Post, User } from "../components/communityBoard/types";
+import { Community, Post } from "../components/communityBoard/types";
 import "./board.scss";
 
 const CommunityBoardTest: React.FC = () => {
   const [community, setCommunity] = useState<Community | null>(null);
-  const [user, setUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -41,10 +40,9 @@ const CommunityBoardTest: React.FC = () => {
 
   const fetchCommunityData = async () => {
     try {
-      const response = await communityApi.findOne(1);
-      console.log(response.data.data);
+      const response = await communityApi.findOne(Number(communityId));
       setCommunity(response.data.data);
-      console.log(community?.communityLogoImage);
+      if (response.data.data?.posts) setPosts(response.data.data?.posts);
     } catch (error) {
       console.error("커뮤니티 데이터 가져오기 오류:", error);
     }
@@ -66,8 +64,9 @@ const CommunityBoardTest: React.FC = () => {
 
   const fetchPosts = async () => {
     try {
-      const response = await postApi.getPosts(3);
-      setPosts(response.data);
+      const response = await postApi.getPosts(Number(3));
+      const postsData = response.data.data as Post[]; // 타입 명시
+      setPosts(postsData);
     } catch (error) {
       console.error("게시물 가져오기 오류:", error);
       if (axios.isAxiosError(error) && error.response?.status === 401) {
@@ -82,7 +81,7 @@ const CommunityBoardTest: React.FC = () => {
       await postApi.like(postId);
       setPosts(
         posts.map((post) =>
-          post.id === postId
+          post.postId === postId
             ? {
                 ...post,
                 likes: post.isLiked ? post.likes - 1 : post.likes + 1,
@@ -136,20 +135,21 @@ const CommunityBoardTest: React.FC = () => {
           )} */}
           {isLoggedIn ? (
             <>
-              <PostForm
-                onPostCreated={fetchPosts}
-                communityId={Number(communityId)}
-              />
+              <PostForm onPostCreated={fetchPosts} />
               <div className="posts-container">
-                {posts.map((post) => (
-                  <PostCard
-                    key={post.id}
-                    {...post}
-                    onLike={handleLike}
-                    onComment={handleComment}
-                    onReply={handleReply}
-                  />
-                ))}
+                {posts.length > 0 ? (
+                  posts.map((post) => (
+                    <PostCard
+                      key={post.postId}
+                      {...post}
+                      onLike={handleLike}
+                      onComment={handleComment}
+                      onReply={handleReply}
+                    />
+                  ))
+                ) : (
+                  <p>게시물이 없습니다.</p>
+                )}
               </div>
             </>
           ) : (

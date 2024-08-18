@@ -9,6 +9,7 @@ import {
   UseGuards,
   UploadedFile,
   ParseIntPipe,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CommunityService } from './community.service';
 import { CreateCommunityDto } from './dto/create-community.dto';
@@ -31,9 +32,11 @@ import {
 } from 'src/util/image-upload/create-s3-storage';
 import { CommunityUserService } from './community-user/community-user.service';
 import { FindCommunityUserDto } from './dto/find-community-user.dto';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiTags('커뮤니티')
 @Controller('v1/communities')
+@UseInterceptors(CacheInterceptor)
 export class CommunityController {
   constructor(
     private readonly communityService: CommunityService,

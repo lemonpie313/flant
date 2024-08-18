@@ -98,20 +98,19 @@ export const communityApi = {
 };
 
 export const postApi = {
-  create: (formData: FormData, communityId: number) =>
+  create: (formData: FormData) =>
     api
-      .post(`/communities/${communityId}/posts`, formData, {
+      .post(`/posts`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       .catch(handleApiError),
   getPosts: (communityId: number, page = 1, limit = 10) =>
     api
-      .get(`/communities/${communityId}/posts`, { params: { page, limit } })
+      .get(`/posts`, { params: { communityId, page, limit } })
       .catch(handleApiError),
   like: (postId: number) =>
     api.post(`/posts/${postId}/like`).catch(handleApiError),
 };
-
 export const commentApi = {
   create: ({ postId, content }: { postId: number; content: string }) =>
     api.post(`/posts/${postId}/comments`, { content }).catch(handleApiError),
@@ -139,4 +138,20 @@ export const communityUserApi = {
     api
       .post(`/communities/userInfo/${communityId}`, { userId })
       .catch(handleApiError),
+};
+
+export const merchandiseApi = {
+  // 카테고리 조회 API
+  fetchCategories: (communityId: number) =>
+    api.get(`/merchandise/category`, { params: { communityId } }),
+
+  // 상품 전체 조회 API
+  fetchMerchandises: (communityId: number, merchandiseCategoryId: number) =>
+    api.get(`/merchandise`, {
+      params: { communityId, merchandiseCategoryId },
+    }),
+
+  // 상품 상세 조회 API
+  fetchMerchandiseDetail: (merchandiseId: number) =>
+    api.get(`/merchandise/${merchandiseId}`),
 };
