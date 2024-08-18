@@ -20,7 +20,6 @@ import { Post } from 'src/post/entities/post.entity';
 import { MembershipPayment } from 'src/membership/entities/membership-payment.entity';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Artist } from 'src/admin/entities/artist.entity';
-import { GoodsShop } from 'src/goods_shop/entities/goods-shop.entity';
 import { Live } from 'src/live/entities/live.entity';
 import { Manager } from './../../admin/entities/manager.entity';
 import { Merchandise } from 'src/merchandise/entities/merchandise.entity';
@@ -103,8 +102,6 @@ export class Community {
   @OneToMany(() => Artist, (artist) => artist.community)
   artist: Artist[];
 
-  @OneToMany(() => GoodsShop, (goodsShop) => goodsShop.community)
-  goodsShop: GoodsShop[];
   @OneToMany(() => Live, (live) => live.community)
   live: Live[];
 
