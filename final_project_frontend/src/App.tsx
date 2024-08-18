@@ -6,13 +6,13 @@ import SignUpPage from "./pages/SignUpPage";
 import UserInfoPage from "./pages/UserInfo";
 import ChatComponent from "./components/ChatComponent";
 import { ChatProvider } from './context/ChatContext';
-import CommunityBoard from './pages/board';
 import LiveStreamingPage from './pages/LiveStreamingPage';
 import LiveListPage from './pages/LiveListPage';
 import { userApi } from './services/api';
-import CommunityBoardTest from "./pages/CommunityBoardTest";
+import CommunityBoardTest from "./pages/CommunityBoard";
 import MerchandiseList from "./pages/merchandiseList";
 import MerchandiseDetail from "./pages/merchandiseDetail";
+import CommunityBoard from "./pages/CommunityBoard";
 
 
 
@@ -141,10 +141,8 @@ const App: React.FC = () => {
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/main" element={<ProtectedRoute><MainPage isLoggedIn={isLoggedIn!} /></ProtectedRoute>} />
             <Route path="/userinfo" element={<ProtectedRoute><UserInfoPage /></ProtectedRoute>} />
-            <Route path="/communities" element={<ProtectedRoute><CommunityBoard /></ProtectedRoute>} />
-            <Route path="/communities/:communityId" element={<ProtectedRoute><CommunityBoard /></ProtectedRoute>} />
-            <Route path="/communitiess" element={<CommunityBoardTest />} />
-            <Route path="/communitiess/:communityId" element={<CommunityBoardTest />} />
+            <Route path="/communitiess" element={<ProtectedRoute><CommunityBoard /></ProtectedRoute>} />
+            <Route path="/communitiess/:communityId" element={<ProtectedRoute><CommunityBoard /></ProtectedRoute>} />
             <Route path="/live" element={<ProtectedRoute><LiveListPage /></ProtectedRoute>} />
             <Route path="/live/:liveId" element={<ProtectedRoute><LiveStreamingPage /></ProtectedRoute>} />
             <Route path="/merchandise" element={<ProtectedRoute><MerchandiseList communityId={1} /></ProtectedRoute>} />

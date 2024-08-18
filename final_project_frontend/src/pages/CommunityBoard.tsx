@@ -9,7 +9,7 @@ import { Community,Post } from '../components/communityBoard/types';
 import './board.scss';
 import CommunityNavigationHeader from '../components/communityBoard/CommunityNavigationHeader';
 
-const CommunityBoardTest: React.FC = () => {
+const CommunityBoard: React.FC = () => {
   const [community, setCommunity] = useState<Community | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -173,4 +173,4 @@ const CommunityBoardTest: React.FC = () => {
   );
 };
 
-export default CommunityBoardTest;
+export default CommunityBoard;

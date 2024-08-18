@@ -80,7 +80,6 @@ export class CommunityController {
    */
   @Get()
   async findAll() {
-    console.log("/communities")
     return await this.communityService.findAll();
   }
 
