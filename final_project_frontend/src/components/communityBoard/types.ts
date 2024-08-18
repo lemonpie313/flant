@@ -1,10 +1,11 @@
 export interface Community {
   communityId: number;
   communityName: string;
-  memberCount: number;
+  description: string;
+  membershipPrice: number;
   communityLogoImage: string;
   communityCoverImage: string;
-  membershipPrice: number;
+  createdAt: string;
 }
 
 interface PostImage {
@@ -14,9 +15,9 @@ interface PostImage {
 
 export interface Post {
   postId: number;
-  // author: string;
-  communityUserId: number;
+  nickname: string;
   content: string;
+  profileImage: string;
   postImages?: PostImage[];
   likes: number;
   comments: Comment[];
@@ -29,6 +30,14 @@ export interface Comment {
   author: string;
   content: string;
   createdAt: string;
+}
+
+export interface User {
+  id: number;
+  email: string;
+  name: string;
+  profileImage: string;
+  role: string;
 }
 
 export interface CommunityUser {

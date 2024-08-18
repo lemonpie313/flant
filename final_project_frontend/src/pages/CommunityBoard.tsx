@@ -48,9 +48,18 @@ const CommunityBoard: React.FC = () => {
   const fetchCommunityData = async () => {
     try {
       const response = await communityApi.findOne(Number(communityId));
-      console.log(response.data.data);
-      setCommunity(response.data.data);
-      if (response.data.data?.posts) setPosts(response.data.data?.posts);
+      const communityData = response.data.data;
+      setCommunity(communityData);
+
+      if (communityData?.posts) {
+        const postsWithLikes = await Promise.all(
+          communityData.posts.map(async (post: Post) => {
+            const isLiked = await fetchMyLikePost(post.postId);
+            return { ...post, isLiked };
+          })
+        );
+        setPosts(postsWithLikes);
+      }
     } catch (error) {
       console.error("커뮤니티 데이터 가져오기 오류:", error);
     }
@@ -62,6 +71,16 @@ const CommunityBoard: React.FC = () => {
       setCommunityUser(response.data);
     } catch (error) {
       console.error("커뮤니티유저 데이터 가져오기 오류:", error);
+    }
+  };
+
+  const fetchMyLikePost = async (id: number) => {
+    try {
+      const response = await postApi.checkIfUserLikedPost(id);
+      return response.data.data.status;
+    } catch (error) {
+      console.error("로그인 유저 정보 가져오기 오류:", error);
+      return false;
     }
   };
 
@@ -93,20 +112,26 @@ const CommunityBoard: React.FC = () => {
     }
   };
 
-  const handleLike = async (postId: number) => {
+  function booleanToNumber(value: boolean): number {
+    return value ? 1 : 0;
+  }
+
+  const handleLike = async (postId: number, likeStatus: boolean) => {
     try {
-      await postApi.like(postId);
+      const status = booleanToNumber(likeStatus);
+      await postApi.like(postId, { status });
       setPosts(
         posts.map((post) =>
           post.postId === postId
             ? {
                 ...post,
-                likes: post.isLiked ? post.likes - 1 : post.likes + 1,
-                isLiked: !post.isLiked,
+                likes: likeStatus ? post.likes - 1 : post.likes + 1,
+                isLiked: likeStatus,
               }
             : post
         )
       );
+      // await fetchCommunityData();
     } catch (error) {
       console.error("좋아요 오류:", error);
     }
@@ -148,16 +173,6 @@ const CommunityBoard: React.FC = () => {
       )}
       <main className="main-content">
         <div className="center-content">
-          {/* {community && (
-            <div className="community-header">
-              <img
-                src={community.communityCoverImage}
-                alt={community.communityName}
-                className="community-cover"
-              />
-              <h1>{community.communityName}</h1>
-            </div>
-          )} */}
           {isLoggedIn ? (
             <>
               <PostForm onPostCreated={fetchPosts} />
@@ -228,13 +243,8 @@ const CommunityBoard: React.FC = () => {
           </div>
           {/* {community && (
             <div className="community-info">
-              <img
-                src={community.communityLogoImage}
-                alt={community.communityName}
-                className="community-logo"
-              />
+              <img src={community.communityLogoImage} alt={community.communityName} className="community-logo" />
               <h2>{community.communityName}</h2>
-              <p>{community.memberCount} members</p>
               <button className="membership-btn">Membership</button>
               <p>지금 멤버십에 가입하고 특별한 혜택을 누려보세요.</p>
               <button className="join-membership-btn">멤버십 가입하기</button>
