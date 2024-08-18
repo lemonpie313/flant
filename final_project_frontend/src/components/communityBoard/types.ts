@@ -6,17 +6,24 @@ export interface Community {
     logoUrl: string;
     coverUrl: string;
   }
+
+  interface PostImage {
+    postImageId: number;
+    postImageUrl: string;
+  }
   
   export interface Post {
-    id: number;
-    author: string;
+    postId: number;
+    // author: string;
+    communityUserId:number
     content: string;
-    imageUrl?: string[];
+    postImages?: PostImage[];
     likes: number;
     comments: Comment[];
     createdAt: string;
     isLiked: boolean;
   }
+
   
   export interface Comment {
     id: number;
