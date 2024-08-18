@@ -13,7 +13,7 @@ import { configModuleGoogleValidationSchema } from './../configs/google-env-vali
 import { Refreshtoken } from './entities/refresh-token.entity';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh-token.strategy';
 import { Cart } from 'src/cart/entities/cart.entity';
-import { MerchandisePost } from 'src/merchandise/entities/merchandise-post.entity';
+import { Merchandise } from 'src/merchandise/entities/merchandise.entity';
 import { MerchandiseOption } from 'src/merchandise/entities/marchandise-option.entity';
 import { CartItem } from 'src/cart/entities/cart.item.entity';
 
@@ -28,7 +28,7 @@ import { CartItem } from 'src/cart/entities/cart.item.entity';
       Refreshtoken,
       Cart,
       CartItem,
-      MerchandisePost,
+      Merchandise,
       MerchandiseOption,
     ]),
     PassportModule,

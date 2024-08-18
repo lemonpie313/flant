@@ -31,7 +31,7 @@ export class OrderService {
     @InjectRepository(OrderItem)
     private readonly orderItemRepository: Repository<OrderItem>,
     @InjectRepository(Merchandise)
-    private readonly merchandise: Repository<Merchandise>,
+    private readonly merchandiseRepository: Repository<Merchandise>,
     @InjectRepository(MerchandiseOption)
     private readonly merchandiseOption: Repository<MerchandiseOption>,
     private dataSource: DataSource,
@@ -142,18 +142,16 @@ export class OrderService {
       throw new NotFoundException('주문이 존재하지 않습니다.');
     }
 
-    const merchandise = await this.merchandisePost.findOne({
-      where: { id: order.orderItem[0].merchandisePostId },
+    const merchandise = await this.merchandiseRepository.findOne({
+      where: { merchandiseId: order.orderItem[0].merchandisePostId },
       relations: ['merchandiseOption'],
     });
-    const deliveryPrice = merchandise.deliveryPrice;
     return {
       status: HttpStatus.OK,
       message: '주문내역 상세 조회에 성공하였습니다.',
       data: {
         orderId: order.id,
         progress: order.progress,
-        deliveryPrice,
         orderItem: order.orderItem,
         totalPrice: order.totalPrice,
         createdAt: order.createdAt,

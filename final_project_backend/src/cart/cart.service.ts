@@ -78,20 +78,6 @@ export class CartService {
           where: { userId },
         });
 
-<<<<<<< HEAD
-        await this.cartItemRepository.save({
-          merchandise: merchandise,
-          merchandiseOption,
-          quantity,
-          cart: userCart,
-        });
-      } else {
-        userCart = await this.cartItemRepository.save({
-          merchandise: merchandise,
-          merchandiseOption,
-          quantity,
-          cart,
-=======
         // 카트 데이터 조회
         let cart = await queryRunner.manager.findOne(Cart, {
           where: { user: { userId } },
@@ -106,11 +92,10 @@ export class CartService {
         // 장바구니에 입력한 동일 상품 id && 옵션 id 있는지 확인
         const merchandiseCheck = await queryRunner.manager.findOne(CartItem, {
           where: {
-            merchandisePost: { id: createCartDto.merchandiseId },
+            merchandise: { merchandiseId: createCartDto.merchandiseId },
             merchandiseOption: { id: createCartDto.merchandiseOptionId },
           },
           relations: ['merchandisePost', 'merchandiseOption'],
->>>>>>> 439d813e3eb0024d7d7552f57ba237f844428f57
         });
 
         // 있다면 수량만 추가 , 없다면 새로 카트에 저장
@@ -159,7 +144,7 @@ export class CartService {
         // 동일 상품 및 옵션이 있는지 확인
         let cartItem = guestCart.find(
           (item) =>
-            item.merchandisePostId === merchandise.id &&
+            item.merchandisePostId === merchandise.merchandiseId &&
             item.merchandiseOptionId === merchandiseOption.id,
         );
 
@@ -173,11 +158,10 @@ export class CartService {
               guestCart.length > 0
                 ? guestCart[guestCart.length - 1].cartItemId + 1
                 : 1,
-            merchandisePostId: merchandise.id,
-            merchandiseTitle: merchandise.title,
+            merchandisePostId: merchandise.merchandiseId,
+            merchandiseName: merchandise.merchandiseName,
             merchandiseOptionId: merchandiseOption.id,
             merchandiseOptionName: merchandiseOption.optionName,
-            merchandiseOptionPrice: merchandiseOption.optionPrice,
             quantity,
           };
           guestCart.push(cartItem);
@@ -192,52 +176,11 @@ export class CartService {
           data: { guestCart },
         };
       }
-<<<<<<< HEAD
-
-      return {
-        status: HttpStatus.OK,
-        message: '카트 저장에 성공했습니다.',
-        data: {
-          merchandisePostId: userCart.merchandise.id,
-          merchandiseTitle: userCart.merchandise.title,
-          merchandiseOption: userCart.merchandiseOption.optionName,
-          merchandiseOptionPrice: userCart.merchandiseOption.optionPrice,
-          quantity: userCart.quantity,
-        },
-      };
-    } else {
-      // 비회원일 경우
-      const guestCart = cookies['guestCart']
-        ? JSON.parse(cookies['guestCart'])
-        : [];
-
-      // 비회원 카트에 아이템 추가
-      guestCart.push({
-        cartItemId:
-          guestCart.length > 0
-            ? guestCart[guestCart.length - 1].cartItemId + 1
-            : 1,
-        merchandisePostId: merchandise.merchandiseId,
-        merchandiseName: merchandise.merchandiseName,
-        price: merchandise.price,
-        merchandiseOptionId: merchandiseOption.id,
-        merchandiseOptionName: merchandiseOption.optionName,
-        quantity,
-      });
-
-      // 비회원 카트 쿠키 설정
-      return {
-        status: HttpStatus.OK,
-        message: '비회원 카트에 저장되었습니다.',
-        data: { guestCart },
-      };
-=======
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;
     } finally {
       await queryRunner.release();
->>>>>>> 439d813e3eb0024d7d7552f57ba237f844428f57
     }
   }
 

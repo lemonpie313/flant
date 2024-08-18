@@ -16,7 +16,7 @@ import { hash } from 'bcrypt';
 import { Refreshtoken } from './entities/refresh-token.entity';
 import { Cart } from 'src/cart/entities/cart.entity';
 import { CartItem } from 'src/cart/entities/cart.item.entity';
-import { MerchandisePost } from 'src/merchandise/entities/merchandise-post.entity';
+import { Merchandise } from 'src/merchandise/entities/merchandise.entity';
 import { MerchandiseOption } from 'src/merchandise/entities/marchandise-option.entity';
 
 @Injectable()
@@ -31,8 +31,8 @@ export class AuthService {
     private readonly cartRepository: Repository<Cart>,
     @InjectRepository(CartItem)
     private readonly cartItemRepository: Repository<CartItem>,
-    @InjectRepository(MerchandisePost)
-    private readonly merchandisePostRepository: Repository<MerchandisePost>,
+    @InjectRepository(Merchandise)
+    private readonly merchandisePostRepository: Repository<Merchandise>,
     @InjectRepository(MerchandiseOption)
     private readonly merchandiseOptionRepository: Repository<MerchandiseOption>,
   ) {}
@@ -311,7 +311,7 @@ export class AuthService {
     for (const item of guestCart) {
       // merchandisePost 추출
       const merchandisePost = await this.merchandisePostRepository.findOne({
-        where: { id: item.merchandisePostId },
+        where: { merchandiseId: item.merchandisePostId },
       });
       // merchandiseOption 추출
       const merchandiseOption = await this.merchandiseOptionRepository.findOne({
