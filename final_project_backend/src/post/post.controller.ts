@@ -11,6 +11,7 @@ import {
   UploadedFiles,
   Put,
   ParseIntPipe,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -27,9 +28,11 @@ import { ApiFiles } from 'src/util/decorators/api-file.decorator';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
 import { postImageUploadFactory } from 'src/util/image-upload/create-s3-storage';
 import { PartialUser } from 'src/user/interfaces/partial-user.entity';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiTags('게시물')
 @Controller('v1/posts')
+@UseInterceptors(CacheInterceptor)
 export class PostController {
   constructor(
     private readonly postService: PostService,
