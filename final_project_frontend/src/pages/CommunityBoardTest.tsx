@@ -11,13 +11,18 @@ import axios from "axios";
 import Header from "../components/communityBoard/Header";
 import PostForm from "../components/communityBoard/PostForm";
 import PostCard from "../components/communityBoard/PostCard";
-import { Community, Post } from "../components/communityBoard/types";
+import {
+  Community,
+  Post,
+  CommunityUser,
+} from "../components/communityBoard/types";
 import "./board.scss";
 import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
 
 const CommunityBoardTest: React.FC = () => {
   const [community, setCommunity] = useState<Community | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [communityUser, setCommunityUser] = useState<CommunityUser>();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -43,6 +48,7 @@ const CommunityBoardTest: React.FC = () => {
   const fetchCommunityData = async () => {
     try {
       const response = await communityApi.findOne(Number(communityId));
+      console.log(response.data.data);
       setCommunity(response.data.data);
       if (response.data.data?.posts) setPosts(response.data.data?.posts);
     } catch (error) {
@@ -52,13 +58,8 @@ const CommunityBoardTest: React.FC = () => {
 
   const fetchCommunityUsers = async () => {
     try {
-      const response = await communityUserApi.findCommunityUser(
-        communityId,
-        userId
-      );
-      console.log("zdfdz");
-      console.log(response.data.data);
-      //setCommunity(response.data.data);
+      const response = await communityUserApi.findCommunityUser(communityId);
+      setCommunityUser(response.data);
     } catch (error) {
       console.error("커뮤니티유저 데이터 가져오기 오류:", error);
     }
@@ -189,7 +190,7 @@ const CommunityBoardTest: React.FC = () => {
         <div className="right-sidebar">
           <div className="right-sidebar-profile-card">
             <img
-              src={community?.communityCoverImage}
+              src={community?.communityLogoImage}
               alt={community?.communityName}
               className="right-sidebar-profile-image"
             />
@@ -212,12 +213,14 @@ const CommunityBoardTest: React.FC = () => {
             <p>지금 DM하세요!</p>
           </div>
           <div className="right-sidebar-user-info">
+            {/*}
             <img
               src="https://example.com/user-placeholder.jpg" // 실제 이미지 URL로 변경 필요
               alt="User"
               className="right-sidebar-user-image"
             />
-            <p>lutaseo</p>
+            */}
+            <p>{communityUser?.nickName}</p>
             <p>0 posts</p>
           </div>
           <div className="right-sidebar-community-notice">

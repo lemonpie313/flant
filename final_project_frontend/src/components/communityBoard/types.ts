@@ -30,3 +30,12 @@ export interface Comment {
   content: string;
   createdAt: string;
 }
+
+export interface CommunityUser {
+  communityUserId: number;
+  userId: number;
+  communityId: number;
+  nickName: string;
+  createdAt: Date;
+  updatedAt: Date;
+}

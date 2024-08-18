@@ -134,10 +134,8 @@ export const liveApi = {
 };
 
 export const communityUserApi = {
-  findCommunityUser: (communityId: number, userId: number) =>
-    api
-      .post(`/communities/userInfo/${communityId}`, { userId })
-      .catch(handleApiError),
+  findCommunityUser: (communityId: number) =>
+    api.post(`/communities/userInfo/${communityId}`).catch(handleApiError),
 };
 
 export const merchandiseApi = {
