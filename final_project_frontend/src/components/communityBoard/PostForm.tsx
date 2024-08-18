@@ -17,7 +17,7 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    console.log(communityId)
         // communityId가 없는 경우 처리
         if (!communityId) {
           throw new Error('communityId가 제공되지 않았습니다.');

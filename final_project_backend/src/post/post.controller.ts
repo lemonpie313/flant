@@ -81,8 +81,10 @@ export class PostController {
   async findPosts(
     @Query('artistId') artistId: number,
     @Query('communityId') communityId: number,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
   ) {
-    return await this.postService.findPosts(+artistId, +communityId);
+    return await this.postService.findPosts(+artistId, +communityId, +page, +limit);
   }
 
   /**

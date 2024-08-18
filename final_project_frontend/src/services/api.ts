@@ -86,7 +86,7 @@ export const postApi = {
       headers: { 'Content-Type': 'multipart/form-data' }
     }).catch(handleApiError),
   getPosts: (communityId: number, page = 1, limit = 10) =>
-    api.get(`posts`, { params: { page, limit } }).catch(handleApiError),
+    api.get(`posts`, { params: { communityId, page, limit } }).catch(handleApiError),
   like: (postId: number) => api.post(`/posts/${postId}/like`).catch(handleApiError),
 };
 

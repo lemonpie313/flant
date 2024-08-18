@@ -178,7 +178,7 @@ const PostForm: React.FC<{ onPostCreated: () => void; communityId: number }> = (
         formData.append(`postImage`, image);
       });
 
-      await postApi.create(formData, communityId);
+      await postApi.create(formData);
       setContent('');
       setImages([]);
       onPostCreated();
