@@ -111,6 +111,7 @@ export const postApi = {
   like: (postId: number) =>
     api.post(`/posts/${postId}/like`).catch(handleApiError),
 };
+
 export const commentApi = {
   create: ({ postId, content }: { postId: number; content: string }) =>
     api.post(`/posts/${postId}/comments`, { content }).catch(handleApiError),
