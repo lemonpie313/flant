@@ -71,9 +71,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
             <Link to="/signup" className="main-signup-a">
               회원가입 하기
             </Link>
-            <Link to="/main" className="main-signup-a ">
-              계정 정보 찾기
-            </Link>
           </div>
 
           <div className="main-login-forget"></div>

@@ -63,9 +63,6 @@ export class AuthController {
     const cookies = req.cookies || {};
     const data = await this.authService.signIn(user.id, res, cookies);
 
-    // 장바구니 쿠키 삭제
-    res.clearCookie('guestCart');
-
     return {
       statusCode: HttpStatus.OK,
       message: MESSAGES.AUTH.SIGN_IN.SECCEED,

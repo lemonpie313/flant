@@ -32,6 +32,7 @@ const MerchandiseList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<{ [key: number]: number }>({});
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [community, setCommunity] = useState<Community | null>(null);
+  const [hasMerchandises, setHasMerchandises] = useState<boolean>(false); // 초기 상태를 false로 설정
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -73,13 +74,19 @@ const MerchandiseList: React.FC = () => {
     const fetchMerchandisesByCategory = async () => {
       try {
         const merchandiseData: { [key: number]: Merchandise[] } = {};
+        let hasItems = false;
 
         for (const category of categories) {
           const response = await merchandiseApi.fetchMerchandises(Number(communityId), category.merchandiseCategoryId);
           merchandiseData[category.merchandiseCategoryId] = response.data.data;
+          
+          if (response.data.data.length > 0) {
+            hasItems = true;
+          }
         }
 
         setMerchandises(merchandiseData);
+        setHasMerchandises(hasItems);
 
         // 각 카테고리마다 현재 페이지를 초기화
         const initialPage: { [key: number]: number } = {};
@@ -144,52 +151,58 @@ const MerchandiseList: React.FC = () => {
       )}
 
       <div className="merchandise-list">
-        {categories.map((category) => {
-          const items = merchandises[category.merchandiseCategoryId] || [];
-          const currentPageIndex = currentPage[category.merchandiseCategoryId] || 0;
-          const startIndex = currentPageIndex * 4;
-          const visibleItems = items.slice(startIndex, startIndex + 4);
+        {categories.length === 0 ? (
+          <p>상품 준비중입니다.</p>
+        ) : hasMerchandises ? (
+          categories.map((category) => {
+            const items = merchandises[category.merchandiseCategoryId] || [];
+            const currentPageIndex = currentPage[category.merchandiseCategoryId] || 0;
+            const startIndex = currentPageIndex * 4;
+            const visibleItems = items.slice(startIndex, startIndex + 4);
 
-          return (
-            <div key={category.merchandiseCategoryId} className="category-section">
-              <h2>{category.categoryName}</h2>
-              <div className="merchandise-slider">
-                {/* 왼쪽 화살표 */}
-                {currentPageIndex > 0 && (
-                  <button className="slider-button prev-button" onClick={() => handlePrevPage(category.merchandiseCategoryId)}>
-                    ◀
-                  </button>
-                )}
+            return (
+              <div key={category.merchandiseCategoryId} className="category-section">
+                <h2>{category.categoryName}</h2>
+                <div className="merchandise-slider">
+                  {/* 왼쪽 화살표 */}
+                  {currentPageIndex > 0 && (
+                    <button className="slider-button prev-button" onClick={() => handlePrevPage(category.merchandiseCategoryId)}>
+                      ◀
+                    </button>
+                  )}
 
-                {/* 상품 리스트 */}
-                <ul className="merchandise-items">
-                  {visibleItems.map((merchandise) => (
-                    <li 
-                      key={merchandise.merchandiseId}
-                      onClick={() => handleMerchandiseClick(merchandise.merchandiseId)}
-                    >
-                      <div className="image-container">
-                        <img
-                          src={merchandise.thumbnail}
-                          alt={merchandise.merchandiseName}
-                        />
-                      </div>
-                      <p>{merchandise.merchandiseName}</p>
-                      <p>Price: {merchandise.price} 원</p>
-                    </li>
-                  ))}
-                </ul>
+                  {/* 상품 리스트 */}
+                  <ul className="merchandise-items">
+                    {visibleItems.map((merchandise) => (
+                      <li 
+                        key={merchandise.merchandiseId}
+                        onClick={() => handleMerchandiseClick(merchandise.merchandiseId)}
+                      >
+                        <div className="image-container">
+                          <img
+                            src={merchandise.thumbnail}
+                            alt={merchandise.merchandiseName}
+                          />
+                        </div>
+                        <p>{merchandise.merchandiseName}</p>
+                        <p>Price: {merchandise.price} 원</p>
+                      </li>
+                    ))}
+                  </ul>
 
-                {/* 오른쪽 화살표 */}
-                {startIndex + 4 < items.length && (
-                  <button className="slider-button next-button" onClick={() => handleNextPage(category.merchandiseCategoryId, items.length)}>
-                    ▶
-                  </button>
-                )}
+                  {/* 오른쪽 화살표 */}
+                  {startIndex + 4 < items.length && (
+                    <button className="slider-button next-button" onClick={() => handleNextPage(category.merchandiseCategoryId, items.length)}>
+                      ▶
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        ) : (
+          <p>상품 준비중입니다.</p>
+        )}
       </div>
     </div>
   );

@@ -41,7 +41,7 @@ const CommunityNavigationHeader: React.FC = () => {
         <span className="nav-tab">LIVE</span>
       </NavLink> */}
       <div className="shop-link-wrapper">
-        <NavLink to="/merchandise" className="nav-link shop-link">
+        <NavLink to={`/communities/${communityId}/merchandise`} className="nav-link shop-link">
           Shop
         </NavLink>
       </div>
