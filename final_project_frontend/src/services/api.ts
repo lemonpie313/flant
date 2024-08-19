@@ -159,4 +159,31 @@ export const merchandiseApi = {
   // 상품 상세 조회 API
   fetchMerchandiseDetail: (merchandiseId: number) =>
     api.get(`/merchandise/${merchandiseId}`),
+
+  // 장바구니 추가 API
+  addToCart: (
+    merchandiseId: number,
+    merchandiseOptionId: number,
+    quantity: number
+  ) =>
+    api
+      .post("/carts", { merchandiseId, merchandiseOptionId, quantity })
+      .catch(handleApiError), // 공통 에러 처리 함수 사용
+};
+
+export const cartApi = {
+  // 카트 조회 API
+  fetchCart: () => api.get("/carts").catch(handleApiError), // 공통 에러 처리 함수 사용
+
+  // 카트 아이템 수량 수정 API
+  updateCartItemQuantity: (cartItemId: number, quantity: 'INCREMENT' | 'DECREMENT') =>
+    api.patch(`/carts/items/${cartItemId}?quantity=${quantity}`),  
+  // 카트 항목 삭제 API
+  removeCartItem: (cartItemId: number) =>
+    api.delete(`/carts/items/${cartItemId}`).catch(handleApiError),
+};
+
+// 결제 관련 API 호출
+export const paymentApi = {
+  createOrder: () => axios.post('/orders').catch(handleApiError), // 결제 API 엔드포인트
 };
