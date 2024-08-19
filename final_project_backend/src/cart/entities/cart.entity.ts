@@ -28,7 +28,7 @@ export class Cart {
   order: Order;
 
   //유저연결
-  @OneToOne(() => User, (user) => user.cart)
-  //@JoinColumn({ name: 'user_id' })
+  @OneToOne(() => User, (user) => user.cart, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
   user: User;
 }
