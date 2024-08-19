@@ -19,7 +19,7 @@ import {
 import "./board.scss";
 import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
 
-const CommunityBoardTest: React.FC = () => {
+const ArtistBoard: React.FC = () => {
   const [community, setCommunity] = useState<Community | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [communityUser, setCommunityUser] = useState<CommunityUser>();
@@ -90,7 +90,7 @@ const CommunityBoardTest: React.FC = () => {
   const fetchPosts = async () => {
     try {
       // isArtist를 true로 설정하여 아티스트 게시물만 가져오기
-      const response = await postApi.getPosts(false, Number(communityId));
+      const response = await postApi.getPosts(true, Number(communityId));
       const postsData = response.data.data as Post[]; // 타입 명시
       setPosts(postsData);
     } catch (error) {
@@ -191,14 +191,14 @@ const CommunityBoardTest: React.FC = () => {
 
   return (
     <div className="community-board">
-        {community && (
-          <>
-        <Header 
-          communityName={community.name} 
-          isLoggedIn={isLoggedIn} 
-          handleLogout={handleLogout} 
-        />
-        <CommunityNavigationHeader/>
+      {community && (
+        <>
+          <Header
+            communityName={community.communityName}
+            isLoggedIn={isLoggedIn}
+            handleLogout={handleLogout}
+          />
+          <CommunityNavigationHeader />
         </>
       )}
       <main className="main-content">
@@ -272,4 +272,4 @@ const CommunityBoardTest: React.FC = () => {
   );
 };
 
-export default CommunityBoardTest;
+export default ArtistBoard;

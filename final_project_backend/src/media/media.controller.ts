@@ -32,7 +32,7 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiTags('미디어')
 @Controller('v1/media')
-@UseInterceptors(CacheInterceptor)
+// @UseInterceptors(CacheInterceptor)
 export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
 

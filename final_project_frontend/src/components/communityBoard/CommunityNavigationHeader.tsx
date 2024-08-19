@@ -87,13 +87,13 @@ const CommunityNavigationHeader: React.FC = () => {
   const liveLink = lives.length > 0 ? `/live/${lives[0].id}` : "/live";
   return (
     <nav className="nav-bar">
-      <NavLink to="#" className="nav-link">
+      <NavLink to={`/communities/${communityId}/feed`} className="nav-link">
         <span className="nav-tab">Feed</span>
       </NavLink>
-      <NavLink to="#" className="nav-link">
+      <NavLink to={`/communities/${communityId}/artists`} className="nav-link">
         <span className="nav-tab">Artist</span>
       </NavLink>
-      <NavLink to="#" className="nav-link">
+      <NavLink to={`/communities/${communityId}/media`} className="nav-link">
         <span className="nav-tab">Media</span>
       </NavLink>
       <NavLink to={liveLink} className="nav-link">

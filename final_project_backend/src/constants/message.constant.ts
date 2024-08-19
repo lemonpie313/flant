@@ -172,8 +172,11 @@ export const MESSAGES = {
       SECCEED: '좋아요 상태 수정에 성공했습니다.',
     },
     GETCOUNT: {
-      SUCCEED: '좋아요 수 조회에 성공했습니다.'
-    }
+      SUCCEED: '좋아요 수 조회에 성공했습니다.',
+    },
+    MY: {
+      SUCCEED: '포스트의 좋아요 상태를 반환합니다.',
+    },
   },
   CUSTOM_DECORATOR: {
     IS_NOT_EMPTY: '값을 입력해주세요.',

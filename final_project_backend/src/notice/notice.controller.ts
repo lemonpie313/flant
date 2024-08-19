@@ -28,7 +28,7 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiTags('공지사항')
 @Controller('v1/notices')
-@UseInterceptors(CacheInterceptor)
+// @UseInterceptors(CacheInterceptor)
 export class NoticeController {
   constructor(private readonly noticeService: NoticeService) {}
 
@@ -56,11 +56,7 @@ export class NoticeController {
       imageUrl = imageLocation;
     }
 
-    return this.noticeService.create(
-      user,
-      createNoticeDto,
-      imageUrl,
-    );
+    return this.noticeService.create(user, createNoticeDto, imageUrl);
   }
 
   /**

@@ -29,7 +29,10 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       const refreshToken = localStorage.getItem("refreshToken");
       try {
-        const res = await axios.post(`${REACT_APP_BACKEND_API_URL}/auth/refresh`, { refreshToken });
+        const res = await axios.post(
+          `${REACT_APP_BACKEND_API_URL}/auth/refresh`,
+          { refreshToken }
+        );
         if (res.status === 200) {
           localStorage.setItem("accessToken", res.data.accessToken);
           return api(originalRequest);
@@ -56,19 +59,34 @@ const handleApiError = (error: any) => {
   throw error;
 };
 
+
 export const authApi = {
   signIn: (email: string, password: string) =>
     api.post("/auth/sign-in", { email, password }).catch(handleApiError),
-  signUp: (name: string, email: string, password: string, passwordConfirm: string) =>
-    api.post("/auth/sign-up", { name, email, password, passwordConfirm }).catch(handleApiError),
-  googleLogin: (token: string) => api.post("/auth/google", { token }).catch(handleApiError),
+  signUp: (
+    name: string,
+    email: string,
+    password: string,
+    passwordConfirm: string
+  ) =>
+    api
+      .post("/auth/sign-up", { name, email, password, passwordConfirm })
+      .catch(handleApiError),
+  googleLogin: (token: string) =>
+    api.post("/auth/google", { token }).catch(handleApiError),
   signOut: () => api.post("/auth/sign-out").catch(handleApiError),
 };
 
 export const userApi = {
   findMy: () => api.get("/users/me").catch(handleApiError),
-  update: (newUserName: string, newPassword: string, confirmNewPassword: string) =>
-    api.patch("/users/me", { newUserName, newPassword, confirmNewPassword }).catch(handleApiError),
+  update: (
+    newUserName: string,
+    newPassword: string,
+    confirmNewPassword: string
+  ) =>
+    api
+      .patch("/users/me", { newUserName, newPassword, confirmNewPassword })
+      .catch(handleApiError),
   checkPassword: (password: string) =>
     api.post("/users/check-password", { password }).catch(handleApiError),
   delete: () => api.delete("/users/me").catch(handleApiError),
@@ -78,34 +96,60 @@ export const communityApi = {
   findAll: () => api.get("/communities").catch(handleApiError),
   findOne: (id: number) => api.get(`/communities/${id}`).catch(handleApiError),
   findMy: () => api.get("/communities/me").catch(handleApiError),
+  // 커뮤니티 가입
+  joinCommunity: (communityId: number) =>
+    api
+      .post(`/communities/userInfo/${communityId}/assign`)
+      .catch(handleApiError),
 };
 
 export const postApi = {
   create: (formData: FormData) =>
-    api.post(`/posts`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    }).catch(handleApiError),
-  getPosts: (communityId: number, page = 1, limit = 10) =>
-    api.get(`/posts`, { params: { communityId, page, limit } }).catch(handleApiError),
-  like: (postId: number) => api.post(`/posts/${postId}/like`).catch(handleApiError),
+    api
+      .post(`/posts`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      .catch(handleApiError),
+  getPosts: (isArtist: boolean, communityId: number, page = 1, limit = 10) =>
+    api
+      .get(`/posts`, { params: { isArtist, communityId, page, limit } })
+      .catch(handleApiError),
+  like: (postId: number, { status }: { status: number }) =>
+    api.put(`/posts/${postId}/likes`, { status }).catch(handleApiError),
+  checkIfUserLikedPost: (id: number) =>
+    api.get(`/posts/${id}/likes/my`).catch(handleApiError),
 };
 
 export const commentApi = {
   create: ({ postId, content }: { postId: number; content: string }) =>
     api.post(`/posts/${postId}/comments`, { content }).catch(handleApiError),
   createReply: (commentId: number, { content }: { content: string }) =>
-    api.post(`/comments/${commentId}/replies`, { content }).catch(handleApiError),
+    api
+      .post(`/comments/${commentId}/replies`, { content })
+      .catch(handleApiError),
   getComments: (postId: number, page = 1, limit = 10) =>
-    api.get(`/posts/${postId}/comments`, { params: { page, limit } }).catch(handleApiError),
+    api
+      .get(`/posts/${postId}/comments`, { params: { page, limit } })
+      .catch(handleApiError),
+  like: (id: number, { status }: { status: number }) =>
+    api.put(`/comments/${id}/likes`, { status }).catch(handleApiError),
+  checkIfUserLikedComment: (id: number) =>
+    api.get(`/comments/${id}/likes/my`).catch(handleApiError),
 };
 
 export const liveApi = {
   createLive: (artistId: string, title: string, liveType: string) =>
-    api.post('/live', { artistId, title, liveType }).catch(handleApiError),
-  findAllLives: (communityId: string) => api.get(`/live/community/${communityId}`).catch(handleApiError),
-  watchLive: (liveId: number) => api.get(`/live/${liveId}`).catch(handleApiError),
+    api.post("/live", { artistId, title, liveType }).catch(handleApiError),
+  findAllLives: (communityId: string) =>
+    api.get(`/live/community/${communityId}`).catch(handleApiError),
+  watchLive: (liveId: number) =>
+    api.get(`/live/${liveId}`).catch(handleApiError),
 };
 
+export const communityUserApi = {
+  findCommunityUser: (communityId: number) =>
+    api.post(`/communities/userInfo/${communityId}`).catch(handleApiError),
+};
 
 export const merchandiseApi = {
   // 카테고리 조회 API
@@ -121,5 +165,31 @@ export const merchandiseApi = {
   // 상품 상세 조회 API
   fetchMerchandiseDetail: (merchandiseId: number) =>
     api.get(`/merchandise/${merchandiseId}`),
+
+  // 장바구니 추가 API
+  addToCart: (
+    merchandiseId: number,
+    merchandiseOptionId: number,
+    quantity: number
+  ) =>
+    api
+      .post("/carts", { merchandiseId, merchandiseOptionId, quantity })
+      .catch(handleApiError), // 공통 에러 처리 함수 사용
 };
 
+export const cartApi = {
+  // 카트 조회 API
+  fetchCart: () => api.get("/carts").catch(handleApiError), // 공통 에러 처리 함수 사용
+
+  // 카트 아이템 수량 수정 API
+  updateCartItemQuantity: (cartItemId: number, quantity: 'INCREMENT' | 'DECREMENT') =>
+    api.patch(`/carts/items/${cartItemId}?quantity=${quantity}`),  
+  // 카트 항목 삭제 API
+  removeCartItem: (cartItemId: number) =>
+    api.delete(`/carts/items/${cartItemId}`).catch(handleApiError),
+};
+
+// 결제 관련 API 호출
+export const paymentApi = {
+  createOrder: () => api.post('/orders').catch(handleApiError), // 결제 API 엔드포인트
+};

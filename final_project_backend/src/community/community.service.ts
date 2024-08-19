@@ -107,28 +107,28 @@ export class CommunityService {
   async findOne(communityId: number) {
     const existedCommunity = await this.communityRepository.findOne({
       where: { communityId: communityId },
-      relations: ['posts', 'posts.communityUser', 'posts.postImages', 'posts.communityUser.users'],
+      //relations: ['posts', 'posts.communityUser', 'posts.postImages', 'posts.communityUser.users'],
     });
 
     if (!existedCommunity) {
       throw new NotFoundException(MESSAGES.COMMUNITY.COMMON.NOT_FOUND);
     }
 
-    const processedPosts = existedCommunity.posts.map(post => {
-      return {
-        postId: post.postId,
-        nickname: post.communityUser.nickName,
-        profileImage: post.communityUser.users.profileImage,
-        isArtist: post.artistId !== null, // artistId가 존재하면 아티스트로 간주
-        content: post.content,
-        createdAt: post.createdAt,
-        updatedAt: post.updatedAt,
-        postImages: post.postImages.map(image => ({
-          postImageId: image.postImageId,
-          postImageUrl: image.postImageUrl,
-        })),
-      };
-    });
+    // const processedPosts = existedCommunity.posts.map(post => {
+    //   return {
+    //     postId: post.postId,
+    //     nickname: post.communityUser.nickName,
+    //     profileImage: post.communityUser.users.profileImage,
+    //     isArtist: post.artistId !== null, // artistId가 존재하면 아티스트로 간주
+    //     content: post.content,
+    //     createdAt: post.createdAt,
+    //     updatedAt: post.updatedAt,
+    //     postImages: post.postImages.map(image => ({
+    //       postImageId: image.postImageId,
+    //       postImageUrl: image.postImageUrl,
+    //     })),
+    //   };
+    // });
   
 
   // 필요한 커뮤니티 정보와 가공된 posts 데이터를 함께 반환
@@ -144,7 +144,7 @@ export class CommunityService {
       createdAt: existedCommunity.createdAt,
       updatedAt: existedCommunity.updatedAt,
       deletedAt: existedCommunity.deletedAt,
-      posts: processedPosts, // 가공된 posts 배열
+      //posts: processedPosts, // 가공된 posts 배열
     },
   };
   }
