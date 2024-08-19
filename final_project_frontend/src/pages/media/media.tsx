@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './media.scss';
-import { mediaApi } from '../../services/api';
+import { authApi, communityApi, mediaApi } from '../../services/api';
 import CommunityNavigationHeader from '../../components/communityBoard/CommunityNavigationHeader';
+import Header from '../../components/communityBoard/Header';
 
 interface MediaItem {
   mediaId: number;
@@ -18,6 +19,21 @@ const Media: React.FC = () => {
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
   const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
   const [isManager, setIsManager] = useState<boolean>(false);
+  const [community, setCommunity] = useState<any>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const fetchCommunityData = async () => {
+      try {
+        const response = await communityApi.findOne(Number(communityId)); // communityId로 커뮤니티 정보 가져오기
+        setCommunity(response.data.data); // 커뮤니티 정보를 상태로 설정
+      } catch (error) {
+        console.error('Error fetching community data:', error);
+      }
+    };
+  
+    fetchCommunityData();
+  }, [communityId]);
   
   useEffect(() => {
     const userRole = localStorage.getItem('userRole');
@@ -75,9 +91,32 @@ const Media: React.FC = () => {
     }
   };
 
+  const handleLogout = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      localStorage.removeItem("isLoggedIn");
+      await authApi.signOut();
+      localStorage.clear();
+      alert("로그아웃이 성공적으로 되었습니다.");
+      navigate("/main");
+      window.location.reload(); // 상태 갱신을 위해 페이지 리로드
+    } catch (error) {
+      alert("로그아웃 실패.");
+    }
+  };
+
   return (
     <div className="media-container">
-      <CommunityNavigationHeader /> {/* 네비게이션 바 추가 */}
+        {community && (
+          <>
+        <Header 
+          communityName={community.communityName} 
+          isLoggedIn={isLoggedIn} 
+          handleLogout={handleLogout} 
+        />
+        <CommunityNavigationHeader/>
+        </>
+      )}
 
       {selectedMedia ? (
   <div className="media-detail-container">
