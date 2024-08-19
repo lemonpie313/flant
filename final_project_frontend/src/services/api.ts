@@ -96,8 +96,10 @@ export const communityApi = {
   findOne: (id: number) => api.get(`/communities/${id}`).catch(handleApiError),
   findMy: () => api.get("/communities/me").catch(handleApiError),
   // 커뮤니티 가입
-  joinCommunity: (communityId: number) =>
-    api.post(`/communities/${communityId}/assign`).catch(handleApiError),
+  joinCommunity: (communityId: number, nickName: string) =>
+    api
+      .post(`/communities/${communityId}/assign`, { nickName })
+      .catch(handleApiError),
 };
 
 export const postApi = {

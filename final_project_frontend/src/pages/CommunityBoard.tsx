@@ -18,7 +18,9 @@ import {
 } from "../components/communityBoard/types";
 import "./board.scss";
 import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
+import Modal from "react-modal"; // Modal 추가
 
+Modal.setAppElement("#root");
 const CommunityBoard: React.FC = () => {
   const [community, setCommunity] = useState<Community | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -28,6 +30,8 @@ const CommunityBoard: React.FC = () => {
   const [isCommunityJoined, setIsCommunityJoined] = useState(false); // 커뮤니티 가입 여부 상태 추가
   const navigate = useNavigate();
   const { communityId } = useParams<{ communityId: string }>();
+  const [isModalOpen, setIsModalOpen] = useState(false); // 모달 열림/닫힘 상태 추가
+  const [nickname, setNickname] = useState(""); // 닉네임 상태 추가
 
   useEffect(() => {
     const checkAuthAndFetchData = async () => {
@@ -169,13 +173,13 @@ const CommunityBoard: React.FC = () => {
           setIsCommunityJoined(true);
         }
       }
-      console.log(response.data.data);
     } catch (error) {
       console.error("커뮤니티 가입 여부 확인 오류:", error);
     }
   };
 
   const handleJoinButtonClick = async () => {
+    console.log("Button clicked!");
     try {
       if (isCommunityJoined) {
         // 멤버십 가입 처리
@@ -184,15 +188,30 @@ const CommunityBoard: React.FC = () => {
         alert("멤버십에 가입되었습니다.");
       } else {
         // 커뮤니티 가입 처리
-        await communityApi.joinCommunity(Number(communityId));
-        alert("커뮤니티에 가입되었습니다.");
-        setIsCommunityJoined(true); // 커뮤니티 가입 상태 업데이트
+        // await communityApi.joinCommunity(Number(communityId));
+        // alert("커뮤니티에 가입되었습니다.");
+        // setIsCommunityJoined(true); // 커뮤니티 가입 상태 업데이트
+        setIsModalOpen(true);
       }
     } catch (error) {
       console.error("가입 처리 오류:", error);
       alert("가입에 실패했습니다.");
     }
   };
+  // 닉네임 제출 및 커뮤니티 가입 처리
+  const handleNicknameSubmit = async () => {
+    try {
+      // 닉네임을 제출하고 커뮤니티 가입 처리
+      await communityApi.joinCommunity(Number(communityId), nickname);
+      alert("커뮤니티에 가입되었습니다.");
+      setIsCommunityJoined(true);
+      setIsModalOpen(false); // 모달 닫기
+    } catch (error) {
+      console.error("커뮤니티 가입 오류:", error);
+      alert("커뮤니티 가입에 실패했습니다.");
+    }
+  };
+
   if (isLoading) {
     return <div>로딩 중...</div>;
   }
@@ -295,6 +314,23 @@ const CommunityBoard: React.FC = () => {
           )} */}
         </div>
       </main>
+      {/* 닉네임 입력 모달 */}
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        className="nickname-modal"
+        overlayClassName="nickname-modal-overlay"
+      >
+        <h2>닉네임 입력</h2>
+        <input
+          type="text"
+          value={nickname}
+          onChange={(e) => setNickname(e.target.value)}
+          placeholder="닉네임을 입력하세요"
+        />
+        <button onClick={handleNicknameSubmit}>가입하기</button>
+        <button onClick={() => setIsModalOpen(false)}>취소</button>
+      </Modal>
     </div>
   );
 };
