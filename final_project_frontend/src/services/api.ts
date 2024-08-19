@@ -6,7 +6,7 @@ const API_TIMEOUT = Number(process.env.API_TIMEOUT);
 
 // Axios 인스턴스 생성
 const api: AxiosInstance = axios.create({
-  baseURL: REACT_APP_BACKEND_API_URL,
+  baseURL: "https://api.flant.club/api/v1",
   timeout: API_TIMEOUT,
   withCredentials: true,
 });
