@@ -47,7 +47,6 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
 // 공통 에러 처리 함수
 const handleApiError = (error: any) => {
   if (axios.isAxiosError(error)) {
@@ -58,7 +57,6 @@ const handleApiError = (error: any) => {
   }
   throw error;
 };
-
 
 export const authApi = {
   signIn: (email: string, password: string) =>
@@ -97,9 +95,9 @@ export const communityApi = {
   findOne: (id: number) => api.get(`/communities/${id}`).catch(handleApiError),
   findMy: () => api.get("/communities/me").catch(handleApiError),
   // 커뮤니티 가입
-  joinCommunity: (communityId: number) =>
+  joinCommunity: (communityId: number, nickName: string) =>
     api
-      .post(`/communities/userInfo/${communityId}/assign`)
+      .post(`/communities/${communityId}/assign`, { nickName })
       .catch(handleApiError),
 };
 
@@ -182,8 +180,10 @@ export const cartApi = {
   fetchCart: () => api.get("/carts").catch(handleApiError), // 공통 에러 처리 함수 사용
 
   // 카트 아이템 수량 수정 API
-  updateCartItemQuantity: (cartItemId: number, quantity: 'INCREMENT' | 'DECREMENT') =>
-    api.patch(`/carts/items/${cartItemId}?quantity=${quantity}`),  
+  updateCartItemQuantity: (
+    cartItemId: number,
+    quantity: "INCREMENT" | "DECREMENT"
+  ) => api.patch(`/carts/items/${cartItemId}?quantity=${quantity}`),
   // 카트 항목 삭제 API
   removeCartItem: (cartItemId: number) =>
     api.delete(`/carts/items/${cartItemId}`).catch(handleApiError),
@@ -191,5 +191,12 @@ export const cartApi = {
 
 // 결제 관련 API 호출
 export const paymentApi = {
-  createOrder: () => api.post('/orders').catch(handleApiError), // 결제 API 엔드포인트
+  createOrder: () => axios.post("/orders").catch(handleApiError), // 결제 API 엔드포인트
+};
+
+// 멤버십 관련 API 호출
+export const membershipApi = {
+  joinMembership: (communityId: number) =>
+    api.post(`/membership`, { communityId }).catch(handleApiError),
+  existedMembership: () => api.get(`/membership`).catch(handleApiError),
 };

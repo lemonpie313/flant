@@ -322,3 +322,64 @@
   border-radius: 10px;
 }
 // 성운 end
+
+/* 모달 오버레이: 배경을 어둡게 처리 */
+.nickname-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* 배경을 어둡게 처리 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* 다른 요소 위에 위치하도록 설정 */
+}
+
+/* 모달 컨테이너: 중앙에 배치 */
+.nickname-modal {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 약간의 그림자 효과 */
+  position: relative;
+  z-index: 1001;
+}
+
+/* 모달의 헤더 스타일 */
+.nickname-modal h2 {
+  margin-top: 0;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+/* 닉네임 입력창 스타일 */
+.nickname-modal input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* 모달 버튼 스타일 */
+.nickname-modal button {
+  padding: 10px 20px;
+  margin-right: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.nickname-modal button:last-child {
+  background-color: #ccc; /* 취소 버튼 색상 */
+}
+
+.nickname-modal button:hover {
+  opacity: 0.9;
+}
