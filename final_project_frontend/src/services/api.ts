@@ -6,7 +6,7 @@ const API_TIMEOUT = Number(process.env.API_TIMEOUT);
 
 // Axios 인스턴스 생성
 const api: AxiosInstance = axios.create({
-  baseURL: "https://api.flant.club/api/v1",
+  baseURL: REACT_APP_BACKEND_API_URL,
   timeout: API_TIMEOUT,
   withCredentials: true,
 });
@@ -193,3 +193,16 @@ export const cartApi = {
 export const paymentApi = {
   createOrder: () => axios.post('/orders').catch(handleApiError), // 결제 API 엔드포인트
 };
+
+export const mediaApi = {
+  createMedia: (formData: FormData) =>
+    api.post(`/media`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      .catch(handleApiError),
+  getMediaList: (communityId: number) => 
+    api.get('/media', { params: { communityId }}).catch(handleApiError),
+  getMediaOne: (mediaId: number) =>
+    api.get(`/media/${mediaId}`).catch(handleApiError)
+  
+}
