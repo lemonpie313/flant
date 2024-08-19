@@ -68,7 +68,7 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
           setMyCommunities(myresponse.data.data);
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
         alert("Failed to fetch communities");
       } finally {
         setIsLoading(false);
