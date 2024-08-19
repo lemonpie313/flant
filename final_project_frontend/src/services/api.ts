@@ -194,3 +194,9 @@ export const cartApi = {
 export const paymentApi = {
   createOrder: () => axios.post("/orders").catch(handleApiError), // 결제 API 엔드포인트
 };
+
+// 멤버십 관련 API 호출
+export const membershipApi = {
+  joinMembership: (communityId: number) =>
+    api.post(`/membership`, { communityId }).catch(handleApiError),
+};

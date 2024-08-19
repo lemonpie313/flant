@@ -6,6 +6,7 @@ import {
   postApi,
   commentApi,
   communityUserApi,
+  membershipApi,
 } from "../services/api";
 import axios from "axios";
 import Header from "../components/communityBoard/Header";
@@ -179,18 +180,13 @@ const CommunityBoard: React.FC = () => {
   };
 
   const handleJoinButtonClick = async () => {
-    console.log("Button clicked!");
     try {
       if (isCommunityJoined) {
         // 멤버십 가입 처리
-        //////////////////// 버튼을 눌렀을때 임시로 가입되게 만들기
-        //await communityUserApi.joinMembership(Number(communityId));
+        await membershipApi.joinMembership(Number(communityId));
         alert("멤버십에 가입되었습니다.");
       } else {
-        // 커뮤니티 가입 처리
-        // await communityApi.joinCommunity(Number(communityId));
-        // alert("커뮤니티에 가입되었습니다.");
-        // setIsCommunityJoined(true); // 커뮤니티 가입 상태 업데이트
+        //모달로 이동
         setIsModalOpen(true);
       }
     } catch (error) {
