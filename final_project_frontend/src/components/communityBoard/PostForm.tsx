@@ -18,7 +18,6 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(communityId);
 
     if (!communityId) {
       throw new Error('communityId가 제공되지 않았습니다.');
@@ -27,7 +26,6 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated }) => {
     try {
       const token = localStorage.getItem("accessToken");
       if (!token) throw new Error('로그인이 필요합니다.');
-      console.log('communityId', communityId);
 
       const formData = new FormData();
       formData.append('content', content);

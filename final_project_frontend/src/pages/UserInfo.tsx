@@ -44,9 +44,7 @@ const UserInfoPage: React.FC = () => {
     try {
       const response = await userApi.checkPassword(password);
       if (response.data.statusCode === 200) {
-        console.log("he");
         await userApi.delete();
-        console.log("she");
         await authApi.signOut(); // 쿠키 삭제 위한 용도
         localStorage.clear();
         alert("계정이 성공적으로 삭제되었습니다.");

@@ -17,8 +17,9 @@ const CommunityNavigationHeader: React.FC = () => {
         throw new Error('communityId가 제공되지 않았습니다.');
       }
       try {
-        const response = await liveApi.findAllLives(communityId);
-        setLives(response.data.data);
+        // TODO : 추후 기능 추가
+        // const response = await liveApi.findAllLives(communityId);
+        // setLives(response.data.data);
       } catch (error) {
         console.error('라이브 목록을 가져오는데 실패했습니다:', error);
       }
