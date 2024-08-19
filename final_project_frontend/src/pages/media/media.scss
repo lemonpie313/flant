@@ -1,5 +1,5 @@
 .media-container {
-    padding: 20px;
+    padding: 0px 20px 20px 20px; /* 상단에 추가 패딩을 줘서 헤더와의 간격을 벌립니다 */
   
     .media-detail-container {
       padding: 20px;
@@ -92,12 +92,12 @@
   
       .media-item {
         cursor: pointer;
-        transition: transform 0.2s;
         text-align: center;
         position: relative;
+        /* transform 효과 제거 */
   
         &:hover {
-          transform: scale(1.05);
+          transform: none; /* 커졌던 효과를 없앱니다 */
         }
   
         img, .no-thumbnail {
@@ -152,5 +152,4 @@
         background-color: #0056b3;
       }
     }
-  }
-  
+}
