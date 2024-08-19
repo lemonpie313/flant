@@ -12,18 +12,22 @@ const Header: React.FC<HeaderProps> = ({ communityName, isLoggedIn, handleLogout
   return (
     <header>
       <div className="header-box">
-        <Link to="/main" className="header-box-logo">
-          <img className="header-box-logo-image" src="/favicon.ico" alt="logo" />
-        </Link>
-        <div className="header-box-blank">{communityName}</div>
-        <div className="header-box-user">
-          {isLoggedIn ? (
-            <div className="header-box-user-info">
-              <div>
+  <div className="header-box-logo-and-name">
+    <Link to="/main" className="header-box-logo">
+      <img className="header-box-logo-image" src="/favicon.ico" alt="logo" />
+    </Link>
+    <div className="header-community-name new-amsterdam-regular">
+      {communityName}
+    </div>
+  </div>
+  <div className="header-box-user">
+    {isLoggedIn ? (
+      <div className="header-box-user-info">
+              {/* <div>
                 <button>
                   <img className="header-notification-icon" src="/images/notification.png" alt="notification" />
                 </button>
-              </div>
+              </div> */}
               <div className="header-box-user-dropdown-container">
                 <button>
                   <img className="header-user-icon" src="/images/user.png" alt="user" />
@@ -31,30 +35,30 @@ const Header: React.FC<HeaderProps> = ({ communityName, isLoggedIn, handleLogout
                 <div className="header-user-dropdown">
                   <Link to="/userinfo">내 정보</Link>
                   <Link to="/membership">멤버십</Link>
-                  <Link to="/payment-history">결제내역</Link>
+                  {/* <Link to="/payment-history">결제내역</Link> */}
                   <button onClick={handleLogout}>로그아웃</button>
                 </div>
               </div>
-            </div>
-          ) : (
-            <div className="header-box-login">
-              <div className="header-box-container">
-                <Link to="/login" className="header-box-btn btn-3">Sign in</Link>
-              </div>
-            </div>
-          )}
-          <div className="header-box-user-shop">
-            <Link to="#">
-              <img
-                style={{ marginLeft: '25px', marginTop: '6px' }}
-                className="header-box-shop-image"
-                src="/green-cart.png"
-                alt="green-cart"
-              />
-            </Link>
-          </div>
+      </div>
+    ) : (
+      <div className="header-box-login">
+        <div className="header-box-container">
+          <Link to="/login" className="header-box-btn btn-3">Sign in</Link>
         </div>
       </div>
+    )}
+    <div className="header-box-user-shop">
+      <Link to="#">
+        <img
+          style={{ marginLeft: '25px', marginTop: '6px' }}
+          className="header-box-shop-image"
+          src="/green-cart.png"
+          alt="green-cart"
+        />
+      </Link>
+    </div>
+  </div>
+</div>
     </header>
   );
 };
