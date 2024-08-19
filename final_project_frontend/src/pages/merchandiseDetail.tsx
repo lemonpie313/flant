@@ -87,7 +87,6 @@ const MerchandiseDetail: React.FC = () => {
         selectedOption,
         quantity
       );
-      console.log(response.data.data);
       alert(response.data.message); // API 응답 메시지 표시
     } catch (error) {
       console.error("장바구니 추가 실패:", error);

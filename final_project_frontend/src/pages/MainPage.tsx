@@ -68,7 +68,7 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
           setMyCommunities(myresponse.data.data);
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
         alert("Failed to fetch communities");
       } finally {
         setIsLoading(false);
@@ -76,7 +76,11 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
     };
     fetchCommunities();
   }, []);
-
+  // 새로고침 핸들러
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault(); // 기본 링크 동작 방지
+    window.location.reload(); // 페이지 새로고침
+  };
   const handleCommunityClick = (communityId: number) => {
     navigate(`/communities/${communityId}/feed`);
   };
@@ -89,7 +93,11 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
     <div className="main-page">
       <header>
         <div className="header-box">
-          <Link to="/main" className="header-box-logo">
+          <Link
+            to="/main"
+            className="header-box-logo"
+            onClick={handleLogoClick}
+          >
             <img
               className="header-box-logo-image"
               src="/favicon.ico"
@@ -139,11 +147,15 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
       <div className="mainPage-main">
         {isLoggedIn && (
           <div className="mainPage-main-my">
-            <CommunityList
-              title="나의 커뮤니티"
-              communities={mycommunities}
-              onCommunityClick={handleCommunityClick}
-            />
+            {mycommunities.length > 0 ? (
+              <CommunityList
+                title="나의 커뮤니티"
+                communities={mycommunities}
+                onCommunityClick={handleCommunityClick}
+              />
+            ) : (
+              <div className="no-communities">가입해줘</div>
+            )}
           </div>
         )}
 

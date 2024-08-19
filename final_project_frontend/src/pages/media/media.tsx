@@ -74,7 +74,6 @@ const Media: React.FC = () => {
       mediaApi.getMediaOne(Number(mediaId))
         .then(response => {
           setSelectedMedia(response.data.data);
-          console.log(selectedMedia);
         })
         .catch(error => console.error('Error fetching media detail:', error));
     } else {

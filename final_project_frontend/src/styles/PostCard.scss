@@ -1,10 +1,8 @@
-/* 배경색과 카드 배경색을 동일하게 하고 카드 하단에만 선을 추가 */
 .post-card {
-  background-color: white; /* 카드의 배경색 (배경과 동일) */
+  background-color: white; /* 카드의 배경색 */
   padding: 20px;
   margin-bottom: 16px; /* 카드 간 간격 */
   border-radius: 8px;
-  // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 카드에 그림자 추가 */
   width: 730px; /* 고정된 너비 설정 */
   overflow: hidden; /* 넘치는 내용 숨기기 */
   position: relative; /* 선을 카드 아래쪽에 위치시키기 위해 설정 */
@@ -58,36 +56,30 @@
 .post-images {
   display: flex;
   gap: 8px; /* 사진 사이의 간격 */
+  justify-content: center; /* 이미지들을 중앙에 정렬 */
 }
 
 .post-images img {
   width: 100%;
-  height: auto; /* 비율 유지 */
-  object-fit: cover; /* 이미지가 컨테이너를 채우도록 */
+  height: 100%;
+  object-fit: contain; /* 이미지가 컨테이너에 맞게 조정되고, 잘리지 않음 */
+  background-color:#fafafa; 
   border-radius: 8px; /* 이미지의 모서리 둥글게 */
 }
 
 .single img {
-  width: 100%;
-  height: 300px; /* 필요에 따라 높이 조정 */
+  height: 300px; /* 높이 고정 */
 }
 
-.two {
-  .post-images {
-    display: flex;
-    gap: 8px; /* 사진 사이의 간격 */
-  }
-  
-  .post-images img {
-    width: calc(50% - 4px); /* 두 이미지를 가로로 나열 */
-    height: 300px; /* 동일한 높이 지정 */
-    object-fit: cover; /* 이미지 비율 유지 */
-  }
+.two .post-images img {
+  width: calc(50% - 4px); /* 두 이미지를 가로로 나란히 */
+  height: 300px; /* 높이 고정 */
 }
 
 .three {
   display: flex;
   gap: 8px;
+  justify-content: center;
   
   .left-image {
     flex: 1;
@@ -106,13 +98,11 @@
   .left-image img {
     width: 100%;
     height: 100%; /* 부모 컨테이너의 높이에 맞추기 */
-    object-fit: cover;
   }
 
   .right-images img {
     width: 100%;
     height: calc(50% - 4px); /* 오른쪽 이미지의 높이 조정, 높이 총합이 왼쪽과 같도록 */
-    object-fit: cover;
   }
 }
 
