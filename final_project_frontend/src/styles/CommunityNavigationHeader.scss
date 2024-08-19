@@ -1,21 +1,21 @@
 .nav-bar {
-  background-image: linear-gradient(90deg, rgb(57,191,151) 0%, rgb(57,191,151) 100%);
+  background-image: linear-gradient(90deg, rgb(57, 191, 151) 0%, rgb(57, 191, 151) 100%);
   margin-top: 80px; /* 헤더 높이만큼 margin을 줘서 아래에 위치하도록 설정 */
   display: flex;
   align-items: center;
-  justify-content: center;
-  height: 50px; /* 기존 60px에서 50px로 수정 */
-  padding: 10px 20px; /* 패딩 추가 */
+  justify-content: center; /* 중앙 정렬 */
+  height: 50px;
+  padding: 10px 20px;
   position: relative;
-  z-index: 1; /* z-index를 1로 설정하여 헤더보다 뒤에 위치하도록 설정 */
+  z-index: 999;
 }
 
 .nav-link {
-  color: #ffffffb3;
+  color: #ffffffb3 !important; 
+  font-weight: bold !important; 
   font-size: 16px;
-  font-weight: 700;
   line-height: 19px;
-  margin: 0 30px;
+  margin: 0 20px; /* 중앙 정렬을 위해 좌우 간격 조정 */
   padding: 8px 10px;
   position: relative;
   text-decoration: none;
@@ -23,7 +23,7 @@
 
 .nav-link:hover,
 .nav-link:focus {
-  color: #ffffff;
+  color: #ffffffb3; /* Hover 시에도 흰색 유지 */
 }
 
 .nav-tab {
@@ -31,9 +31,9 @@
 }
 
 .shop-link-wrapper {
-  margin-left: auto; /* 오른쪽으로 정렬 */
+  margin-left: 0; /* 모든 링크를 중앙에 배치하기 위해 좌측 여백 제거 */
 }
 
 .shop-link {
-  color: #ffffffb3;
+  color: #ffffffb3; /* 글씨를 흰색으로 설정 */
 }

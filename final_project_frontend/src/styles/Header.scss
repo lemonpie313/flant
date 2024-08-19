@@ -2,58 +2,40 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 80px; /* 헤더 전체 크기 설정 */
-    padding: 0 20px; /* 좌우 패딩 설정 */
+    height: 80px;
+    padding: 0 20px;
     background-color: #f8f8f8;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.header-box-logo {
+  }
+  
+  .header-box-logo-and-name {
     display: flex;
     align-items: center;
-}
-
-.header-box-logo-image {
-    width: 120px; /* 로고 이미지 크기 조정 */
+  }
+  
+  .header-box-logo-image {
+    width: 120px;
     height: auto;
-}
-
-.header-community-name {
-    font-size: 24px;
-    font-weight: bold;
-    margin-left: 20px;
+  }
+  
+  .header-community-name {
+    font-size: 40px;
+    margin-left: 10px; /* 로고와 커뮤니티 이름 사이의 간격 */
     color: #333;
-}
-
-.header-box-user {
+  }
+  
+  .header-box-user {
     display: flex;
     align-items: center;
-}
+  }
 
-.header-box-user-info {
-    display: flex;
-    align-items: center;
-    margin-right: 20px;
-}
-
-.header-notification-icon,
-.header-user-icon,
-.header-box-shop-image {
-    width: 38px; /* 아이콘 크기 조정 */
-    height: 38px; /* 아이콘 크기 조정 */
-    cursor: pointer;
-}
-
-.header-box-login .header-box-btn {
-    font-size: 16px;
-    padding: 8px 16px;
-    color: #fff;
-    background-color: #007bff;
-    border-radius: 4px;
-    text-decoration: none;
-}
-
-.header-user-dropdown {
+  .new-amsterdam-regular {
+    font-family: "New Amsterdam", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+  .header-user-dropdown {
     display: none;
     position: absolute;
     right: 0;
@@ -62,8 +44,26 @@
     border: 1px solid #ddd;
     padding: 10px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    width: 200px; /* 드롭다운 메뉴의 가로 길이 설정 */
+    z-index: 1100;
 }
 
-.header-box-user-info button:hover .header-user-dropdown {
+.header-box-user-dropdown-container:hover .header-user-dropdown {
     display: block;
 }
+
+.header-user-dropdown a,
+.header-user-dropdown button {
+    display: block;
+    padding: 8px 0; /* 패딩으로 여백 추가 */
+    text-align: left; /* 텍스트 왼쪽 정렬 */
+    color: #333; /* 텍스트 색상 */
+    text-decoration: none; /* 링크의 기본 밑줄 제거 */
+    border-bottom: 1px solid #ddd; /* 항목 아래에 구분선 추가 */
+}
+
+.header-user-dropdown a:last-child,
+.header-user-dropdown button:last-child {
+    border-bottom: none; /* 마지막 항목 아래는 구분선 제거 */
+}
+  
