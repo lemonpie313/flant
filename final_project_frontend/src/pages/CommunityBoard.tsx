@@ -194,7 +194,7 @@ const CommunityBoardTest: React.FC = () => {
         {community && (
           <>
         <Header 
-          communityName={community.name} 
+          communityName={community.communityName} 
           isLoggedIn={isLoggedIn} 
           handleLogout={handleLogout} 
         />
@@ -254,17 +254,9 @@ const CommunityBoardTest: React.FC = () => {
               {isCommunityJoined ? "Membership 가입하기" : "커뮤니티 가입하기"}
             </button>
           </div>
-          <div className="right-sidebar-dm-section">
-            <button className="right-sidebar-dm-button">Weverse DM</button>
-            <p>지금 DM하세요!</p>
-          </div>
           <div className="right-sidebar-user-info">
             <p>{communityUser?.nickName}</p>
             <p>0 posts</p>
-          </div>
-          <div className="right-sidebar-community-notice">
-            <h3>커뮤니티 공지사항</h3>
-            <p>[NOTICE] CHUU 2ND MINI ALBUM...</p>
           </div>
         </div>
       </main>
