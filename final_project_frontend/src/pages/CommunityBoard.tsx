@@ -179,6 +179,7 @@ const CommunityBoard: React.FC = () => {
     try {
       if (isCommunityJoined) {
         // 멤버십 가입 처리
+        //////////////////// 버튼을 눌렀을때 임시로 가입되게 만들기
         //await communityUserApi.joinMembership(Number(communityId));
         alert("멤버십에 가입되었습니다.");
       } else {

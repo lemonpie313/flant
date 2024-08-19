@@ -6,7 +6,7 @@ const API_TIMEOUT = Number(process.env.API_TIMEOUT);
 
 // Axios 인스턴스 생성
 const api: AxiosInstance = axios.create({
-  baseURL: "https://api.flant.club/api/v1",
+  baseURL: REACT_APP_BACKEND_API_URL,
   timeout: API_TIMEOUT,
   withCredentials: true,
 });
@@ -59,7 +59,6 @@ const handleApiError = (error: any) => {
   throw error;
 };
 
-
 export const authApi = {
   signIn: (email: string, password: string) =>
     api.post("/auth/sign-in", { email, password }).catch(handleApiError),
@@ -98,9 +97,7 @@ export const communityApi = {
   findMy: () => api.get("/communities/me").catch(handleApiError),
   // 커뮤니티 가입
   joinCommunity: (communityId: number) =>
-    api
-      .post(`/communities/userInfo/${communityId}/assign`)
-      .catch(handleApiError),
+    api.post(`/communities/${communityId}/assign`).catch(handleApiError),
 };
 
 export const postApi = {
@@ -182,8 +179,10 @@ export const cartApi = {
   fetchCart: () => api.get("/carts").catch(handleApiError), // 공통 에러 처리 함수 사용
 
   // 카트 아이템 수량 수정 API
-  updateCartItemQuantity: (cartItemId: number, quantity: 'INCREMENT' | 'DECREMENT') =>
-    api.patch(`/carts/items/${cartItemId}?quantity=${quantity}`),  
+  updateCartItemQuantity: (
+    cartItemId: number,
+    quantity: "INCREMENT" | "DECREMENT"
+  ) => api.patch(`/carts/items/${cartItemId}?quantity=${quantity}`),
   // 카트 항목 삭제 API
   removeCartItem: (cartItemId: number) =>
     api.delete(`/carts/items/${cartItemId}`).catch(handleApiError),
@@ -191,5 +190,5 @@ export const cartApi = {
 
 // 결제 관련 API 호출
 export const paymentApi = {
-  createOrder: () => axios.post('/orders').catch(handleApiError), // 결제 API 엔드포인트
+  createOrder: () => axios.post("/orders").catch(handleApiError), // 결제 API 엔드포인트
 };
