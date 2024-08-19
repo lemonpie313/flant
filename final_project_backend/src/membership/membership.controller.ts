@@ -53,14 +53,17 @@ export class MembershipController {
 
   /**
    * 멤버십 가입
-   * 
+   *
    * @returns
    */
   @ApiBearerAuth()
   @CommunityUserRoles()
   @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @Post('/')
-  async createMembership(@UserInfo() user: PartialUser, @Body() membershipDto: MembershipDto) {
+  async createMembership(
+    @UserInfo() user: PartialUser,
+    @Body() membershipDto: MembershipDto,
+  ) {
     const { communityId } = membershipDto;
     console.log(user.id);
     const membership = await this.membershipService.createMembership(

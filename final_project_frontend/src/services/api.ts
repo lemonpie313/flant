@@ -199,4 +199,5 @@ export const paymentApi = {
 export const membershipApi = {
   joinMembership: (communityId: number) =>
     api.post(`/membership`, { communityId }).catch(handleApiError),
+  existedMembership: () => api.get(`/membership`).catch(handleApiError),
 };

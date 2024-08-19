@@ -16,16 +16,19 @@ import {
   Community,
   Post,
   CommunityUser,
+  Membership,
 } from "../components/communityBoard/types";
 import "./board.scss";
 import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
 import Modal from "react-modal"; // Modal 추가
+import { LessThan } from "typeorm";
 
 Modal.setAppElement("#root");
 const CommunityBoard: React.FC = () => {
   const [community, setCommunity] = useState<Community | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [communityUser, setCommunityUser] = useState<CommunityUser>();
+  const [membership, setMembership] = useState<Membership>();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isCommunityJoined, setIsCommunityJoined] = useState(false); // 커뮤니티 가입 여부 상태 추가
@@ -183,6 +186,16 @@ const CommunityBoard: React.FC = () => {
     try {
       if (isCommunityJoined) {
         // 멤버십 가입 처리
+        // 멤버십을 이미 가입했다면 false 반환
+        const existedMembership = await membershipApi.existedMembership();
+        const existedMembershipInfo = existedMembership.data.data;
+        for (let i = 0; i < existedMembershipInfo.length; i++) {
+          if (existedMembershipInfo[i].group == community?.communityName) {
+            alert("이미 멤버십에 가입되었습니다.");
+            return;
+          }
+        }
+
         await membershipApi.joinMembership(Number(communityId));
         alert("멤버십에 가입되었습니다.");
       } else {
