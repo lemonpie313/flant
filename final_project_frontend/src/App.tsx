@@ -92,7 +92,7 @@ const App: React.FC = () => {
             <Route path="/live" element={<ProtectedRoute><LiveListPage /></ProtectedRoute>} />
             <Route path="/live/:liveId" element={<ProtectedRoute><LiveStreamingPage /></ProtectedRoute>} />
             <Route path="communities/:communityId/merchandise" element={<ProtectedRoute><MerchandiseList /></ProtectedRoute>} />
-            <Route path="/merchandise/:merchandiseId" element={<ProtectedRoute><MerchandiseDetail /></ProtectedRoute>} />
+            <Route path="communities/:communityId/merchandise/:merchandiseId" element={<ProtectedRoute><MerchandiseDetail /></ProtectedRoute>} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/" element={<Navigate to="/main" replace />} />
             <Route path="*" element={<Navigate to="/main" replace />} />

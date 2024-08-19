@@ -80,53 +80,80 @@ export class PostService {
     };
   }
 
-  async findPosts(
-    isArtist: boolean,
-    communityId: number,
-    page: number,
-    limit: number,
-  ) {
-    // 페이지네이션을 위한 오프셋과 제한 설정
-    const offset = (page - 1) * limit;
-
+  async findPosts(isArtist: boolean, communityId: number) {
     if (!isArtist) {
       const [allPosts, total] = await this.postRepository.findAndCount({
         where: {
           communityId: communityId,
           artistId: IsNull(),
         },
-        relations: ['postImages'],
-        skip: offset,
-        take: limit,
+        relations: {
+          postImages: true,
+          communityUser: {
+            users: true,
+          },
+        },
         order: { createdAt: 'DESC' }, // 최신 게시물 순으로 정렬 (필요 시 추가)
+      });
+
+      const posts = allPosts.map(post => {
+        return {
+          postId: post.postId,
+          nickname: post.communityUser.nickName,
+          profileImage: post.communityUser.users.profileImage,
+          isArtist: post.artistId !== null, // artistId가 존재하면 아티스트로 간주
+          content: post.content,
+          createdAt: post.createdAt,
+          updatedAt: post.updatedAt,
+          postImages: post.postImages.map(image => ({
+            postImageId: image.postImageId,
+            postImageUrl: image.postImageUrl,
+          })),
+        };
       });
 
       return {
         status: HttpStatus.OK,
         message: MESSAGES.POST.FINDPOSTS.SUCCEED,
-        data: allPosts,
+        data: posts,
         total, // 총 게시물 수 반환
-        page, // 현재 페이지 반환
-        limit, // 한 페이지에 보여줄 게시물 수 반환
       };
     } else {
       const [artistPosts, total] = await this.postRepository.findAndCount({
-        where: { 
+        where: {
           communityId: communityId,
-          artistId: Not(IsNull()) },
-        relations: ['postImages'],
-        skip: offset,
-        take: limit,
+          artistId: Not(IsNull()),
+        },
+        relations: {
+          postImages: true,
+          communityUser: {
+            users: true,
+          },
+        },
         order: { createdAt: 'DESC' }, // 최신 게시물 순으로 정렬 (필요 시 추가)
+      });
+
+      const posts = artistPosts.map(post => {
+        return {
+          postId: post.postId,
+          nickname: post.communityUser.nickName,
+          profileImage: post.communityUser.users.profileImage,
+          isArtist: post.artistId !== null, // artistId가 존재하면 아티스트로 간주
+          content: post.content,
+          createdAt: post.createdAt,
+          updatedAt: post.updatedAt,
+          postImages: post.postImages.map(image => ({
+            postImageId: image.postImageId,
+            postImageUrl: image.postImageUrl,
+          })),
+        };
       });
 
       return {
         status: HttpStatus.OK,
         message: MESSAGES.POST.FINDPOSTS.ARTIST,
-        data: artistPosts,
+        data: posts,
         total, // 총 게시물 수 반환
-        page, // 현재 페이지 반환
-        limit, // 한 페이지에 보여줄 게시물 수 반환
       };
     }
   }

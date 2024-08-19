@@ -19,24 +19,25 @@ import {
 import "./board.scss";
 import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
 
-const ArtistPostsBoard: React.FC = () => {
+const ArtistBoard: React.FC = () => {
   const [community, setCommunity] = useState<Community | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [communityUser, setCommunityUser] = useState<CommunityUser>();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCommunityJoined, setIsCommunityJoined] = useState(false); // 커뮤니티 가입 여부 상태 추가
   const navigate = useNavigate();
   const { communityId } = useParams<{ communityId: string }>();
 
   useEffect(() => {
     const checkAuthAndFetchData = async () => {
       const token = localStorage.getItem("accessToken");
-      console.log();
       if (token) {
         setIsLoggedIn(true);
         await fetchCommunityData();
-        await fetchPosts();
+        await fetchPosts(); // 아티스트 게시물만 가져오기
         await fetchCommunityUsers();
+        await checkIfCommunityJoined(); // 커뮤니티 가입 여부 확인
       } else {
         setIsLoggedIn(false);
       }
@@ -88,10 +89,10 @@ const ArtistPostsBoard: React.FC = () => {
 
   const fetchPosts = async () => {
     try {
+      // isArtist를 true로 설정하여 아티스트 게시물만 가져오기
       const response = await postApi.getPosts(true, Number(communityId));
       const postsData = response.data.data as Post[]; // 타입 명시
       setPosts(postsData);
-      console.log(postsData);
     } catch (error) {
       console.error("게시물 가져오기 오류:", error);
       if (axios.isAxiosError(error) && error.response?.status === 401) {
@@ -111,7 +112,7 @@ const ArtistPostsBoard: React.FC = () => {
       navigate("/main");
       window.location.reload(); // 상태 갱신을 위해 페이지 리로드
     } catch (error) {
-      alert("LogOut failed.");
+      alert("로그아웃 실패.");
     }
   };
 
@@ -155,6 +156,32 @@ const ArtistPostsBoard: React.FC = () => {
       await fetchPosts();
     } catch (error) {
       console.error("답글 작성 오류:", error);
+    }
+  };
+
+  // 커뮤니티 가입 여부를 확인하는 함수
+  const checkIfCommunityJoined = async () => {
+    try {
+      const response = await communityApi.findMy();
+      const myCommunity = response.data.data;
+      setIsCommunityJoined(myCommunity.some((c: any) => c.communityId === Number(communityId)));
+    } catch (error) {
+      console.error("커뮤니티 가입 여부 확인 오류:", error);
+    }
+  };
+
+  const handleJoinButtonClick = async () => {
+    try {
+      if (isCommunityJoined) {
+        alert("이미 가입된 커뮤니티입니다.");
+      } else {
+        await communityApi.joinCommunity(Number(communityId));
+        alert("커뮤니티에 가입되었습니다.");
+        setIsCommunityJoined(true); // 커뮤니티 가입 상태 업데이트
+      }
+    } catch (error) {
+      console.error("가입 처리 오류:", error);
+      alert("가입에 실패했습니다.");
     }
   };
 
@@ -217,12 +244,14 @@ const ArtistPostsBoard: React.FC = () => {
             </div>
           </div>
           <div className="right-sidebar-membership">
-            <button className="right-sidebar-membership-button">
-              Membership
-            </button>
-            <p>자유 멤버십에 가입해서 새로운 스케줄 소식을 받아보세요.</p>
-            <button className="right-sidebar-join-button">
-              멤버십 가입하기
+            {isCommunityJoined
+              ? "자유 멤버십에 가입해서 새로운 스케줄 소식을 받아보세요."
+              : "커뮤니티에 가입해 소식을 받아보세요."}
+            <button
+              className="right-sidebar-join-button"
+              onClick={handleJoinButtonClick}
+            >
+              {isCommunityJoined ? "Membership 가입하기" : "커뮤니티 가입하기"}
             </button>
           </div>
           <div className="right-sidebar-dm-section">
@@ -230,13 +259,6 @@ const ArtistPostsBoard: React.FC = () => {
             <p>지금 DM하세요!</p>
           </div>
           <div className="right-sidebar-user-info">
-            {/*}
-            <img
-              src="https://example.com/user-placeholder.jpg" // 실제 이미지 URL로 변경 필요
-              alt="User"
-              className="right-sidebar-user-image"
-            />
-            */}
             <p>{communityUser?.nickName}</p>
             <p>0 posts</p>
           </div>
@@ -244,19 +266,10 @@ const ArtistPostsBoard: React.FC = () => {
             <h3>커뮤니티 공지사항</h3>
             <p>[NOTICE] CHUU 2ND MINI ALBUM...</p>
           </div>
-          {/* {community && (
-            <div className="community-info">
-              <img src={community.communityLogoImage} alt={community.communityName} className="community-logo" />
-              <h2>{community.communityName}</h2>
-              <button className="membership-btn">Membership</button>
-              <p>지금 멤버십에 가입하고 특별한 혜택을 누려보세요.</p>
-              <button className="join-membership-btn">멤버십 가입하기</button>
-            </div>
-          )} */}
         </div>
       </main>
     </div>
   );
 };
 
-export default ArtistPostsBoard;
+export default ArtistBoard;

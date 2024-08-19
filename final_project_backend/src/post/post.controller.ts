@@ -83,8 +83,6 @@ export class PostController {
     return await this.postService.findPosts(
       isArtist,
       +communityId,
-      +page,
-      +limit,
     );
   }
 
