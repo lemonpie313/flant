@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // useNavigate 훅 추가
-import { cartApi, paymentApi } from '../services/api'; // API 서비스 호출
+import { useNavigate } from 'react-router-dom';
+import { cartApi, paymentApi } from '../services/api'; // orderApi로 주문 API 호출
 import './cart.scss';
 
 interface CartItem {
@@ -17,7 +17,7 @@ interface CartItem {
 const Cart: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate(); // useNavigate 훅 사용
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -76,14 +76,16 @@ const Cart: React.FC = () => {
     }
   };
 
+  // 주문 생성 핸들러
   const handleCheckout = async () => {
     try {
-      const response = await paymentApi.createOrder(); // 결제 API 호출
-      alert(response.data.message); // 응답 메시지 표시
-      navigate(`/order/${response.data.data.orderId}`); // 주문 상세 페이지로 이동
+      const response = await paymentApi.createOrder(); // 주문 생성 API 호출
+      alert(response.data.message); // 성공 메시지 표시
+      const orderId = response.data.data.orderId; // 주문 ID 추출
+      navigate(`/order/${orderId}`); // 주문 상세 페이지로 이동
     } catch (error) {
-      console.error("결제 실패:", error);
-      alert("결제 기능은 지원하지 않습니다.");
+      console.error("주문 생성 실패:", error);
+      alert("주문을 처리하는 중 문제가 발생했습니다.");
     }
   };
 
@@ -102,7 +104,7 @@ const Cart: React.FC = () => {
             <div
               key={item.cartItemId}
               className="cart-item"
-              onClick={(e) => e.stopPropagation()} // 클릭 시 상품 상세 페이지로 이동하지 않도록
+              onClick={(e) => e.stopPropagation()}
             >
               <img src={item.thumbnail} alt={item.merchandiseName} className="thumbnail" />
               <div className="item-details">
@@ -112,7 +114,7 @@ const Cart: React.FC = () => {
                 <div className="quantity-control">
                   <button 
                     onClick={(e) => {
-                      e.stopPropagation(); // 클릭 시 상품 상세 페이지로 이동하지 않도록
+                      e.stopPropagation();
                       updateQuantity(item.cartItemId, false, item.quantity);
                     }}
                   >
@@ -121,7 +123,7 @@ const Cart: React.FC = () => {
                   <span>{item.quantity}</span>
                   <button 
                     onClick={(e) => {
-                      e.stopPropagation(); // 클릭 시 상품 상세 페이지로 이동하지 않도록
+                      e.stopPropagation();
                       updateQuantity(item.cartItemId, true, item.quantity);
                     }}
                   >
@@ -131,7 +133,7 @@ const Cart: React.FC = () => {
               </div>
               <button
                 onClick={(e) => {
-                  e.stopPropagation(); // 클릭 시 상품 상세 페이지로 이동하지 않도록
+                  e.stopPropagation();
                   removeCartItem(item.cartItemId);
                 }}
                 className="remove-btn"

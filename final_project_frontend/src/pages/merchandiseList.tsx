@@ -92,7 +92,7 @@ const MerchandiseList: React.FC = () => {
 
   // 상품 클릭 시 상세 페이지로 이동
   const handleMerchandiseClick = (merchandiseId: number) => {
-    navigate(`/merchandise/${merchandiseId}`);
+    navigate(`/communities/${communityId}/merchandise/${merchandiseId}`);
   };
 
   if (loading) {

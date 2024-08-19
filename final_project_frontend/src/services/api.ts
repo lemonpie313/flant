@@ -109,9 +109,9 @@ export const postApi = {
         headers: { "Content-Type": "multipart/form-data" },
       })
       .catch(handleApiError),
-  getPosts: (communityId: number, page = 1, limit = 10) =>
+  getPosts: (isArtist: boolean, communityId: number, page = 1, limit = 10) =>
     api
-      .get(`/posts`, { params: { communityId, page, limit } })
+      .get(`/posts`, { params: { isArtist, communityId, page, limit } })
       .catch(handleApiError),
   like: (postId: number, { status }: { status: number }) =>
     api.put(`/posts/${postId}/likes`, { status }).catch(handleApiError),

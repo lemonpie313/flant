@@ -72,19 +72,17 @@ export class PostController {
    * @returns
    */
   @Get()
-  @ApiQuery({ name: 'artistId', required: false, type: Number })
+  @ApiQuery({ name: 'isArtist', required: false, type: Boolean })
   @ApiQuery({ name: 'communityId', required: true, type: Number })
   async findPosts(
-    @Query('artistId') artistId: number,
+    @Query('isArtist') isArtist: boolean,
     @Query('communityId') communityId: number,
     @Query('page') page: number,
     @Query('limit') limit: number,
   ) {
     return await this.postService.findPosts(
-      +artistId,
+      isArtist,
       +communityId,
-      +page,
-      +limit,
     );
   }
 
