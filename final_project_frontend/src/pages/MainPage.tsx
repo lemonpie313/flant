@@ -36,6 +36,8 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
   const navigate = useNavigate();
   const [communities, setCommunities] = useState<Community[]>([]);
   const [mycommunities, setMyCommunities] = useState<Community[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
 
   const handleLogout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,27 +56,34 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
   useEffect(() => {
     const fetchCommunities = async () => {
       try {
+        setIsLoading(true);
         const token = getToken();
-        if (!token) {
-          const response = await communityApi.findAll();
-          setCommunities(response.data.data);
-        } else {
-          const response = await communityApi.findAll();
-          const myresponse = await communityApi.findMy();
-          setCommunities(response.data.data);
-          setMyCommunities(myresponse.data.data);
+        const response = await communityApi.findAll();
+        setCommunities(response.data.data);
+  
+        if (token) {
+          const myResponse = await communityApi.findMy();
+          console.log("My communities data:", myResponse.data.data);
+          setMyCommunities(myResponse.data.data);
         }
       } catch (error) {
-        console.log(error)
+        console.log(error);
         alert("Failed to fetch communities");
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchCommunities();
   }, []);
 
+
   const handleCommunityClick = (communityId: number) => {
     navigate(`/communities/${communityId}`);
   };
+  
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="main-page">

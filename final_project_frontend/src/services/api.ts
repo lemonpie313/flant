@@ -122,3 +122,4 @@ export const merchandiseApi = {
   fetchMerchandiseDetail: (merchandiseId: number) =>
     api.get(`/merchandise/${merchandiseId}`),
 };
+

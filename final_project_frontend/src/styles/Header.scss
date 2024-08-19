@@ -2,58 +2,59 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 80px; /* 헤더 전체 크기 설정 */
-    padding: 0 20px; /* 좌우 패딩 설정 */
+    height: 80px;
+    padding: 0 20px;
     background-color: #f8f8f8;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.header-box-logo {
+    /* position: static; // 이 줄을 제거하여 기본 흐름에 따르게 함 */
+  }
+  
+  .header-box-logo {
     display: flex;
     align-items: center;
-}
-
-.header-box-logo-image {
-    width: 120px; /* 로고 이미지 크기 조정 */
+  }
+  
+  .header-box-logo-image {
+    width: 120px;
     height: auto;
-}
-
-.header-community-name {
+  }
+  
+  .header-community-name {
     font-size: 24px;
     font-weight: bold;
     margin-left: 20px;
     color: #333;
-}
-
-.header-box-user {
+  }
+  
+  .header-box-user {
     display: flex;
     align-items: center;
-}
-
-.header-box-user-info {
+  }
+  
+  .header-box-user-info {
     display: flex;
     align-items: center;
     margin-right: 20px;
-}
-
-.header-notification-icon,
-.header-user-icon,
-.header-box-shop-image {
-    width: 38px; /* 아이콘 크기 조정 */
-    height: 38px; /* 아이콘 크기 조정 */
+  }
+  
+  .header-notification-icon,
+  .header-user-icon,
+  .header-box-shop-image {
+    width: 38px;
+    height: 38px;
     cursor: pointer;
-}
-
-.header-box-login .header-box-btn {
+  }
+  
+  .header-box-login .header-box-btn {
     font-size: 16px;
     padding: 8px 16px;
     color: #fff;
     background-color: #007bff;
     border-radius: 4px;
     text-decoration: none;
-}
-
-.header-user-dropdown {
+  }
+  
+  .header-user-dropdown {
     display: none;
     position: absolute;
     right: 0;
@@ -62,8 +63,15 @@
     border: 1px solid #ddd;
     padding: 10px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.header-box-user-info button:hover .header-user-dropdown {
+    z-index: 1;
+  }
+  
+  .header-user-button:hover .header-user-dropdown {
     display: block;
-}
+  }
+  
+  .header-box-user-shop {
+    display: flex;
+    align-items: center;
+  }
+  

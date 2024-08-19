@@ -1,40 +1,40 @@
 .nav-bar {
-    background-image: linear-gradient(90deg,rgb(57,191,151) 0%, rgb(57,191,151) 100%);
-    margin-top: 80px; /* 헤더 높이만큼 margin을 줘서 아래에 위치하도록 설정 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 50px; /* 기존 60px에서 50px로 수정 */
-    padding: 10px 20px; /* 패딩 추가 */
-    position: relative;
-    z-index: 1000;
-  }
-  
-  .nav-link {
-    color: #ffffffb3;
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 19px;
-    margin: 0 30px;
-    padding: 8px 10px;
-    position: relative;
-    text-decoration: none;
-  }
-  
-  .nav-link:hover,
-  .nav-link:focus {
-    color: #ffffff;
-  }
-  
-  .nav-tab {
-    display: block;
-  }
-  
-  .shop-link-wrapper {
-    margin-left: auto; /* 오른쪽으로 정렬 */
-  }
-  
-  .shop-link {
-    color: #ffffffb3;
-  }
-  
+  background-image: linear-gradient(90deg, rgb(57,191,151) 0%, rgb(57,191,151) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  padding: 10px 20px;
+  position: relative; /* 상대적인 위치 */
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 추가 */
+  margin-top: 80px; /* 로고 높이만큼 여백 추가 */
+}
+
+.nav-link {
+  color: #ffffffb3;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 19px;
+  margin: 0 30px;
+  padding: 8px 10px;
+  position: relative;
+  text-decoration: none;
+}
+
+.nav-link:hover,
+.nav-link:focus {
+  color: #ffffff;
+}
+
+.nav-tab {
+  display: block;
+}
+
+.shop-link-wrapper {
+  margin-left: auto; /* 오른쪽으로 정렬 */
+}
+
+.shop-link {
+  color: #ffffffb3;
+}

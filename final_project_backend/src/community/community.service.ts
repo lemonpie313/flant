@@ -3,6 +3,7 @@ import {
   HttpStatus,
   Injectable,
   NotFoundException,
+  ConflictException,
 } from '@nestjs/common';
 import { CreateCommunityDto } from './dto/create-community.dto';
 import { UpdateCommunityDto } from './dto/update-community.dto';
@@ -44,6 +45,13 @@ export class CommunityService {
     communityId: number,
     communityAssignDto: CommunityAssignDto,
   ) {
+    const existedData = await this.communityUserRepository.findOne({
+      where: { userId :userId, communityId: communityId }
+    })
+    if(existedData){
+      throw new ConflictException('이미 가입된 사용자입니다.')
+    }
+
     const assignData = await this.communityUserRepository.save({
       userId: userId,
       communityId: communityId,
@@ -69,7 +77,7 @@ export class CommunityService {
 
   async findAll() {
     const allCommunities = await this.communityRepository.find({
-      select: ['communityLogoImage', 'communityName', 'communityCoverImage'],
+      select: ['communityLogoImage', 'communityName', 'communityCoverImage','communityId'],
     });
     return {
       status: HttpStatus.OK,
