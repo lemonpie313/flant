@@ -6,7 +6,7 @@ const API_TIMEOUT = Number(process.env.API_TIMEOUT);
 
 // Axios 인스턴스 생성
 const api: AxiosInstance = axios.create({
-  baseURL: REACT_APP_BACKEND_API_URL,
+  baseURL: "https://api.flant.club/api/v1",
   timeout: API_TIMEOUT,
   withCredentials: true,
 });
@@ -59,6 +59,7 @@ const handleApiError = (error: any) => {
   throw error;
 };
 
+
 export const authApi = {
   signIn: (email: string, password: string) =>
     api.post("/auth/sign-in", { email, password }).catch(handleApiError),
@@ -95,6 +96,11 @@ export const communityApi = {
   findAll: () => api.get("/communities").catch(handleApiError),
   findOne: (id: number) => api.get(`/communities/${id}`).catch(handleApiError),
   findMy: () => api.get("/communities/me").catch(handleApiError),
+  // 커뮤니티 가입
+  joinCommunity: (communityId: number) =>
+    api
+      .post(`/communities/userInfo/${communityId}/assign`)
+      .catch(handleApiError),
 };
 
 export const postApi = {
