@@ -21,7 +21,6 @@ import {
 import "./board.scss";
 import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
 import Modal from "react-modal"; // Modal 추가
-import { LessThan } from "typeorm";
 
 Modal.setAppElement("#root");
 const CommunityBoard: React.FC = () => {
