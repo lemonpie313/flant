@@ -96,9 +96,6 @@ const CommunityNavigationHeader: React.FC = () => {
       <NavLink to={`/communities/${communityId}/media`} className="nav-link">
         <span className="nav-tab">Media</span>
       </NavLink>
-      <NavLink to={liveLink} className="nav-link">
-        <span className="nav-tab">LIVE</span>
-      </NavLink>
       <div className="shop-link-wrapper">
         <NavLink to="/merchandise" className="nav-link shop-link">
           Shop
