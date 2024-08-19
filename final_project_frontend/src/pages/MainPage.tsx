@@ -132,16 +132,6 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
                 </div>
               </div>
             )}
-            <div className="header-box-user-shop">
-              <Link to="#">
-                <img
-                  style={{ marginLeft: "25px", marginTop: "6px" }}
-                  className="header-box-shop-image"
-                  src="/green-cart.png"
-                  alt="green-cart"
-                />
-              </Link>
-            </div>
           </div>
         </div>
       </header>
