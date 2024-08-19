@@ -148,11 +148,15 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
       <div className="mainPage-main">
         {isLoggedIn && (
           <div className="mainPage-main-my">
-            <CommunityList
-              title="나의 커뮤니티"
-              communities={mycommunities}
-              onCommunityClick={handleCommunityClick}
-            />
+            {mycommunities.length > 0 ? (
+              <CommunityList
+                title="나의 커뮤니티"
+                communities={mycommunities}
+                onCommunityClick={handleCommunityClick}
+              />
+            ) : (
+              <div className="no-communities">가입해줘</div>
+            )}
           </div>
         )}
 
