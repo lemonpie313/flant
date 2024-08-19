@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
   margin: 0;
@@ -126,7 +127,7 @@ body {
   margin-right: 15px; /* 아이콘 간 여백 조정 */
 }
 
-.header-notification-icon{
+.header-notification-icon {
   width: 40px; /* 아이콘 크기 조정 */
 }
 
@@ -147,7 +148,7 @@ body {
   right: 0;
   background-color: white;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  z-index: 1;
+  z-index: 10;
   transition: visibility 0s, opacity 0.3s linear;
 }
 
@@ -157,6 +158,7 @@ body {
   padding: 12px 16px;
   text-decoration: none;
   display: block;
+  cursor: pointer;
 }
 
 .header-user-dropdown a:hover,
@@ -169,7 +171,6 @@ body {
   visibility: visible;
   opacity: 1;
 }
-
 
 // card start
 // .figure {
@@ -214,7 +215,3 @@ body {
 //     color: #fff;
 //   }
 // }
-
-
-
-
