@@ -118,6 +118,7 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
                   <div className="header-user-dropdown">
                     <Link to="/userinfo">내 정보</Link>
                     <Link to="/membership">멤버십</Link>
+                    <Link to="/cart">장바구니</Link>
                     {/* <Link to="/payment-history">결제내역</Link> */}
                     <button onClick={handleLogout}>로그아웃</button>
                   </div>
