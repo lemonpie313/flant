@@ -6,7 +6,7 @@ const API_TIMEOUT = Number(process.env.API_TIMEOUT);
 
 // Axios 인스턴스 생성
 const api: AxiosInstance = axios.create({
-  baseURL: "http://localhost:3001/api/v1",
+  baseURL: REACT_APP_BACKEND_API_URL,
   timeout: API_TIMEOUT,
   withCredentials: true,
 });
