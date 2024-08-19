@@ -48,3 +48,13 @@ export interface CommunityUser {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface Membership {
+  membershipId: number;
+  communityUserId: number;
+  communityId: number;
+  createdAt: Date;
+  updatedAt: Date;
+  expiration: Date;
+  deletedAt: Date;
+}

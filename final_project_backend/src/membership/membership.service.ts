@@ -190,10 +190,8 @@ export class MembershipService {
     const membership = communityUser.membership.find((cur) => {
       return cur.deletedAt == null;
     });
-    const membershipPayment = await this.membershipPaymentRepository.find({
-      where: {
-        membershipId: membership.membershipId,
-      },
+    const membershipPayment = await this.membershipPaymentRepository.findOneBy({
+      membershipId: membership.membershipId,
     });
     const membershipInfo = {
       communityUserId: communityUser.communityUserId,

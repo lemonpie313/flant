@@ -19,7 +19,7 @@ import {
 import "./board.scss";
 import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
 
-const ArtistBoard: React.FC = () => {
+const CommunityBoardTest: React.FC = () => {
   const [community, setCommunity] = useState<Community | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [communityUser, setCommunityUser] = useState<CommunityUser>();
@@ -35,7 +35,7 @@ const ArtistBoard: React.FC = () => {
       if (token) {
         setIsLoggedIn(true);
         await fetchCommunityData();
-        await fetchPosts(); // 아티스트 게시물만 가져오기
+        await fetchPosts(); 
         await fetchCommunityUsers();
         await checkIfCommunityJoined(); // 커뮤니티 가입 여부 확인
       } else {
@@ -51,16 +51,6 @@ const ArtistBoard: React.FC = () => {
       const response = await communityApi.findOne(Number(communityId));
       const communityData = response.data.data;
       setCommunity(communityData);
-
-      if (communityData?.posts) {
-        const postsWithLikes = await Promise.all(
-          communityData.posts.map(async (post: Post) => {
-            const isLiked = await fetchMyLikePost(post.postId);
-            return { ...post, isLiked };
-          })
-        );
-        setPosts(postsWithLikes);
-      }
     } catch (error) {
       console.error("커뮤니티 데이터 가져오기 오류:", error);
     }
@@ -89,10 +79,18 @@ const ArtistBoard: React.FC = () => {
 
   const fetchPosts = async () => {
     try {
-      // isArtist를 true로 설정하여 아티스트 게시물만 가져오기
+      // 커뮤니티 가입 유저 게시글만 불러옴
       const response = await postApi.getPosts(false, Number(communityId));
       const postsData = response.data.data as Post[]; // 타입 명시
-      setPosts(postsData);
+
+      // TODO : LIKE 관련 로직 추후 리팩토링 필요
+      const postsWithLikes = await Promise.all(
+        postsData.map(async (post: Post) => {
+          const isLiked = await fetchMyLikePost(post.postId);
+          return { ...post, isLiked };
+        })
+      );
+      setPosts(postsWithLikes);
     } catch (error) {
       console.error("게시물 가져오기 오류:", error);
       if (axios.isAxiosError(error) && error.response?.status === 401) {
@@ -172,10 +170,17 @@ const ArtistBoard: React.FC = () => {
 
   const handleJoinButtonClick = async () => {
     try {
+      const nickName = "exampleNickName"; // 임시로 nickName을 설정합니다. 실제로는 올바른 방법으로 가져와야 합니다.
+  
+      if (!nickName) {
+        alert("로그인이 필요합니다.");
+        return;
+      }
+  
       if (isCommunityJoined) {
         alert("이미 가입된 커뮤니티입니다.");
       } else {
-        await communityApi.joinCommunity(Number(communityId));
+        await communityApi.joinCommunity(Number(communityId), nickName);
         alert("커뮤니티에 가입되었습니다.");
         setIsCommunityJoined(true); // 커뮤니티 가입 상태 업데이트
       }
@@ -185,20 +190,16 @@ const ArtistBoard: React.FC = () => {
     }
   };
 
-  if (isLoading) {
-    return <div>로딩 중...</div>;
-  }
-
   return (
     <div className="community-board">
-      {community && (
-        <>
-          <Header
-            communityName={community.communityName}
-            isLoggedIn={isLoggedIn}
-            handleLogout={handleLogout}
-          />
-          <CommunityNavigationHeader />
+        {community && (
+          <>
+        <Header 
+          communityName={community.communityName} 
+          isLoggedIn={isLoggedIn} 
+          handleLogout={handleLogout} 
+        />
+        <CommunityNavigationHeader/>
         </>
       )}
       <main className="main-content">
@@ -262,14 +263,10 @@ const ArtistBoard: React.FC = () => {
             <p>{communityUser?.nickName}</p>
             <p>0 posts</p>
           </div>
-          <div className="right-sidebar-community-notice">
-            <h3>커뮤니티 공지사항</h3>
-            <p>[NOTICE] CHUU 2ND MINI ALBUM...</p>
-          </div>
         </div>
       </main>
     </div>
   );
 };
 
-export default ArtistBoard;
+export default CommunityBoardTest;

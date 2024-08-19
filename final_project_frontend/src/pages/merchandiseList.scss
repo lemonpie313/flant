@@ -1,18 +1,26 @@
 .merchandise-list {
   padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   h2 {
     font-size: 1.8rem;
     margin-bottom: 16px;
     color: #333;
+    text-align: center;
   }
 
   ul {
     list-style: none;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(4, 1fr); // 한 줄에 4개의 상품
+    gap: 24px;
+    justify-items: center;
+    max-width: 1200px;
+    width: 100%;
+    min-height: 400px; // 최소 높이를 지정해 크기가 다른 문제 해결
   }
 
   li {
@@ -22,6 +30,8 @@
     padding: 16px;
     text-align: center;
     transition: box-shadow 0.3s ease;
+    width: 100%;
+    min-height: 350px; // 상품 목록의 최소 높이를 지정
 
     &:hover {
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -30,20 +40,20 @@
     /* 이미지 컨테이너 */
     .image-container {
       width: 100%;
-      height: 200px; /* 원하는 높이 설정 */
+      padding-top: 100%; /* 1:1 비율 유지 */
+      position: relative;
       overflow: hidden;
       border-radius: 8px;
       margin-bottom: 12px;
-      position: relative;
     }
 
     img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
       position: absolute;
       top: 0;
       left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     p {
@@ -60,5 +70,12 @@
         font-size: 1.1rem;
       }
     }
+  }
+
+  /* 카테고리 섹션 간의 간격 */
+  .category-section {
+    width: 100%;
+    max-width: 1200px;
+    margin-bottom: 48px; // 카테고리 간 여백 추가
   }
 }

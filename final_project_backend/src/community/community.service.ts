@@ -4,6 +4,7 @@ import {
   HttpStatus,
   Injectable,
   NotFoundException,
+  ConflictException,
 } from '@nestjs/common';
 import { CreateCommunityDto } from './dto/create-community.dto';
 import { UpdateCommunityDto } from './dto/update-community.dto';
@@ -77,7 +78,7 @@ export class CommunityService {
 
   async findAll() {
     const allCommunities = await this.communityRepository.find({
-      select: ['communityLogoImage', 'communityName', 'communityCoverImage'],
+      select: ['communityLogoImage', 'communityName', 'communityCoverImage','communityId'],
     });
     return {
       status: HttpStatus.OK,
