@@ -19,7 +19,7 @@ import {
 import "./board.scss";
 import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
 
-const CommunityBoard: React.FC = () => {
+const ArtistPostsBoard: React.FC = () => {
   const [community, setCommunity] = useState<Community | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [communityUser, setCommunityUser] = useState<CommunityUser>();
@@ -88,9 +88,10 @@ const CommunityBoard: React.FC = () => {
 
   const fetchPosts = async () => {
     try {
-      const response = await postApi.getPosts(false, Number(communityId));
+      const response = await postApi.getPosts(true, Number(communityId));
       const postsData = response.data.data as Post[]; // 타입 명시
       setPosts(postsData);
+      console.log(postsData);
     } catch (error) {
       console.error("게시물 가져오기 오류:", error);
       if (axios.isAxiosError(error) && error.response?.status === 401) {
@@ -258,4 +259,4 @@ const CommunityBoard: React.FC = () => {
   );
 };
 
-export default CommunityBoard;
+export default ArtistPostsBoard;

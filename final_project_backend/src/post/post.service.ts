@@ -91,7 +91,10 @@ export class PostService {
 
     if (!isArtist) {
       const [allPosts, total] = await this.postRepository.findAndCount({
-        where: { communityId: communityId },
+        where: {
+          communityId: communityId,
+          artistId: IsNull(),
+        },
         relations: ['postImages'],
         skip: offset,
         take: limit,
