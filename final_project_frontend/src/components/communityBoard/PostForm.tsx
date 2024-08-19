@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { postApi } from '../../services/api';
-import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
-import './PostForm.scss';
+import React, { useState, useEffect } from "react";
+import { postApi, communityApi } from "../../services/api";
+import axios from "axios";
+import { useNavigate, useParams } from "react-router-dom";
+import "./PostForm.scss";
 
 interface PostFormProps {
   onPostCreated: () => void;
@@ -10,63 +10,99 @@ interface PostFormProps {
 
 const PostForm: React.FC<PostFormProps> = ({ onPostCreated }) => {
   const { communityId } = useParams<{ communityId: string }>();
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [selectedFileNames, setSelectedFileNames] = useState<string[]>([]); // 파일명 상태 추가
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isCommunityJoined, setIsCommunityJoined] = useState(false); // 커뮤니티 가입 여부 상태 추가
   const navigate = useNavigate();
+  useEffect(() => {
+    const checkIfCommunityJoined = async () => {
+      try {
+        if (communityId) {
+          const response = await communityApi.findMy();
+          const myCommunity = response.data.data;
+          setIsCommunityJoined(
+            myCommunity.some((c: any) => c.communityId === Number(communityId))
+          );
+        }
+      } catch (error) {
+        console.error("커뮤니티 가입 여부 확인 오류:", error);
+      }
+    };
 
+    checkIfCommunityJoined();
+  }, [communityId]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log(communityId);
 
     if (!communityId) {
-      throw new Error('communityId가 제공되지 않았습니다.');
+      throw new Error("communityId가 제공되지 않았습니다.");
     }
 
     try {
       const token = localStorage.getItem("accessToken");
-      if (!token) throw new Error('로그인이 필요합니다.');
-      console.log('communityId', communityId);
+      if (!token) throw new Error("로그인이 필요합니다.");
+      console.log("communityId", communityId);
 
       const formData = new FormData();
-      formData.append('content', content);
-      formData.append('communityId', communityId);
-      images.forEach((image) => formData.append('postImage', image));
+      formData.append("content", content);
+      formData.append("communityId", communityId);
+      images.forEach((image) => formData.append("postImage", image));
 
       await postApi.create(formData);
-      setContent('');
+      setContent("");
       setImages([]);
       setSelectedFileNames([]); // 폼 제출 후 파일명 초기화
       onPostCreated();
       setIsFormOpen(false);
     } catch (error) {
-      console.error('게시물 생성 오류:', error);
+      console.error("게시물 생성 오류:", error);
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        navigate('/login');
+        navigate("/login");
       }
     }
   };
-
+  // 커뮤니티 가입 여부를 확인하는 함수
+  const checkIfCommunityJoined = async () => {
+    try {
+      const response = await communityApi.findMy();
+      const myCommunity = response.data.data;
+      setIsCommunityJoined(
+        myCommunity.some((c: any) => c.communityId === Number(communityId))
+      );
+    } catch (error) {
+      console.error("커뮤니티 가입 여부 확인 오류:", error);
+    }
+  };
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
       setImages(filesArray);
-      setSelectedFileNames(filesArray.map(file => file.name)); // 선택된 파일명 저장
+      setSelectedFileNames(filesArray.map((file) => file.name)); // 선택된 파일명 저장
     }
   };
 
   const triggerFileInput = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault(); 
-    const fileInput = document.querySelector<HTMLInputElement>('.image-upload-input');
+    e.preventDefault();
+    const fileInput = document.querySelector<HTMLInputElement>(
+      ".image-upload-input"
+    );
     fileInput?.click();
   };
 
   return (
     <>
-      <div 
-        className={`floating-btn ${isFormOpen ? 'open' : ''}`}
-        onClick={() => setIsFormOpen(true)}
+      <div
+        className={`floating-btn ${isFormOpen ? "open" : ""} ${
+          !isCommunityJoined ? "disabled" : ""
+        }`}
+        onClick={() => {
+          if (isCommunityJoined) {
+            setIsFormOpen(true);
+          }
+        }}
       >
         <span className="post-text">게시글을 남겨보세요</span>
       </div>
@@ -74,8 +110,12 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated }) => {
       {isFormOpen && (
         <div className="overlay">
           <div className="floating-form">
-            <form onSubmit={handleSubmit} className="post-form" onClick={(e) => e.stopPropagation()}>
-              <textarea 
+            <form
+              onSubmit={handleSubmit}
+              className="post-form"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="플랜트에 포스트를 남겨보세요."
@@ -88,11 +128,11 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated }) => {
                     <button className="upload-btn" onClick={triggerFileInput}>
                       이미지 업로드
                     </button>
-                    <input 
-                      type="file" 
-                      onChange={handleImageChange} 
-                      multiple 
-                      accept="image/*" 
+                    <input
+                      type="file"
+                      onChange={handleImageChange}
+                      multiple
+                      accept="image/*"
                       className="image-upload-input"
                     />
                   </div>
@@ -106,15 +146,14 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated }) => {
                     )}
                   </div>
                 </div>
-                
-                <button type="submit" className="submit-btn">게시</button>
+
+                <button type="submit" className="submit-btn">
+                  게시
+                </button>
               </div>
             </form>
 
-            <button 
-              className="close-btn" 
-              onClick={() => setIsFormOpen(false)}
-            >
+            <button className="close-btn" onClick={() => setIsFormOpen(false)}>
               닫기
             </button>
           </div>
