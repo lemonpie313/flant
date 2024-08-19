@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import { authApi, merchandiseApi } from '../services/api';
+import { useParams, useNavigate } from "react-router-dom";
+import { authApi, communityApi, merchandiseApi } from '../services/api';
 import './merchandiseList.scss';
 import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
+import Header from "../components/communityBoard/Header";
 
 interface Merchandise {
   merchandiseId: number;
@@ -17,43 +18,57 @@ interface Category {
   categoryName: string;
 }
 
-const getToken = () => {
-  return localStorage.getItem("accessToken");
-};
+interface Community {
+  communityName: string;
+  // 추가로 필요한 community 속성이 있다면 여기에 추가
+}
+
+const getToken = () => localStorage.getItem("accessToken");
 
 const MerchandiseList: React.FC = () => {
-  const { communityId } = useParams<{ communityId: string }>();  // useParams를 이용해 communityId 가져오기
+  const { communityId } = useParams<{ communityId: string }>();
   const [categories, setCategories] = useState<Category[]>([]);
   const [merchandises, setMerchandises] = useState<{ [key: number]: Merchandise[] }>({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null); // 에러 상태 추가
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // 로그인 상태 확인
+  const [currentPage, setCurrentPage] = useState<{ [key: number]: number }>({});
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [community, setCommunity] = useState<Community | null>(null);
   const navigate = useNavigate();
 
-  // 로그인 상태 체크
   useEffect(() => {
     const token = getToken();
-    setIsLoggedIn(!!token); // 토큰이 있으면 로그인 상태로 설정
+    setIsLoggedIn(!!token);
   }, []);
 
-  // 카테고리 조회
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const categoryResponse = await merchandiseApi.fetchCategories(Number(communityId));  // communityId는 문자열이므로 숫자로 변환
-        setCategories(categoryResponse.data.data.categories);
+        if (communityId) {
+          const categoryResponse = await merchandiseApi.fetchCategories(Number(communityId));
+          setCategories(categoryResponse.data.data.categories);
+        }
       } catch (error) {
-        setError("카테고리 조회에 실패했습니다.");
         console.error("카테고리 조회 실패:", error);
       }
     };
 
-    if (communityId) {
-      fetchCategories();
-    }
+    fetchCategories();
   }, [communityId]);
 
-  // 각 카테고리별 상품 조회
+  useEffect(() => {
+    const fetchCommunity = async () => {
+      try {
+        if (communityId) {
+          const communityResponse = await communityApi.findOne(Number(communityId));
+          setCommunity(communityResponse.data);
+        }
+      } catch (error) {
+        console.error("커뮤니티 조회 실패:", error);
+      }
+    };
+
+    fetchCommunity();
+  }, [communityId]);
+
   useEffect(() => {
     const fetchMerchandisesByCategory = async () => {
       try {
@@ -65,9 +80,14 @@ const MerchandiseList: React.FC = () => {
         }
 
         setMerchandises(merchandiseData);
-        setLoading(false);
+
+        // 각 카테고리마다 현재 페이지를 초기화
+        const initialPage: { [key: number]: number } = {};
+        categories.forEach((category) => {
+          initialPage[category.merchandiseCategoryId] = 0;
+        });
+        setCurrentPage(initialPage);
       } catch (error) {
-        setError("상품 조회에 실패했습니다.");
         console.error("상품 조회 실패:", error);
       }
     };
@@ -77,123 +97,99 @@ const MerchandiseList: React.FC = () => {
     }
   }, [categories, communityId]);
 
-  // 로그아웃 처리
-  const handleLogout = async () => {
-    try {
-      await authApi.signOut();
-      localStorage.clear();
-      alert("로그아웃 성공");
-      navigate("/login");
-    } catch (error) {
-      console.error("로그아웃 실패:", error);
-      alert("로그아웃 실패");
-    }
-  };
-
-  // 상품 클릭 시 상세 페이지로 이동
   const handleMerchandiseClick = (merchandiseId: number) => {
     navigate(`/communities/${communityId}/merchandise/${merchandiseId}`);
   };
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
+  const handlePrevPage = (categoryId: number) => {
+    setCurrentPage((prev) => ({
+      ...prev,
+      [categoryId]: Math.max(prev[categoryId] - 1, 0)
+    }));
+  };
 
-  if (error) {
-    return <p>{error}</p>;
-  }
+  const handleNextPage = (categoryId: number, totalItems: number) => {
+    const maxPage = Math.ceil(totalItems / 4) - 1;
+    setCurrentPage((prev) => ({
+      ...prev,
+      [categoryId]: Math.min(prev[categoryId] + 1, maxPage)
+    }));
+  };
+
+  const handleLogout = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      localStorage.removeItem("isLoggedIn");
+      await authApi.signOut();
+      localStorage.clear();
+      alert("로그아웃이 성공적으로 되었습니다.");
+      navigate("/main");
+      window.location.reload();
+    } catch (error) {
+      alert("로그아웃 실패.");
+    }
+  };
 
   return (
-    <div className="merchandise-list-page">
-      {/* Header Section */}
-      <header>
-        <div className="header-box">
-          <Link to="/main" className="header-box-logo">
-            <img
-              className="header-box-logo-image"
-              src="/TGSrd-removebg-preview.png"
-              alt="logo"
-            />
-          </Link>
-          <div className="header-box-blank">상품 리스트 페이지</div>
-          <div className="header-box-user">
-            {isLoggedIn ? (
-              <div className="header-box-user-info">
-                <button>
-                  <img
-                    className="header-notification-icon"
-                    src="/images/notification.png"
-                    alt="notification"
-                  />
-                </button>
-                <button>
-                  <img
-                    className="header-user-icon"
-                    src="/images/user.png"
-                    alt="user"
-                  />
-                  <div className="header-user-dropdown">
-                    <Link to="/userinfo">내 정보</Link>
-                    <Link to="/membership">멤버십</Link>
-                    <Link to="/payment-history">결제내역</Link>
-                    <button onClick={handleLogout}>로그아웃</button>
-                  </div>
-                </button>
-              </div>
-            ) : (
-              <div className="header-box-login">
-                <div className="header-box-container">
-                  <Link to="/login" className="header-box-btn btn-3">
-                    Sign in
-                  </Link>
-                </div>
-              </div>
-            )}
-            <div className="header-box-user-shop">
-              <Link to="/cart">
-                <img
-                  style={{ marginLeft: "25px", marginTop: "6px" }}
-                  className="header-box-shop-image"
-                  src="/green-cart.png"
-                  alt="green-cart"
-                />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="community-board">
+      {community && (
+        <>
+          <Header
+            communityName={community.communityName}
+            isLoggedIn={isLoggedIn}
+            handleLogout={handleLogout}
+          />
+          <CommunityNavigationHeader />
+        </>
+      )}
 
-      {/* Navigation Bar Section */}
-      <CommunityNavigationHeader />
-
-      {/* Merchandise List Section */}
       <div className="merchandise-list">
-        {categories.map((category) => (
-          <div key={category.merchandiseCategoryId} className="category-section">
-            <h2>{category.categoryName}</h2>
-            <ul>
-              {merchandises[category.merchandiseCategoryId]?.length > 0 ? (
-                merchandises[category.merchandiseCategoryId].map((merchandise) => (
-                  <li 
-                    key={merchandise.merchandiseId}
-                    onClick={() => handleMerchandiseClick(merchandise.merchandiseId)}  // 클릭 시 상세 페이지로 이동
-                  >
-                    <div className="image-container">
-                      <img
-                        src={merchandise.thumbnail}
-                        alt={merchandise.merchandiseName}
-                      />
-                    </div>
-                    <p>{merchandise.merchandiseName}</p>
-                    <p>Price: {merchandise.price} 원</p>
-                  </li>
-                ))
-              ) : (
-                <p>No merchandise available for this category.</p>
-              )}
-            </ul>
-          </div>
-        ))}
+        {categories.map((category) => {
+          const items = merchandises[category.merchandiseCategoryId] || [];
+          const currentPageIndex = currentPage[category.merchandiseCategoryId] || 0;
+          const startIndex = currentPageIndex * 4;
+          const visibleItems = items.slice(startIndex, startIndex + 4);
+
+          return (
+            <div key={category.merchandiseCategoryId} className="category-section">
+              <h2>{category.categoryName}</h2>
+              <div className="merchandise-slider">
+                {/* 왼쪽 화살표 */}
+                {currentPageIndex > 0 && (
+                  <button className="slider-button prev-button" onClick={() => handlePrevPage(category.merchandiseCategoryId)}>
+                    ◀
+                  </button>
+                )}
+
+                {/* 상품 리스트 */}
+                <ul className="merchandise-items">
+                  {visibleItems.map((merchandise) => (
+                    <li 
+                      key={merchandise.merchandiseId}
+                      onClick={() => handleMerchandiseClick(merchandise.merchandiseId)}
+                    >
+                      <div className="image-container">
+                        <img
+                          src={merchandise.thumbnail}
+                          alt={merchandise.merchandiseName}
+                        />
+                      </div>
+                      <p>{merchandise.merchandiseName}</p>
+                      <p>Price: {merchandise.price} 원</p>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* 오른쪽 화살표 */}
+                {startIndex + 4 < items.length && (
+                  <button className="slider-button next-button" onClick={() => handleNextPage(category.merchandiseCategoryId, items.length)}>
+                    ▶
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
