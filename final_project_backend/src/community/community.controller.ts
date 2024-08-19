@@ -70,8 +70,6 @@ export class CommunityController {
     @Param('communityId', ParseIntPipe) communityId: number,
     @UserInfo() user: PartialUser,
   ) {
-    console.log(communityId, user.id);
-    console.log('zeoll');
     const userInfo = this.communityUserService.findByCommunityIdAndUserId(
       communityId,
       user.id,
