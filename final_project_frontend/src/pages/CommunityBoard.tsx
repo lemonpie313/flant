@@ -19,7 +19,7 @@ import {
 import "./board.scss";
 import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
 
-const ArtistBoard: React.FC = () => {
+const CommunityBoard: React.FC = () => {
   const [community, setCommunity] = useState<Community | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [communityUser, setCommunityUser] = useState<CommunityUser>();
@@ -272,4 +272,4 @@ const ArtistBoard: React.FC = () => {
   );
 };
 
-export default ArtistBoard;
+export default CommunityBoard;
