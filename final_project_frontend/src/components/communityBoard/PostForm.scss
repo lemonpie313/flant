@@ -154,14 +154,15 @@
           transition: background-color 0.3s;
           z-index: 2; // z-index 조정
           position: relative; // z-index 적용을 위한 상대적 위치 지정
-  
+
           &:hover {
             background-color: darken(#1d72b8, 10%);
           }
         }
-  
+
         .image-upload-input {
           position: absolute;
+
           left: 0;
           top: 0;
           width: 100%;
@@ -170,14 +171,14 @@
           cursor: pointer;
           z-index: 1; // z-index 조정
         }
-  
+
         .selected-files {
           margin-left: 15px; // 버튼과 파일명 사이의 간격
           ul {
             list-style-type: none;
             padding: 0;
             margin: 0;
-    
+
             li {
               background-color: #f4f4f4;
               margin-bottom: 5px;
@@ -207,4 +208,14 @@
       }
     }
   }
+}
+.floating-btn {
+  cursor: pointer;
+  /* 기타 버튼 스타일 */
+}
+
+.floating-btn.disabled {
+  pointer-events: none; /* 클릭 이벤트를 비활성화 */
+  opacity: 0.5; /* 버튼의 시각적 비활성화 표시 */
+  /* 필요한 추가 스타일을 설정 */
 }

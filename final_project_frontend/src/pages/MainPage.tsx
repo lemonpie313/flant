@@ -76,7 +76,11 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
     };
     fetchCommunities();
   }, []);
-
+  // 새로고침 핸들러
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault(); // 기본 링크 동작 방지
+    window.location.reload(); // 페이지 새로고침
+  };
   const handleCommunityClick = (communityId: number) => {
     navigate(`/communities/${communityId}/feed`);
   };
@@ -89,7 +93,11 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
     <div className="main-page">
       <header>
         <div className="header-box">
-          <Link to="/main" className="header-box-logo">
+          <Link
+            to="/main"
+            className="header-box-logo"
+            onClick={handleLogoClick}
+          >
             <img
               className="header-box-logo-image"
               src="/favicon.ico"

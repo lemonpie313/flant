@@ -35,7 +35,7 @@ const CommunityBoardTest: React.FC = () => {
       if (token) {
         setIsLoggedIn(true);
         await fetchCommunityData();
-        await fetchPosts(); 
+        await fetchPosts();
         await fetchCommunityUsers();
         await checkIfCommunityJoined(); // 커뮤니티 가입 여부 확인
       } else {
@@ -162,7 +162,9 @@ const CommunityBoardTest: React.FC = () => {
     try {
       const response = await communityApi.findMy();
       const myCommunity = response.data.data;
-      setIsCommunityJoined(myCommunity.some((c: any) => c.communityId === Number(communityId)));
+      setIsCommunityJoined(
+        myCommunity.some((c: any) => c.communityId === Number(communityId))
+      );
     } catch (error) {
       console.error("커뮤니티 가입 여부 확인 오류:", error);
     }
@@ -171,18 +173,19 @@ const CommunityBoardTest: React.FC = () => {
   const handleJoinButtonClick = async () => {
     try {
       const nickName = "exampleNickName"; // 임시로 nickName을 설정합니다. 실제로는 올바른 방법으로 가져와야 합니다.
-  
+
       if (!nickName) {
         alert("로그인이 필요합니다.");
         return;
       }
-  
+
       if (isCommunityJoined) {
         alert("이미 가입된 커뮤니티입니다.");
       } else {
         await communityApi.joinCommunity(Number(communityId), nickName);
         alert("커뮤니티에 가입되었습니다.");
         setIsCommunityJoined(true); // 커뮤니티 가입 상태 업데이트
+        window.location.reload();
       }
     } catch (error) {
       console.error("가입 처리 오류:", error);
@@ -192,14 +195,14 @@ const CommunityBoardTest: React.FC = () => {
 
   return (
     <div className="community-board">
-        {community && (
-          <>
-        <Header 
-          communityName={community.communityName} 
-          isLoggedIn={isLoggedIn} 
-          handleLogout={handleLogout} 
-        />
-        <CommunityNavigationHeader/>
+      {community && (
+        <>
+          <Header
+            communityName={community.communityName}
+            isLoggedIn={isLoggedIn}
+            handleLogout={handleLogout}
+          />
+          <CommunityNavigationHeader />
         </>
       )}
       <main className="main-content">
