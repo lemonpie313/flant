@@ -29,6 +29,8 @@ export class OrderController {
    * @param createOrderDto
    * @returns
    */
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Post()
   async create(@UserInfo() user: PartialUser) {
     return await this.orderService.create(+user.id);
@@ -38,6 +40,8 @@ export class OrderController {
    * 주문내역 전체 조회
    * @returns
    */
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Get()
   async findAll(@UserInfo() user: PartialUser) {
     return this.orderService.findAll(user.id);
@@ -48,6 +52,8 @@ export class OrderController {
    * @param id
    * @returns
    */
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string, @UserInfo() user: PartialUser) {
     return this.orderService.findOne(+id, user.id);
@@ -59,6 +65,8 @@ export class OrderController {
    * @param updateOrderDto
    * @returns
    */
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(@Param('id') id: string) {
     return this.orderService.update(+id);

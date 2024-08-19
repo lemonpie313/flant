@@ -68,6 +68,7 @@ export class Post {
   community: Community;
 
   @ManyToOne(() => Artist, (artist) => artist.posts)
+  @JoinColumn({ name: 'artist_id' })
   artist: Artist;
 
   @ManyToOne(() => CommunityUser, (communityUser) => communityUser.posts,{

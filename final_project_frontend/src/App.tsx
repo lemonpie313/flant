@@ -19,6 +19,8 @@ import Cart from "./pages/cart";
 import CommunityBoard from "./pages/CommunityBoard";
 import MerchandiseList from "./pages/merchandiseList";
 import MerchandiseDetail from "./pages/merchandiseDetail";
+import ArtistPostsBoard from "./pages/ArtistPostsBoard";
+import Media from "./pages/media/media";
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -86,13 +88,13 @@ const App: React.FC = () => {
             <Route path="/main" element={<ProtectedRoute><MainPage isLoggedIn={isLoggedIn!} /></ProtectedRoute>} />
             <Route path="/userinfo" element={<ProtectedRoute><UserInfoPage /></ProtectedRoute>} />
             <Route path="/communities" element={<ProtectedRoute><CommunityBoard /></ProtectedRoute>} />
-            <Route path="/communities/:communityId" element={<ProtectedRoute><CommunityBoard /></ProtectedRoute>} />
-            <Route path="/communities/:communityId/media" element={<ProtectedRoute><CommunityBoard /></ProtectedRoute>} />
-            <Route path="/communitiess" element={<CommunityBoard />} />
+            <Route path="/communities/:communityId/feed" element={<ProtectedRoute><CommunityBoard /></ProtectedRoute>} />
+            <Route path="/communities/:communityId/artists" element={<ProtectedRoute><ArtistPostsBoard /></ProtectedRoute>} />
+            <Route path="/communities/:communityId/media" element={<ProtectedRoute><Media /></ProtectedRoute>} />
             <Route path="/live" element={<ProtectedRoute><LiveListPage /></ProtectedRoute>} />
             <Route path="/live/:liveId" element={<ProtectedRoute><LiveStreamingPage /></ProtectedRoute>} />
             <Route path="communities/:communityId/merchandise" element={<ProtectedRoute><MerchandiseList /></ProtectedRoute>} />
-            <Route path="/merchandise/:merchandiseId" element={<ProtectedRoute><MerchandiseDetail /></ProtectedRoute>} />
+            <Route path="communities/:communityId/merchandise/:merchandiseId" element={<ProtectedRoute><MerchandiseDetail /></ProtectedRoute>} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/" element={<Navigate to="/main" replace />} />
             <Route path="*" element={<Navigate to="/main" replace />} />
