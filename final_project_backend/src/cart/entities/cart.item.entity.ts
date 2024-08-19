@@ -18,10 +18,13 @@ export class CartItem {
   @PrimaryGeneratedColumn({ unsigned: true})
   id: number;
 
+  @Column({unsigned: true})
+  merchandiseId: number;
+
   // 카트 연결
   @ManyToOne(() => Cart, (cart) => cart.cartItem, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'cart_id' })
-  cart: Cart;
+  cart: Cart; 
 
   //상품 연결
   @ManyToOne(
@@ -29,6 +32,7 @@ export class CartItem {
     (merchandise) => merchandise.cartItems,
     { onDelete: 'CASCADE' },
   )
+  @JoinColumn({ name: 'merchandise_id' })
   merchandise: Merchandise;
 
   //상품 옵션 연결

@@ -6,7 +6,7 @@ const API_TIMEOUT = Number(process.env.API_TIMEOUT);
 
 // Axios 인스턴스 생성
 const api: AxiosInstance = axios.create({
-  baseURL: REACT_APP_BACKEND_API_URL,
+  baseURL: "https://api.flant.club/api/v1",
   timeout: API_TIMEOUT,
   withCredentials: true,
 });
@@ -59,6 +59,7 @@ const handleApiError = (error: any) => {
   throw error;
 };
 
+
 export const authApi = {
   signIn: (email: string, password: string) =>
     api.post("/auth/sign-in", { email, password }).catch(handleApiError),
@@ -95,7 +96,11 @@ export const communityApi = {
   findAll: () => api.get("/communities").catch(handleApiError),
   findOne: (id: number) => api.get(`/communities/${id}`).catch(handleApiError),
   findMy: () => api.get("/communities/me").catch(handleApiError),
-  assign: (communityId : number) => api.post(`/communities/${communityId}/assign`).catch(handleApiError)
+  // 커뮤니티 가입
+  joinCommunity: (communityId: number) =>
+    api
+      .post(`/communities/userInfo/${communityId}/assign`)
+      .catch(handleApiError),
 };
 
 export const postApi = {
@@ -160,4 +165,31 @@ export const merchandiseApi = {
   // 상품 상세 조회 API
   fetchMerchandiseDetail: (merchandiseId: number) =>
     api.get(`/merchandise/${merchandiseId}`),
+
+  // 장바구니 추가 API
+  addToCart: (
+    merchandiseId: number,
+    merchandiseOptionId: number,
+    quantity: number
+  ) =>
+    api
+      .post("/carts", { merchandiseId, merchandiseOptionId, quantity })
+      .catch(handleApiError), // 공통 에러 처리 함수 사용
+};
+
+export const cartApi = {
+  // 카트 조회 API
+  fetchCart: () => api.get("/carts").catch(handleApiError), // 공통 에러 처리 함수 사용
+
+  // 카트 아이템 수량 수정 API
+  updateCartItemQuantity: (cartItemId: number, quantity: 'INCREMENT' | 'DECREMENT') =>
+    api.patch(`/carts/items/${cartItemId}?quantity=${quantity}`),  
+  // 카트 항목 삭제 API
+  removeCartItem: (cartItemId: number) =>
+    api.delete(`/carts/items/${cartItemId}`).catch(handleApiError),
+};
+
+// 결제 관련 API 호출
+export const paymentApi = {
+  createOrder: () => axios.post('/orders').catch(handleApiError), // 결제 API 엔드포인트
 };

@@ -15,6 +15,7 @@ import { ChatProvider } from "./context/ChatContext";
 import LiveStreamingPage from "./pages/LiveStreamingPage";
 import LiveListPage from "./pages/LiveListPage";
 import { userApi } from "./services/api";
+import Cart from "./pages/cart";
 import CommunityBoard from "./pages/CommunityBoard";
 import MerchandiseList from "./pages/merchandiseList";
 import MerchandiseDetail from "./pages/merchandiseDetail";
@@ -82,74 +83,16 @@ const App: React.FC = () => {
               }
             />
             <Route path="/signup" element={<SignUpPage />} />
-            <Route
-              path="/main"
-              element={
-                <ProtectedRoute>
-                  <MainPage isLoggedIn={isLoggedIn} />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/userinfo"
-              element={
-                <ProtectedRoute>
-                  <UserInfoPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/communities"
-              element={
-                <ProtectedRoute>
-                  <CommunityBoard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/communities/:communityId"
-              element={
-                <ProtectedRoute>
-                  <CommunityBoard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/communitiess/:communityId"
-              element={<CommunityBoard />}
-            />
-            <Route
-              path="/live"
-              element={
-                <ProtectedRoute>
-                  <LiveListPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/live/:liveId"
-              element={
-                <ProtectedRoute>
-                  <LiveStreamingPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/merchandise"
-              element={
-                <ProtectedRoute>
-                  <MerchandiseList communityId={1} />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/merchandise/:merchandiseId"
-              element={
-                <ProtectedRoute>
-                  <MerchandiseDetail />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/main" element={<ProtectedRoute><MainPage isLoggedIn={isLoggedIn!} /></ProtectedRoute>} />
+            <Route path="/userinfo" element={<ProtectedRoute><UserInfoPage /></ProtectedRoute>} />
+            <Route path="/communities" element={<ProtectedRoute><CommunityBoard /></ProtectedRoute>} />
+            <Route path="/communities/:communityId" element={<ProtectedRoute><CommunityBoard /></ProtectedRoute>} />
+            <Route path="/communitiess" element={<CommunityBoard />} />
+            <Route path="/live" element={<ProtectedRoute><LiveListPage /></ProtectedRoute>} />
+            <Route path="/live/:liveId" element={<ProtectedRoute><LiveStreamingPage /></ProtectedRoute>} />
+            <Route path="communities/:communityId/merchandise" element={<ProtectedRoute><MerchandiseList /></ProtectedRoute>} />
+            <Route path="/merchandise/:merchandiseId" element={<ProtectedRoute><MerchandiseDetail /></ProtectedRoute>} />
+            <Route path="/cart" element={<Cart />} />
             <Route path="/" element={<Navigate to="/main" replace />} />
             <Route path="*" element={<Navigate to="/main" replace />} />
           </Routes>

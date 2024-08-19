@@ -25,6 +25,7 @@ const CommunityBoard: React.FC = () => {
   const [communityUser, setCommunityUser] = useState<CommunityUser>();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCommunityJoined, setIsCommunityJoined] = useState(false); // 커뮤니티 가입 여부 상태 추가
   const navigate = useNavigate();
   const { communityId } = useParams<{ communityId: string }>();
 
@@ -37,6 +38,7 @@ const CommunityBoard: React.FC = () => {
         await fetchCommunityData();
         //await fetchPosts();
         await fetchCommunityUsers();
+        await checkIfCommunityJoined(); // 커뮤니티 가입 여부 확인
       } else {
         setIsLoggedIn(false);
       }
@@ -156,7 +158,40 @@ const CommunityBoard: React.FC = () => {
       console.error("답글 작성 오류:", error);
     }
   };
+  // 커뮤니티 가입 여부를 확인하는 함수
+  const checkIfCommunityJoined = async () => {
+    try {
+      // 내가 가입한 가입 목록 확인
+      const response = await communityApi.findMy();
+      const myCommunity = response.data.data;
+      for (let i = 0; i < myCommunity.length; i++) {
+        if (communityId == myCommunity[i].communityId) {
+          setIsCommunityJoined(true);
+        }
+      }
+      console.log(response.data.data);
+    } catch (error) {
+      console.error("커뮤니티 가입 여부 확인 오류:", error);
+    }
+  };
 
+  const handleJoinButtonClick = async () => {
+    try {
+      if (isCommunityJoined) {
+        // 멤버십 가입 처리
+        //await communityUserApi.joinMembership(Number(communityId));
+        alert("멤버십에 가입되었습니다.");
+      } else {
+        // 커뮤니티 가입 처리
+        await communityApi.joinCommunity(Number(communityId));
+        alert("커뮤니티에 가입되었습니다.");
+        setIsCommunityJoined(true); // 커뮤니티 가입 상태 업데이트
+      }
+    } catch (error) {
+      console.error("가입 처리 오류:", error);
+      alert("가입에 실패했습니다.");
+    }
+  };
   if (isLoading) {
     return <div>로딩 중...</div>;
   }
@@ -216,12 +251,17 @@ const CommunityBoard: React.FC = () => {
             </div>
           </div>
           <div className="right-sidebar-membership">
-            <button className="right-sidebar-membership-button">
-              Membership
-            </button>
-            <p>자유 멤버십에 가입해서 새로운 스케줄 소식을 받아보세요.</p>
-            <button className="right-sidebar-join-button">
-              멤버십 가입하기
+            {/* <button className="right-sidebar-membership-button">
+              {isCommunityJoined ? "Membership 가입하기" : "커뮤니티 가입하기"}
+            </button> */}
+            {isCommunityJoined
+              ? "자유 멤버십에 가입해서 새로운 스케줄 소식을 받아보세요."
+              : "커뮤니티에 가입해 소식을 받아보세요."}
+            <button
+              className="right-sidebar-join-button"
+              onClick={handleJoinButtonClick}
+            >
+              {isCommunityJoined ? "Membership 가입하기" : "커뮤니티 가입하기"}
             </button>
           </div>
           <div className="right-sidebar-dm-section">
