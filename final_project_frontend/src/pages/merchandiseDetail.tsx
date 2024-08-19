@@ -94,6 +94,10 @@ const MerchandiseDetail: React.FC = () => {
     }
   };
 
+  const handleNavigateToCart = () => {
+    navigate("/cart");
+  };
+
   const handleLogout = async () => {
     try {
       await authApi.signOut();
@@ -154,7 +158,10 @@ const MerchandiseDetail: React.FC = () => {
           />
         </div>
 
-        <button onClick={handleAddToCart}>Add to Cart</button>
+        <div className="action-buttons">
+          <button onClick={handleAddToCart}>Add to Cart</button>
+          <button onClick={handleNavigateToCart} className="go-to-cart-button">Go to Cart</button>
+        </div>
 
         <div className="content">
           {merchandise?.merchandiseImage.map((image) => (
