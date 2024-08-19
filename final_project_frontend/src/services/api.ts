@@ -78,9 +78,9 @@ export const authApi = {
 export const userApi = {
   findMy: () => api.get("/users/me").catch(handleApiError),
   update: (
-    newUserName: string,
-    newPassword: string,
-    confirmNewPassword: string
+    newUserName?: string,
+    newPassword?: string,
+    confirmNewPassword?: string
   ) =>
     api
       .patch("/users/me", { newUserName, newPassword, confirmNewPassword })

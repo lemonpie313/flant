@@ -34,7 +34,7 @@ export class AuthController {
    * @returns
    */
   @Post('/sign-up')
-  async signUp(@Body() signUpDto : SignUpDto) {
+  async signUp(@Body() signUpDto: SignUpDto) {
     const data = await this.authService.signUp(signUpDto);
 
     return {
@@ -43,7 +43,6 @@ export class AuthController {
       data: data,
     };
   }
-  
 
   /**
    * 로그인
@@ -55,7 +54,7 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('/sign-in')
   async signIn(
-    @UserInfo() user: PartialUser ,
+    @UserInfo() user: PartialUser,
     @Body() signInDto: SignInDto,
     @Res({ passthrough: true }) res: Response,
     @Req() req,
@@ -63,13 +62,16 @@ export class AuthController {
     const cookies = req.cookies || {};
     const data = await this.authService.signIn(user.id, res, cookies);
 
+    // 장바구니 쿠키 삭제
+    res.clearCookie('guestCart');
+
     return {
       statusCode: HttpStatus.OK,
       message: MESSAGES.AUTH.SIGN_IN.SECCEED,
       data,
     };
   }
-//
+  //
   /**
    * 구글 로그인
    * @param req
