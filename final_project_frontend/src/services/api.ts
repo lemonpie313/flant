@@ -47,7 +47,6 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
 // 공통 에러 처리 함수
 const handleApiError = (error: any) => {
   if (axios.isAxiosError(error)) {
