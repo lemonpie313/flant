@@ -37,7 +37,6 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
   const [communities, setCommunities] = useState<Community[]>([]);
   const [mycommunities, setMyCommunities] = useState<Community[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
 
   const handleLogout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +63,7 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
         } else {
           const response = await communityApi.findAll();
           const myresponse = await communityApi.findMy();
-          
+
           setCommunities(response.data.data);
           setMyCommunities(myresponse.data.data);
         }
@@ -78,11 +77,10 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
     fetchCommunities();
   }, []);
 
-
   const handleCommunityClick = (communityId: number) => {
     navigate(`/communities/${communityId}/feed`);
   };
-  
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -109,19 +107,21 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
                     alt="notification"
                   />
                 </button> */}
-                <button>
-                  <img
-                    className="header-user-icon"
-                    src="/images/user.png"
-                    alt="user"
-                  />
+                <div className="header-box-user-dropdown-container">
+                  <button>
+                    <img
+                      className="header-user-icon"
+                      src="/images/user.png"
+                      alt="user"
+                    />
+                  </button>
                   <div className="header-user-dropdown">
                     <Link to="/userinfo">내 정보</Link>
                     <Link to="/membership">멤버십</Link>
-                    <Link to="/payment-history">결제내역</Link>
+                    {/* <Link to="/payment-history">결제내역</Link> */}
                     <button onClick={handleLogout}>로그아웃</button>
                   </div>
-                </button>
+                </div>
               </div>
             ) : (
               <div className="header-box-login">
@@ -151,7 +151,7 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
             title="모든 커뮤니티"
             communities={communities}
             onCommunityClick={handleCommunityClick}
-          />  
+          />
         </div>
       </div>
       <footer></footer>

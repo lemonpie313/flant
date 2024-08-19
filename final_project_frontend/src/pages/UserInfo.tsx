@@ -1,4 +1,4 @@
-// src/pages/MainPage.tsx 
+// src/pages/MainPage.tsx
 import React from "react";
 import "./UserInfo.scss";
 import { Link, useNavigate } from "react-router-dom";
@@ -10,7 +10,7 @@ const UserInfoPage: React.FC = () => {
   const [userName, setUsername] = useState<string>("");
   const [userEmail, setUserEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [name, setNewUserName] = useState<string>("");
+  const [newUserName, setNewUserName] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
   const [newPasswordConfirm, setConfirmNewPassword] = useState<string>("");
   const [showConfirmDialog, setShowConfirmDialog] = useState<boolean>(false);
@@ -31,7 +31,7 @@ const UserInfoPage: React.FC = () => {
   };
   const handleUpdateAccount = async () => {
     try {
-      await userApi.update(name, newPassword, newPasswordConfirm);
+      await userApi.update(newUserName, newPassword, newPasswordConfirm);
       alert("계정 정보가 성공적으로 변경되었습니다.");
       setShowUpdateDialog(false);
       //setUsername(newUserName);
@@ -43,9 +43,10 @@ const UserInfoPage: React.FC = () => {
   const handleDeleteAccount = async () => {
     try {
       const response = await userApi.checkPassword(password);
-
       if (response.data.statusCode === 200) {
+        console.log("he");
         await userApi.delete();
+        console.log("she");
         await authApi.signOut(); // 쿠키 삭제 위한 용도
         localStorage.clear();
         alert("계정이 성공적으로 삭제되었습니다.");
@@ -161,7 +162,14 @@ const UserInfoPage: React.FC = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
             <button onClick={handleDeleteAccount}>확인</button>
-            <button onClick={() => setShowPasswordInput(false)}>취소</button>
+            <button
+              onClick={() => {
+                setShowPasswordInput(false);
+                setPassword("");
+              }}
+            >
+              취소
+            </button>
           </div>
         )}
 
@@ -171,7 +179,7 @@ const UserInfoPage: React.FC = () => {
             <input
               type="text"
               placeholder="새로운 이름"
-              value={name}
+              value={newUserName}
               onChange={(e) => setNewUserName(e.target.value)}
             />
             <input
