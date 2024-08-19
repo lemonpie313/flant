@@ -34,7 +34,7 @@ const App: React.FC = () => {
           await userApi.findMy();
           setIsLoggedIn(true);
         } catch (error) {
-          console.log("error", error);
+          console.error("error", error);
           localStorage.removeItem("accessToken");
           setIsLoggedIn(false);
         }
@@ -93,9 +93,9 @@ const App: React.FC = () => {
             <Route path="/" element={<Navigate to="/main" replace />} />
             <Route path="*" element={<Navigate to="/main" replace />} />
           </Routes>
-          {isLoggedIn && (
-            <ChatComponent />
-          )}
+          {/* {isLoggedIn && (
+            // <ChatComponent />
+          )} */}
         </div>
       </Router>
     </ChatProvider>
