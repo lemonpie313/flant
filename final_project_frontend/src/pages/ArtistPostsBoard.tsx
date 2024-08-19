@@ -90,7 +90,7 @@ const ArtistBoard: React.FC = () => {
   const fetchPosts = async () => {
     try {
       // isArtist를 true로 설정하여 아티스트 게시물만 가져오기
-      const response = await postApi.getPosts(false, Number(communityId));
+      const response = await postApi.getPosts(true, Number(communityId));
       const postsData = response.data.data as Post[]; // 타입 명시
       setPosts(postsData);
     } catch (error) {

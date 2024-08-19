@@ -74,7 +74,7 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
   }, []);
 
   const handleCommunityClick = (communityId: number) => {
-    navigate(`/communities/${communityId}`);
+    navigate(`/communities/${communityId}/feed`);
   };
 
   return (
