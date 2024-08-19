@@ -186,7 +186,6 @@ const ArtistBoard: React.FC = () => {
       alert("가입에 실패했습니다.");
     }
   };
-
   if (isLoading) {
     return <div>로딩 중...</div>;
   }
