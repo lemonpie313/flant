@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import { authApi, merchandiseApi } from '../services/api';
+import { useParams, useNavigate } from "react-router-dom";
+import { authApi, communityApi, merchandiseApi } from '../services/api';
 import './merchandiseList.scss';
 import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
+import Header from "../components/communityBoard/Header";
 
 interface Merchandise {
   merchandiseId: number;
@@ -17,16 +18,20 @@ interface Category {
   categoryName: string;
 }
 
-const getToken = () => {
-  return localStorage.getItem("accessToken");
-};
+interface Community {
+  communityName: string;
+  // 추가로 필요한 community 속성이 있다면 여기에 추가
+}
+
+const getToken = () => localStorage.getItem("accessToken");
 
 const MerchandiseList: React.FC = () => {
-  const { communityId } = useParams<{ communityId: string }>();  
+  const { communityId } = useParams<{ communityId: string }>();
   const [categories, setCategories] = useState<Category[]>([]);
   const [merchandises, setMerchandises] = useState<{ [key: number]: Merchandise[] }>({});
   const [currentPage, setCurrentPage] = useState<{ [key: number]: number }>({});
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [community, setCommunity] = useState<Community | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,16 +42,31 @@ const MerchandiseList: React.FC = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const categoryResponse = await merchandiseApi.fetchCategories(Number(communityId));
-        setCategories(categoryResponse.data.data.categories);
+        if (communityId) {
+          const categoryResponse = await merchandiseApi.fetchCategories(Number(communityId));
+          setCategories(categoryResponse.data.data.categories);
+        }
       } catch (error) {
         console.error("카테고리 조회 실패:", error);
       }
     };
 
-    if (communityId) {
-      fetchCategories();
-    }
+    fetchCategories();
+  }, [communityId]);
+
+  useEffect(() => {
+    const fetchCommunity = async () => {
+      try {
+        if (communityId) {
+          const communityResponse = await communityApi.findOne(Number(communityId));
+          setCommunity(communityResponse.data);
+        }
+      } catch (error) {
+        console.error("커뮤니티 조회 실패:", error);
+      }
+    };
+
+    fetchCommunity();
   }, [communityId]);
 
   useEffect(() => {
@@ -67,7 +87,6 @@ const MerchandiseList: React.FC = () => {
           initialPage[category.merchandiseCategoryId] = 0;
         });
         setCurrentPage(initialPage);
-
       } catch (error) {
         console.error("상품 조회 실패:", error);
       }
@@ -82,7 +101,6 @@ const MerchandiseList: React.FC = () => {
     navigate(`/communities/${communityId}/merchandise/${merchandiseId}`);
   };
 
-  // 이전 페이지로 이동
   const handlePrevPage = (categoryId: number) => {
     setCurrentPage((prev) => ({
       ...prev,
@@ -90,7 +108,6 @@ const MerchandiseList: React.FC = () => {
     }));
   };
 
-  // 다음 페이지로 이동
   const handleNextPage = (categoryId: number, totalItems: number) => {
     const maxPage = Math.ceil(totalItems / 4) - 1;
     setCurrentPage((prev) => ({
@@ -107,72 +124,24 @@ const MerchandiseList: React.FC = () => {
       localStorage.clear();
       alert("로그아웃이 성공적으로 되었습니다.");
       navigate("/main");
-      window.location.reload(); // 상태 갱신을 위해 페이지 리로드
+      window.location.reload();
     } catch (error) {
       alert("로그아웃 실패.");
     }
   };
 
   return (
-    <div className="merchandise-list-page">
-      <header>
-        <div className="header-box">
-          <Link to="/main" className="header-box-logo">
-            <img
-              className="header-box-logo-image"
-              src="/TGSrd-removebg-preview.png"
-              alt="logo"
-            />
-          </Link>
-          <div className="header-box-blank">상품 리스트 페이지</div>
-          <div className="header-box-user">
-            {isLoggedIn ? (
-              <div className="header-box-user-info">
-                <button>
-                  <img
-                    className="header-notification-icon"
-                    src="/images/notification.png"
-                    alt="notification"
-                  />
-                </button>
-                <button>
-                  <img
-                    className="header-user-icon"
-                    src="/images/user.png"
-                    alt="user"
-                  />
-                  <div className="header-user-dropdown">
-                    <Link to="/userinfo">내 정보</Link>
-                    <Link to="/membership">멤버십</Link>
-                    <Link to="/payment-history">결제내역</Link>
-                    <button onClick={handleLogout}>로그아웃</button>
-                  </div>
-                </button>
-              </div>
-            ) : (
-              <div className="header-box-login">
-                <div className="header-box-container">
-                  <Link to="/login" className="header-box-btn btn-3">
-                    Sign in
-                  </Link>
-                </div>
-              </div>
-            )}
-            <div className="header-box-user-shop">
-              <Link to="/cart">
-                <img
-                  style={{ marginLeft: "25px", marginTop: "6px" }}
-                  className="header-box-shop-image"
-                  src="/green-cart.png"
-                  alt="green-cart"
-                />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <CommunityNavigationHeader />
+    <div className="community-board">
+      {community && (
+        <>
+          <Header
+            communityName={community.communityName}
+            isLoggedIn={isLoggedIn}
+            handleLogout={handleLogout}
+          />
+          <CommunityNavigationHeader />
+        </>
+      )}
 
       <div className="merchandise-list">
         {categories.map((category) => {

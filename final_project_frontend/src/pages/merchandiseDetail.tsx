@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import { merchandiseApi } from '../services/api';
-import { authApi } from '../services/api'; // 로그아웃 API 가져오기
+import { useParams, useNavigate } from "react-router-dom";
+import { merchandiseApi, authApi, communityApi } from '../services/api';
 import './merchandiseDetail.scss'; // CSS 파일 추가
 import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
+import Header from "../components/communityBoard/Header";
 
 interface MerchandiseImage {
   merchandiseImageId: number;
@@ -25,17 +25,22 @@ interface MerchandiseDetail {
   merchandiseOption: MerchandiseOption[]; // 옵션 추가
 }
 
-const getToken = () => {
-  return localStorage.getItem("accessToken");
-};
+interface Community {
+  communityName: string;
+  // 추가로 필요한 community 속성이 있다면 여기에 추가
+}
+
+const getToken = () => localStorage.getItem("accessToken");
 
 const MerchandiseDetail: React.FC = () => {
+  const { communityId } = useParams<{ communityId: string }>();
   const { merchandiseId } = useParams<{ merchandiseId: string }>();
-  const navigate = useNavigate(); // useNavigate 훅 사용
+  const navigate = useNavigate();
   const [merchandise, setMerchandise] = useState<MerchandiseDetail | null>(null);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [quantity, setQuantity] = useState<number>(1);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [community, setCommunity] = useState<Community | null>(null);
 
   useEffect(() => {
     const token = getToken();
@@ -43,16 +48,31 @@ const MerchandiseDetail: React.FC = () => {
 
     const fetchMerchandiseDetail = async () => {
       try {
-        const response = await merchandiseApi.fetchMerchandiseDetail(Number(merchandiseId));
-        setMerchandise(response.data.data);
+        if (merchandiseId) {
+          const response = await merchandiseApi.fetchMerchandiseDetail(Number(merchandiseId));
+          setMerchandise(response.data.data);
+        }
       } catch (error) {
         console.error("상품 상세 정보 조회 실패:", error);
       }
     };
 
-    if (merchandiseId) {
-      fetchMerchandiseDetail();
-    }
+    fetchMerchandiseDetail();
+  }, [merchandiseId]);
+
+  useEffect(() => {
+    const fetchCommunity = async () => {
+      try {
+        if (merchandiseId) {
+          const communityResponse = await communityApi.findOne(Number(communityId));
+          setCommunity(communityResponse.data);
+        }
+      } catch (error) {
+        console.error("커뮤니티 조회 실패:", error);
+      }
+    };
+
+    fetchCommunity();
   }, [merchandiseId]);
 
   const handleAddToCart = async () => {
@@ -89,66 +109,16 @@ const MerchandiseDetail: React.FC = () => {
 
   return (
     <div className="merchandise-detail-page">
-      {/* Header Section */}
-      <header>
-        <div className="header-box">
-          <Link to="/main" className="header-box-logo">
-            <img
-              className="header-box-logo-image"
-              src="/TGSrd-removebg-preview.png"
-              alt="logo"
-            />
-          </Link>
-          <div className="header-box-blank">상품 상세 페이지</div>
-          <div className="header-box-user">
-            {isLoggedIn ? (
-              <div className="header-box-user-info">
-                <button>
-                  <img
-                    className="header-notification-icon"
-                    src="/images/notification.png"
-                    alt="notification"
-                  />
-                </button>
-                <button>
-                  <img
-                    className="header-user-icon"
-                    src="/images/user.png"
-                    alt="user"
-                  />
-                  <div className="header-user-dropdown">
-                    <Link to="/userinfo">내 정보</Link>
-                    <Link to="/membership">멤버십</Link>
-                    <Link to="/payment-history">결제내역</Link>
-                    <button onClick={handleLogout}>로그아웃</button>
-                  </div>
-                </button>
-              </div>
-            ) : (
-              <div className="header-box-login">
-                <div className="header-box-container">
-                  <Link to="/login" className="header-box-btn btn-3">
-                    Sign in
-                  </Link>
-                </div>
-              </div>
-            )}
-            <div className="header-box-user-shop">
-              <Link to="/cart">
-                <img
-                  style={{ marginLeft: "25px", marginTop: "6px" }}
-                  className="header-box-shop-image"
-                  src="/green-cart.png"
-                  alt="green-cart"
-                />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Navigation Bar (Community) */}
-      <CommunityNavigationHeader /> {/* 커뮤니티 네비게이션 추가 */}
+      {community && (
+        <>
+          <Header
+            communityName={community.communityName}
+            isLoggedIn={isLoggedIn}
+            handleLogout={handleLogout}
+          />
+          <CommunityNavigationHeader />
+        </>
+      )}
 
       {/* Main Content */}
       <div className="merchandise-detail">
@@ -188,16 +158,14 @@ const MerchandiseDetail: React.FC = () => {
         <button onClick={handleAddToCart}>Add to Cart</button>
 
         <div className="content">
-          { (
-            merchandise?.merchandiseImage.map((image) => (
-              <img 
-                key={image.merchandiseImageId} 
-                src={image.url} 
-                alt={`Image ${image.merchandiseImageId}`} 
-                className="detail-image" 
-              />
-            ))
-          ) }
+          {merchandise?.merchandiseImage.map((image) => (
+            <img 
+              key={image.merchandiseImageId} 
+              src={image.url} 
+              alt={`Image ${image.merchandiseImageId}`} 
+              className="detail-image" 
+            />
+          ))}
         </div>
       </div>
     </div>
