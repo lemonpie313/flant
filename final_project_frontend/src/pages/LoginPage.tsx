@@ -34,11 +34,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
     <div className="login-page">
       <div className="login-box">
         <header>
-          <img
-            className="main-box-logo"
-            src="/TGSrd-removebg-preview.png"
-            alt="logo"
-          ></img>
+          <img className="main-box-logo" src="/favicon.ico" alt="logo"></img>
         </header>
         <main>
           <form onSubmit={handleSubmit}>
