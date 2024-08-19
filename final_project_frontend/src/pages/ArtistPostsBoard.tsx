@@ -164,7 +164,9 @@ const ArtistBoard: React.FC = () => {
     try {
       const response = await communityApi.findMy();
       const myCommunity = response.data.data;
-      setIsCommunityJoined(myCommunity.some((c: any) => c.communityId === Number(communityId)));
+      setIsCommunityJoined(
+        myCommunity.some((c: any) => c.communityId === Number(communityId))
+      );
     } catch (error) {
       console.error("커뮤니티 가입 여부 확인 오류:", error);
     }
@@ -175,7 +177,7 @@ const ArtistBoard: React.FC = () => {
       if (isCommunityJoined) {
         alert("이미 가입된 커뮤니티입니다.");
       } else {
-        await communityApi.joinCommunity(Number(communityId));
+        //await communityApi.joinCommunity(Number(communityId));
         alert("커뮤니티에 가입되었습니다.");
         setIsCommunityJoined(true); // 커뮤니티 가입 상태 업데이트
       }
