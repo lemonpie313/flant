@@ -39,11 +39,39 @@ export class CommunityUserService {
         communityId,
       },
     });
-    console.log('zff');
-    console.log(existedCommunityUser);
+
     if (!existedCommunityUser) {
       throw new NotFoundException(MESSAGES.COMMUNITY_USER.COMMON.NOT_FOUND);
     }
+
+    return existedCommunityUser;
+  }
+
+  async findByCommunityUser(communityId: number, userId: number) {
+    const existedUser = await this.userRepository.findOne({
+      where: { userId },
+    });
+    if (!existedUser) {
+      throw new NotFoundException(MESSAGES.USER.COMMON.NOT_FOUND);
+    }
+
+    const existedCommunity = await this.communityRepository.findOne({
+      where: { communityId },
+    });
+    if (!existedCommunity) {
+      throw new NotFoundException(MESSAGES.COMMUNITY.COMMON.NOT_FOUND);
+    }
+
+    const existedCommunityUser = await this.communityUserRepository.findOne({
+      where: {
+        userId,
+        communityId,
+      },
+    });
+
+    // if (!existedCommunityUser) {
+    //   throw new NotFoundException(MESSAGES.COMMUNITY_USER.COMMON.NOT_FOUND);
+    // }
 
     return existedCommunityUser;
   }
