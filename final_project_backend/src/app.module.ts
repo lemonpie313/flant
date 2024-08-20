@@ -71,6 +71,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     PostModule,
     LiveModule,
     CommunityUserModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [

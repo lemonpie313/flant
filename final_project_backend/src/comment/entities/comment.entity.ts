@@ -7,9 +7,11 @@ import {
   DeleteDateColumn,
   ManyToOne,
   OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import { CommunityUser } from '../../community/community-user/entities/communityUser.entity';
 import { Artist } from '../../admin/entities/artist.entity';
+import { join } from 'path';
 //import { Post } from 'src/post/entities/post.entity';
 
 @Entity('comments')
@@ -25,10 +27,10 @@ export class Comment {
 
   @Column({ unsigned: true })
   communityUserId: number;
-
   @ManyToOne(() => CommunityUser, (user) => user.comments, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'community_user_id' })
   communityUser: CommunityUser;
 
   @Column({ unsigned: true, nullable: true })

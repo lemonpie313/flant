@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConsoleLogger,
   HttpStatus,
   Injectable,
   NotFoundException,
@@ -13,11 +14,13 @@ import { Post } from './entities/post.entity';
 import { PostImage } from './entities/post-image.entity';
 import { CommunityUser } from 'src/community/community-user/entities/communityUser.entity';
 import { Artist } from 'src/admin/entities/artist.entity';
+import { Comment } from 'src/comment/entities/comment.entity';
 import _ from 'lodash';
 import { User } from 'src/user/entities/user.entity';
 import { Manager } from 'src/admin/entities/manager.entity';
 import { MESSAGES } from 'src/constants/message.constant';
 import { PartialUser } from 'src/user/interfaces/partial-user.entity';
+import { CreateCommentDto } from 'src/comment/dto/create-comment.dto';
 
 @Injectable()
 export class PostService {
@@ -34,6 +37,8 @@ export class PostService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Manager)
     private readonly managerRepository: Repository<Manager>,
+    @InjectRepository(Comment)
+    private readonly commentRepository: Repository<Comment>,
   ) {}
 
   async create(
@@ -96,7 +101,7 @@ export class PostService {
         order: { createdAt: 'DESC' }, // 최신 게시물 순으로 정렬 (필요 시 추가)
       });
 
-      const posts = allPosts.map(post => {
+      const posts = allPosts.map((post) => {
         return {
           postId: post.postId,
           nickname: post.communityUser.nickName,
@@ -105,7 +110,7 @@ export class PostService {
           content: post.content,
           createdAt: post.createdAt,
           updatedAt: post.updatedAt,
-          postImages: post.postImages.map(image => ({
+          postImages: post.postImages.map((image) => ({
             postImageId: image.postImageId,
             postImageUrl: image.postImageUrl,
           })),
@@ -133,7 +138,7 @@ export class PostService {
         order: { createdAt: 'DESC' }, // 최신 게시물 순으로 정렬 (필요 시 추가)
       });
 
-      const posts = artistPosts.map(post => {
+      const posts = artistPosts.map((post) => {
         return {
           postId: post.postId,
           nickname: post.communityUser.nickName,
@@ -142,7 +147,7 @@ export class PostService {
           content: post.content,
           createdAt: post.createdAt,
           updatedAt: post.updatedAt,
-          postImages: post.postImages.map(image => ({
+          postImages: post.postImages.map((image) => ({
             postImageId: image.postImageId,
             postImageUrl: image.postImageUrl,
           })),
@@ -263,5 +268,81 @@ export class PostService {
     } else {
       throw new UnauthorizedException(MESSAGES.POST.REMOVE.UNAUTHORIZED);
     }
+  }
+
+  /**
+   * 새로운 댓글을 생성합니다.
+   * @param commentData - 생성할 댓글의 데이터
+   * @returns 생성된 댓글
+   */
+  async createCommentByPost(
+    postId: number,
+    user: PartialUser,
+    createCommentDto,
+  ) {
+    const userId = user.id;
+
+    const postData = await this.postRepository.findOne({
+      where: { postId: postId },
+    });
+
+    if (!postData) {
+      throw new NotFoundException(MESSAGES.POST.UPDATE.NOT_FOUND);
+    }
+
+    const communityUser = await this.communityUserRepository.findOne({
+      where: { userId: userId, communityId: createCommentDto.communityId },
+    });
+    if (!communityUser) {
+      throw new UnauthorizedException(MESSAGES.COMMENT.CREATE.BAD_REQUEST);
+    }
+    if (_.isEmpty(createCommentDto.comment)) {
+      throw new BadRequestException(MESSAGES.COMMENT.COMMON.COMMENT);
+    }
+
+    const communityUserId = communityUser.communityUserId;
+    const artistId = createCommentDto?.artistId;
+    const requestData = {
+      postId,
+      communityUserId,
+      artistId,
+      comment: createCommentDto.comment,
+    };
+
+    const comment = await this.commentRepository.save(requestData); // 댓글 엔티티 인스턴스 생성
+    return comment; // 댓글을 데이터베이스에 저장
+  }
+
+  /**
+   * 특정 게시물에 대한 댓글을 조회합니다.
+   * @param postId - 게시물의 ID
+   * @returns 해당 게시물의 댓글 배열
+   */
+  async findCommentsByPost(postId: number) {
+    const comments = await this.commentRepository.find({
+      where: { postId },
+      // relations: {
+      //   communityUser: {
+      //     users: true,
+      //   },
+      // },
+      relations: ['communityUser', 'communityUser.users'],
+      order: { createdAt: 'DESC' }, // 최신 게시물 순으로 정렬 (필요 시 추가)
+    });
+
+    console.log(comments);
+    const commentList = comments.map((comment) => {
+      // console.log(comment.communityUser);
+      return {
+        postId: comment.postId,
+        author: comment.communityUser.nickName,
+        profileImage: comment.communityUser.users.profileImage,
+        // isArtist: comment.artistId !== null, // artistId가 존재하면 아티스트로 간주
+        comment: comment.comment,
+        createdAt: comment.createdAt,
+        updatedAt: comment.updatedAt,
+      };
+    });
+    return commentList;
   }
 }
