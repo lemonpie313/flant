@@ -90,10 +90,13 @@ const PostCard: React.FC<PostCardProps> = ({
     };
   }, [communityId]);
 
-  const openAllCommentsPopup = () => {
+  const openAllCommentsPopup = async () => {
     console.log("Post ID:", postId); // postId가 제대로 전달되는지 확인
     setPopupPostId(postId); // postId를 상태에 저장
+
     setShowAllCommentsPopup(true);
+    const updatedComments = await commentApi.getComments(postId!);
+    setCommentsList(updatedComments.data);
   };
 
   const closeAllCommentsPopup = () => {
