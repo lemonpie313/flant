@@ -6,6 +6,7 @@ import {
   postApi,
   commentApi,
   communityUserApi,
+  membershipApi,
 } from "../services/api";
 import axios from "axios";
 import Header from "../components/communityBoard/Header";
@@ -26,6 +27,11 @@ const CommunityBoardTest: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isCommunityJoined, setIsCommunityJoined] = useState(false); // 커뮤니티 가입 여부 상태 추가
+  const [isNicknameModalOpen, setIsNicknameModalOpen] = useState(false);
+  const [nickname, setNickname] = useState("");
+  const openNicknameModal = () => setIsNicknameModalOpen(true);
+  const closeNicknameModal = () => setIsNicknameModalOpen(false);
+
   const navigate = useNavigate();
   const { communityId } = useParams<{ communityId: string }>();
 
@@ -172,27 +178,58 @@ const CommunityBoardTest: React.FC = () => {
 
   const handleJoinButtonClick = async () => {
     try {
-      const nickName = "exampleNickName"; // 임시로 nickName을 설정합니다. 실제로는 올바른 방법으로 가져와야 합니다.
-
-      if (!nickName) {
-        alert("로그인이 필요합니다.");
-        return;
-      }
-
       if (isCommunityJoined) {
         alert("이미 가입된 커뮤니티입니다.");
       } else {
-        await communityApi.joinCommunity(Number(communityId), nickName);
-        alert("커뮤니티에 가입되었습니다.");
-        setIsCommunityJoined(true); // 커뮤니티 가입 상태 업데이트
-        window.location.reload();
+        openNicknameModal(); // 닉네임 입력 창 열기
+        // await communityApi.joinCommunity(Number(communityId), nickName);
+        // alert("커뮤니티에 가입되었습니다.");
+        // setIsCommunityJoined(true); // 커뮤니티 가입 상태 업데이트
+        // window.location.reload();
       }
     } catch (error) {
       console.error("가입 처리 오류:", error);
       alert("가입에 실패했습니다.");
     }
   };
+  const handleNicknameSubmit = async () => {
+    if (!nickname.trim()) {
+      alert("닉네임을 입력해주세요.");
+      return;
+    }
 
+    try {
+      await communityApi.joinCommunity(Number(communityId), nickname);
+      alert("커뮤니티에 가입되었습니다.");
+      setIsCommunityJoined(true);
+      closeNicknameModal();
+      window.location.reload();
+    } catch (error) {
+      console.error("가입 처리 오류:", error);
+      alert("가입에 실패했습니다.");
+    }
+  };
+  const handleMembershipJoin = async () => {
+    try {
+      // 멤버십 가입 요청
+      const existedMembership = await membershipApi.existedMembership();
+      const existedMembershipInfo = existedMembership.data.data;
+      for (let i = 0; i < existedMembershipInfo.length; i++) {
+        if (community?.communityName == existedMembershipInfo[i].group) {
+          alert("이미 멤버십 가입이 완료되었습니다.");
+          return;
+        }
+      }
+      await membershipApi.joinMembership(Number(communityId));
+      alert("멤버십 가입이 완료되었습니다.");
+
+      // 가입 후에 멤버십 상태를 업데이트하거나 필요한 추가 동작 수행
+      // setIsMembershipJoined(true); // 멤버십 가입 상태 업데이트
+    } catch (error) {
+      console.error("멤버십 가입 오류:", error);
+      alert("멤버십 가입에 실패했습니다.");
+    }
+  };
   return (
     <div className="community-board">
       {community && (
@@ -247,24 +284,42 @@ const CommunityBoardTest: React.FC = () => {
               <p>16,692 members</p>
             </div>
           </div>
+          {isNicknameModalOpen && (
+            <div className="overlay">
+              <div className="nickname-modal">
+                <h2>닉네임 입력</h2>
+                <input
+                  type="text"
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                  placeholder="닉네임을 입력하세요"
+                />
+                <div className="modal-buttons">
+                  <button onClick={handleNicknameSubmit}>가입하기</button>
+                  <button onClick={closeNicknameModal}>취소</button>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="right-sidebar-membership">
             {isCommunityJoined
               ? "자유 멤버십에 가입해서 새로운 스케줄 소식을 받아보세요."
               : "커뮤니티에 가입해 소식을 받아보세요."}
             <button
               className="right-sidebar-join-button"
-              onClick={handleJoinButtonClick}
+              onClick={
+                isCommunityJoined ? handleMembershipJoin : handleJoinButtonClick
+              }
             >
               {isCommunityJoined ? "Membership 가입하기" : "커뮤니티 가입하기"}
             </button>
           </div>
-          <div className="right-sidebar-dm-section">
+          {/* <div className="right-sidebar-dm-section">
             <button className="right-sidebar-dm-button">Weverse DM</button>
             <p>지금 DM하세요!</p>
-          </div>
+          </div> */}
           <div className="right-sidebar-user-info">
             <p>{communityUser?.nickName}</p>
-            <p>0 posts</p>
           </div>
         </div>
       </main>
