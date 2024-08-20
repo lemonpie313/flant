@@ -205,6 +205,20 @@ export const MESSAGES = {
       UNAUTHORIZED: '게시글 삭제 권한이 없습니다.',
     },
   },
+  COMMENT: {
+    COMMON: {
+      COMMENT: '댓글을 작성해주세요.',
+    },
+    CREATE: {
+      BAD_REQUEST: '커뮤니티 가입을 먼저 진행해주세요.',
+      SUCCEED: '댓글 작성에 성공하였습니다.',
+    },
+    FIND: {
+      NOT_FOUND: '댓글이 존재하지 않습니다.',
+      SUCCEED: '댓글 조회에 성공했습니다.',
+    },
+  },
+
   NOTICE: {
     CREATE: {
       UNAUTHORIZED: '공지 작성 권한이 없습니다.',
