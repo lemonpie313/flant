@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   HttpStatus,
   Injectable,
   NotFoundException,
@@ -44,6 +45,13 @@ export class CommunityService {
     communityId: number,
     communityAssignDto: CommunityAssignDto,
   ) {
+    const existedData = await this.communityUserRepository.findOne({
+      where: { userId: userId, communityId: communityId },
+    });
+    if (existedData) {
+      throw new ConflictException('이미 가입된 사용자입니다.');
+    }
+
     const assignData = await this.communityUserRepository.save({
       userId: userId,
       communityId: communityId,
@@ -69,7 +77,12 @@ export class CommunityService {
 
   async findAll() {
     const allCommunities = await this.communityRepository.find({
-      select: ['communityLogoImage', 'communityName', 'communityCoverImage'],
+      select: [
+        'communityLogoImage',
+        'communityName',
+        'communityCoverImage',
+        'communityId',
+      ],
     });
     return {
       status: HttpStatus.OK,
@@ -87,7 +100,6 @@ export class CommunityService {
     const myData = myCommunities.map(
       (communityUser) => communityUser?.community,
     );
-
 
     return {
       status: HttpStatus.OK,
@@ -121,24 +133,23 @@ export class CommunityService {
     //     })),
     //   };
     // });
-  
 
-  // 필요한 커뮤니티 정보와 가공된 posts 데이터를 함께 반환
-  return {
-    status: HttpStatus.OK,
-    message: MESSAGES.COMMUNITY.FINDONE.SUCCEED,
-    data: {
-      communityId: existedCommunity.communityId,
-      communityName: existedCommunity.communityName,
-      communityLogoImage: existedCommunity.communityLogoImage,
-      communityCoverImage: existedCommunity.communityCoverImage,
-      membershipPrice: existedCommunity.membershipPrice,
-      createdAt: existedCommunity.createdAt,
-      updatedAt: existedCommunity.updatedAt,
-      deletedAt: existedCommunity.deletedAt,
-      //posts: processedPosts, // 가공된 posts 배열
-    },
-  };
+    // 필요한 커뮤니티 정보와 가공된 posts 데이터를 함께 반환
+    return {
+      status: HttpStatus.OK,
+      message: MESSAGES.COMMUNITY.FINDONE.SUCCEED,
+      data: {
+        communityId: existedCommunity.communityId,
+        communityName: existedCommunity.communityName,
+        communityLogoImage: existedCommunity.communityLogoImage,
+        communityCoverImage: existedCommunity.communityCoverImage,
+        membershipPrice: existedCommunity.membershipPrice,
+        createdAt: existedCommunity.createdAt,
+        updatedAt: existedCommunity.updatedAt,
+        deletedAt: existedCommunity.deletedAt,
+        //posts: processedPosts, // 가공된 posts 배열
+      },
+    };
   }
 
   async updateCommunity(

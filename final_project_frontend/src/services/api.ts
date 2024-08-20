@@ -65,7 +65,7 @@ export const authApi = {
 
 export const userApi = {
   findMy: () => api.get("/users/me").catch(handleApiError),
-  update: (newUserName: string, newPassword: string, confirmNewPassword: string) =>
+  update: (newUserName?: string, newPassword?: string, confirmNewPassword?: string) =>
     api.patch("/users/me", { newUserName, newPassword, confirmNewPassword }).catch(handleApiError),
   checkPassword: (password: string) => api.post("/users/check-password", { password }).catch(handleApiError),
   delete: () => api.delete("/users/me").catch(handleApiError),
@@ -165,4 +165,22 @@ export const paymentApi = {
 export const membershipApi = {
   joinMembership: (communityId: number) => api.post(`/membership`, { communityId }).catch(handleApiError),
   existedMembership: () => api.get(`/membership`).catch(handleApiError),
+};
+
+export const mediaApi = {
+  createMedia: (formData: FormData) =>
+    api
+      .post(`/media`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      .catch(handleApiError),
+  getMediaList: (communityId: number) => api.get("/media", { params: { communityId } }).catch(handleApiError),
+  getMediaOne: (mediaId: number) => api.get(`/media/${mediaId}`).catch(handleApiError),
+  patchThumbnail: (formData: FormData, mediaId: number) =>
+    api
+      .patch(`/media/${mediaId}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      .catch(handleApiError)
+      .catch(handleApiError),
 };

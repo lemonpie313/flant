@@ -35,6 +35,7 @@ const Header: React.FC<HeaderProps> = ({ communityName, isLoggedIn, handleLogout
                 <div className="header-user-dropdown">
                   <Link to="/userinfo">내 정보</Link>
                   <Link to="/membership">멤버십</Link>
+                  <Link to="/cart">장바구니</Link>
                   {/* <Link to="/payment-history">결제내역</Link> */}
                   <button onClick={handleLogout}>로그아웃</button>
                 </div>
@@ -47,16 +48,7 @@ const Header: React.FC<HeaderProps> = ({ communityName, isLoggedIn, handleLogout
         </div>
       </div>
     )}
-    <div className="header-box-user-shop">
-      <Link to="#">
-        <img
-          style={{ marginLeft: '25px', marginTop: '6px' }}
-          className="header-box-shop-image"
-          src="/green-cart.png"
-          alt="green-cart"
-        />
-      </Link>
-    </div>
+
   </div>
 </div>
     </header>

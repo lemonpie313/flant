@@ -14,7 +14,7 @@ export class Cart {
   map(cart: Cart) {
     throw new Error('Method not implemented.');
   }
-  @PrimaryGeneratedColumn({unsigned: true})
+  @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
   // 카트아이템 연결
@@ -28,7 +28,7 @@ export class Cart {
   order: Order;
 
   //유저연결
-  @OneToOne(() => User, (user) => user.cart)
+  @OneToOne(() => User, (user) => user.cart, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
 }

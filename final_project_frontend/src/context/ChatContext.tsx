@@ -1,17 +1,26 @@
-// src/context/ChatContext.tsx
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
+// ChatMessage 인터페이스 정의
+export interface ChatMessage {
+  roomId: string;
+  userId: string;
+  message: string;
+  timestamp: Date;
+  fileUrl?: string;
+  type?: 'message' | 'notification';
+}
+
 interface ChatContextType {
-  messages: string[];
-  addMessage: (message: string) => void;
+  messages: ChatMessage[];
+  addMessage: (message: ChatMessage) => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
 export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
 
-  const addMessage = (message: string) => {
+  const addMessage = (message: ChatMessage) => {
     setMessages(prev => [...prev, message]);
   };
 
@@ -22,7 +31,7 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   );
 };
 
-export const useChatContext = () => {
+export const useChatContext = (): ChatContextType => {
   const context = useContext(ChatContext);
   if (context === undefined) {
     throw new Error('useChatContext must be used within a ChatProvider');

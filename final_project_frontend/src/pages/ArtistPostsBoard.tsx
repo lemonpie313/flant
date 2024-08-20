@@ -41,16 +41,6 @@ const ArtistBoard: React.FC = () => {
       const response = await communityApi.findOne(Number(communityId));
       const communityData = response.data.data;
       setCommunity(communityData);
-
-      if (communityData?.posts) {
-        const postsWithLikes = await Promise.all(
-          communityData.posts.map(async (post: Post) => {
-            const isLiked = await fetchMyLikePost(post.postId);
-            return { ...post, isLiked };
-          })
-        );
-        setPosts(postsWithLikes);
-      }
     } catch (error) {
       console.error("커뮤니티 데이터 가져오기 오류:", error);
     }
@@ -80,7 +70,15 @@ const ArtistBoard: React.FC = () => {
       // isArtist를 true로 설정하여 아티스트 게시물만 가져오기
       const response = await postApi.getPosts(true, Number(communityId));
       const postsData = response.data.data as Post[]; // 타입 명시
-      setPosts(postsData);
+
+      // TODO : LIKE 관련 로직 추후 리팩토링 필요
+      const postsWithLikes = await Promise.all(
+        postsData.map(async (post: Post) => {
+          const isLiked = await fetchMyLikePost(post.postId);
+          return { ...post, isLiked };
+        })
+      );
+      setPosts(postsWithLikes);
     } catch (error) {
       console.error("게시물 가져오기 오류:", error);
       if (axios.isAxiosError(error) && error.response?.status === 401) {

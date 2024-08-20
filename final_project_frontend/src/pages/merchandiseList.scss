@@ -11,16 +11,27 @@
     text-align: center;
   }
 
-  ul {
+  .category-section {
+    width: 100%;
+    max-width: 1200px;
+    margin-bottom: 48px;
+    position: relative; // 화살표 버튼 위치 설정을 위해 추가
+  }
+
+  .merchandise-slider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .merchandise-items {
     list-style: none;
     padding: 0;
     display: grid;
     grid-template-columns: repeat(4, 1fr); // 한 줄에 4개의 상품
     gap: 24px;
-    justify-items: center;
-    max-width: 1200px;
     width: 100%;
-    min-height: 400px; // 최소 높이를 지정해 크기가 다른 문제 해결
   }
 
   li {
@@ -31,16 +42,15 @@
     text-align: center;
     transition: box-shadow 0.3s ease;
     width: 100%;
-    min-height: 350px; // 상품 목록의 최소 높이를 지정
+    min-height: 350px;
 
     &:hover {
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
-    /* 이미지 컨테이너 */
     .image-container {
       width: 100%;
-      padding-top: 100%; /* 1:1 비율 유지 */
+      padding-top: 100%; /* 1:1 비율 */
       position: relative;
       overflow: hidden;
       border-radius: 8px;
@@ -72,10 +82,24 @@
     }
   }
 
-  /* 카테고리 섹션 간의 간격 */
-  .category-section {
-    width: 100%;
-    max-width: 1200px;
-    margin-bottom: 48px; // 카테고리 간 여백 추가
+  .slider-button {
+    background-color: #007aff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .prev-button {
+    left: -40px;
+  }
+
+  .next-button {
+    right: -40px;
   }
 }

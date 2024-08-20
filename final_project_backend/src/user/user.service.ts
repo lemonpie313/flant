@@ -101,6 +101,25 @@ export class UserService {
     console.log('zzzzzzzzzzz');
     console.log(newUserName);
     console.log('bb');
+
+    // 아이디 변경의 경우
+    if (
+      newUserName != null &&
+      newPassword == null &&
+      confirmNewPassword == null
+    ) {
+      const whereCondition = userId;
+      const whereContent = {
+        ...(newUserName && { name: newUserName }),
+      };
+      console.log('zzzzzzzzzzz');
+      const updateUser = await this.userRepository.update(
+        whereCondition,
+        whereContent,
+      );
+
+      return updateUser;
+    }
     // 비밀번호 변경의 경우
     if (newPassword) {
       // 새 비밀번호 일치 확인

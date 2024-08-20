@@ -135,7 +135,6 @@ const PostCard: React.FC<PostCardProps> = ({
     }
   };
 
-  // 게시글 날짜 형식 지정 (MM. DD. HH:MM)
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return `${(date.getMonth() + 1).toString().padStart(2, "0")}. ${date.getDate().toString().padStart(2, "0")}. ${date
@@ -144,7 +143,6 @@ const PostCard: React.FC<PostCardProps> = ({
       .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
   };
 
-  // 게시글 이미지 layout 설정
   const getImageLayout = () => {
     if (postImages.length === 1) {
       return "single";

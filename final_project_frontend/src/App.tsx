@@ -4,20 +4,20 @@ import LoginPage from "./pages/LoginPage";
 import MainPage from "./pages/MainPage";
 import SignUpPage from "./pages/SignUpPage";
 import UserInfoPage from "./pages/UserInfo";
-import ChatComponent from "./components/ChatComponent";
 import { ChatProvider } from "./context/ChatContext";
 import LiveStreamingPage from "./pages/LiveStreamingPage";
 import LiveListPage from "./pages/LiveListPage";
 import { userApi } from "./services/api";
-import Cart from "./pages/cart";
 import CommunityBoard from "./pages/CommunityBoard";
 import MerchandiseList from "./pages/merchandiseList";
 import MerchandiseDetail from "./pages/merchandiseDetail";
+import ChatComponent from "./components/ChatComponent";
+import Cart from "./pages/cart";
 import ArtistPostsBoard from "./pages/ArtistPostsBoard";
+import Media from "./pages/media/media";
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const App: React.FC = () => {
           await userApi.findMy();
           setIsLoggedIn(true);
         } catch (error) {
-          console.log("error", error);
+          console.error("error", error);
           localStorage.removeItem("accessToken");
           setIsLoggedIn(false);
         }
@@ -37,10 +37,6 @@ const App: React.FC = () => {
     };
     checkLoginStatus();
   }, []);
-
-  const toggleChat = () => {
-    setIsChatOpen(!isChatOpen);
-  };
 
   const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
     const location = useLocation();
@@ -63,7 +59,7 @@ const App: React.FC = () => {
   return (
     <ChatProvider>
       <Router>
-        <div>
+        <div className="relative min-h-screen">
           <Routes>
             <Route
               path="/login"
@@ -111,6 +107,22 @@ const App: React.FC = () => {
               }
             />
             <Route
+              path="/communities/:communityId/media"
+              element={
+                <ProtectedRoute>
+                  <Media />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/communities/:communityId/media/:mediaId"
+              element={
+                <ProtectedRoute>
+                  <Media />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/live"
               element={
                 <ProtectedRoute>
@@ -146,21 +158,9 @@ const App: React.FC = () => {
             <Route path="/" element={<Navigate to="/main" replace />} />
             <Route path="*" element={<Navigate to="/main" replace />} />
           </Routes>
-          {isLoggedIn && (
-            <>
-              <button
-                onClick={toggleChat}
-                className="fixed bottom-5 right-5 z-50 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
-              >
-                {isChatOpen ? "채팅 닫기" : "채팅 열기"}
-              </button>
-              {isChatOpen && (
-                <div className="fixed bottom-20 right-5 w-80 h-96 z-50 bg-white shadow-lg rounded-lg overflow-hidden">
-                  <ChatComponent />
-                </div>
-              )}
-            </>
-          )}
+          {/* {isLoggedIn && (
+            // <ChatComponent />
+          )} */}
         </div>
       </Router>
     </ChatProvider>

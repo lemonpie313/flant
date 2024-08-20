@@ -37,7 +37,7 @@ export class UserController {
    */
   @Get('/me')
   async findOne(@UserInfo() user: PartialUser) {
-    console.log("------------------------------user")
+    console.log('------------------------------user');
     console.log(user);
     const data = await this.userService.findMe(user.id);
     return {
@@ -101,10 +101,7 @@ export class UserController {
    * @returns
    */
   @Patch('/me')
-  async updateUser(
-    @UserInfo() user: PartialUser,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
+  async updateUser(@UserInfo() user: PartialUser, @Body() updateUserDto) {
     await this.userService.updateUser(user.id, updateUserDto);
 
     return {

@@ -87,12 +87,15 @@ const MerchandiseDetail: React.FC = () => {
         selectedOption,
         quantity
       );
-      console.log(response.data.data);
       alert(response.data.message); // API 응답 메시지 표시
     } catch (error) {
       console.error("장바구니 추가 실패:", error);
       alert("장바구니 추가에 실패했습니다.");
     }
+  };
+
+  const handleNavigateToCart = () => {
+    navigate("/cart");
   };
 
   const handleLogout = async () => {
@@ -155,7 +158,10 @@ const MerchandiseDetail: React.FC = () => {
           />
         </div>
 
-        <button onClick={handleAddToCart}>Add to Cart</button>
+        <div className="action-buttons">
+          <button onClick={handleAddToCart}>Add to Cart</button>
+          <button onClick={handleNavigateToCart} className="go-to-cart-button">Go to Cart</button>
+        </div>
 
         <div className="content">
           {merchandise?.merchandiseImage.map((image) => (

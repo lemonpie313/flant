@@ -36,6 +36,7 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
   const navigate = useNavigate();
   const [communities, setCommunities] = useState<Community[]>([]);
   const [mycommunities, setMyCommunities] = useState<Community[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleLogout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +55,7 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
   useEffect(() => {
     const fetchCommunities = async () => {
       try {
+        setIsLoading(true);
         const token = getToken();
         if (!token) {
           const response = await communityApi.findAll();
@@ -61,57 +63,74 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
         } else {
           const response = await communityApi.findAll();
           const myresponse = await communityApi.findMy();
-          
+
           setCommunities(response.data.data);
           setMyCommunities(myresponse.data.data);
         }
       } catch (error) {
-        console.log(error)
+        console.error(error);
         alert("Failed to fetch communities");
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchCommunities();
   }, []);
-
+  // 새로고침 핸들러
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault(); // 기본 링크 동작 방지
+    window.location.reload(); // 페이지 새로고침
+  };
   const handleCommunityClick = (communityId: number) => {
     navigate(`/communities/${communityId}/feed`);
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="main-page">
       <header>
         <div className="header-box">
-          <Link to="/main" className="header-box-logo">
+          <Link
+            to="/main"
+            className="header-box-logo"
+            onClick={handleLogoClick}
+          >
             <img
               className="header-box-logo-image"
               src="/favicon.ico"
               alt="logo"
             />
           </Link>
-          <div className="header-box-blank">메인 페이지입니당</div>
+          <div className="header-box-blank"></div>
           <div className="header-box-user">
             {isLoggedIn ? (
               <div className="header-box-user-info">
-                <button>
+                {/* <button>
                   <img
                     className="header-notification-icon"
                     src="/images/notification.png"
                     alt="notification"
                   />
-                </button>
-                <button>
-                  <img
-                    className="header-user-icon"
-                    src="/images/user.png"
-                    alt="user"
-                  />
+                </button> */}
+                <div className="header-box-user-dropdown-container">
+                  <button>
+                    <img
+                      className="header-user-icon"
+                      src="/images/user.png"
+                      alt="user"
+                    />
+                  </button>
                   <div className="header-user-dropdown">
                     <Link to="/userinfo">내 정보</Link>
                     <Link to="/membership">멤버십</Link>
-                    <Link to="/payment-history">결제내역</Link>
+                    <Link to="/cart">장바구니</Link>
+                    {/* <Link to="/payment-history">결제내역</Link> */}
                     <button onClick={handleLogout}>로그아웃</button>
                   </div>
-                </button>
+                </div>
               </div>
             ) : (
               <div className="header-box-login">
@@ -122,84 +141,30 @@ const MainPage: React.FC<MainPage> = ({ isLoggedIn }) => {
                 </div>
               </div>
             )}
-            <div className="header-box-user-shop">
-              <Link to="#">
-                <img
-                  style={{ marginLeft: "25px", marginTop: "6px" }}
-                  className="header-box-shop-image"
-                  src="/green-cart.png"
-                  alt="green-cart"
-                />
-              </Link>
-            </div>
           </div>
         </div>
       </header>
       <div className="mainPage-main">
         {isLoggedIn && (
           <div className="mainPage-main-my">
-            {/* <Row>
-              <div>
-                <h1>나의 커뮤니티</h1>
-              </div>
-              {mycommunities.map((mycommunity) => (
-                <Col key={mycommunity.communityId} md={3}>
-                  <div 
-                    className="figure"
-                    onClick={() => handleCommunityClick(mycommunity.communityId)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <img
-                      style={{ width: "300px", height: "400px" }}
-                      src={
-                        mycommunity.communityCoverImage ||
-                        "https://picsum.photos/id/475/250/300"
-                      }
-                      alt={mycommunity.communityName}
-                    />
-                    <figcaption>{mycommunity.communityName}</figcaption>
-                  </div>
-                </Col>
-              ))}
-            </Row> */}
-            <CommunityList
-              title="나의 커뮤니티"
-              communities={mycommunities}
-              onCommunityClick={handleCommunityClick}
-            />
+            {mycommunities.length > 0 ? (
+              <CommunityList
+                title="나의 커뮤니티"
+                communities={mycommunities}
+                onCommunityClick={handleCommunityClick}
+              />
+            ) : (
+              <div className="no-communities">가입해줘</div>
+            )}
           </div>
         )}
 
         <div className="mainPage-main-all">
-          {/* <Row className="mainPage-main-all">
-            <div>
-              <h1>모든 커뮤니티</h1>
-            </div>
-            {communities.map((community) => (
-              <Col key={community.communityId} md={3}>
-                <div 
-                  className="figure"
-                  onClick={() => handleCommunityClick(community.communityId)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <img
-                    style={{ width: "300px", height: "400px" }}
-                    src={
-                      community.communityCoverImage ||
-                      "https://picsum.photos/id/475/250/300"
-                    }
-                    alt={community.communityName || `Community ${community.communityId}`}
-                  />
-                  <figcaption>{community.communityName || `Community ${community.communityId}` }</figcaption>
-                </div>
-              </Col>
-            ))}
-          </Row> */}
           <CommunityList
             title="모든 커뮤니티"
             communities={communities}
             onCommunityClick={handleCommunityClick}
-          />  
+          />
         </div>
       </div>
       <footer></footer>
