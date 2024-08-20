@@ -30,8 +30,15 @@
 }
 
 .right-sidebar-membership {
+  font-size: 18px;
   text-align: center;
   margin-bottom: 20px;
+  p {
+    margin-bottom: 10px; // 텍스트 아래에 간격 추가
+  }
+  .join-button {
+    margin-top: 10px; // 버튼 위에 간격 추가
+  }
 }
 
 .right-sidebar-join-button,

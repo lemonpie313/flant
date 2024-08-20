@@ -1,4 +1,3 @@
-
 import {
   IsNotEmpty,
   IsNumber,
@@ -8,17 +7,11 @@ import {
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-
 export class CreateCommentDto {
-  @ApiProperty({ description: 'The ID of the post' })
+  @ApiProperty({ description: 'The ID of the community' })
   @IsNotEmpty()
   @IsNumber()
-  postId: number;
-
-  @ApiProperty({ description: 'The ID of the community user' })
-  @IsNotEmpty() 
-  @IsNumber()
-  communityUserId: number;
+  communityId: number;
 
   @ApiProperty({ description: 'The ID of the artist', required: false })
   @IsOptional()

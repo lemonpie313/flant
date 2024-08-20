@@ -17,7 +17,12 @@ import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CreateLikeDto } from 'src/like/dto/create-like.dto';
 import { ApiResponse } from 'src/util/api-response.interface';
 import { Like } from 'src/like/entities/like.entity';
@@ -29,6 +34,8 @@ import { UserInfo } from 'src/util/decorators/user-info.decorator';
 import { postImageUploadFactory } from 'src/util/image-upload/create-s3-storage';
 import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { CreateCommentDto } from 'src/comment/dto/create-comment.dto';
+import { CommunityUserGuard } from 'src/auth/guards/community-user.guard';
 
 @ApiTags('게시물')
 @Controller('v1/posts')
@@ -80,10 +87,7 @@ export class PostController {
     @Query('page') page: number,
     @Query('limit') limit: number,
   ) {
-    return await this.postService.findPosts(
-      isArtist,
-      +communityId,
-    );
+    return await this.postService.findPosts(isArtist, +communityId);
   }
 
   /**
@@ -175,5 +179,28 @@ export class PostController {
     @Param('id', ParseIntPipe) id: number,
   ) {
     return await this.likeService.checkIfUserLiked(user.id, id, ItemType.POST);
+  }
+
+  @Post('/:postId/comments')
+  @ApiOperation({ summary: 'Get comments by post ID' })
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
+  async createCommentByPost(
+    @Body() createCommentDto: CreateCommentDto,
+    @UserInfo() user: PartialUser,
+    @Param('postId', ParseIntPipe)
+    postId: number,
+  ) {
+    return await this.postService.createCommentByPost(
+      postId,
+      user,
+      createCommentDto,
+    );
+  }
+
+  @Get('/:postId/comments')
+  @ApiOperation({ summary: 'Get comments by post ID' })
+  @UseGuards(JwtAuthGuard)
+  async findCommentsByPost(@Param('postId', ParseIntPipe) postId: number) {
+    return await this.postService.findCommentsByPost(postId);
   }
 }
