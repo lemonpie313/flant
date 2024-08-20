@@ -99,15 +99,15 @@ export const commentApi = {
     postId,
     comment,
     communityId,
-    artistId,
-    imageUrl,
-  }: {
+  }: // artistId,
+  // imageUrl,
+  {
     postId: number;
     comment: string;
     communityId: number;
-    artistId?: number;
-    imageUrl?: string;
-  }) => api.post(`/posts/${postId}/comments`, { comment, communityId, artistId, imageUrl }).catch(handleApiError),
+    // artistId?: number;
+    // imageUrl?: string;
+  }) => api.post(`/posts/${postId}/comments`, { comment, communityId /* artistId, imageUrl*/ }).catch(handleApiError),
   createReply: (commentId: number, { content }: { content: string }) =>
     api.post(`/comments/${commentId}/replies`, { content }).catch(handleApiError),
   getComments: (postId: number) => api.get(`/posts/${postId}/comments`).catch(handleApiError),

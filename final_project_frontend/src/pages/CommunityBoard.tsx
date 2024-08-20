@@ -142,7 +142,7 @@ const CommunityBoard: React.FC = () => {
     imageUrl?: string
   ) => {
     try {
-      await commentApi.create({ postId, comment, communityId, artistId, imageUrl });
+      await commentApi.create({ postId, comment, communityId });
       await fetchPosts();
     } catch (error) {
       console.error("댓글 작성 오류:", error);

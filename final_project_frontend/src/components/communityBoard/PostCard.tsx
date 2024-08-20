@@ -99,15 +99,16 @@ const PostCard: React.FC<PostCardProps> = ({
     e.preventDefault();
     if (newComment.trim()) {
       try {
+        console.log(newComment);
         await commentApi.create({
           postId: popupPostId!, // 팝업에서 사용될 postId로 댓글 생성
           comment: newComment,
-          communityId,
-          artistId,
-          imageUrl,
+          communityId: Number(communityId),
+          // artistId,
+          // imageUrl,
         });
         setNewComment("");
-        const updatedComments = await commentApi.getComments(popupPostId!, 1, 10);
+        const updatedComments = await commentApi.getComments(popupPostId!);
         setCommentsList(updatedComments.data);
       } catch (error) {
         console.error("댓글 작성 실패:", error);
@@ -119,7 +120,7 @@ const PostCard: React.FC<PostCardProps> = ({
     if (loadingComments) return;
     setLoadingComments(true);
     try {
-      const response = await commentApi.getComments(popupPostId!, Math.ceil(commentsList.length / 10) + 1, 10);
+      const response = await commentApi.getComments(popupPostId!);
       const newComments = response.data;
 
       if (newComments.length > 0) {
@@ -250,7 +251,7 @@ const PostCard: React.FC<PostCardProps> = ({
                 >
                   {commentsList.length > 0
                     ? commentsList.map((comment) => <CommentItem key={comment.id} {...comment} onReply={onReply} />)
-                    : !loadingComments && <p>No comments yet.</p>}
+                    : !loadingComments && <p>댓글이 존재하지 않습니다.</p>}
                 </InfiniteScroll>
                 <form onSubmit={handleCommentSubmit} className="comment-form">
                   <textarea
