@@ -8,7 +8,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 
 interface PostCardProps extends Post {
   onLike: (postId: number, likeStatus: boolean) => void;
-  onComment: (postId: number, content: string) => void;
+  onComment: (postId: number, comment: string, communityId: number, artistId?: number, imageUrl?: string) => void;
   onReply: (commentId: number, content: string) => void;
 }
 
@@ -101,7 +101,10 @@ const PostCard: React.FC<PostCardProps> = ({
       try {
         await commentApi.create({
           postId: popupPostId!, // 팝업에서 사용될 postId로 댓글 생성
-          content: newComment,
+          comment: newComment,
+          communityId,
+          artistId,
+          imageUrl,
         });
         setNewComment("");
         const updatedComments = await commentApi.getComments(popupPostId!, 1, 10);

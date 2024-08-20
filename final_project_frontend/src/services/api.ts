@@ -95,12 +95,22 @@ export const postApi = {
 };
 
 export const commentApi = {
-  create: ({ postId, content }: { postId: number; content: string }) =>
-    api.post(`/posts/${postId}/comments`, { content }).catch(handleApiError),
+  create: ({
+    postId,
+    comment,
+    communityId,
+    artistId,
+    imageUrl,
+  }: {
+    postId: number;
+    comment: string;
+    communityId: number;
+    artistId?: number;
+    imageUrl?: string;
+  }) => api.post(`/posts/${postId}/comments`, { comment, communityId, artistId, imageUrl }).catch(handleApiError),
   createReply: (commentId: number, { content }: { content: string }) =>
     api.post(`/comments/${commentId}/replies`, { content }).catch(handleApiError),
-  getComments: (postId: number, page = 1, limit = 10) =>
-    api.get(`/posts/${postId}/comments`, { params: { page, limit } }).catch(handleApiError),
+  getComments: (postId: number) => api.get(`/posts/${postId}/comments`).catch(handleApiError),
   like: (id: number, { status }: { status: number }) =>
     api.put(`/comments/${id}/likes`, { status }).catch(handleApiError),
   checkIfUserLikedComment: (id: number) => api.get(`/comments/${id}/likes/my`).catch(handleApiError),

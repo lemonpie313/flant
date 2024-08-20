@@ -134,9 +134,15 @@ const CommunityBoard: React.FC = () => {
     }
   };
 
-  const handleComment = async (postId: number, content: string) => {
+  const handleComment = async (
+    postId: number,
+    comment: string,
+    communityId: number,
+    artistId?: number,
+    imageUrl?: string
+  ) => {
     try {
-      await commentApi.create({ postId, content });
+      await commentApi.create({ postId, comment, communityId, artistId, imageUrl });
       await fetchPosts();
     } catch (error) {
       console.error("댓글 작성 오류:", error);

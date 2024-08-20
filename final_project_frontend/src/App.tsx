@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-  useLocation,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import MainPage from "./pages/MainPage";
 import SignUpPage from "./pages/SignUpPage";
@@ -48,9 +42,7 @@ const App: React.FC = () => {
     setIsChatOpen(!isChatOpen);
   };
 
-  const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({
-    children,
-  }) => {
+  const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
     const location = useLocation();
 
     if (loading) {
@@ -75,24 +67,81 @@ const App: React.FC = () => {
           <Routes>
             <Route
               path="/login"
-              element={
-                isLoggedIn ? (
-                  <Navigate to="/main" replace />
-                ) : (
-                  <LoginPage setIsLoggedIn={setIsLoggedIn} />
-                )
-              }
+              element={isLoggedIn ? <Navigate to="/main" replace /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}
             />
             <Route path="/signup" element={<SignUpPage />} />
-            <Route path="/main" element={<ProtectedRoute><MainPage isLoggedIn={isLoggedIn!} /></ProtectedRoute>} />
-            <Route path="/userinfo" element={<ProtectedRoute><UserInfoPage /></ProtectedRoute>} />
-            <Route path="/communities" element={<ProtectedRoute><CommunityBoard /></ProtectedRoute>} />
-            <Route path="/communities/:communityId/feed" element={<ProtectedRoute><CommunityBoard /></ProtectedRoute>} />
-            <Route path="/communities/:communityId/artists" element={<ProtectedRoute><ArtistPostsBoard /></ProtectedRoute>} />
-            <Route path="/live" element={<ProtectedRoute><LiveListPage /></ProtectedRoute>} />
-            <Route path="/live/:liveId" element={<ProtectedRoute><LiveStreamingPage /></ProtectedRoute>} />
-            <Route path="communities/:communityId/merchandise" element={<ProtectedRoute><MerchandiseList /></ProtectedRoute>} />
-            <Route path="communities/:communityId/merchandise/:merchandiseId" element={<ProtectedRoute><MerchandiseDetail /></ProtectedRoute>} />
+            <Route
+              path="/main"
+              element={
+                <ProtectedRoute>
+                  <MainPage isLoggedIn={isLoggedIn!} />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/userinfo"
+              element={
+                <ProtectedRoute>
+                  <UserInfoPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/communities"
+              element={
+                <ProtectedRoute>
+                  <CommunityBoard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/communities/:communityId/feed"
+              element={
+                <ProtectedRoute>
+                  <CommunityBoard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/communities/:communityId/artists"
+              element={
+                <ProtectedRoute>
+                  <ArtistPostsBoard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/live"
+              element={
+                <ProtectedRoute>
+                  <LiveListPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/live/:liveId"
+              element={
+                <ProtectedRoute>
+                  <LiveStreamingPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="communities/:communityId/merchandise"
+              element={
+                <ProtectedRoute>
+                  <MerchandiseList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="communities/:communityId/merchandise/:merchandiseId"
+              element={
+                <ProtectedRoute>
+                  <MerchandiseDetail />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/cart" element={<Cart />} />
             <Route path="/" element={<Navigate to="/main" replace />} />
             <Route path="*" element={<Navigate to="/main" replace />} />
