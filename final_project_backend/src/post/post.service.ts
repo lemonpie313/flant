@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConsoleLogger,
   HttpStatus,
   Injectable,
   NotFoundException,
@@ -318,6 +319,30 @@ export class PostService {
    * @returns 해당 게시물의 댓글 배열
    */
   async findCommentsByPost(postId: number) {
-    return this.commentRepository.find({ where: { postId } }); // 게시물 ID로 댓글 조회
+    const comments = await this.commentRepository.find({
+      where: { postId },
+      // relations: {
+      //   communityUser: {
+      //     users: true,
+      //   },
+      // },
+      relations: ['communityUser', 'communityUser.users'],
+      order: { createdAt: 'DESC' }, // 최신 게시물 순으로 정렬 (필요 시 추가)
+    });
+
+    console.log(comments);
+    const commentList = comments.map((comment) => {
+      // console.log(comment.communityUser);
+      return {
+        postId: comment.postId,
+        author: comment.communityUser.nickName,
+        profileImage: comment.communityUser.users.profileImage,
+        // isArtist: comment.artistId !== null, // artistId가 존재하면 아티스트로 간주
+        comment: comment.comment,
+        createdAt: comment.createdAt,
+        updatedAt: comment.updatedAt,
+      };
+    });
+    return commentList;
   }
 }
