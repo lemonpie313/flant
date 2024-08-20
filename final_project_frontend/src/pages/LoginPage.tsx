@@ -74,7 +74,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
 
           <div className="main-login-forget"></div>
         </main>
-        <footer>
+        {/* <footer>
           <div className="footer-line">혹은</div>
           <div className="footer-socialLogin">
             <a href="#">
@@ -85,7 +85,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
               ></img>
             </a>
           </div>
-        </footer>
+        </footer> */}
       </div>
     </div>
   );
