@@ -1,9 +1,7 @@
-// src/pages/MainPage.tsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./UserInfo.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { authApi, userApi } from "../services/api";
-import { useEffect, useState } from "react";
 
 const UserInfoPage: React.FC = () => {
   const navigate = useNavigate();
@@ -16,6 +14,8 @@ const UserInfoPage: React.FC = () => {
   const [showConfirmDialog, setShowConfirmDialog] = useState<boolean>(false);
   const [showPasswordInput, setShowPasswordInput] = useState<boolean>(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState<boolean>(false);
+  const [isDropdownVisible, setDropdownVisible] = useState<boolean>(false);
+
   const handleLogout = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -29,17 +29,18 @@ const UserInfoPage: React.FC = () => {
       alert("LogOut failed.");
     }
   };
+
   const handleUpdateAccount = async () => {
     try {
       await userApi.update(newUserName, newPassword, newPasswordConfirm);
       alert("계정 정보가 성공적으로 변경되었습니다.");
       setShowUpdateDialog(false);
-      //setUsername(newUserName);
       setPassword("");
     } catch (error) {
       alert("계정 정보 변경에 실패했습니다.");
     }
   };
+
   const handleDeleteAccount = async () => {
     try {
       const response = await userApi.checkPassword(password);
@@ -57,6 +58,7 @@ const UserInfoPage: React.FC = () => {
       alert("비밀번호 재확인 바랍니다.");
     }
   };
+
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -71,6 +73,7 @@ const UserInfoPage: React.FC = () => {
     };
     fetchUserInfo();
   }, []);
+
   return (
     <div className="main-page">
       <header>
@@ -90,21 +93,29 @@ const UserInfoPage: React.FC = () => {
                   className="header-notification-icon"
                   src="/images/notification.png"
                   alt="notification"
-                ></img>
+                />
               </button>
-              <button>
-                <img
-                  className="header-user-icon"
-                  src="/images/user.png"
-                  alt="user"
-                ></img>
-                <div className="header-user-dropdown">
-                  <Link to="/userinfo">내 정보</Link>
-                  {/* <Link to="/membership">멤버십</Link> */}
-                  <Link to="/payment-history">결제내역</Link>
-                  <button onClick={handleLogout}>로그아웃</button>
-                </div>
-              </button>
+              <div
+                className="header-box-user-dropdown-container"
+                onMouseEnter={() => setDropdownVisible(true)}
+                onMouseLeave={() => setDropdownVisible(false)}
+              >
+                <button>
+                  <img
+                    className="header-user-icon"
+                    src="/images/user.png"
+                    alt="user"
+                  />
+                </button>
+                {isDropdownVisible && (
+                  <div className="header-user-dropdown">
+                    <Link to="/userinfo">내 정보</Link>
+                   {/* <Link to="/membership">멤버십</Link> */}
+                    <Link to="/payment-history">결제내역</Link>
+                    <button onClick={handleLogout}>로그아웃</button>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="header-box-user-shop">
@@ -114,7 +125,7 @@ const UserInfoPage: React.FC = () => {
                   className="header-box-shop-image"
                   src="/green-cart.png"
                   alt="green-cart"
-                ></img>
+                />
               </Link>
             </div>
           </div>
