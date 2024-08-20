@@ -76,3 +76,31 @@
   border: 1px solid #ccc;
   border-radius: 4px;
 }
+
+// 알림 및 카트 아이콘 숨기기
+.header-notification-icon,
+.header-box-shop-image {
+  display: none;
+}
+
+.user-icon {
+  position: relative;
+  cursor: pointer;
+}
+
+.user-info {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: white;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.user-icon:hover .user-info {
+  display: block;
+}
