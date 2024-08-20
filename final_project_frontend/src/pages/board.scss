@@ -23,15 +23,26 @@
   margin-bottom: 10px;
 }
 
-.right-sidebar-profile-info h2 {
-  margin: 10px 0;
-  font-size: 20px;
-  font-weight: bold;
+.right-sidebar-profile-info {
+  h2 {
+    margin: 10px 0;
+    font-size: 25px;
+    font-weight: bold;
+  }
+  p {
+    margin: 5px 0; // Adjust margin for better spacing
+  }
 }
 
 .right-sidebar-membership {
-  text-align: center;
+  text-align: center; // Center align text
+  font-size: 18px; // Adjust font size as needed
   margin-bottom: 20px;
+  p {
+    margin-bottom: 10px; // Space between lines
+    line-height: 1.4; // Improve readability
+
+  }
 }
 
 .right-sidebar-join-button,
@@ -43,71 +54,33 @@
   border-radius: 20px;
   cursor: pointer;
   margin-top: 10px;
+  width: 100%; // Make buttons full width for better alignment
 }
 
 .right-sidebar-dm-section {
   text-align: center;
   margin-bottom: 20px;
+  p {
+    margin-top: 5px; // Space between button and text
+  }
 }
 
 .right-sidebar-user-info {
-  text-align: center;
+  text-align: center; // Align text to the left
   margin-bottom: 20px;
+  p {
+    margin: 5px 0; // Space between lines
+  }
 }
 
-.overlay {
-  position: fixed; /* 화면 전체를 기준으로 고정 */
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* 배경 반투명 */
-  display: flex;
-  justify-content: center; /* 가로 가운데 정렬 */
-  align-items: center; /* 세로 가운데 정렬 */
-  z-index: 1000; /* 다른 콘텐츠 위에 표시 */
-}
-
-.nickname-modal {
-  background-color: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 300px; /* 모달 너비 조정 */
-  text-align: center;
-  position: relative; /* position을 relative로 설정 */
-}
-
-.nickname-modal h2 {
-  margin-bottom: 20px;
-}
-
-.nickname-modal input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.modal-buttons {
-  display: flex;
-  justify-content: space-between;
-}
-
-.modal-buttons button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.modal-buttons button:first-child {
-  background-color: #007bff;
-  color: white;
-}
-
-.modal-buttons button:last-child {
-  background-color: #ccc;
-  color: #333;
+.right-sidebar-community-notice {
+  text-align: left; // Align text to the left
+  h3 {
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+  p {
+    font-size: 14px;
+    line-height: 1.4; // Improve readability
+  }
 }

@@ -12,6 +12,7 @@ import { urlencoded } from 'express';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+  
 
   // sentry 초기 설정
   Sentry.init({
@@ -26,6 +27,9 @@ async function bootstrap() {
       credentials: true,
     });
   }
+  // app.enableCors(corsOptions);
+  // app.useWebSocketAdapter(new IoAdapter(app));
+
 
   app.use(cookieParser());
   app.use(urlencoded({ extended: true }))
