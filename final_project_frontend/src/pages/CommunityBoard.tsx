@@ -216,12 +216,12 @@ const CommunityBoardTest: React.FC = () => {
       const existedMembershipInfo = existedMembership.data.data;
       for (let i = 0; i < existedMembershipInfo.length; i++) {
         if (community?.communityName == existedMembershipInfo[i].group) {
-          alert("이미 멤버십 가입이 완료되었습니다.");
+          alert("멤버십 가인 기능은 현재 지원하지 않습니다.");
           return;
         }
       }
       await membershipApi.joinMembership(Number(communityId));
-      alert("멤버십 가입이 완료되었습니다.");
+      alert("멤버십 가인 기능은 현재 지원하지 않습니다.");
 
       // 가입 후에 멤버십 상태를 업데이트하거나 필요한 추가 동작 수행
       // setIsMembershipJoined(true); // 멤버십 가입 상태 업데이트
