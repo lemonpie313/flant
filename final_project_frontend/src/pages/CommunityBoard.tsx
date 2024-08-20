@@ -291,7 +291,7 @@ const CommunityBoardTest: React.FC = () => {
             />
             <div className="right-sidebar-profile-info">
               <h2>{community?.communityName}</h2>
-              <p>16,692 members</p>
+              {/* <p>16,692 members</p> */}
             </div>
           </div>
           {isNicknameModalOpen && (
