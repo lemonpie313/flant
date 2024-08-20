@@ -9,6 +9,7 @@ import { Artist } from 'src/admin/entities/artist.entity';
 import { CommunityUser } from 'src/community/community-user/entities/communityUser.entity';
 import { Manager } from 'src/admin/entities/manager.entity';
 import { LikeModule } from 'src/like/like.module';
+import { CommentModule } from 'src/comment/comment.module';
 
 @Module({
   imports: [
@@ -19,8 +20,10 @@ import { LikeModule } from 'src/like/like.module';
       Artist,
       CommunityUser,
       Manager,
+      Comment,
     ]),
     LikeModule,
+    // CommentModule,
   ],
   controllers: [PostController],
   providers: [PostService],
