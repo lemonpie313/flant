@@ -8,7 +8,13 @@ import InfiniteScroll from "react-infinite-scroll-component";
 
 interface PostCardProps extends Post {
   onLike: (postId: number, likeStatus: boolean) => void;
-  onComment: (postId: number, comment: string, communityId: number, artistId?: number, imageUrl?: string) => void;
+  onComment: (
+    postId: number,
+    comment: string,
+    communityId: number,
+    artistId?: number,
+    imageUrl?: string
+  ) => void;
   onReply: (commentId: number, content: string) => void;
 }
 
@@ -137,10 +143,13 @@ const PostCard: React.FC<PostCardProps> = ({
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return `${(date.getMonth() + 1).toString().padStart(2, "0")}. ${date.getDate().toString().padStart(2, "0")}. ${date
-      .getHours()
+    return `${(date.getMonth() + 1).toString().padStart(2, "0")}. ${date
+      .getDate()
       .toString()
-      .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+      .padStart(2, "0")}. ${date.getHours().toString().padStart(2, "0")}:${date
+      .getMinutes()
+      .toString()
+      .padStart(2, "0")}`;
   };
 
   const getImageLayout = () => {
@@ -195,14 +204,18 @@ const PostCard: React.FC<PostCardProps> = ({
           </div>
           <div className="right-images">
             {postImages.slice(1).map((image) => (
-              <img key={image.postImageId} src={image.postImageUrl} alt="Post" />
+              <img
+                key={image.postImageId}
+                src={image.postImageUrl}
+                alt="Post"
+              />
             ))}
           </div>
         </div>
       )}
       <div className="post-actions">
         <button onClick={handleLike} className={isLiked ? "liked" : ""}>
-          <span className="material-symbols-outlined">favorite</span> {likes}
+          <span className="material-symbols-outlined">favorite</span>
         </button>
         <button onClick={openAllCommentsPopup}>
           <span className="material-symbols-outlined">comment</span>
@@ -211,7 +224,9 @@ const PostCard: React.FC<PostCardProps> = ({
       {showComments && (
         <div className="comments-section">
           {comments.length > 0
-            ? comments.map((comment) => <CommentItem key={comment.id} {...comment} onReply={onReply} />)
+            ? comments.map((comment) => (
+                <CommentItem key={comment.id} {...comment} onReply={onReply} />
+              ))
             : !loadingComments && <p>No comments yet.</p>}
           <form onSubmit={handleCommentSubmit} className="comment-form">
             <input
@@ -236,7 +251,13 @@ const PostCard: React.FC<PostCardProps> = ({
                 <h3>게시글 내용</h3>
                 <p>{content}</p>
                 {postImages.length > 0 &&
-                  postImages.map((image) => <img key={image.postImageId} src={image.postImageUrl} alt="Post" />)}
+                  postImages.map((image) => (
+                    <img
+                      key={image.postImageId}
+                      src={image.postImageUrl}
+                      alt="Post"
+                    />
+                  ))}
               </div>
               <div className="comments-content-right">
                 <h3>전체 댓글</h3>
@@ -248,7 +269,13 @@ const PostCard: React.FC<PostCardProps> = ({
                   endMessage={!hasMoreComments && <p>No more comments</p>}
                 >
                   {commentsList.length > 0
-                    ? commentsList.map((comment) => <CommentItem key={comment.id} {...comment} onReply={onReply} />)
+                    ? commentsList.map((comment) => (
+                        <CommentItem
+                          key={comment.id}
+                          {...comment}
+                          onReply={onReply}
+                        />
+                      ))
                     : !loadingComments && <p>댓글이 존재하지 않습니다.</p>}
                 </InfiniteScroll>
                 <form onSubmit={handleCommentSubmit} className="comment-form">
