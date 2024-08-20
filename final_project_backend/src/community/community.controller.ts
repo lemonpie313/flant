@@ -65,12 +65,12 @@ export class CommunityController {
    */
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @Post('userInfo/:communityId')
+  @Get('userInfo/:communityId')
   getCommunityUserInfo(
     @Param('communityId', ParseIntPipe) communityId: number,
     @UserInfo() user: PartialUser,
   ) {
-    const userInfo = this.communityUserService.findByCommunityIdAndUserId(
+    const userInfo = this.communityUserService.findByCommunityUser(
       communityId,
       user.id,
     );
