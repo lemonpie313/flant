@@ -93,20 +93,7 @@ const UserInfoPage: React.FC = () => {
                   className="header-notification-icon"
                   src="/images/notification.png"
                   alt="notification"
-                ></img>
-              </button>
-              <button>
-                <img
-                  className="header-user-icon"
-                  src="/images/user.png"
-                  alt="user"
-                ></img>
-                <div className="header-user-dropdown">
-                  <Link to="/userinfo">내 정보</Link>
-                  {/* <Link to="/membership">멤버십</Link> */}
-                  <Link to="/payment-history">결제내역</Link>
-                  <button onClick={handleLogout}>로그아웃</button>
-                </div>
+                />
               </button>
               <div
                 className="header-box-user-dropdown-container"
@@ -123,7 +110,7 @@ const UserInfoPage: React.FC = () => {
                 {isDropdownVisible && (
                   <div className="header-user-dropdown">
                     <Link to="/userinfo">내 정보</Link>
-                    <Link to="/membership">멤버십</Link>
+                   {/* <Link to="/membership">멤버십</Link> */}
                     <Link to="/payment-history">결제내역</Link>
                     <button onClick={handleLogout}>로그아웃</button>
                   </div>
