@@ -213,7 +213,7 @@ export const paymentApi = {
 
 // 멤버십 관련 API 호출
 export const membershipApi = {
-  joinMembership: (communityId: number) =>
+  joinMembership: (userId:number, communityId: number) =>
     api.post(`/membership`, { communityId }).catch(handleApiError),
   existedMembership: () => api.get(`/membership`).catch(handleApiError),
 };

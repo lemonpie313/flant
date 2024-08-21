@@ -46,6 +46,10 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated }) => {
 
       const formData = new FormData();
       formData.append("content", content);
+      if(!content){
+        alert("내용을 입력해주세요.")
+        return
+      }
       formData.append("communityId", communityId);
       images.forEach((image) => formData.append("postImage", image));
 
