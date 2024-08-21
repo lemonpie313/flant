@@ -20,7 +20,7 @@ import {
 } from "../components/communityBoard/types";
 import "./board.scss";
 import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
-
+import { PaymentPortone } from "./payments/paymentPortone";
 const CommunityBoardTest: React.FC = () => {
   const [community, setCommunity] = useState<Community | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -30,6 +30,7 @@ const CommunityBoardTest: React.FC = () => {
   const [isCommunityJoined, setIsCommunityJoined] = useState(false); // 커뮤니티 가입 여부 상태 추가
   const [isNicknameModalOpen, setIsNicknameModalOpen] = useState(false);
   const [nickname, setNickname] = useState("");
+  const [showPayment, setShowPayment] = useState(false);
   const openNicknameModal = () => setIsNicknameModalOpen(true);
   const closeNicknameModal = () => setIsNicknameModalOpen(false);
 
@@ -226,21 +227,40 @@ const CommunityBoardTest: React.FC = () => {
       // 멤버십 가입 요청
       const existedMembership = await membershipApi.existedMembership();
       const existedMembershipInfo = existedMembership.data.data;
+      // 내가 가입한 멤버십이 현재 가입하려는 멤버십과 같은 경우
       for (let i = 0; i < existedMembershipInfo.length; i++) {
         if (community?.communityName == existedMembershipInfo[i].group) {
-          alert("멤버십 가입 기능은 현재 지원하지 않습니다.");
+          alert("이미 가입한 멤버십입니다.");
           return;
         }
       }
-      const userId = communityUser?.userId
-      if(!userId){
-        alert("커뮤니티 가입여부가 확인되지 않습니다.")
+      const userId = communityUser?.userId;
+      if (!userId) {
+        alert("커뮤니티 가입여부가 확인되지 않습니다.");
       }
-      await membershipApi.joinMembership(Number(userId), Number(communityId));
-      alert("멤버십 가입 기능은 현재 지원하지 않습니다.");
+      // await membershipApi.joinMembership(Number(userId), Number(communityId));
+      setShowPayment(true); // 결제 창 표시
 
       // 가입 후에 멤버십 상태를 업데이트하거나 필요한 추가 동작 수행
       // setIsMembershipJoined(true); // 멤버십 가입 상태 업데이트
+    } catch (error) {
+      console.error("멤버십 가입 오류:", error);
+      alert("멤버십 가입에 실패했습니다.");
+    }
+  };
+  const handlePaymentSuccess = async () => {
+    try {
+      const userId = communityUser?.userId;
+      if (!userId || communityId === null) {
+        alert("커뮤니티 가입여부가 확인되지 않습니다.");
+        return;
+      }
+
+      // 멤버십 가입 요청
+      await membershipApi.joinMembership(Number(userId), Number(communityId));
+      alert("멤버십 가입이 완료되었습니다.");
+      setShowPayment(false); // 결제 창 숨기기
+      navigate("/main");
     } catch (error) {
       console.error("멤버십 가입 오류:", error);
       alert("멤버십 가입에 실패했습니다.");
@@ -323,10 +343,22 @@ const CommunityBoardTest: React.FC = () => {
               : "커뮤니티에 가입해 소식을 받아보세요."}
             <button
               className="right-sidebar-join-button"
-              onClick={isCommunityJoined ? handleMembershipJoin : handleJoinButtonClick}
+              onClick={
+                isCommunityJoined ? handleMembershipJoin : handleJoinButtonClick
+              }
             >
               {isCommunityJoined ? "Membership 가입하기" : "커뮤니티 가입하기"}
             </button>
+            {showPayment && (
+              <PaymentPortone
+                amount={
+                  community?.membershipPrice !== undefined
+                    ? community.membershipPrice
+                    : 10000
+                }
+                onPaymentSuccess={handlePaymentSuccess}
+              />
+            )}
           </div>
           {/* <div className="right-sidebar-dm-section">
             <button className="right-sidebar-dm-button">Weverse DM</button>

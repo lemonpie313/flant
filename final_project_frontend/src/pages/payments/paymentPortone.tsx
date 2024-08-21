@@ -2,7 +2,15 @@ import { RequestPayParams } from "./../../types/portone.d";
 import { RequestPayResponse } from "./../../types/portone.d";
 import { useNavigate } from "react-router-dom";
 import React from "react";
-export const PaymentPortone: React.FC = () => {
+interface PaymentPortoneProps {
+  amount: number; // 결제 금액
+  onPaymentSuccess: () => void; // 결제 성공 시 호출할 콜백 함수
+}
+
+export const PaymentPortone: React.FC<PaymentPortoneProps> = ({
+  amount,
+  onPaymentSuccess,
+}) => {
   const onClickPayment = () => {
     if (!window.IMP) return;
     /* 1. 가맹점 식별하기 */
@@ -15,7 +23,7 @@ export const PaymentPortone: React.FC = () => {
       pg: "tosspayments", // PG사 : https://developers.portone.io/docs/ko/tip/pg-2 참고
       pay_method: "card", // 결제수단
       merchant_uid: `mid_${new Date().getTime()}`, // 주문번호
-      amount: 1000, // 결제금액
+      amount: amount, // 결제금액
       name: "아임포트 결제 데이터 분석", // 주문명
       buyer_name: "홍길동", // 구매자 이름
       buyer_tel: "01012341234", // 구매자 전화번호
@@ -32,8 +40,8 @@ export const PaymentPortone: React.FC = () => {
   function callback(response: RequestPayResponse) {
     const navigate = useNavigate();
     alert("결제 성공");
+    onPaymentSuccess(); // 결제 성공 시 콜백 호출
     // 결제내역 테이블에 추가
-    navigate("/main");
   }
 
   return <button onClick={onClickPayment}>결제하기</button>;

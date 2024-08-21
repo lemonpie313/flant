@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { cartApi, paymentApi } from "../services/api"; // orderApi로 주문 API 호출
+import PaymentPortone from "./payments/paymentPortone";
 import "./cart.scss";
 
 interface CartItem {
@@ -17,6 +18,8 @@ interface CartItem {
 const Cart: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showPayment, setShowPayment] = useState(false);
+  const [totalAmount, setTotalAmount] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,6 +27,7 @@ const Cart: React.FC = () => {
       try {
         const response = await cartApi.fetchCart();
         setCartItems(response.data.data);
+        setTotalAmount(getTotalPrice(response.data.data));
       } catch (error) {
         console.error("Error fetching cart items", error);
       } finally {
@@ -34,11 +38,8 @@ const Cart: React.FC = () => {
     fetchCartItems();
   }, []);
 
-  const getTotalPrice = () => {
-    return cartItems.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0
-    );
+  const getTotalPrice = (items: CartItem[]) => {
+    return items.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
   const removeCartItem = async (cartItemId: number) => {
@@ -85,15 +86,19 @@ const Cart: React.FC = () => {
       console.error("Error updating cart item quantity", error);
     }
   };
-
+  const handlePaymentSuccess = () => {
+    // 결제 성공 후 처리 로직 (예: 주문 상세 페이지로 이동)
+    navigate("/main");
+  };
   // 주문 생성 핸들러
   const handleCheckout = async () => {
     try {
       // response는 단순히 주문 테이블에 데이터를 저장. 실제 주문하는건 아님
-      const response = await paymentApi.createOrder(); // 주문 생성 API 호출
-
-      const orderId = response.data.data.orderId; // 주문 ID 추출
-      navigate(`/order/${orderId}`); // 주문 상세 페이지로 이동
+      await paymentApi.createOrder(); // 주문 생성 API 호출
+      setShowPayment(true); // 결제 창 표시
+      navigate("/main");
+      //const orderId = response.data.data.orderId; // 주문 ID 추출
+      //navigate(`/order/${orderId}`); // 주문 상세 페이지로 이동
     } catch (error) {
       console.error("주문 생성 실패:", error);
       alert("주문을 처리하는 중 문제가 발생했습니다.");
@@ -158,12 +163,18 @@ const Cart: React.FC = () => {
             </div>
           ))}
           <div className="cart-total">
-            <h3>Total: ${getTotalPrice()}</h3>
+            <h3>Total: ${totalAmount}</h3>
             <button onClick={handleCheckout} className="checkout-btn">
               Proceed to Checkout
             </button>
           </div>
         </div>
+      )}
+      {showPayment && (
+        <PaymentPortone
+          amount={totalAmount}
+          onPaymentSuccess={handlePaymentSuccess}
+        />
       )}
     </div>
   );
