@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, Validate } from 'class-validator';
 import { Membership } from '../../../membership/entities/membership.entity';
 import {
   Column,
@@ -17,7 +17,7 @@ import { Comment } from '../../../comment/entities/comment.entity';
 import { Artist } from 'src/admin/entities/artist.entity';
 import { Manager } from './../../../admin/entities/manager.entity';
 import { Post } from 'src/post/entities/post.entity';
-
+import { IsValidNameConstraint } from 'src/util/decorators/is-valid-name-constraint';
 
 @Entity('community_users')
 export class CommunityUser {
@@ -36,6 +36,7 @@ export class CommunityUser {
    */
   @IsString()
   @IsNotEmpty({ message: '커뮤니티에서 사용할 닉네임을 입력해주세요.' })
+  @Validate(IsValidNameConstraint)
   @Column()
   nickName: string;
 

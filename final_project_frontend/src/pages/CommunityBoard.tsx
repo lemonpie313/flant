@@ -1,14 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { authApi, communityApi, postApi, commentApi, communityUserApi, membershipApi } from "../services/api";
+import {
+  authApi,
+  communityApi,
+  postApi,
+  commentApi,
+  communityUserApi,
+  membershipApi,
+} from "../services/api";
 import axios from "axios";
 import Header from "../components/communityBoard/Header";
 import PostForm from "../components/communityBoard/PostForm";
 import PostCard from "./../components/communityBoard/PostCard";
-import { Community, Post, CommunityUser, Membership } from "../components/communityBoard/types";
+import {
+  Community,
+  Post,
+  CommunityUser,
+  Membership,
+} from "../components/communityBoard/types";
 import "./board.scss";
 import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
-
+import { PaymentPortone } from "./payments/paymentPortone";
 const CommunityBoardTest: React.FC = () => {
   const [community, setCommunity] = useState<Community | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -18,6 +30,8 @@ const CommunityBoardTest: React.FC = () => {
   const [isCommunityJoined, setIsCommunityJoined] = useState(false); // 커뮤니티 가입 여부 상태 추가
   const [isNicknameModalOpen, setIsNicknameModalOpen] = useState(false);
   const [nickname, setNickname] = useState("");
+  const [showPayment, setShowPayment] = useState(false);
+  const [isPaymentProcessing, setIsPaymentProcessing] = useState(false); // 결제 처리 상태 추가
   const openNicknameModal = () => setIsNicknameModalOpen(true);
   const closeNicknameModal = () => setIsNicknameModalOpen(false);
 
@@ -53,8 +67,13 @@ const CommunityBoardTest: React.FC = () => {
 
   const fetchCommunityUsers = async () => {
     try {
-      const response = await communityUserApi.findCommunityUser(Number(communityId));
-      setCommunityUser(response.data);
+      const response = await communityUserApi.findCommunityUser(
+        Number(communityId)
+      );
+
+      if (response) {
+        setCommunityUser(response.data);
+      }
     } catch (error) {
       console.error("커뮤니티유저 데이터 가져오기 오류:", error);
     }
@@ -80,7 +99,9 @@ const CommunityBoardTest: React.FC = () => {
       const postsWithLikes = await Promise.all(
         postsData.map(async (post: Post) => {
           const isLiked = await fetchMyLikePost(post.postId);
-          return { ...post, isLiked };
+          const likeCountResponse = await postApi.countLikesOnPost(post.postId); // 추가된 부분
+          const likeCount = likeCountResponse.data.data.likesCount; // 좋아요 수 가져오기
+          return { ...post, isLiked, likes: likeCount };
         })
       );
       setPosts(postsWithLikes);
@@ -120,7 +141,7 @@ const CommunityBoardTest: React.FC = () => {
           post.postId === postId
             ? {
                 ...post,
-                likes: likeStatus ? post.likes - 1 : post.likes + 1,
+                likes: likeStatus ? post.likes + 1 : post.likes - 1,
                 isLiked: likeStatus,
               }
             : post
@@ -161,7 +182,9 @@ const CommunityBoardTest: React.FC = () => {
     try {
       const response = await communityApi.findMy();
       const myCommunity = response.data.data;
-      setIsCommunityJoined(myCommunity.some((c: any) => c.communityId === Number(communityId)));
+      setIsCommunityJoined(
+        myCommunity.some((c: any) => c.communityId === Number(communityId))
+      );
     } catch (error) {
       console.error("커뮤니티 가입 여부 확인 오류:", error);
     }
@@ -202,30 +225,68 @@ const CommunityBoardTest: React.FC = () => {
   };
   const handleMembershipJoin = async () => {
     try {
+      alert("handleMembershipJoin");
       // 멤버십 가입 요청
       const existedMembership = await membershipApi.existedMembership();
       const existedMembershipInfo = existedMembership.data.data;
+      // 내가 가입한 멤버십이 현재 가입하려는 멤버십과 같은 경우
       for (let i = 0; i < existedMembershipInfo.length; i++) {
         if (community?.communityName == existedMembershipInfo[i].group) {
-          alert("멤버십 가인 기능은 현재 지원하지 않습니다.");
+          alert("이미 가입한 멤버십입니다.");
           return;
         }
       }
-      await membershipApi.joinMembership(Number(communityId));
-      alert("멤버십 가인 기능은 현재 지원하지 않습니다.");
+      const userId = communityUser?.userId;
+      if (!userId) {
+        alert("커뮤니티 가입여부가 확인되지 않습니다.");
+      }
+      // await membershipApi.joinMembership(Number(userId), Number(communityId));
+      setShowPayment(false); // 결제 창 표시
+      setIsPaymentProcessing(false);
+      console.log(showPayment);
+      setShowPayment(true); // 결제 창 표시
+      setIsPaymentProcessing(false);
+      console.log(showPayment);
 
       // 가입 후에 멤버십 상태를 업데이트하거나 필요한 추가 동작 수행
       // setIsMembershipJoined(true); // 멤버십 가입 상태 업데이트
     } catch (error) {
       console.error("멤버십 가입 오류:", error);
       alert("멤버십 가입에 실패했습니다.");
+      setShowPayment(false); // 결제 창 표시
+    }
+  };
+  const handlePaymentSuccess = async () => {
+    try {
+      setShowPayment(false);
+      const userId = communityUser?.userId;
+      if (!userId || communityId === null) {
+        alert("커뮤니티 가입여부가 확인되지 않습니다.");
+        return;
+      }
+      console.log(community?.membershipPrice);
+      // 멤버십 가입 요청
+      await membershipApi.joinMembership(Number(userId), Number(communityId));
+      alert("멤버십 가입이 완료되었습니다.");
+
+      navigate("/main");
+    } catch (error) {
+      console.error("멤버십 가입 오류:", error);
+      alert("멤버십 가입에 실패했습니다.");
+      // 결제 상태 초기화
+      setShowPayment(false);
+      setIsPaymentProcessing(false); // 결제 처리 상태를 false로 설정
     }
   };
   return (
     <div className="community-board">
       {community && (
         <>
-          <Header communityName={community.communityName} isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
+          <Header
+            communityName={community.communityName}
+            isLoggedIn={isLoggedIn}
+            handleLogout={handleLogout}
+          />
           <CommunityNavigationHeader />
         </>
       )}
@@ -253,7 +314,9 @@ const CommunityBoardTest: React.FC = () => {
           ) : (
             <div>
               <p>이 페이지를 보려면 로그인이 필요합니다.</p>
-              <button onClick={() => navigate("/login")}>로그인 페이지로 이동</button>
+              <button onClick={() => navigate("/login")}>
+                로그인 페이지로 이동
+              </button>
             </div>
           )}
         </div>
@@ -266,7 +329,7 @@ const CommunityBoardTest: React.FC = () => {
             />
             <div className="right-sidebar-profile-info">
               <h2>{community?.communityName}</h2>
-              <p>16,692 members</p>
+              {/* <p>16,692 members</p> */}
             </div>
           </div>
           {isNicknameModalOpen && (
@@ -290,9 +353,25 @@ const CommunityBoardTest: React.FC = () => {
             {isCommunityJoined
               ? "자유 멤버십에 가입해서 새로운 스케줄 소식을 받아보세요."
               : "커뮤니티에 가입해 소식을 받아보세요."}
-            <button className="right-sidebar-join-button" onClick={handleJoinButtonClick}>
+            <button
+              className="right-sidebar-join-button"
+              onClick={
+                isCommunityJoined ? handleMembershipJoin : handleJoinButtonClick
+              }
+              disabled={isPaymentProcessing} // 결제 중일 때 버튼 비활성화
+            >
               {isCommunityJoined ? "Membership 가입하기" : "커뮤니티 가입하기"}
             </button>
+            {showPayment && (
+              <PaymentPortone
+                amount={
+                  community?.membershipPrice !== undefined
+                    ? community.membershipPrice
+                    : 10000
+                }
+                onPaymentSuccess={handlePaymentSuccess}
+              />
+            )}
           </div>
           {/* <div className="right-sidebar-dm-section">
             <button className="right-sidebar-dm-button">Weverse DM</button>

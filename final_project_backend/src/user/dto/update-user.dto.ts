@@ -3,8 +3,10 @@ import {
   IsString,
   IsStrongPassword,
   IsNotEmpty,
+  Validate,
 } from 'class-validator';
 import { MESSAGES } from 'src/constants/message.constant';
+import { IsValidNameConstraint } from 'src/util/decorators/is-valid-name-constraint';
 
 export class UpdateUserDto {
   /**
@@ -12,6 +14,7 @@ export class UpdateUserDto {
    * @example 신짱구
    */
   @IsOptional()
+  @Validate(IsValidNameConstraint)
   @IsString()
   newUserName?: string;
 
