@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { cartApi, paymentApi } from "../services/api"; // orderApi로 주문 API 호출
 import PaymentPortone from "./payments/paymentPortone";
+import "./UserInfo.scss";
 import "./cart.scss";
-
+import { Link, useNavigate } from "react-router-dom";
+import { authApi } from "../services/api";
 interface CartItem {
   cartItemId: number;
   merchandiseId: number;
@@ -20,6 +21,7 @@ const Cart: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showPayment, setShowPayment] = useState(false);
   const [totalAmount, setTotalAmount] = useState(0);
+  const [isDropdownVisible, setDropdownVisible] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -111,9 +113,76 @@ const Cart: React.FC = () => {
   if (loading) {
     return <div>Loading...</div>;
   }
-
+  const handleLogout = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      localStorage.removeItem("isLoggedIn");
+      await authApi.signOut();
+      localStorage.clear();
+      alert("로그아웃이 성공적으로 되었습니다.");
+      navigate("/main");
+      window.location.reload(); // 상태 갱신을 위해 페이지 리로드
+    } catch (error) {
+      alert("LogOut failed.");
+    }
+  };
   return (
     <div className="cart-container">
+      <header>
+        <div className="header-box">
+          <Link to="/main" className="header-box-logo">
+            <img
+              className="header-box-logo-image"
+              src="/favicon.ico"
+              alt="logo"
+            />
+          </Link>
+          <div className="header-box-blank"></div>
+          <div className="header-box-user">
+            <div className="header-box-user-info">
+              <button>
+                <img
+                  className="header-notification-icon"
+                  src="/images/notification.png"
+                  alt="notification"
+                />
+              </button>
+              <div
+                className="header-box-user-dropdown-container"
+                onMouseEnter={() => setDropdownVisible(true)}
+                onMouseLeave={() => setDropdownVisible(false)}
+              >
+                <button>
+                  <img
+                    className="header-user-icon"
+                    src="/images/user.png"
+                    alt="user"
+                  />
+                </button>
+                {isDropdownVisible && (
+                  <div className="header-user-dropdown">
+                    <Link to="/userinfo">내 정보</Link>
+                    {/* <Link to="/membership">멤버십</Link> */}
+                    <Link to="/payment-history">결제내역</Link>
+                    <button onClick={handleLogout}>로그아웃</button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="header-box-user-shop">
+              <Link to="#">
+                <img
+                  style={{ marginLeft: "25px", marginTop: "6px" }}
+                  className="header-box-shop-image"
+                  src="/green-cart.png"
+                  alt="green-cart"
+                />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </header>
       <h2>My Cart</h2>
       {cartItems.length === 0 ? (
         <div className="empty-cart">Your cart is empty.</div>
