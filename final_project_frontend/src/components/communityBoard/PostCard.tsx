@@ -76,7 +76,6 @@ const PostCard: React.FC<PostCardProps> = ({
     const fetchUser = async () => {
       try {
         const response = await userApi.findMy(); // 유저 조회 API 호출
-        console.log(response, communityId);
         setUsers(response.data);
       } catch (error) {
         console.error("Failed to fetch user:", error);
@@ -85,7 +84,6 @@ const PostCard: React.FC<PostCardProps> = ({
   }, [communityId]);
 
   const openAllCommentsPopup = () => {
-    console.log("Post ID:", postId); // postId가 제대로 전달되는지 확인
     setPopupPostId(postId); // postId를 상태에 저장
     setShowAllCommentsPopup(true);
   };
@@ -99,7 +97,6 @@ const PostCard: React.FC<PostCardProps> = ({
     e.preventDefault();
     if (newComment.trim()) {
       try {
-        console.log(newComment);
         await commentApi.create({
           postId: popupPostId!, // 팝업에서 사용될 postId로 댓글 생성
           comment: newComment,
