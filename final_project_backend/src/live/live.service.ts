@@ -65,8 +65,8 @@ export class LiveService {
       //   cert: './cert.pem',
       // },
       trans: {
-        ffmpeg: '/usr/bin/ffmpeg',
-          //'/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+         //ffmpeg:'/usr/bin/ffmpeg',
+         ffmpeg: '/Users/pc/Downloads/ffmpeg-2024-08-18-git-7e5410eadb-full_build/ffmpeg-2024-08-18-git-7e5410eadb-full_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
