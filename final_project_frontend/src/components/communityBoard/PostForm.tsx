@@ -46,7 +46,8 @@ const PostForm: React.FC<PostFormProps> = ({ onPostCreated }) => {
 
       const formData = new FormData();
       formData.append("content", content);
-      if(!content){
+      //내용을 입력하지 않았거나 공백(스페이스바)만 입력된 경우
+      if(!content.trim()){
         alert("내용을 입력해주세요.")
         return
       }
