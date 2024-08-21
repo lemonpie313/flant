@@ -111,6 +111,9 @@ export const MESSAGES = {
       PROFILE_IMAGE: {
         REQUIRED: '프로필 이미지를 입력해주세요.',
       },
+      NAME: {
+        INVALID_FORMAT: "특수 문자 및 'admin'은 사용할 수 없습니다.",
+      },
     },
     PASSWORD_CHECK: {
       SUCCEED: '비밀번호 확인에 성공했습니다.',
