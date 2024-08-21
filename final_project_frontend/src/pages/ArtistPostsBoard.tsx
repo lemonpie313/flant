@@ -210,7 +210,7 @@ const ArtistBoard: React.FC = () => {
         <div className="center-content">
           {isLoggedIn ? (
             <>
-              <PostForm onPostCreated={fetchPosts} />
+              {/* <PostForm onPostCreated={fetchPosts} /> */}
               <div className="posts-container">
                 {posts.length > 0 ? (
                   posts.map((post) => (

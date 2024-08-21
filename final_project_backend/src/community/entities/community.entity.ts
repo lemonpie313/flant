@@ -4,6 +4,7 @@ import {
   IsOptional,
   IsString,
   IsUrl,
+  Validate,
 } from 'class-validator';
 import {
   Column,
@@ -23,6 +24,7 @@ import { Artist } from 'src/admin/entities/artist.entity';
 import { Live } from 'src/live/entities/live.entity';
 import { Manager } from './../../admin/entities/manager.entity';
 import { Merchandise } from 'src/merchandise/entities/merchandise.entity';
+import { IsNotEmptyConstraint } from 'src/util/decorators/is-not-emtpy-constraint.decorator';
 
 @Entity('communities')
 export class Community {
@@ -34,6 +36,7 @@ export class Community {
    * @example "Celestial Born"
    */
   @IsNotEmpty()
+  @Validate(IsNotEmptyConstraint)
   @IsString()
   @Column()
   communityName: string;

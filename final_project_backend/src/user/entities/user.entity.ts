@@ -28,7 +28,7 @@ import { UserProvider } from '../types/user-provider.type';
 import { Refreshtoken } from 'src/auth/entities/refresh-token.entity';
 import { Exclude } from 'class-transformer';
 import { MESSAGES } from 'src/constants/message.constant';
-import { IsNotEmptyConstraint } from 'src/util/decorators/is-not-emtpy-constraint.decorator';
+import { IsValidNameConstraint } from 'src/util/decorators/is-valid-name-constraint';
 
 @Entity('users')
 export class User {
@@ -40,7 +40,7 @@ export class User {
    * @example"신짱구"
    */
   @IsNotEmpty({ message: MESSAGES.AUTH.COMMON.NAME.REQUIRED })
-  @Validate(IsNotEmptyConstraint)
+  @Validate(IsValidNameConstraint)
   @IsString()
   @Column()
   name: string;
