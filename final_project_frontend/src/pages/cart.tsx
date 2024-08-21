@@ -166,15 +166,10 @@ const Cart: React.FC = () => {
             </div>
           ))}
           <div className="cart-total">
-<<<<<<< HEAD
-            <h3>Total: {getTotalPrice()} 원</h3>
-            <button onClick={handleCheckout} className="checkout-btn">Proceed to Checkout</button>
-=======
-            <h3>Total: ${totalAmount}</h3>
+            <h3>Total: {totalAmount}원</h3>
             <button onClick={handleCheckout} className="checkout-btn">
               Proceed to Checkout
             </button>
->>>>>>> 114ca1eaa09d7414fe1f0e326a99980f58832bef
           </div>
         </div>
       )}
