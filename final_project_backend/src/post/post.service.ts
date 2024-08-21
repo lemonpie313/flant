@@ -302,13 +302,12 @@ export class PostService {
     if (_.isEmpty(createCommentDto.comment)) {
       throw new BadRequestException(MESSAGES.COMMENT.COMMON.COMMENT);
     }
-
     const communityUserId = communityUser.communityUserId;
     //const artistId = createCommentDto?.artistId;
     const requestData = {
       postId,
       communityUserId,
-      artistId: communityUser.artist.artistId,
+      artistId: communityUser.artist?.artistId,
       comment: createCommentDto.comment,
     };
 
@@ -331,7 +330,7 @@ export class PostService {
       });
     } else {
       comments = await this.commentRepository.find({
-        where: { postId, artistId: IsNull() },
+        where: { postId },
         relations: ['communityUser', 'communityUser.users'],
         order: { createdAt: 'DESC' }, // 최신 게시물 순으로 정렬 (필요 시 추가)
       });
