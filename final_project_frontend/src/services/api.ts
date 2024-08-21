@@ -116,6 +116,8 @@ export const postApi = {
     api.put(`/posts/${postId}/likes`, { status }).catch(handleApiError),
   checkIfUserLikedPost: (id: number) =>
     api.get(`/posts/${id}/likes/my`).catch(handleApiError),
+  countLikesOnPost: (postId: number) =>
+    api.get(`/posts/${postId}/likes`).catch(handleApiError)
 };
 
 export const commentApi = {
@@ -211,7 +213,7 @@ export const paymentApi = {
 
 // 멤버십 관련 API 호출
 export const membershipApi = {
-  joinMembership: (communityId: number) =>
+  joinMembership: (userId:number, communityId: number) =>
     api.post(`/membership`, { communityId }).catch(handleApiError),
   existedMembership: () => api.get(`/membership`).catch(handleApiError),
 };

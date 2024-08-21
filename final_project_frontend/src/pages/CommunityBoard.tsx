@@ -97,7 +97,9 @@ const CommunityBoardTest: React.FC = () => {
       const postsWithLikes = await Promise.all(
         postsData.map(async (post: Post) => {
           const isLiked = await fetchMyLikePost(post.postId);
-          return { ...post, isLiked };
+          const likeCountResponse = await postApi.countLikesOnPost(post.postId); // 추가된 부분
+          const likeCount = likeCountResponse.data.data.likesCount; // 좋아요 수 가져오기
+          return { ...post, isLiked, likes: likeCount };
         })
       );
       setPosts(postsWithLikes);
@@ -137,7 +139,7 @@ const CommunityBoardTest: React.FC = () => {
           post.postId === postId
             ? {
                 ...post,
-                likes: likeStatus ? post.likes - 1 : post.likes + 1,
+                likes: likeStatus ? post.likes + 1 : post.likes - 1,
                 isLiked: likeStatus,
               }
             : post
@@ -226,12 +228,16 @@ const CommunityBoardTest: React.FC = () => {
       const existedMembershipInfo = existedMembership.data.data;
       for (let i = 0; i < existedMembershipInfo.length; i++) {
         if (community?.communityName == existedMembershipInfo[i].group) {
-          alert("멤버십 가인 기능은 현재 지원하지 않습니다.");
+          alert("멤버십 가입 기능은 현재 지원하지 않습니다.");
           return;
         }
       }
-      await membershipApi.joinMembership(Number(communityId));
-      alert("멤버십 가인 기능은 현재 지원하지 않습니다.");
+      const userId = communityUser?.userId
+      if(!userId){
+        alert("커뮤니티 가입여부가 확인되지 않습니다.")
+      }
+      await membershipApi.joinMembership(Number(userId), Number(communityId));
+      alert("멤버십 가입 기능은 현재 지원하지 않습니다.");
 
       // 가입 후에 멤버십 상태를 업데이트하거나 필요한 추가 동작 수행
       // setIsMembershipJoined(true); // 멤버십 가입 상태 업데이트
@@ -317,7 +323,7 @@ const CommunityBoardTest: React.FC = () => {
               : "커뮤니티에 가입해 소식을 받아보세요."}
             <button
               className="right-sidebar-join-button"
-              onClick={handleJoinButtonClick}
+              onClick={isCommunityJoined ? handleMembershipJoin : handleJoinButtonClick}
             >
               {isCommunityJoined ? "Membership 가입하기" : "커뮤니티 가입하기"}
             </button>
