@@ -97,7 +97,9 @@ const CommunityBoardTest: React.FC = () => {
       const postsWithLikes = await Promise.all(
         postsData.map(async (post: Post) => {
           const isLiked = await fetchMyLikePost(post.postId);
-          return { ...post, isLiked };
+          const likeCountResponse = await postApi.countLikesOnPost(post.postId); // 추가된 부분
+          const likeCount = likeCountResponse.data.data.likesCount; // 좋아요 수 가져오기
+          return { ...post, isLiked, likes: likeCount };
         })
       );
       setPosts(postsWithLikes);
@@ -137,7 +139,7 @@ const CommunityBoardTest: React.FC = () => {
           post.postId === postId
             ? {
                 ...post,
-                likes: likeStatus ? post.likes - 1 : post.likes + 1,
+                likes: likeStatus ? post.likes + 1 : post.likes - 1,
                 isLiked: likeStatus,
               }
             : post

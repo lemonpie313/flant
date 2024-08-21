@@ -84,7 +84,7 @@ export class LikeService {
     }
 
     const countLikes = await this.likeRepository.findAndCount({
-      where: { itemId, itemType },
+      where: { itemId, itemType, status: 1 },
     });
 
     const responseData = {

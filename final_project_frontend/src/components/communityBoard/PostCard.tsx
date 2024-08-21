@@ -220,6 +220,7 @@ const PostCard: React.FC<PostCardProps> = ({
         <button onClick={handleLike} className={isLiked ? "liked" : ""}>
           <span className="material-symbols-outlined">favorite</span>
         </button>
+        <span>{likes}</span> {/* 좋아요 수 표시 */}
         <button onClick={openAllCommentsPopup}>
           <span className="material-symbols-outlined">comment</span>
         </button>
