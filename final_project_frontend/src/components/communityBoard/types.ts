@@ -30,6 +30,8 @@ export interface Comment {
   author: string;
   comment: string;
   createdAt: string;
+  profileImage?: string; // 프로필 이미지를 위한 속성 추가
+  isArtist?: boolean;    // 아티스트 여부를 위한 속성 추가
 }
 
 export interface User {
