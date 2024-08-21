@@ -110,7 +110,7 @@ const Cart: React.FC = () => {
               <div className="item-details">
                 <h3>{item.merchandiseName}</h3>
                 <p>Option: {item.merchandiseOptionName}</p>
-                <p>Price: ${item.price}</p>
+                <p>Price: {item.price} 원</p>
                 <div className="quantity-control">
                   <button 
                     onClick={(e) => {
