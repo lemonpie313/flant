@@ -36,6 +36,8 @@ const PostCard: React.FC<PostCardProps> = ({
   const [popupUserId, setPopupUserId] = useState<number | null>(null);
   const [communityUserId, setCommunityUser] = useState<CommunityUser>();
   const { communityId } = useParams<{ communityId: string }>();
+  const [currentCommunityUserId, setCurrentCommunityUserId] = useState<number | null>(null);
+  const [communityUsers, setCommunityUsers] = useState<CommunityUser[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [users, setUsers] = useState<User[]>([]);
 
@@ -72,24 +74,52 @@ const PostCard: React.FC<PostCardProps> = ({
   //   }
   // };
 
+  // 로그인된 사용자의 communityUserId 가져오기
+  // useEffect(() => {
+  //   const fetchCommunityUsers = async () => {
+  //     try {
+  //       const response = await communityUserApi.findCommunityUser(Number(communityId));
+  //       setCommunityUsers(response.data);
+
+  //       // 현재 로그인 사용자의 communityUserId 찾기
+  //       // 여기서는 현재 로그인 사용자 ID를 사용하는 API 호출을 가정
+  //       const currentUserResponse = await userApi.findMy();
+  //       const currentUserId = currentUserResponse.data.id;
+
+  //       const currentUserCommunityUser = response.data.find((user) => user.userId === currentUserId);
+  //       setCurrentCommunityUserId(currentUserCommunityUser?.communityUserId || null);
+  //     } catch (error) {
+  //       console.error("Failed to fetch community users:", error);
+  //     }
+  //   };
+
+  //   fetchCommunityUsers();
+  // }, [communityId]);
+  // // 댓글 작성자와 현재 사용자 비교
+  // const isCommentOwner = (comment: Comment) => {
+  //   return currentCommunityUserId === comment.authorId;
+  // };
+
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await userApi.findMy(); // 유저 조회 API 호출
-        console.log(response, communityId);
-        setUsers(response.data);
-      } catch (error) {
-        console.error("Failed to fetch user:", error);
+    const fetchComments = async () => {
+      if (popupPostId !== null) {
+        try {
+          const response = await commentApi.getComments(popupPostId);
+          setCommentsList(response.data);
+        } catch (error) {
+          console.error("Failed to fetch comments:", error);
+        }
       }
     };
-  }, [communityId]);
+
+    fetchComments();
+  }, [popupPostId]);
 
   const openAllCommentsPopup = () => {
     console.log("Post ID:", postId); // postId가 제대로 전달되는지 확인
     setPopupPostId(postId); // postId를 상태에 저장
     setShowAllCommentsPopup(true);
   };
-
   const closeAllCommentsPopup = () => {
     setShowAllCommentsPopup(false);
     setPopupPostId(null); // 팝업을 닫을 때 postId 초기화
@@ -99,7 +129,6 @@ const PostCard: React.FC<PostCardProps> = ({
     e.preventDefault();
     if (newComment.trim()) {
       try {
-        console.log(newComment);
         await commentApi.create({
           postId: popupPostId!, // 팝업에서 사용될 postId로 댓글 생성
           comment: newComment,
@@ -157,6 +186,20 @@ const PostCard: React.FC<PostCardProps> = ({
 
   const imageLayout = getImageLayout();
 
+  const handleEditComment = (commentId: number) => {
+    console.log("Edit comment with ID:", commentId);
+    // 댓글 수정 로직을 추가하세요
+  };
+
+  const handleDeleteComment = async (commentId: number) => {
+    try {
+      await commentApi.delete(commentId);
+      setCommentsList((prevComments) => prevComments.filter((comment) => comment.id !== commentId));
+    } catch (error) {
+      console.error("Failed to delete comment:", error);
+    }
+  };
+
   return (
     <div className="post-card">
       <div className="post-header">
@@ -210,9 +253,17 @@ const PostCard: React.FC<PostCardProps> = ({
       </div>
       {showComments && (
         <div className="comments-section">
-          {comments.length > 0
-            ? comments.map((comment) => <CommentItem key={comment.id} {...comment} onReply={onReply} />)
-            : !loadingComments && <p>No comments yet.</p>}
+          {commentsList.length > 0
+            ? commentsList.map((comment) => (
+                <CommentItem
+                  key={comment.id}
+                  {...comment}
+                  onReply={onReply}
+                  onEdit={handleEditComment}
+                  onDelete={handleDeleteComment}
+                />
+              ))
+            : !loadingComments && <p>댓글이 존재하지 않습니다.</p>}
           <form onSubmit={handleCommentSubmit} className="comment-form">
             <input
               type="text"
@@ -248,7 +299,15 @@ const PostCard: React.FC<PostCardProps> = ({
                   endMessage={!hasMoreComments && <p>No more comments</p>}
                 >
                   {commentsList.length > 0
-                    ? commentsList.map((comment) => <CommentItem key={comment.id} {...comment} onReply={onReply} />)
+                    ? commentsList.map((comment) => (
+                        <CommentItem
+                          key={comment.id}
+                          {...comment}
+                          onReply={onReply}
+                          onEdit={handleEditComment}
+                          onDelete={handleDeleteComment}
+                        />
+                      ))
                     : !loadingComments && <p>댓글이 존재하지 않습니다.</p>}
                 </InfiniteScroll>
                 <form onSubmit={handleCommentSubmit} className="comment-form">

@@ -315,3 +315,20 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #929292; /* 핸들 색상 (호버 상태) */
 }
+.comment-item {
+  margin-bottom: 20px; /* 각 댓글 항목 사이에 간격 추가 */
+}
+
+.comment-author {
+  margin-right: 15px; /* 닉네임 오른쪽 간격 추가 */
+  font-size: 18px;
+}
+
+.comment-time {
+  font-size: 15px; /* 시간 텍스트의 크기 설정 */
+  color: #888; /* 시간 텍스트 색상 설정 */
+}
+
+.comment-content {
+  margin-top: 5px; /* 댓글 내용과 시간 사이에 간격 추가 */
+}

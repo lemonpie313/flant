@@ -114,6 +114,11 @@ export const commentApi = {
   like: (id: number, { status }: { status: number }) =>
     api.put(`/comments/${id}/likes`, { status }).catch(handleApiError),
   checkIfUserLikedComment: (id: number) => api.get(`/comments/${id}/likes/my`).catch(handleApiError),
+  delete: (commentId: number) =>
+    api
+      .delete(`/comments/${commentId}`)
+      .then((response) => response.data)
+      .catch(handleApiError),
 };
 
 export const liveApi = {

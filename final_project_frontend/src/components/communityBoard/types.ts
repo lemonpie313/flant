@@ -30,6 +30,7 @@ export interface Comment {
   author: string;
   comment: string;
   createdAt: string;
+  authorId: number; // 댓글 작성자의 communityUserId
 }
 
 export interface User {
