@@ -86,17 +86,20 @@ const Cart: React.FC = () => {
       console.error("Error updating cart item quantity", error);
     }
   };
-  const handlePaymentSuccess = () => {
+  const handlePaymentSuccess = async () => {
+    setShowPayment(false); // 결제 창 표시
     // 결제 성공 후 처리 로직 (예: 주문 상세 페이지로 이동)
+    console.log("clear");
+    await paymentApi.createOrder(); // 주문 생성 API 호출
+
     navigate("/main");
   };
   // 주문 생성 핸들러
   const handleCheckout = async () => {
     try {
       // response는 단순히 주문 테이블에 데이터를 저장. 실제 주문하는건 아님
-      await paymentApi.createOrder(); // 주문 생성 API 호출
       setShowPayment(true); // 결제 창 표시
-      navigate("/main");
+
       //const orderId = response.data.data.orderId; // 주문 ID 추출
       //navigate(`/order/${orderId}`); // 주문 상세 페이지로 이동
     } catch (error) {

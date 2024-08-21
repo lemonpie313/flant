@@ -31,6 +31,7 @@ const CommunityBoardTest: React.FC = () => {
   const [isNicknameModalOpen, setIsNicknameModalOpen] = useState(false);
   const [nickname, setNickname] = useState("");
   const [showPayment, setShowPayment] = useState(false);
+  const [isPaymentProcessing, setIsPaymentProcessing] = useState(false); // 결제 처리 상태 추가
   const openNicknameModal = () => setIsNicknameModalOpen(true);
   const closeNicknameModal = () => setIsNicknameModalOpen(false);
 
@@ -224,6 +225,7 @@ const CommunityBoardTest: React.FC = () => {
   };
   const handleMembershipJoin = async () => {
     try {
+      alert("handleMembershipJoin");
       // 멤버십 가입 요청
       const existedMembership = await membershipApi.existedMembership();
       const existedMembershipInfo = existedMembership.data.data;
@@ -239,31 +241,41 @@ const CommunityBoardTest: React.FC = () => {
         alert("커뮤니티 가입여부가 확인되지 않습니다.");
       }
       // await membershipApi.joinMembership(Number(userId), Number(communityId));
+      setShowPayment(false); // 결제 창 표시
+      setIsPaymentProcessing(false);
+      console.log(showPayment);
       setShowPayment(true); // 결제 창 표시
+      setIsPaymentProcessing(false);
+      console.log(showPayment);
 
       // 가입 후에 멤버십 상태를 업데이트하거나 필요한 추가 동작 수행
       // setIsMembershipJoined(true); // 멤버십 가입 상태 업데이트
     } catch (error) {
       console.error("멤버십 가입 오류:", error);
       alert("멤버십 가입에 실패했습니다.");
+      setShowPayment(false); // 결제 창 표시
     }
   };
   const handlePaymentSuccess = async () => {
     try {
+      setShowPayment(false);
       const userId = communityUser?.userId;
       if (!userId || communityId === null) {
         alert("커뮤니티 가입여부가 확인되지 않습니다.");
         return;
       }
-
+      console.log(community?.membershipPrice);
       // 멤버십 가입 요청
       await membershipApi.joinMembership(Number(userId), Number(communityId));
       alert("멤버십 가입이 완료되었습니다.");
-      setShowPayment(false); // 결제 창 숨기기
+
       navigate("/main");
     } catch (error) {
       console.error("멤버십 가입 오류:", error);
       alert("멤버십 가입에 실패했습니다.");
+      // 결제 상태 초기화
+      setShowPayment(false);
+      setIsPaymentProcessing(false); // 결제 처리 상태를 false로 설정
     }
   };
   return (
@@ -346,6 +358,7 @@ const CommunityBoardTest: React.FC = () => {
               onClick={
                 isCommunityJoined ? handleMembershipJoin : handleJoinButtonClick
               }
+              disabled={isPaymentProcessing} // 결제 중일 때 버튼 비활성화
             >
               {isCommunityJoined ? "Membership 가입하기" : "커뮤니티 가입하기"}
             </button>
