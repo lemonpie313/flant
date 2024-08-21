@@ -40,6 +40,7 @@ export class Comment {
     nullable: true,
     onDelete: 'SET NULL',
   })
+  @JoinColumn({name: 'artist_id'})
   artist: Artist | null;
 
   @Column('text')

@@ -143,7 +143,7 @@ const Cart: React.FC = () => {
             </div>
           ))}
           <div className="cart-total">
-            <h3>Total: ${getTotalPrice()}</h3>
+            <h3>Total: {getTotalPrice()} 원</h3>
             <button onClick={handleCheckout} className="checkout-btn">Proceed to Checkout</button>
           </div>
         </div>

@@ -13,10 +13,10 @@ export class CreateCommentDto {
   @IsNumber()
   communityId: number;
 
-  @ApiProperty({ description: 'The ID of the artist', required: false })
-  @IsOptional()
-  @IsNumber()
-  artistId: number | null;
+  // @ApiProperty({ description: 'The ID of the artist', required: false })
+  // @IsOptional()
+  // @IsNumber()
+  // artistId: number | null;
 
   @ApiProperty({ description: 'The comment text' })
   @IsNotEmpty()

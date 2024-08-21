@@ -142,8 +142,8 @@ export const commentApi = {
     api
       .post(`/comments/${commentId}/replies`, { content })
       .catch(handleApiError),
-  getComments: (postId: number) =>
-    api.get(`/posts/${postId}/comments`).catch(handleApiError),
+  getComments: (postId: number, isArtist: boolean) =>
+    api.get(`/posts/${postId}/comments?isArtist=${isArtist}`).catch(handleApiError),
   like: (id: number, { status }: { status: number }) =>
     api.put(`/comments/${id}/likes`, { status }).catch(handleApiError),
   checkIfUserLikedComment: (id: number) =>

@@ -36,11 +36,11 @@ const PostCard: React.FC<PostCardProps> = ({
   const [newComment, setNewComment] = useState("");
   const [showAllCommentsPopup, setShowAllCommentsPopup] = useState(false);
   const [commentsList, setCommentsList] = useState(comments);
+  const [artistComments, setArtistComments] = useState<Comment[]>([]);
   const [hasMoreComments, setHasMoreComments] = useState(true);
   const [loadingComments, setLoadingComments] = useState(false);
   const [popupPostId, setPopupPostId] = useState<number | null>(null);
   const [popupUserId, setPopupUserId] = useState<number | null>(null);
-  const [communityUserId, setCommunityUser] = useState<CommunityUser>();
   const { communityId } = useParams<{ communityId: string }>();
   const [posts, setPosts] = useState<Post[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -48,35 +48,6 @@ const PostCard: React.FC<PostCardProps> = ({
   const handleLike = () => {
     onLike(postId, !isLiked);
   };
-
-  //정보 가져오기
-  // const fetchCommunityUsers = async () => {
-  //   try {
-  //     const response = await communityUserApi.findCommunityUser(Number(communityId));
-  //     setCommunityUser(response.data);
-  //   } catch (error) {
-  //     console.error("커뮤니티유저 데이터 가져오기 오류:", error);
-  //   }
-  // };
-  // // useEffect(() => {
-  //   const fetchUser = async () => {
-  //     try {
-  //       const response = await userApi.findMy(); // 유저 조회 API 호출
-  //       console.log(response, communityId);
-  //       setUsers(response.data);
-  //     } catch (error) {
-  //       console.error("Failed to fetch user:", error);
-  //     }
-  //   };
-  // });
-
-  // const handleCommentSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   if (newComment.trim()) {
-  //     onComment(postId, newComment);
-  //     setNewComment("");
-  //   }
-  // };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -88,15 +59,26 @@ const PostCard: React.FC<PostCardProps> = ({
         console.error("Failed to fetch user:", error);
       }
     };
+    fetchUser();
   }, [communityId]);
 
   const openAllCommentsPopup = async () => {
     console.log("Post ID:", postId); // postId가 제대로 전달되는지 확인
     setPopupPostId(postId); // postId를 상태에 저장
-
     setShowAllCommentsPopup(true);
-    const updatedComments = await commentApi.getComments(postId!);
-    setCommentsList(updatedComments.data);
+
+    try {
+      // 아티스트 댓글 먼저 불러오기
+      const artistResponse = await commentApi.getComments(postId!, true);
+      console.log(artistResponse.data);
+      setArtistComments(artistResponse.data);
+
+      // 일반 댓글 불러오기
+      const generalResponse = await commentApi.getComments(postId!, false);
+      setCommentsList(generalResponse.data);
+    } catch (error) {
+      console.error("댓글 불러오기 실패:", error);
+    }
   };
 
   const closeAllCommentsPopup = () => {
@@ -117,7 +99,7 @@ const PostCard: React.FC<PostCardProps> = ({
           // imageUrl,
         });
         setNewComment("");
-        const updatedComments = await commentApi.getComments(popupPostId!);
+        const updatedComments = await commentApi.getComments(popupPostId!, false);
         setCommentsList(updatedComments.data);
       } catch (error) {
         console.error("댓글 작성 실패:", error);
@@ -129,7 +111,7 @@ const PostCard: React.FC<PostCardProps> = ({
     if (loadingComments) return;
     setLoadingComments(true);
     try {
-      const response = await commentApi.getComments(popupPostId!);
+      const response = await commentApi.getComments(popupPostId!, false);
       const newComments = response.data;
 
       if (newComments.length > 0) {
@@ -262,36 +244,47 @@ const PostCard: React.FC<PostCardProps> = ({
                     />
                   ))}
               </div>
-              <div className="comments-content-right">
-                <h3>전체 댓글</h3>
+              <div className="post-content-right">
+                <h3>댓글</h3>
                 <InfiniteScroll
                   dataLength={commentsList.length}
                   next={loadMoreComments}
                   hasMore={hasMoreComments}
-                  loader={loadingComments && <p>Loading...</p>}
-                  endMessage={!hasMoreComments && <p>No more comments</p>}
+                  loader={<h4>Loading...</h4>}
+                  scrollableTarget="scrollableDiv"
                 >
-                  {commentsList.length > 0
-                    ? commentsList.map((comment) => (
+                  {artistComments.length > 0 && (
+                    <>
+                      <h4>아티스트 댓글</h4>
+                      {artistComments.map((comment) => (
                         <CommentItem
                           key={comment.id}
                           {...comment}
                           onReply={onReply}
                         />
-                      ))
-                    : !loadingComments && <p>댓글이 존재하지 않습니다.</p>}
+                      ))}
+                    </>
+                  )}
+                  {commentsList.length > 0 ? (
+                    commentsList.map((comment) => (
+                      <CommentItem
+                        key={comment.id}
+                        {...comment}
+                        onReply={onReply}
+                      />
+                    ))
+                  ) : (
+                    <p>No comments yet.</p>
+                  )}
                 </InfiniteScroll>
                 <form onSubmit={handleCommentSubmit} className="comment-form">
-                  <textarea
+                  <input
+                    type="text"
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="댓글을 작성하세요..."
-                    className="comment-input"
-                    id="popupCommentInput"
+                    placeholder="댓글을 입력하세요..."
                   />
-                  <button type="submit" className="submit-btn">
-                    등록
-                  </button>
+                  <button type="submit">댓글 작성</button>
                 </form>
               </div>
             </div>
