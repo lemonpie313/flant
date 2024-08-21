@@ -116,6 +116,8 @@ export const postApi = {
     api.put(`/posts/${postId}/likes`, { status }).catch(handleApiError),
   checkIfUserLikedPost: (id: number) =>
     api.get(`/posts/${id}/likes/my`).catch(handleApiError),
+  countLikesOnPost: (postId: number) =>
+    api.get(`/posts/${postId}/likes`).catch(handleApiError)
 };
 
 export const commentApi = {
