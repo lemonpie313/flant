@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import MainPage from "./pages/MainPage";
 import SignUpPage from "./pages/SignUpPage";
@@ -38,7 +44,9 @@ const App: React.FC = () => {
     checkLoginStatus();
   }, []);
 
-  const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+  const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({
+    children,
+  }) => {
     const location = useLocation();
 
     if (loading) {
@@ -63,7 +71,13 @@ const App: React.FC = () => {
           <Routes>
             <Route
               path="/login"
-              element={isLoggedIn ? <Navigate to="/main" replace /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}
+              element={
+                isLoggedIn ? (
+                  <Navigate to="/main" replace />
+                ) : (
+                  <LoginPage setIsLoggedIn={setIsLoggedIn} />
+                )
+              }
             />
             <Route path="/signup" element={<SignUpPage />} />
             <Route
