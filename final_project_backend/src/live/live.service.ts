@@ -311,7 +311,7 @@ export class LiveService {
       streamKey,
     });
     return {
-      liveServer: 'rtmp://3.34.3.166/live',
+      liveServer: 'rtmp://43.201.107.36/live',
       title: live.title,
       streamKey: live.streamKey,
     };
@@ -351,7 +351,7 @@ export class LiveService {
       artistId: live.artistId,
       // artistNickname: live.artist.artistNickname,
       title: live.title,
-      liveHls: `http://3.34.3.166:8000/live/${live.streamKey}/index.m3u8`,
+      liveHls: `https://43.201.107.36:8443/live/${live.streamKey}/index.m3u8`,
       // liveHls: `https://flant.club:8443/live/${live.streamKey}/index.m3u8`,
     };
   }
