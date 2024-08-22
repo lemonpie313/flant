@@ -351,7 +351,7 @@ export class LiveService {
       artistId: live.artistId,
       // artistNickname: live.artist.artistNickname,
       title: live.title,
-      liveHls: `https://43.201.107.36:8443/live/${live.streamKey}/index.m3u8`,
+      liveHls: `https://live.flant.club:8443/live/${live.streamKey}/index.m3u8`,
       // liveHls: `https://flant.club:8443/live/${live.streamKey}/index.m3u8`,
     };
   }
