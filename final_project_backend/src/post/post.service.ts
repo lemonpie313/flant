@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConsoleLogger,
   HttpStatus,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -21,6 +22,7 @@ import { Manager } from 'src/admin/entities/manager.entity';
 import { MESSAGES } from 'src/constants/message.constant';
 import { PartialUser } from 'src/user/interfaces/partial-user.entity';
 import { CreateCommentDto } from 'src/comment/dto/create-comment.dto';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class PostService {
@@ -39,6 +41,7 @@ export class PostService {
     private readonly managerRepository: Repository<Manager>,
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
+    @Inject('CACHE_MANAGER') private cacheManager: Cache
   ) {}
 
   async create(
@@ -78,11 +81,30 @@ export class PostService {
         await this.postImageRepository.save(postImageData);
       }
     }
+    const cacheKey = `posts_community_${createPostDto.communityId}`
+    await this.cacheManager.del(cacheKey)
+
     return {
       status: HttpStatus.CREATED,
       message: MESSAGES.POST.CREATE.SUCCEED,
       data: saveData,
     };
+  }
+
+  async getCachedData(isArtist: boolean, communityId: number){
+    const cacheKey = `posts_community_${communityId}`
+
+    let cachedPosts = await this.cacheManager.get(cacheKey)
+    console.log(cacheKey, cachedPosts)
+    
+    if(!cachedPosts){
+      cachedPosts = await this.findPosts(isArtist, communityId)
+
+      await this.cacheManager.set(cacheKey, cachedPosts);
+      console.log(cacheKey, cachedPosts)
+    }
+
+    return cachedPosts
   }
 
   async findPosts(isArtist: boolean, communityId: number) {
@@ -162,6 +184,7 @@ export class PostService {
       };
     }
   }
+
 
   async findOne(postId: number) {
     const data = await this.postRepository.findOne({
