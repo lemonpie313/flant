@@ -87,7 +87,7 @@ export class PostController {
     @Query('page') page: number,
     @Query('limit') limit: number,
   ) {
-    return await this.postService.findPosts(isArtist, +communityId);
+    return await this.postService.getCachedData(isArtist, +communityId);
   }
 
   /**
