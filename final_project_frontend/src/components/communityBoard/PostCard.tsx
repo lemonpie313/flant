@@ -5,6 +5,7 @@ import "../../styles/PostCard.scss";
 import { commentApi, communityUserApi, userApi } from "../../services/api";
 import { useParams } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
+import ArtistCommentItem from "./ArtistCommentItem";
 
 interface PostCardProps extends Post {
   onLike: (postId: number, likeStatus: boolean) => void;
@@ -32,6 +33,7 @@ const PostCard: React.FC<PostCardProps> = ({
   const [newComment, setNewComment] = useState("");
   const [showAllCommentsPopup, setShowAllCommentsPopup] = useState(false);
   const [commentsList, setCommentsList] = useState(comments);
+  const [artistsCommentsList, setArtistsCommentsList] = useState(comments);
   const [hasMoreComments, setHasMoreComments] = useState(true);
   const [loadingComments, setLoadingComments] = useState(false);
   const [popupPostId, setPopupPostId] = useState<number | null>(null);
@@ -98,19 +100,36 @@ const PostCard: React.FC<PostCardProps> = ({
     const fetchComments = async () => {
       if (popupPostId !== null) {
         try {
-          const response = await commentApi.getComments(popupPostId);
+          const response = await commentApi.getComments(popupPostId, isArtist);
           setCommentsList(response.data);
         } catch (error) {
           console.error("Failed to fetch comments:", error);
         }
       }
     };
-    fetchComments();
-  }, [popupPostId]);
 
-  const openAllCommentsPopup = () => {
+    const fetchUser = async () => {
+      try {
+        const response = await userApi.findMy(); // 유저 조회 API 호출
+        setUsers(response.data);
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+      }
+    };
+
+    // 두 함수 호출
+    fetchComments();
+    fetchUser();
+  }, [popupPostId]); // popupPostId가 변경될 때마다 이 useEffect가 실행됩니다.
+
+  const openAllCommentsPopup = async () => {
     setPopupPostId(postId); // postId를 상태에 저장
+
     setShowAllCommentsPopup(true);
+    const updatedArtistComments = await commentApi.getComments(postId!, true);
+    setArtistsCommentsList(updatedArtistComments.data);
+    const updatedComments = await commentApi.getComments(postId!, false);
+    setCommentsList(updatedComments.data);
   };
 
   const closeAllCommentsPopup = () => {
@@ -134,7 +153,7 @@ const PostCard: React.FC<PostCardProps> = ({
         }
 
         setNewComment("");
-        const updatedComments = await commentApi.getComments(popupPostId!);
+        const updatedComments = await commentApi.getComments(popupPostId!, false);
         setCommentsList(updatedComments.data);
       } catch (error) {
         console.error("댓글 작성 실패:", error);
@@ -148,7 +167,7 @@ const PostCard: React.FC<PostCardProps> = ({
     try {
       await commentApi.patchComment(commentId, {
         comment: updatedComment,
-        artistId: numericArtistId,
+        isArtist: numericArtistId,
       });
       const updatedComments = await commentApi.getComments(popupPostId!);
       setCommentsList(updatedComments.data);
@@ -170,7 +189,7 @@ const PostCard: React.FC<PostCardProps> = ({
     if (loadingComments) return;
     setLoadingComments(true);
     try {
-      const response = await commentApi.getComments(popupPostId!);
+      const response = await commentApi.getComments(popupPostId!, false);
       const newComments = response.data;
 
       if (newComments.length > 0) {
@@ -252,8 +271,9 @@ const PostCard: React.FC<PostCardProps> = ({
       )}
       <div className="post-actions">
         <button onClick={handleLike} className={isLiked ? "liked" : ""}>
-          <span className="material-symbols-outlined">favorite</span> {likes}
+          <span className="material-symbols-outlined">favorite</span>
         </button>
+        <span>{likes}</span> {/* 좋아요 수 표시 */}
         <button onClick={openAllCommentsPopup}>
           <span className="material-symbols-outlined">comment</span>
         </button>
@@ -298,7 +318,7 @@ const PostCard: React.FC<PostCardProps> = ({
                   postImages.map((image) => <img key={image.postImageId} src={image.postImageUrl} alt="Post" />)}
               </div>
               <div className="comments-content-right">
-                <h3>전체 댓글</h3>
+                <h3>댓글</h3>
                 <InfiniteScroll
                   dataLength={commentsList.length}
                   next={loadMoreComments}
@@ -306,6 +326,13 @@ const PostCard: React.FC<PostCardProps> = ({
                   loader={loadingComments && <p>Loading...</p>}
                   endMessage={!hasMoreComments && <p>No more comments</p>}
                 >
+                  <div className="artist-comments">
+                    {commentsList.length > 0
+                      ? artistsCommentsList.map((comment) => (
+                          <ArtistCommentItem key={comment.commentId} {...comment} onReply={onReply} />
+                        ))
+                      : !loadingComments && <p></p>}
+                  </div>
                   {commentsList.length > 0
                     ? commentsList.map((comment) => (
                         <CommentItem

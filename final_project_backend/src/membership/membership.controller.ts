@@ -65,7 +65,6 @@ export class MembershipController {
     @Body() membershipDto: MembershipDto,
   ) {
     const { communityId } = membershipDto;
-    console.log(user.id);
     const membership = await this.membershipService.createMembership(
       user.id,
       communityId,

@@ -99,12 +99,9 @@ export class AuthController {
     @UserInfo() user: PartialUser,
     @Res({ passthrough: true }) res: Response,
   ) {
-    console.log(user);
     const userId = user.id;
-    console.log(userId);
     const { accessOption, refreshOption } =
       await this.authService.signOut(userId);
-    console.log(accessOption);
     res.cookie('Authentication', '', accessOption);
     res.cookie('Refresh', '', refreshOption);
     return {

@@ -50,7 +50,9 @@ export class CommentController {
     summary: 'Create a comment (Membership or Artist Manager required)',
   })
   @ApiBody({ type: CreateCommentDto })
-  async create(@Body() commentData: CreateCommentDto): Promise<Comment> {
+  async create(@Body() commentData: CreateCommentDto, @UserInfo() user: PartialUser): Promise<Comment> {
+    console.log(user);
+    console.log("----------000")
     return this.commentService.createComment(commentData);
   }
 

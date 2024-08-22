@@ -1,9 +1,10 @@
-// src/pages/MainPage.tsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./UserInfo.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { authApi, userApi } from "../services/api";
-import { useEffect, useState } from "react";
+import { isValidName } from "../utils/validateName";
+import { isEmpty } from "../utils/isEmpty";
+import { validatePassword } from "../utils/validatePassword";
 
 const UserInfoPage: React.FC = () => {
   const navigate = useNavigate();
@@ -16,6 +17,8 @@ const UserInfoPage: React.FC = () => {
   const [showConfirmDialog, setShowConfirmDialog] = useState<boolean>(false);
   const [showPasswordInput, setShowPasswordInput] = useState<boolean>(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState<boolean>(false);
+  const [isDropdownVisible, setDropdownVisible] = useState<boolean>(false);
+
   const handleLogout = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -29,17 +32,61 @@ const UserInfoPage: React.FC = () => {
       alert("LogOut failed.");
     }
   };
+
   const handleUpdateAccount = async () => {
     try {
+      // 값이 모두 비어있는 경우
+      if (
+        isEmpty(newUserName) &&
+        isEmpty(newPassword) &&
+        isEmpty(newPasswordConfirm)
+      ) {
+        alert("변경할 값을 입력해주세요.");
+        return;
+      }
+
+      // 이름 변경시
+      if (!isEmpty(newUserName) && !isValidName(newUserName)) {
+        alert(
+          "변경할 이름을 확인해주세요. 특수 문자 및 공백,'admin'은 사용할 수 없습니다."
+        );
+        return;
+      }
+
+      // 비밀번호 변경시
+      if (!isEmpty(newPassword)) {
+        if (!validatePassword(newPassword)) {
+          alert(
+            "비밀번호는 최소 8자 이상이어야 하며, 대문자, 소문자, 숫자, 특수 문자를 포함해야 합니다."
+          );
+          return;
+        }
+
+        if (newPassword !== newPasswordConfirm) {
+          alert("비밀번호 확인이 일치하지 않습니다.");
+          return;
+        }
+      }
+
       await userApi.update(newUserName, newPassword, newPasswordConfirm);
       alert("계정 정보가 성공적으로 변경되었습니다.");
+
       setShowUpdateDialog(false);
-      //setUsername(newUserName);
       setPassword("");
+
+      clearUpdateUserInputText();
     } catch (error) {
       alert("계정 정보 변경에 실패했습니다.");
     }
   };
+
+  // 내 정보 input창 초기화
+  const clearUpdateUserInputText = async () => {
+    setNewUserName("");
+    setNewPassword("");
+    setConfirmNewPassword("");
+  };
+
   const handleDeleteAccount = async () => {
     try {
       const response = await userApi.checkPassword(password);
@@ -57,6 +104,7 @@ const UserInfoPage: React.FC = () => {
       alert("비밀번호 재확인 바랍니다.");
     }
   };
+
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -71,6 +119,7 @@ const UserInfoPage: React.FC = () => {
     };
     fetchUserInfo();
   }, []);
+
   return (
     <div className="main-page">
       <header>
@@ -82,7 +131,7 @@ const UserInfoPage: React.FC = () => {
               alt="logo"
             />
           </Link>
-          <div className="header-box-blank">유저 정보 페이지입니당</div>
+          <div className="header-box-blank"></div>
           <div className="header-box-user">
             <div className="header-box-user-info">
               <button>
@@ -90,21 +139,29 @@ const UserInfoPage: React.FC = () => {
                   className="header-notification-icon"
                   src="/images/notification.png"
                   alt="notification"
-                ></img>
+                />
               </button>
-              <button>
-                <img
-                  className="header-user-icon"
-                  src="/images/user.png"
-                  alt="user"
-                ></img>
-                <div className="header-user-dropdown">
-                  <Link to="/userinfo">내 정보</Link>
-                  <Link to="/membership">멤버십</Link>
-                  <Link to="/payment-history">결제내역</Link>
-                  <button onClick={handleLogout}>로그아웃</button>
-                </div>
-              </button>
+              <div
+                className="header-box-user-dropdown-container"
+                onMouseEnter={() => setDropdownVisible(true)}
+                onMouseLeave={() => setDropdownVisible(false)}
+              >
+                <button>
+                  <img
+                    className="header-user-icon"
+                    src="/images/user.png"
+                    alt="user"
+                  />
+                </button>
+                {isDropdownVisible && (
+                  <div className="header-user-dropdown">
+                    <Link to="/userinfo">내 정보</Link>
+                    {/* <Link to="/membership">멤버십</Link> */}
+                    <Link to="/payment-history">결제내역</Link>
+                    <button onClick={handleLogout}>로그아웃</button>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="header-box-user-shop">
@@ -114,7 +171,7 @@ const UserInfoPage: React.FC = () => {
                   className="header-box-shop-image"
                   src="/green-cart.png"
                   alt="green-cart"
-                ></img>
+                />
               </Link>
             </div>
           </div>
@@ -173,27 +230,64 @@ const UserInfoPage: React.FC = () => {
 
         {showUpdateDialog && (
           <div className="update-dialog">
-            <p>변경할 정보를 입력하세요:</p>
-            <input
-              type="text"
-              placeholder="새로운 이름"
-              value={newUserName}
-              onChange={(e) => setNewUserName(e.target.value)}
-            />
-            <input
-              type="password"
-              placeholder="새로운 비밀번호"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
-            <input
-              type="password"
-              placeholder="비밀번호 확인"
-              value={newPasswordConfirm}
-              onChange={(e) => setConfirmNewPassword(e.target.value)}
-            />
-            <button onClick={handleUpdateAccount}>확인</button>
-            <button onClick={() => setShowUpdateDialog(false)}>취소</button>
+            <p className="update-dialog-title">변경할 정보를 입력하세요</p>
+            <div className="update-dialog-section">
+              <label htmlFor="newUserName" className="update-dialog-label">
+                변경할 닉네임
+              </label>
+              <input
+                id="newUserName"
+                className="update-dialog-input"
+                type="text"
+                placeholder="새로운 이름"
+                value={newUserName}
+                onChange={(e) => setNewUserName(e.target.value)}
+              />
+            </div>
+            <div className="update-dialog-section">
+              <label htmlFor="newPassword" className="update-dialog-label">
+                변경할 비밀번호
+              </label>
+              <input
+                id="newPassword"
+                className="update-dialog-input"
+                type="password"
+                placeholder="새로운 비밀번호"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </div>
+            <div className="update-dialog-section">
+              <label
+                htmlFor="newPasswordConfirm"
+                className="update-dialog-label"
+              >
+                비밀번호 확인
+              </label>
+              <input
+                id="newPasswordConfirm"
+                className="update-dialog-input"
+                type="password"
+                placeholder="비밀번호 확인"
+                value={newPasswordConfirm}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
+              />
+            </div>
+            <button
+              onClick={handleUpdateAccount}
+              className="update-dialog-button"
+            >
+              확인
+            </button>
+            <button
+              onClick={() => {
+                setShowUpdateDialog(false);
+                clearUpdateUserInputText();
+              }}
+              className="update-dialog-button"
+            >
+              취소
+            </button>
           </div>
         )}
       </main>

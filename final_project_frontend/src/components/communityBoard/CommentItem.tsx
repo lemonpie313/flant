@@ -12,6 +12,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   author,
   communityId,
   artistId,
+  profileImage,
   comment,
   createdAt,
   onEdit,
@@ -67,8 +68,16 @@ const CommentItem: React.FC<CommentItemProps> = ({
   return (
     <div className="comment-item">
       <div className="comment-header">
-        <strong className="comment-author">{author}</strong>
-        <span className="comment-time">{new Date(createdAt).toLocaleString()}</span>
+        <img
+          src={profileImage || "/default-profile.png"}
+          alt={author}
+          className="author-image"
+          onError={(e) => {
+            e.currentTarget.src = "/default-profile.png";
+          }}
+        />
+        <strong>{author}</strong>
+        <span>{new Date(createdAt).toLocaleString()}</span>
       </div>
       <div className="comment-content">
         {isEditing ? (

@@ -35,7 +35,7 @@ const CommunityList: React.FC<CommunityListProps> = ({
                 community.communityCoverImage ||
                 "https://picsum.photos/id/475/250/300"
               }
-              alt={community.communityName}
+              alt="커버 이미지"
             />
           </div>
           <div className="community-card-logo-wrap">
@@ -45,10 +45,10 @@ const CommunityList: React.FC<CommunityListProps> = ({
                 community.communityLogoImage ||
                 "https://picsum.photos/id/476/43/43"
               }
-              alt={community.communityName}
+              alt="로고 이미지"
             />
           </div>
-          <div className="community-card-caption">
+          <div className="community-card-caption new-amsterdam-regular">
             {community.communityName}
           </div>
         </div>

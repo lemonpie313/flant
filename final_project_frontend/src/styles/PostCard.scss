@@ -112,31 +112,39 @@
 
 .post-actions {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* 댓글 버튼을 오른쪽 끝에 배치 */
   align-items: center;
   margin-top: 16px;
-}
 
-.post-actions button {
-  display: flex;
-  align-items: center;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-size: 1rem;
-}
+  button {
+    display: flex;
+    align-items: center;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1rem;
 
-.material-symbols-outlined {
-  color: #555555; /* 진회색 */
-}
+    /* 이 부분 추가: 아이콘과 숫자를 나란히 배치 */
+    .material-symbols-outlined {
+      color: #555555; /* 기본 아이콘 색상 */
+      font-size: 24px; /* 아이콘 크기 */
+      margin-right: 4px; /* 아이콘과 숫자 사이의 간격 */
+    }
 
-.post-actions button .material-symbols-outlined {
-  margin-right: 0.25rem;
-  font-size: 24px; /* 아이콘 크기 */
-}
+    .like-count {
+      font-size: 16px; /* 숫자 크기 */
+      color: #555555; /* 숫자 색상 */
+    }
+  }
 
-.liked .material-symbols-outlined {
-  color: rgb(252, 2, 105); /* 좋아요 아이콘의 색상 변경 */
+  .liked .material-symbols-outlined {
+    color: rgb(252, 2, 105); /* 좋아요 아이콘 색상 (좋아요 눌렀을 때) */
+  }
+
+  /* 좋아요 버튼과 댓글 버튼 사이의 간격 추가 */
+  button:last-of-type {
+    margin-left: auto; /* 마지막 버튼(댓글)을 오른쪽으로 밀어냄 */
+  }
 }
 
 .comments-section form input {
@@ -318,6 +326,7 @@
 /* 핸들에 마우스가 올 때의 스타일 */
 ::-webkit-scrollbar-thumb:hover {
   background: #929292; /* 핸들 색상 (호버 상태) */
+<<<<<<< HEAD
 }
 
 .comment-item {
@@ -495,3 +504,6 @@ button {
   background-color: #5a6268; /* 호버 시 더 어두운 회색 */
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
+=======
+}
+>>>>>>> 05c7c8330d2cd202316dd9ff4a95686d321aaae4

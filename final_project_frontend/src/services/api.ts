@@ -92,6 +92,7 @@ export const postApi = {
   like: (postId: number, { status }: { status: number }) =>
     api.put(`/posts/${postId}/likes`, { status }).catch(handleApiError),
   checkIfUserLikedPost: (id: number) => api.get(`/posts/${id}/likes/my`).catch(handleApiError),
+  countLikesOnPost: (postId: number) => api.get(`/posts/${postId}/likes`).catch(handleApiError),
 };
 
 export const commentApi = {
@@ -108,13 +109,19 @@ export const commentApi = {
     artistId?: number;
     // artistId?: number;
     // imageUrl?: string;
-  }) => api.post(`/posts/${postId}/comments`, { comment, communityId, artistId }).catch(handleApiError),
+  }) =>
+    api
+      .post(`/posts/${postId}/comments`, {
+        comment,
+        communityId,
+        artistId,
+      })
+      .catch(handleApiError),
 
   createReply: (commentId: number, { content }: { content: string }) =>
     api.post(`/comments/${commentId}/replies`, { content }).catch(handleApiError),
-
-  getComments: (postId: number) => api.get(`/posts/${postId}/comments`).catch(handleApiError),
-
+  getComments: (postId: number, isArtist: boolean = false) =>
+    api.get(`/posts/${postId}/comments?isArtist=${isArtist}`).catch(handleApiError),
   like: (id: number, { status }: { status: number }) =>
     api.put(`/comments/${id}/likes`, { status }).catch(handleApiError),
 
@@ -122,8 +129,8 @@ export const commentApi = {
 
   patchComment: (
     commentId: number,
-    { comment, artistId }: { comment: string; artistId?: number } // communityId 제거
-  ) => api.patch(`/comments/${commentId}`, { comment, artistId }).catch(handleApiError),
+    { comment, isArtist }: { comment: string; isArtist?: number } // communityId 제거
+  ) => api.patch(`/comments/${commentId}`, { comment, isArtist }).catch(handleApiError),
 
   deleteComment: (commentId: number) => api.delete(`/comments/${commentId}`).catch(handleApiError),
 };
@@ -131,12 +138,11 @@ export const commentApi = {
 export const liveApi = {
   createLive: (artistId: string, title: string, liveType: string) =>
     api.post("/live", { artistId, title, liveType }).catch(handleApiError),
-  findAllLives: (communityId: string) => api.get(`/live/community/${communityId}`).catch(handleApiError),
   watchLive: (liveId: number) => api.get(`/live/${liveId}`).catch(handleApiError),
 };
 
 export const communityUserApi = {
-  findCommunityUser: (communityId: number) => api.post(`/communities/userInfo/${communityId}`).catch(handleApiError),
+  findCommunityUser: (communityId: number) => api.get(`/communities/userInfo/${communityId}`).catch(handleApiError),
 };
 
 export const merchandiseApi = {
@@ -170,12 +176,13 @@ export const cartApi = {
 
 // 결제 관련 API 호출
 export const paymentApi = {
-  createOrder: () => axios.post("/orders").catch(handleApiError), // 결제 API 엔드포인트
+  createOrder: () => api.post("/orders").catch(handleApiError), // 결제 API 엔드포인트
 };
 
 // 멤버십 관련 API 호출
 export const membershipApi = {
-  joinMembership: (communityId: number) => api.post(`/membership`, { communityId }).catch(handleApiError),
+  joinMembership: (userId: number, communityId: number) =>
+    api.post(`/membership`, { communityId }).catch(handleApiError),
   existedMembership: () => api.get(`/membership`).catch(handleApiError),
 };
 
