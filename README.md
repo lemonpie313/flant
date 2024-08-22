@@ -83,7 +83,54 @@
 ## 📌 폴더 구조
 
 ```
-
+.
+├── dev
+├── nest-cli.json
+├── package-lock.json
+├── package.json
+├── public
+│   └── toss.html
+├── report.json
+├── src
+│   ├── admin
+│   ├── all-exceptions.filter.ts
+│   ├── app.controller.spec.ts
+│   ├── app.controller.ts
+│   ├── app.module.ts
+│   ├── app.service.ts
+│   ├── auth
+│   ├── cart
+│   ├── chat
+│   ├── comment
+│   ├── community
+│   ├── configs
+│   ├── constants
+│   ├── data-source.ts
+│   ├── database
+│   ├── factory
+│   ├── filters
+│   ├── form
+│   ├── like
+│   ├── live
+│   ├── main.ts
+│   ├── media
+│   ├── membership
+│   ├── merchandise
+│   ├── notice
+│   ├── notification
+│   ├── order
+│   ├── post
+│   ├── user
+│   ├── util
+│   └── webhook.interceptor.ts
+├── test
+│   ├── app.e2e-spec.ts
+│   ├── jest-e2e.json
+│   ├── live.scenario.yml
+│   ├── posts.scenario.yml
+│   └── users.csv
+├── tsconfig.build.json
+├── tsconfig.json
 ```
 
 ## 📌 주요 기능 및 설명
@@ -97,7 +144,6 @@
 - 매니저 생성 / 삭제
 </details>
 
-<br>
 <details><summary>2. 인증
 
 </summary>
@@ -109,7 +155,7 @@
 - 로그아웃
 
 </details>
-<br>
+
 <details><summary>3. 사용자
 </summary>
 
@@ -122,7 +168,7 @@
 - 회원 탈퇴
 
 </details>
-<br><details><summary>4. 커뮤니티
+<details><summary>4. 커뮤니티
 </summary>
 
 - 커뮤니티 생성
@@ -139,7 +185,7 @@
 
 - 로고 및 커버 이미지 수정
 </details>
-<br><details><summary>5. 게시글
+<details><summary>5. 게시글
 </summary>
 
 - 게시글 생성
@@ -152,7 +198,7 @@
 
 - 게시글 좋아요 확인
 </details>
-<br><details><summary>6. 댓글
+<details><summary>6. 댓글
 </summary>
 
 - 댓글 생성
@@ -164,7 +210,7 @@
 - 댓글 삭제
 </details>
 </details>
-<br><details><summary>7. 미디어
+<details><summary>7. 미디어
 </summary>
 
 - 미디어 생성
@@ -178,13 +224,13 @@
 - 썸네일 이미지 수정
 </details>
 </details>
-<br><details><summary>8. 멤버십
+<details><summary>8. 멤버십
 </summary>
 
 - 멤버십 가입
 </details>
 </details>
-<br><details><summary>9. 좋아요 기능
+<details><summary>9. 좋아요 기능
 </summary>
 
 - 커뮤니티 좋아요
@@ -194,7 +240,7 @@
 - 좋아요 개수 조회
 </details>
 </details>
-<br><details><summary>10. 상품
+<details><summary>10. 상품
 </summary>
 
 - 상품 생성
@@ -207,7 +253,7 @@
 </details>
 </details>
 </details>
-<br><details><summary>11. 장바구니
+<details><summary>11. 장바구니
 </summary>
 
 - 카트 생성
@@ -220,7 +266,7 @@
 </details>
 </details>
 </details>
-<br><details><summary>12. 주문
+<details><summary>12. 주문
 </summary>
 
 - 주문 생성
