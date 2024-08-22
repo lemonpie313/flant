@@ -238,8 +238,8 @@ export class LiveService {
             { liveVideoUrl },
           );
         }
-        fs.unlinkSync(file);
-        await this.cleanupStreamFolder(streamKey);
+        fs.unlinkSync(filePath);
+        // await this.cleanupStreamFolder(streamKey);
         console.log(
           '----------------------repository 업데이트, 삭제 완-----------------------',
         );
@@ -311,7 +311,7 @@ export class LiveService {
       streamKey,
     });
     return {
-      liveServer: 'rtmp://43.201.107.36/live',
+      liveServer: 'rtmp://52.79.234.150/live',
       title: live.title,
       streamKey: live.streamKey,
     };
