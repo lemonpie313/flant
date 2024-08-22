@@ -26,11 +26,13 @@ export interface Post {
 }
 
 export interface Comment {
-  id: number;
+  commentId: number;
+  communityId: number;
   author: string;
   comment: string;
   createdAt: string;
   authorId: number; // 댓글 작성자의 communityUserId
+  artistId?: number;
 }
 
 export interface User {

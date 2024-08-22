@@ -10,6 +10,7 @@ interface PostCardProps extends Post {
   onLike: (postId: number, likeStatus: boolean) => void;
   onComment: (postId: number, comment: string, communityId: number, artistId?: number, imageUrl?: string) => void;
   onReply: (commentId: number, content: string) => void;
+  artistId?: number; // PostCard에 artistId를 선택적으로 전달
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -25,6 +26,7 @@ const PostCard: React.FC<PostCardProps> = ({
   onLike,
   onComment,
   onReply,
+  artistId, // artistId를 받아옴
 }) => {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
@@ -65,14 +67,6 @@ const PostCard: React.FC<PostCardProps> = ({
   //     }
   //   };
   // });
-
-  // const handleCommentSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   if (newComment.trim()) {
-  //     onComment(postId, newComment);
-  //     setNewComment("");
-  //   }
-  // };
 
   // 로그인된 사용자의 communityUserId 가져오기
   // useEffect(() => {
@@ -118,6 +112,7 @@ const PostCard: React.FC<PostCardProps> = ({
     setPopupPostId(postId); // postId를 상태에 저장
     setShowAllCommentsPopup(true);
   };
+
   const closeAllCommentsPopup = () => {
     setShowAllCommentsPopup(false);
     setPopupPostId(null); // 팝업을 닫을 때 postId 초기화
@@ -131,15 +126,43 @@ const PostCard: React.FC<PostCardProps> = ({
           postId: popupPostId!, // 팝업에서 사용될 postId로 댓글 생성
           comment: newComment,
           communityId: Number(communityId),
-          // artistId,
+          artistId: Number(artistId),
           // imageUrl,
         });
+        if (artistId) {
+          artistId; // artistId가 있을 경우에만 추가
+        }
+
         setNewComment("");
         const updatedComments = await commentApi.getComments(popupPostId!);
         setCommentsList(updatedComments.data);
       } catch (error) {
         console.error("댓글 작성 실패:", error);
       }
+    }
+  };
+
+  const handleEditComment = async (commentId: number, updatedComment: string) => {
+    const numericArtistId = artistId ? Number(artistId) : undefined;
+
+    try {
+      await commentApi.patchComment(commentId, {
+        comment: updatedComment,
+        artistId: numericArtistId,
+      });
+      const updatedComments = await commentApi.getComments(popupPostId!);
+      setCommentsList(updatedComments.data);
+    } catch (error) {
+      console.error("Failed to edit comment:", error);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: number) => {
+    try {
+      await commentApi.deleteComment(commentId);
+      setCommentsList((prevComments) => prevComments.filter((comment) => comment.commentId !== commentId));
+    } catch (error) {
+      console.error("Failed to delete comment:", error);
     }
   };
 
@@ -183,20 +206,6 @@ const PostCard: React.FC<PostCardProps> = ({
   };
 
   const imageLayout = getImageLayout();
-
-  const handleEditComment = (commentId: number) => {
-    console.log("Edit comment with ID:", commentId);
-    // 댓글 수정 로직을 추가하세요
-  };
-
-  const handleDeleteComment = async (commentId: number) => {
-    try {
-      await commentApi.delete(commentId);
-      setCommentsList((prevComments) => prevComments.filter((comment) => comment.id !== commentId));
-    } catch (error) {
-      console.error("Failed to delete comment:", error);
-    }
-  };
 
   return (
     <div className="post-card">
@@ -254,11 +263,12 @@ const PostCard: React.FC<PostCardProps> = ({
           {commentsList.length > 0
             ? commentsList.map((comment) => (
                 <CommentItem
-                  key={comment.id}
+                  key={comment.commentId}
                   {...comment}
-                  onReply={onReply}
-                  onEdit={handleEditComment}
+                  commentId={comment.commentId}
                   onDelete={handleDeleteComment}
+                  onEdit={() => {}}
+                  onReply={() => {}}
                 />
               ))
             : !loadingComments && <p>댓글이 존재하지 않습니다.</p>}
@@ -299,8 +309,9 @@ const PostCard: React.FC<PostCardProps> = ({
                   {commentsList.length > 0
                     ? commentsList.map((comment) => (
                         <CommentItem
-                          key={comment.id}
+                          key={comment.commentId}
                           {...comment}
+                          commentId={comment.commentId}
                           onReply={onReply}
                           onEdit={handleEditComment}
                           onDelete={handleDeleteComment}
