@@ -238,6 +238,7 @@ export class LiveService {
             { liveVideoUrl },
           );
         }
+        fs.unlinkSync(file);
         await this.cleanupStreamFolder(streamKey);
         console.log(
           '----------------------repository 업데이트, 삭제 완-----------------------',
@@ -310,7 +311,7 @@ export class LiveService {
       streamKey,
     });
     return {
-      liveServer: 'rtmp://54.180.82.208/live',
+      liveServer: 'rtmp://43.201.107.36/live',
       title: live.title,
       streamKey: live.streamKey,
     };
@@ -350,7 +351,7 @@ export class LiveService {
       artistId: live.artistId,
       // artistNickname: live.artist.artistNickname,
       title: live.title,
-      liveHls: `http://54.180.82.208:8000/live/${live.streamKey}/index.m3u8`,
+      liveHls: `https://43.201.107.36:8443/live/${live.streamKey}/index.m3u8`,
       // liveHls: `https://flant.club:8443/live/${live.streamKey}/index.m3u8`,
     };
   }
