@@ -1,6 +1,7 @@
 import { PickType } from '@nestjs/swagger';
 import { Community } from '../entities/community.entity';
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, Validate } from 'class-validator';
+import { IsNotEmptyConstraint } from 'src/util/decorators/is-not-emtpy-constraint.decorator';
 
 export class UpdateCommunityDto extends PickType(Community, [
   'membershipPrice',
@@ -10,6 +11,7 @@ export class UpdateCommunityDto extends PickType(Community, [
    * @example "Celestial Born"
    */
   @IsOptional()
+  @Validate(IsNotEmptyConstraint)
   @IsString()
   communityName: string;
 }

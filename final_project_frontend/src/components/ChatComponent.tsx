@@ -4,12 +4,12 @@ import { useChatContext } from '../context/ChatContext';
 import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
 import { X, PaperclipIcon, SendIcon } from 'lucide-react';
-import jwtDecode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import { communityApi } from "../services/api";
 
 import './ChatComponent.scss';
 
-const REACT_APP_BACKEND_API_URL = process.env.REACT_APP_BACKEND_API_URL || 'http://localhost:3001';
+const REACT_APP_BACKEND_API_URL = 'http://localhost:3001';
 
 interface ChatMessage {
   roomId: string;
@@ -141,7 +141,6 @@ const ChatComponent: React.FC = () => {
     if (!userId) return;
     try {
       const response = await communityApi.findMy();
-      console.log("User communities response:", response.data);
       setCommunities(response.data.data);
     } catch (error) {
       console.error("Failed to fetch user communities:", error);

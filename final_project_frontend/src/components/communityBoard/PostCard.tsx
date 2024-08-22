@@ -5,6 +5,7 @@ import "../../styles/PostCard.scss";
 import { commentApi, communityUserApi, userApi } from "../../services/api";
 import { useParams } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
+import ArtistCommentItem from "./ArtistCommentItem";
 
 interface PostCardProps extends Post {
   onLike: (postId: number, likeStatus: boolean) => void;
@@ -36,6 +37,7 @@ const PostCard: React.FC<PostCardProps> = ({
   const [newComment, setNewComment] = useState("");
   const [showAllCommentsPopup, setShowAllCommentsPopup] = useState(false);
   const [commentsList, setCommentsList] = useState(comments);
+  const [artistsCommentsList, setArtistsCommentsList] = useState(comments);
   const [hasMoreComments, setHasMoreComments] = useState(true);
   const [loadingComments, setLoadingComments] = useState(false);
   const [popupPostId, setPopupPostId] = useState<number | null>(null);
@@ -82,7 +84,6 @@ const PostCard: React.FC<PostCardProps> = ({
     const fetchUser = async () => {
       try {
         const response = await userApi.findMy(); // 유저 조회 API 호출
-        console.log(response, communityId);
         setUsers(response.data);
       } catch (error) {
         console.error("Failed to fetch user:", error);
@@ -91,11 +92,12 @@ const PostCard: React.FC<PostCardProps> = ({
   }, [communityId]);
 
   const openAllCommentsPopup = async () => {
-    console.log("Post ID:", postId); // postId가 제대로 전달되는지 확인
     setPopupPostId(postId); // postId를 상태에 저장
 
     setShowAllCommentsPopup(true);
-    const updatedComments = await commentApi.getComments(postId!);
+    const updatedArtistComments = await commentApi.getComments(postId!, true);
+    setArtistsCommentsList(updatedArtistComments.data);
+    const updatedComments = await commentApi.getComments(postId!, false);
     setCommentsList(updatedComments.data);
   };
 
@@ -108,7 +110,6 @@ const PostCard: React.FC<PostCardProps> = ({
     e.preventDefault();
     if (newComment.trim()) {
       try {
-        console.log(newComment);
         await commentApi.create({
           postId: popupPostId!, // 팝업에서 사용될 postId로 댓글 생성
           comment: newComment,
@@ -117,7 +118,10 @@ const PostCard: React.FC<PostCardProps> = ({
           // imageUrl,
         });
         setNewComment("");
-        const updatedComments = await commentApi.getComments(popupPostId!);
+        const updatedComments = await commentApi.getComments(
+          popupPostId!,
+          false
+        );
         setCommentsList(updatedComments.data);
       } catch (error) {
         console.error("댓글 작성 실패:", error);
@@ -129,7 +133,7 @@ const PostCard: React.FC<PostCardProps> = ({
     if (loadingComments) return;
     setLoadingComments(true);
     try {
-      const response = await commentApi.getComments(popupPostId!);
+      const response = await commentApi.getComments(popupPostId!, false);
       const newComments = response.data;
 
       if (newComments.length > 0) {
@@ -264,7 +268,7 @@ const PostCard: React.FC<PostCardProps> = ({
                   ))}
               </div>
               <div className="comments-content-right">
-                <h3>전체 댓글</h3>
+                <h3>댓글</h3>
                 <InfiniteScroll
                   dataLength={commentsList.length}
                   next={loadMoreComments}
@@ -272,6 +276,17 @@ const PostCard: React.FC<PostCardProps> = ({
                   loader={loadingComments && <p>Loading...</p>}
                   endMessage={!hasMoreComments && <p>No more comments</p>}
                 >
+                  <div className="artist-comments">
+                    {commentsList.length > 0
+                      ? artistsCommentsList.map((comment) => (
+                          <ArtistCommentItem
+                            key={comment.id}
+                            {...comment}
+                            onReply={onReply}
+                          />
+                        ))
+                      : !loadingComments && <p></p>}
+                  </div>
                   {commentsList.length > 0
                     ? commentsList.map((comment) => (
                         <CommentItem

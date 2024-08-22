@@ -3,6 +3,5 @@ import { Live } from '../entities/live.entity';
 
 export class CreateLiveDto extends PickType(Live, [
   'title',
-  'liveType',
   'communityId',
 ]) {}

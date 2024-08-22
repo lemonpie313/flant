@@ -4,7 +4,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import NodeMediaServer from 'node-media-server';
-import { LiveTypes } from './types/live-types.enum';
 import Crypto from 'crypto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -57,17 +56,17 @@ export class LiveService {
         port: 8000,
         mediaroot: '../media', // path.join(__dirname, '../../media'),
         webroot: './www',
+        hls: true,  // HLS 사용 설정
         allow_origin: '*',
       },
       // https: {
       //   port: 8443,
-      //   key: './key.pem',
-      //   cert: './cert.pem',
+      //   key: '/etc/letsencrypt/live/live.flant.club/privkey.pem',
+      //   cert: '/etc/letsencrypt/live/live.flant.club/fullchain.pem',
       // },
       trans: {
-        //'/usr/bin/ffmpeg',
-        ffmpeg:
-          '/Users/82104/Downloads/ffmpeg-7.0.1-essentials_build/ffmpeg-7.0.1-essentials_build/bin/ffmpeg.exe',
+         ffmpeg:'/usr/bin/ffmpeg',
+         //ffmpeg: '/Users/pc/Downloads/ffmpeg-2024-08-18-git-7e5410eadb-full_build/ffmpeg-2024-08-18-git-7e5410eadb-full_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
@@ -239,6 +238,7 @@ export class LiveService {
             { liveVideoUrl },
           );
         }
+        fs.unlinkSync(file);
         await this.cleanupStreamFolder(streamKey);
         console.log(
           '----------------------repository 업데이트, 삭제 완-----------------------',
@@ -285,7 +285,7 @@ export class LiveService {
     }
   }
 
-  async createLive(artistId: number, title: string, liveType: LiveTypes) {
+  async createLive(artistId: number, title: string) {
     // userId로 커뮤니티아티인지 확인 + 어느 커뮤니티인지 조회
     const artist = await this.artistsRepository.findOne({
       where: {
@@ -308,11 +308,10 @@ export class LiveService {
       communityId: artist.communityId,
       artistId: artistId,
       title,
-      liveType,
       streamKey,
     });
     return {
-      liveServer: 'rtmp://54.180.82.208/live',
+      liveServer: 'rtmp://43.201.107.36/live',
       title: live.title,
       streamKey: live.streamKey,
     };
@@ -352,7 +351,7 @@ export class LiveService {
       artistId: live.artistId,
       // artistNickname: live.artist.artistNickname,
       title: live.title,
-      liveHls: `http://localhost:8000/live/${live.streamKey}/index.m3u8`,
+      liveHls: `https://live.flant.club:8443/live/${live.streamKey}/index.m3u8`,
       // liveHls: `https://flant.club:8443/live/${live.streamKey}/index.m3u8`,
     };
   }

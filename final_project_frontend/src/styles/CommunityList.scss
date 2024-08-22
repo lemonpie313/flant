@@ -52,6 +52,12 @@
     height: 100%;
     object-fit: cover;
   }
+
+  .new-amsterdam-regular {
+    font-family: "New Amsterdam", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
   
   .community-card-caption {
     position: absolute;
@@ -69,7 +75,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 19px;
+    font-size: 25px;
+    line-height: 1; /* 줄 간격을 줄여서 텍스트 간 간격을 줄임 */
   }
   
   /* Col의 너비를 고정하고 여백을 제거 */

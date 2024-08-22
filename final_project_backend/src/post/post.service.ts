@@ -16,7 +16,7 @@ import { PostImage } from './entities/post-image.entity';
 import { CommunityUser } from 'src/community/community-user/entities/communityUser.entity';
 import { Artist } from 'src/admin/entities/artist.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
-import _ from 'lodash';
+import _, { isNull } from 'lodash';
 import { User } from 'src/user/entities/user.entity';
 import { Manager } from 'src/admin/entities/manager.entity';
 import { MESSAGES } from 'src/constants/message.constant';
@@ -303,7 +303,7 @@ export class PostService {
   async createCommentByPost(
     postId: number,
     user: PartialUser,
-    createCommentDto,
+    createCommentDto: CreateCommentDto,
   ) {
     const userId = user.id;
 
@@ -317,6 +317,9 @@ export class PostService {
 
     const communityUser = await this.communityUserRepository.findOne({
       where: { userId: userId, communityId: createCommentDto.communityId },
+      relations: {
+        artist: true,
+      },
     });
     if (!communityUser) {
       throw new UnauthorizedException(MESSAGES.COMMENT.CREATE.BAD_REQUEST);
@@ -324,13 +327,12 @@ export class PostService {
     if (_.isEmpty(createCommentDto.comment)) {
       throw new BadRequestException(MESSAGES.COMMENT.COMMON.COMMENT);
     }
-
     const communityUserId = communityUser.communityUserId;
-    const artistId = createCommentDto?.artistId;
+    //const artistId = createCommentDto?.artistId;
     const requestData = {
       postId,
       communityUserId,
-      artistId,
+      artistId: communityUser.artist?.artistId,
       comment: createCommentDto.comment,
     };
 
@@ -343,17 +345,21 @@ export class PostService {
    * @param postId - 게시물의 ID
    * @returns 해당 게시물의 댓글 배열
    */
-  async findCommentsByPost(postId: number) {
-    const comments = await this.commentRepository.find({
-      where: { postId },
-      // relations: {
-      //   communityUser: {
-      //     users: true,
-      //   },
-      // },
-      relations: ['communityUser', 'communityUser.users'],
-      order: { createdAt: 'DESC' }, // 최신 게시물 순으로 정렬 (필요 시 추가)
-    });
+  async findCommentsByPost(postId: number, isArtist: boolean) {
+    let comments;
+    if (isArtist) {
+      comments = await this.commentRepository.find({
+        where: { postId, artistId: Not(IsNull()) },
+        relations: ['communityUser', 'communityUser.users'],
+        order: { createdAt: 'DESC' }, // 최신 게시물 순으로 정렬 (필요 시 추가)
+      });
+    } else {
+      comments = await this.commentRepository.find({
+        where: { postId },
+        relations: ['communityUser', 'communityUser.users'],
+        order: { createdAt: 'DESC' }, // 최신 게시물 순으로 정렬 (필요 시 추가)
+      });
+    }
 
     console.log(comments);
     const commentList = comments.map((comment) => {
