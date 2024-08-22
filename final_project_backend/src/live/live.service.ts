@@ -4,7 +4,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import NodeMediaServer from 'node-media-server';
-import { LiveTypes } from './types/live-types.enum';
 import Crypto from 'crypto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -65,8 +64,8 @@ export class LiveService {
       //   cert: './cert.pem',
       // },
       trans: {
-         //ffmpeg:'/usr/bin/ffmpeg',
-         ffmpeg: '/Users/pc/Downloads/ffmpeg-2024-08-18-git-7e5410eadb-full_build/ffmpeg-2024-08-18-git-7e5410eadb-full_build/bin/ffmpeg.exe',
+         ffmpeg:'/usr/bin/ffmpeg',
+         //ffmpeg: '/Users/pc/Downloads/ffmpeg-2024-08-18-git-7e5410eadb-full_build/ffmpeg-2024-08-18-git-7e5410eadb-full_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
@@ -284,7 +283,7 @@ export class LiveService {
     }
   }
 
-  async createLive(artistId: number, title: string, liveType: LiveTypes) {
+  async createLive(artistId: number, title: string) {
     // userId로 커뮤니티아티인지 확인 + 어느 커뮤니티인지 조회
     const artist = await this.artistsRepository.findOne({
       where: {
@@ -307,7 +306,6 @@ export class LiveService {
       communityId: artist.communityId,
       artistId: artistId,
       title,
-      liveType,
       streamKey,
     });
     return {
