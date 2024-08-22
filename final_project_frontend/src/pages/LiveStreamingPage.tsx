@@ -3,55 +3,43 @@ import { useParams } from 'react-router-dom';
 import { liveApi } from '../services/api';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
-import './LiveStreamingPage'; // 새로운 CSS 파일을 만들어 스타일을 추가합니다.
+import './LiveStreamingPage.scss';
+import Header from "../components/communityBoard/Header2";
+import CommunityNavigationHeader from "../components/communityBoard/liveHeader";
 
 interface LiveData {
   liveId: number;
   title: string;
   artistId: number;
   liveHls: string;
-  communityId: number;
 }
-
-const getToken = (): string | null => {
-  return localStorage.getItem("accessToken");
-};
-
-const isTokenValid = (token: string | null): boolean => {
-  if (!token) return false;
-  // 여기에 토큰 유효성 검사 로직 추가
-  return true; // 임시로 true 반환
-};
 
 const LiveStreamingPage: React.FC = () => {
   const [liveData, setLiveData] = useState<LiveData | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   const { liveId } = useParams<{ liveId: string }>();
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<any>(null);
 
   useEffect(() => {
-    const fetchLiveData = async () => {
-      try {
-        const response = await liveApi.watchLive(Number(liveId));
-        if (response.data.status === 200) {
-          setLiveData(response.data.data);
-        } else {
-          console.error('라이브 데이터를 가져오는데 실패했습니다:', response.data.message);
-        }
-      } catch (error) {
-        console.error('라이브 데이터를 가져오는데 실패했습니다:', error);
+    const checkAuthAndFetchData = async () => {
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        setIsLoggedIn(true);
+        await fetchLiveData();
+      } else {
+        setIsLoggedIn(false);
       }
     };
-    if (liveId) {
-      fetchLiveData();
-    }
+    checkAuthAndFetchData();
   }, [liveId]);
 
   useEffect(() => {
     if (liveData?.liveHls) {
       const videoJsOptions = {
-        autoplay: true,
+        autoplay: false, // 자동 실행을 false로 설정
         controls: true,
         responsive: true,
         fluid: true,
@@ -84,6 +72,31 @@ const LiveStreamingPage: React.FC = () => {
     };
   }, [liveData]);
 
+  const fetchLiveData = async () => {
+    try {
+      const response = await liveApi.watchLive(Number(liveId));
+      if (response.data.status === 200) {
+        setLiveData(response.data.data);
+      } else {
+        console.error('라이브 데이터를 가져오는데 실패했습니다:', response.data.message);
+      }
+    } catch (error) {
+      console.error('라이브 데이터를 가져오는데 실패했습니다:', error);
+    }
+  };
+
+  const handleLogout = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      localStorage.removeItem("isLoggedIn");
+      localStorage.clear();
+      alert("로그아웃이 성공적으로 되었습니다.");
+      window.location.reload();
+    } catch (error) {
+      alert("로그아웃 실패.");
+    }
+  };
+
   const toggleFullscreen = () => {
     if (playerRef.current) {
       if (!isFullscreen) {
@@ -95,21 +108,26 @@ const LiveStreamingPage: React.FC = () => {
   };
 
   return (
-    <div className="live-streaming-container">
-      <h1>{liveData?.title}</h1>
-      {liveData?.liveHls && (
-        <div className="video-container">
-          <div data-vjs-player>
-            <video
-              ref={videoRef}
-              className="video-js vjs-default-skin vjs-big-play-centered"
-            ></video>
-          </div>
-          <button onClick={toggleFullscreen} className="fullscreen-button">
-            {isFullscreen ? '전체화면 종료' : '전체화면'}
-          </button>
+    <div className="live-streaming-page">
+      <Header communityName={liveData?.title || "Live Streaming"} isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
+      <CommunityNavigationHeader />
+      <div className="main-content">
+        <div className="video-section">
+          {liveData?.liveHls && (
+            <div className="video-container">
+              <div data-vjs-player>
+                <video
+                  ref={videoRef}
+                  className="video-js vjs-default-skin vjs-big-play-centered"
+                ></video>
+              </div>
+              <button onClick={toggleFullscreen} className="fullscreen-button">
+                {isFullscreen ? '전체화면 종료' : '전체화면'}
+              </button>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };
