@@ -59,11 +59,11 @@ export class LiveService {
         hls: true,  // HLS 사용 설정
         allow_origin: '*',
       },
-      https: {
-        port: 8443,
-        key: '../key.pem',
-        cert: '../cert.pem',
-      },
+      // https: {
+      //   port: 8443,
+      //   key: '/etc/letsencrypt/live/live.flant.club/privkey.pem',
+      //   cert: '/etc/letsencrypt/live/live.flant.club/fullchain.pem',
+      // },
       trans: {
          ffmpeg:'/usr/bin/ffmpeg',
          //ffmpeg: '/Users/pc/Downloads/ffmpeg-2024-08-18-git-7e5410eadb-full_build/ffmpeg-2024-08-18-git-7e5410eadb-full_build/bin/ffmpeg.exe',
@@ -351,7 +351,7 @@ export class LiveService {
       artistId: live.artistId,
       // artistNickname: live.artist.artistNickname,
       title: live.title,
-      liveHls: `https://43.201.107.36:8443/live/${live.streamKey}/index.m3u8`,
+      liveHls: `https://live.flant.club:8443/live/${live.streamKey}/index.m3u8`,
       // liveHls: `https://flant.club:8443/live/${live.streamKey}/index.m3u8`,
     };
   }
