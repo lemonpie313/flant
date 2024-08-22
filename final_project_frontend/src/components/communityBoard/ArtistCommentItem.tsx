@@ -5,13 +5,13 @@ interface CommentItemProps extends Comment {
   onReply: (commentId: number, comment: string) => void;
 }
 
-const CommentItem: React.FC<CommentItemProps> = ({ id, author, comment, createdAt, profileImage, onReply }) => {
+const CommentItem: React.FC<CommentItemProps> = ({ commentId, author, comment, createdAt, profileImage, onReply }) => {
   const [replyContent, setReplyContent] = useState("");
 
   const handleReplySubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (replyContent.trim()) {
-      onReply(id, replyContent);
+      onReply(commentId, replyContent);
       setReplyContent("");
     }
   };
@@ -19,14 +19,14 @@ const CommentItem: React.FC<CommentItemProps> = ({ id, author, comment, createdA
   return (
     <div className="comment-item">
       <div className="comment-header">
-      <img
-            src={profileImage || "/default-profile.png"}
-            alt={author}
-            className="author-image"
-            onError={(e) => {
-              e.currentTarget.src = "/default-profile.png";
-            }}
-          />
+        <img
+          src={profileImage || "/default-profile.png"}
+          alt={author}
+          className="author-image"
+          onError={(e) => {
+            e.currentTarget.src = "/default-profile.png";
+          }}
+        />
         <strong>{author}</strong>
         <span>{new Date(createdAt).toLocaleString()}</span>
       </div>

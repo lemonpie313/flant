@@ -101,13 +101,13 @@ export class CartController {
     @Res() res,
   ) {
     // 서비스 호출하여 로직 처리
-    console.log({quantity});
+    console.log({ quantity });
     const data = await this.cartService.cartQuantity(
       user.id,
       +cartItemId,
       quantity,
     );
-    console.log({quantity});
+    console.log({ quantity });
     return res.json(data);
   }
 }
