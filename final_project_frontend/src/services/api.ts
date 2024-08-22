@@ -155,8 +155,6 @@ export const commentApi = {
 export const liveApi = {
   createLive: (artistId: string, title: string, liveType: string) =>
     api.post("/live", { artistId, title, liveType }).catch(handleApiError),
-  findAllLives: (communityId: string) =>
-    api.get(`/live/community/${communityId}`).catch(handleApiError),
   watchLive: (liveId: number) =>
     api.get(`/live/${liveId}`).catch(handleApiError),
 };
