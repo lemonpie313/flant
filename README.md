@@ -35,6 +35,8 @@
 <h4>팬들 간의 활발한 교류를 나눌 수 있는 공간을 제공합니다.</h4>
 <h4>누구에게나 쉽게 접근하고 이용할 수 있는 플랫폼을 목표로 Flant를 만들었습니다.</h4>
 
+---
+
 ## 👨‍👨‍👦‍👦 팀원 구성
 
 <table>
@@ -86,7 +88,7 @@
 
 ## 📌 주요 기능 및 설명
 
- <details><summary>관리자
+ <details><summary>1. 관리자
 
 </summary>
 
@@ -95,7 +97,8 @@
 - 매니저 생성 / 삭제
 </details>
 
- <details><summary> 인증
+<br>
+<details><summary>2. 인증
 
 </summary>
 
@@ -106,8 +109,8 @@
 - 로그아웃
 
 </details>
-
-<details><summary>사용자
+<br>
+<details><summary>3. 사용자
 </summary>
 
 - 내 정보 조회
@@ -117,7 +120,9 @@
 - 내 정보 수정
 
 - 회원 탈퇴
-</details><details><summary>커뮤니티
+
+</details>
+<br><details><summary>4. 커뮤니티
 </summary>
 
 - 커뮤니티 생성
@@ -133,7 +138,8 @@
 - 내가 가입한 커뮤니티 조회
 
 - 로고 및 커버 이미지 수정
-</details><details><summary>게시글
+</details>
+<br><details><summary>5. 게시글
 </summary>
 
 - 게시글 생성
@@ -145,7 +151,8 @@
 - 게시글 삭제
 
 - 게시글 좋아요 확인
-</details><details><summary>댓글
+</details>
+<br><details><summary>6. 댓글
 </summary>
 
 - 댓글 생성
@@ -156,7 +163,8 @@
 
 - 댓글 삭제
 </details>
-</details><details><summary>미디어
+</details>
+<br><details><summary>7. 미디어
 </summary>
 
 - 미디어 생성
@@ -169,12 +177,14 @@
 
 - 썸네일 이미지 수정
 </details>
-</details><details><summary>멤버십
+</details>
+<br><details><summary>8. 멤버십
 </summary>
 
 - 멤버십 가입
 </details>
-</details><details><summary>좋아요 기능
+</details>
+<br><details><summary>9. 좋아요 기능
 </summary>
 
 - 커뮤니티 좋아요
@@ -183,7 +193,8 @@
 
 - 좋아요 개수 조회
 </details>
-</details><details><summary>상품
+</details>
+<br><details><summary>10. 상품
 </summary>
 
 - 상품 생성
@@ -195,7 +206,8 @@
 - 상품 삭제
 </details>
 </details>
-</details><details><summary>장바구니
+</details>
+<br><details><summary>11. 장바구니
 </summary>
 
 - 카트 생성
@@ -207,7 +219,8 @@
 - 상품 수량 수정
 </details>
 </details>
-</details><details><summary>주문
+</details>
+<br><details><summary>12. 주문
 </summary>
 
 - 주문 생성
