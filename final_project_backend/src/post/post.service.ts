@@ -361,12 +361,14 @@ export class PostService {
 
     console.log(comments);
     const commentList = comments.map((comment) => {
-      // console.log(comment.communityUser);
+      console.log(comment.communityUser);
       return {
         postId: comment.postId,
+        commentId: comment.commentId,
         author: comment.communityUser.nickName,
+        authorId: comment.communityUser.userId,
         profileImage: comment.communityUser.users.profileImage,
-        // isArtist: comment.artistId !== null, // artistId가 존재하면 아티스트로 간주
+        isArtist: comment.artistId !== null, // artistId가 존재하면 아티스트로 간주
         comment: comment.comment,
         createdAt: comment.createdAt,
         updatedAt: comment.updatedAt,
