@@ -9,14 +9,9 @@ import ArtistCommentItem from "./ArtistCommentItem";
 
 interface PostCardProps extends Post {
   onLike: (postId: number, likeStatus: boolean) => void;
-  onComment: (
-    postId: number,
-    comment: string,
-    communityId: number,
-    artistId?: number,
-    imageUrl?: string
-  ) => void;
+  onComment: (postId: number, comment: string, communityId: number, artistId?: number, imageUrl?: string) => void;
   onReply: (commentId: number, content: string) => void;
+  artistId?: number; // PostCard에 artistId를 선택적으로 전달
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -32,6 +27,7 @@ const PostCard: React.FC<PostCardProps> = ({
   onLike,
   onComment,
   onReply,
+  artistId, // artistId를 받아옴
 }) => {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
@@ -44,6 +40,8 @@ const PostCard: React.FC<PostCardProps> = ({
   const [popupUserId, setPopupUserId] = useState<number | null>(null);
   const [communityUserId, setCommunityUser] = useState<CommunityUser>();
   const { communityId } = useParams<{ communityId: string }>();
+  const [currentCommunityUserId, setCurrentCommunityUserId] = useState<number | null>(null);
+  const [communityUsers, setCommunityUsers] = useState<CommunityUser[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [users, setUsers] = useState<User[]>([]);
 
@@ -72,15 +70,44 @@ const PostCard: React.FC<PostCardProps> = ({
   //   };
   // });
 
-  // const handleCommentSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   if (newComment.trim()) {
-  //     onComment(postId, newComment);
-  //     setNewComment("");
-  //   }
+  // 로그인된 사용자의 communityUserId 가져오기
+  // useEffect(() => {
+  //   const fetchCommunityUsers = async () => {
+  //     try {
+  //       const response = await communityUserApi.findCommunityUser(Number(communityId));
+  //       setCommunityUsers(response.data);
+
+  //       // 현재 로그인 사용자의 communityUserId 찾기
+  //       // 여기서는 현재 로그인 사용자 ID를 사용하는 API 호출을 가정
+  //       const currentUserResponse = await userApi.findMy();
+  //       const currentUserId = currentUserResponse.data.id;
+
+  //       const currentUserCommunityUser = response.data.find((user) => user.userId === currentUserId);
+  //       setCurrentCommunityUserId(currentUserCommunityUser?.communityUserId || null);
+  //     } catch (error) {
+  //       console.error("Failed to fetch community users:", error);
+  //     }
+  //   };
+
+  //   fetchCommunityUsers();
+  // }, [communityId]);
+  // // 댓글 작성자와 현재 사용자 비교
+  // const isCommentOwner = (comment: Comment) => {
+  //   return currentCommunityUserId === comment.authorId;
   // };
 
   useEffect(() => {
+    const fetchComments = async () => {
+      if (popupPostId !== null) {
+        try {
+          const response = await commentApi.getComments(popupPostId, true);
+          setCommentsList(response.data);
+        } catch (error) {
+          console.error("Failed to fetch comments:", error);
+        }
+      }
+    };
+
     const fetchUser = async () => {
       try {
         const response = await userApi.findMy(); // 유저 조회 API 호출
@@ -89,7 +116,11 @@ const PostCard: React.FC<PostCardProps> = ({
         console.error("Failed to fetch user:", error);
       }
     };
-  }, [communityId]);
+
+    // 두 함수 호출
+    fetchComments();
+    fetchUser();
+  }, [popupPostId]); // popupPostId가 변경될 때마다 이 useEffect가 실행됩니다.
 
   const openAllCommentsPopup = async () => {
     setPopupPostId(postId); // postId를 상태에 저장
@@ -114,18 +145,43 @@ const PostCard: React.FC<PostCardProps> = ({
           postId: popupPostId!, // 팝업에서 사용될 postId로 댓글 생성
           comment: newComment,
           communityId: Number(communityId),
-          // artistId,
+          artistId: Number(artistId),
           // imageUrl,
         });
+        if (artistId) {
+          artistId; // artistId가 있을 경우에만 추가
+        }
+
         setNewComment("");
-        const updatedComments = await commentApi.getComments(
-          popupPostId!,
-          false
-        );
+        const updatedComments = await commentApi.getComments(popupPostId!, false);
         setCommentsList(updatedComments.data);
       } catch (error) {
         console.error("댓글 작성 실패:", error);
       }
+    }
+  };
+
+  const handleEditComment = async (commentId: number, updatedComment: string) => {
+    const numericArtistId = artistId ? Number(artistId) : undefined;
+
+    try {
+      await commentApi.patchComment(commentId, {
+        comment: updatedComment,
+        isArtist: numericArtistId,
+      });
+      const updatedComments = await commentApi.getComments(popupPostId!);
+      setCommentsList(updatedComments.data);
+    } catch (error) {
+      console.error("Failed to edit comment:", error);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: number) => {
+    try {
+      await commentApi.deleteComment(commentId);
+      setCommentsList((prevComments) => prevComments.filter((comment) => comment.commentId !== commentId));
+    } catch (error) {
+      console.error("Failed to delete comment:", error);
     }
   };
 
@@ -150,13 +206,10 @@ const PostCard: React.FC<PostCardProps> = ({
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return `${(date.getMonth() + 1).toString().padStart(2, "0")}. ${date
-      .getDate()
+    return `${(date.getMonth() + 1).toString().padStart(2, "0")}. ${date.getDate().toString().padStart(2, "0")}. ${date
+      .getHours()
       .toString()
-      .padStart(2, "0")}. ${date.getHours().toString().padStart(2, "0")}:${date
-      .getMinutes()
-      .toString()
-      .padStart(2, "0")}`;
+      .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
   };
 
   const getImageLayout = () => {
@@ -211,11 +264,7 @@ const PostCard: React.FC<PostCardProps> = ({
           </div>
           <div className="right-images">
             {postImages.slice(1).map((image) => (
-              <img
-                key={image.postImageId}
-                src={image.postImageUrl}
-                alt="Post"
-              />
+              <img key={image.postImageId} src={image.postImageUrl} alt="Post" />
             ))}
           </div>
         </div>
@@ -231,11 +280,18 @@ const PostCard: React.FC<PostCardProps> = ({
       </div>
       {showComments && (
         <div className="comments-section">
-          {comments.length > 0
-            ? comments.map((comment) => (
-                <CommentItem key={comment.id} {...comment} onReply={onReply} />
+          {commentsList.length > 0
+            ? commentsList.map((comment) => (
+                <CommentItem
+                  key={comment.commentId}
+                  {...comment}
+                  commentId={comment.commentId}
+                  onDelete={handleDeleteComment}
+                  onEdit={() => {}}
+                  onReply={() => {}}
+                />
               ))
-            : !loadingComments && <p>No comments yet.</p>}
+            : !loadingComments && <p>댓글이 존재하지 않습니다.</p>}
           <form onSubmit={handleCommentSubmit} className="comment-form">
             <input
               type="text"
@@ -259,13 +315,7 @@ const PostCard: React.FC<PostCardProps> = ({
                 <h3>게시글 내용</h3>
                 <p>{content}</p>
                 {postImages.length > 0 &&
-                  postImages.map((image) => (
-                    <img
-                      key={image.postImageId}
-                      src={image.postImageUrl}
-                      alt="Post"
-                    />
-                  ))}
+                  postImages.map((image) => <img key={image.postImageId} src={image.postImageUrl} alt="Post" />)}
               </div>
               <div className="comments-content-right">
                 <h3>댓글</h3>
@@ -279,20 +329,19 @@ const PostCard: React.FC<PostCardProps> = ({
                   <div className="artist-comments">
                     {commentsList.length > 0
                       ? artistsCommentsList.map((comment) => (
-                          <ArtistCommentItem
-                            key={comment.id}
-                            {...comment}
-                            onReply={onReply}
-                          />
+                          <ArtistCommentItem key={comment.commentId} {...comment} onReply={onReply} />
                         ))
                       : !loadingComments && <p></p>}
                   </div>
                   {commentsList.length > 0
                     ? commentsList.map((comment) => (
                         <CommentItem
-                          key={comment.id}
+                          key={comment.commentId}
                           {...comment}
+                          commentId={comment.commentId}
                           onReply={onReply}
+                          onEdit={handleEditComment}
+                          onDelete={handleDeleteComment}
                         />
                       ))
                     : !loadingComments && <p>댓글이 존재하지 않습니다.</p>}
