@@ -217,6 +217,15 @@ export const MESSAGES = {
       NOT_FOUND: '댓글이 존재하지 않습니다.',
       SUCCEED: '댓글 조회에 성공했습니다.',
     },
+    UPDATE: {
+      REQUIRED: '입력된 수정 사항이 없습니다.',
+      UNAUTHORIZED: '댓글 수정 권한이 없습니다',
+      SUCCEED: '댓글 수정에 성공했습니다.',
+    },
+    DELETE: {
+      UNAUTHORIZED: '댓글 삭제 권한이 없습니다',
+      SUCCEED: '댓글 삭제에 성공했습니다.',
+    },
   },
 
   NOTICE: {

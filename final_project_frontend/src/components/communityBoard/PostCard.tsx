@@ -111,12 +111,10 @@ const PostCard: React.FC<PostCardProps> = ({
         }
       }
     };
-
     fetchComments();
   }, [popupPostId]);
 
   const openAllCommentsPopup = () => {
-    console.log("Post ID:", postId); // postId가 제대로 전달되는지 확인
     setPopupPostId(postId); // postId를 상태에 저장
     setShowAllCommentsPopup(true);
   };

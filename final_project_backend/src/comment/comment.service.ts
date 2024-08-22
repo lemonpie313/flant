@@ -1,13 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comment } from './entities/comment.entity';
+import { PartialUser } from 'src/user/interfaces/partial-user.entity';
+import { CommunityUser } from 'src/community/community-user/entities/communityUser.entity';
+import { MESSAGES } from 'src/constants/message.constant';
 
 @Injectable()
 export class CommentService {
   constructor(
     @InjectRepository(Comment)
     private commentRepository: Repository<Comment>, // Comment 엔티티에 대한 Repository 주입
+    @InjectRepository(CommunityUser)
+    private communityUserRepository: Repository<CommunityUser>, // Comment 엔티티에 대한 Repository 주입
   ) {}
 
   /**
@@ -42,7 +52,27 @@ export class CommentService {
    * @param id - 업데이트할 댓글의 ID
    * @param commentData - 업데이트할 데이터
    */
-  async update(id: number, commentData: Partial<Comment>): Promise<void> {
+  async update(
+    user: PartialUser,
+    id: number,
+    commentData: Partial<Comment>,
+  ): Promise<void> {
+    const userId = user.id;
+    const comment = await this.commentRepository.findOne({
+      where: { commentId: id },
+    });
+
+    // 현재 사용자가 속한 모든 communityUserId 조회
+    const communityUsers = await this.communityUserRepository.find({
+      where: { userId },
+    });
+    // 사용자가 속한 모든 커뮤니티의 communityUserId 목록 생성
+    const communityUserIds = communityUsers.map((cu) => cu.communityUserId);
+    // 댓글의 communityUserId가 사용자의 communityUserId 목록에 포함되는지 확인
+    if (!communityUserIds.includes(comment.communityUserId)) {
+      throw new ForbiddenException(MESSAGES.COMMENT.UPDATE.UNAUTHORIZED);
+    }
+
     await this.commentRepository.update(id, commentData); // ID로 댓글을 찾아 업데이트
   }
 
@@ -50,8 +80,25 @@ export class CommentService {
    * 주어진 ID의 댓글을 삭제합니다.
    * @param id - 삭제할 댓글의 ID
    */
-  async remove(id: number): Promise<void> {
-    await this.commentRepository.delete(id); // ID로 댓글을 삭제
+  async remove(user: PartialUser, id: number) {
+    const userId = user.id;
+
+    const comment = await this.commentRepository.findOne({
+      where: { commentId: id },
+    });
+
+    // 현재 사용자가 속한 모든 communityUserId 조회
+    const communityUsers = await this.communityUserRepository.find({
+      where: { userId },
+    });
+    // 사용자가 속한 모든 커뮤니티의 communityUserId 목록 생성
+    const communityUserIds = communityUsers.map((cu) => cu.communityUserId);
+    // 댓글의 communityUserId가 사용자의 communityUserId 목록에 포함되는지 확인
+    if (!communityUserIds.includes(comment.communityUserId)) {
+      throw new ForbiddenException(MESSAGES.COMMENT.DELETE.UNAUTHORIZED);
+    }
+
+    return await this.commentRepository.delete(id); // 댓글 엔티티 인스턴스 생성
   }
 
   /**
@@ -64,14 +111,14 @@ export class CommentService {
   }
 
   /**
- * 새로운 대댓글을 생성합니다.
- * @param replyData - 생성할 대댓글의 데이터 (parentCommentId 포함)
- * @returns 생성된 대댓글
- */
-async createReply(replyData: Partial<Comment>): Promise<Comment> {
-  const reply = this.commentRepository.create(replyData);
-  return this.commentRepository.save(reply);
-}
+   * 새로운 대댓글을 생성합니다.
+   * @param replyData - 생성할 대댓글의 데이터 (parentCommentId 포함)
+   * @returns 생성된 대댓글
+   */
+  async createReply(replyData: Partial<Comment>): Promise<Comment> {
+    const reply = this.commentRepository.create(replyData);
+    return this.commentRepository.save(reply);
+  }
 
   /**
    * 특정 댓글에 대한 대댓글을 조회합니다.
