@@ -11,7 +11,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   commentId,
   author,
   communityId,
-  artistId,
+  isArtist,
   profileImage,
   comment,
   createdAt,
@@ -39,7 +39,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   const handleSaveEdit = async () => {
     if (newComment.trim()) {
       try {
-        await onEdit(commentId, newComment, communityId, artistId);
+        await onEdit(commentId, newComment, communityId);
         setIsEditing(false); // Exit editing mode
         setError(null); // Clear error message
       } catch (error) {

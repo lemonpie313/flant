@@ -100,7 +100,7 @@ const PostCard: React.FC<PostCardProps> = ({
     const fetchComments = async () => {
       if (popupPostId !== null) {
         try {
-          const response = await commentApi.getComments(popupPostId, isArtist);
+          const response = await commentApi.getComments(popupPostId, true);
           setCommentsList(response.data);
         } catch (error) {
           console.error("Failed to fetch comments:", error);

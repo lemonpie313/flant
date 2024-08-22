@@ -29,15 +29,11 @@ export interface Comment {
   commentId: number;
   communityId: number;
   author: string;
+  authorId: number;
   comment: string;
   createdAt: string;
-<<<<<<< HEAD
-  authorId: number; // 댓글 작성자의 communityUserId
-  artistId?: number;
-=======
   profileImage?: string; // 프로필 이미지를 위한 속성 추가
-  isArtist?: boolean;    // 아티스트 여부를 위한 속성 추가
->>>>>>> 05c7c8330d2cd202316dd9ff4a95686d321aaae4
+  isArtist?: boolean; // 아티스트 여부를 위한 속성 추가
 }
 
 export interface User {
