@@ -61,8 +61,8 @@ export class LiveService {
       },
       https: {
         port: 8443,
-        key: '/etc/letsencrypt/live/live.flant.club/privkey.pem',
-        cert: '/etc/letsencrypt/live/live.flant.club/fullchain.pem',
+        key: '../key.pem',
+        cert: '..cert.pem',
       },
       trans: {
          ffmpeg:'/usr/bin/ffmpeg',
