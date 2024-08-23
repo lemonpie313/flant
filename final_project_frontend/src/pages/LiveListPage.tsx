@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 import { liveApi, authApi } from '../services/api';
 import Header from "../components/communityBoard/Header";
 import CommunityNavigationHeader from "../components/communityBoard/liveHeader";
@@ -14,8 +14,10 @@ const LiveListPage: React.FC = () => {
   const [lives, setLives] = useState<Live[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const { communityId } = useParams<{ communityId: string }>();
 
   useEffect(() => {
+    console.log(communityId)
     const checkAuth = async () => {
       const token = localStorage.getItem("accessToken");
       if (token) {
