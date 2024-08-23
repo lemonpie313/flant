@@ -56,7 +56,7 @@ export class LiveService {
         port: 8000,
         mediaroot: '../media', // path.join(__dirname, '../../media'),
         webroot: './www',
-        hls: true,  // HLS 사용 설정
+        hls: true, // HLS 사용 설정
         allow_origin: '*',
       },
       https: {
@@ -65,8 +65,8 @@ export class LiveService {
         cert: '/etc/letsencrypt/live/live.flant.club/fullchain.pem',
       },
       trans: {
-         ffmpeg:'/usr/bin/ffmpeg',
-         //ffmpeg: '/Users/pc/Downloads/ffmpeg-2024-08-18-git-7e5410eadb-full_build/ffmpeg-2024-08-18-git-7e5410eadb-full_build/bin/ffmpeg.exe',
+        ffmpeg: '/usr/bin/ffmpeg',
+        //ffmpeg: '/Users/pc/Downloads/ffmpeg-2024-08-18-git-7e5410eadb-full_build/ffmpeg-2024-08-18-git-7e5410eadb-full_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
