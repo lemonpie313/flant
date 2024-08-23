@@ -18,7 +18,7 @@ interface ChatRoom {
 @Injectable()
 export class ChatService {
   // 채팅 방을 저장할 객체
-  private chatRooms: { [roomId: string]: ChatRoom } = {};
+  private chatRooms: { [roomId: string]: ChatRoom } = {}
 
   // 새로운 채팅 방 생성
   createRoom(roomId: string) {
