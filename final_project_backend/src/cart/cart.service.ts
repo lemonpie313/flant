@@ -89,12 +89,14 @@ export class CartService {
       if (!cart) {
         cart = await queryRunner.manager.save(Cart, { user });
       }
+
       console.log('---------------장바구니생성완료------------');
       // 장바구니에 입력한 동일 상품 id && 옵션 id 있는지 확인
       const merchandiseCheck = await queryRunner.manager.findOne(CartItem, {
         where: {
           merchandise: { merchandiseId: createCartDto.merchandiseId },
           merchandiseOption: { id: createCartDto.merchandiseOptionId },
+          cartId: cart.id,
         },
         relations: ['merchandise', 'merchandiseOption'],
       });
@@ -227,18 +229,18 @@ export class CartService {
     console.log(cartItem);
     console.log(quantity);
     let updatedQuantity;
-    if (quantity==UpdateQuantity.INCREMENT) {
+    if (quantity == UpdateQuantity.INCREMENT) {
       updatedQuantity = cartItem.quantity + 1;
-    } else if (quantity==UpdateQuantity.DECREMENT) {
+    } else if (quantity == UpdateQuantity.DECREMENT) {
       updatedQuantity = cartItem.quantity - 1;
     } else {
-      return{
+      return {
         status: HttpStatus.BAD_REQUEST,
         message: '잘못된 경로입니다.',
       };
     }
-    if (updatedQuantity==0) {
-      return{
+    if (updatedQuantity == 0) {
+      return {
         status: HttpStatus.BAD_REQUEST,
         message: '최소 수량입니다.',
       };
