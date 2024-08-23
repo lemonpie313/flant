@@ -15,23 +15,24 @@ import { MerchandiseOption } from 'src/merchandise/entities/marchandise-option.e
 
 @Entity('cart_items')
 export class CartItem {
-  @PrimaryGeneratedColumn({ unsigned: true})
+  @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
-  @Column({unsigned: true})
+  @Column({ unsigned: true })
   merchandiseId: number;
+
+  @Column({ unsigned: true })
+  cartId: number;
 
   // 카트 연결
   @ManyToOne(() => Cart, (cart) => cart.cartItem, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'cart_id' })
-  cart: Cart; 
+  cart: Cart;
 
   //상품 연결
-  @ManyToOne(
-    () => Merchandise,
-    (merchandise) => merchandise.cartItems,
-    { onDelete: 'CASCADE' },
-  )
+  @ManyToOne(() => Merchandise, (merchandise) => merchandise.cartItems, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'merchandise_id' })
   merchandise: Merchandise;
 
