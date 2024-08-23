@@ -17,8 +17,8 @@ const CommentItem: React.FC<CommentItemProps> = ({ commentId, author, comment, c
   };
 
   return (
-    <div className="comment-item">
-      <div className="comment-header">
+    <div className="artist-comment-item">
+      <div className="artist-comment-header">
         <img
           src={profileImage || "/default-profile.png"}
           alt={author}
@@ -26,11 +26,11 @@ const CommentItem: React.FC<CommentItemProps> = ({ commentId, author, comment, c
           onError={(e) => {
             e.currentTarget.src = "/default-profile.png";
           }}
-        />
+        />g
         <strong>{author}</strong>
         <span>{new Date(createdAt).toLocaleString()}</span>
       </div>
-      <p className="comment-content">{comment}</p>
+      <p className="artist-comment-content">{comment}</p>
       {/* <button onClick={() => setReplyContent("답글")} className="reply-button">
         답글
       </button>

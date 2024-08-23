@@ -352,6 +352,32 @@
   flex: 1; /* 남은 공간을 모두 차지하게 함 */
 }
 
+
+.artist-comment-item { // 아티스트의 댓글만 따로 상단에 고정
+  background-color: rgba(0, 255, 106, 0.274);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column; /* 기본적으로 세로 방향 정렬 */
+  position: relative; /* 자식 요소의 위치를 상대적으로 설정할 수 있게 함 */
+  padding: 5px; /* 댓글 여백 설정 */
+  margin-bottom: 5px; /* 댓글 사이 여백 */
+}
+
+.artist-comment-author {
+  margin-right: 15px; /* 닉네임 오른쪽 간격 추가 */
+  font-size: 18px;
+  margin-bottom: 30px;
+}
+
+.artist-comment-time {
+  font-size: 15px; /* 시간 텍스트의 크기 설정 */
+  color: #888; /* 시간 텍스트 색상 설정 */
+}
+
+.artist-comment-content {
+  flex: 1; /* 남은 공간을 모두 차지하게 함 */
+}
+
 /* Modal overlay style */
 .overlay {
   position: fixed;
