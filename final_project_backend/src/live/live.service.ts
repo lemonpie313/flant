@@ -286,7 +286,7 @@ export class LiveService {
     }
   }
 
-  async createLive(artistId: number, title: string) {
+  async createLive(artistId: number, title: string, thumbnailImage: string) {
     // userId로 커뮤니티아티인지 확인 + 어느 커뮤니티인지 조회
     const artist = await this.artistsRepository.findOne({
       where: {
@@ -309,6 +309,7 @@ export class LiveService {
       communityId: artist.communityId,
       artistId: artistId,
       title,
+      thumbnailImage,
       streamKey,
     });
     return {

@@ -37,6 +37,12 @@
   height: 100% !important;
 }
 
+.live-title {
+  text-align: center; // 제목을 가운데 정렬
+  margin-bottom: 20px; // 제목 아래 여백 추가
+  margin-top: 20px;
+}
+
 // 대형 화면 (1200px 이상) 대응 스타일
 @media (min-width: 1200px) {
   .live-streaming-container {

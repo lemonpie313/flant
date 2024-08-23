@@ -145,7 +145,7 @@ const App: React.FC = () => {
               }
             />
             <Route
-              path="/live/:liveId"
+              path="communities/:communityId/live/:liveId"
               element={
                 <ProtectedRoute>
                   <LiveStreamingPage />

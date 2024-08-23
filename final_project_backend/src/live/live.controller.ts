@@ -37,8 +37,8 @@ export class LiveController {
   @UseGuards(JwtAuthGuard, CommunityUserGuard)
   @Post('/')
   async createLive(@UserInfo() user: PartialUser, @Body() createLiveDto: CreateLiveDto) {
-    const { title } = createLiveDto;
-    const live = await this.liveService.createLive(user.roleInfo.roleId, title);
+    const { title, thumbnailImage } = createLiveDto;
+    const live = await this.liveService.createLive(user.roleInfo.roleId, title, thumbnailImage);
     return {
       status: HttpStatus.CREATED,
       message: '스트림키 생성 완료',
