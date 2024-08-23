@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useChatContext } from '../context/ChatContext';
 import ChatWindow from './ChatWindow';
+import RoomSelector from './RoomSelector';
 import { jwtDecode } from "jwt-decode";
 import { communityApi } from "../services/api";
 
