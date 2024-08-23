@@ -4,7 +4,7 @@ import { useChatContext } from '../context/ChatContext';
 import ChatWindow from './ChatWindow';
 import RoomSelector from './RoomSelector';
 import { jwtDecode } from "jwt-decode";
-import { communityApi } from "../services/api";
+import { communityApi, userApi } from "../services/api";
 
 import './ChatComponent.scss';
 
@@ -33,6 +33,7 @@ const ChatComponent: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [communities, setCommunities] = useState<Community[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [isManager, setIsManager] = useState<boolean>(false); // 매니저 권한 상태
 
   const initializeSocket = useCallback(() => {
     const token = getToken();
@@ -71,6 +72,7 @@ const ChatComponent: React.FC = () => {
       const userId = getUserIdFromToken(token);
       setUserId(userId);
       fetchUserCommunities(userId);
+      checkUserIsManager(); // 사용자 매니저 권한 확인
     }
 
     const cleanup = initializeSocket();
@@ -86,6 +88,15 @@ const ChatComponent: React.FC = () => {
     } catch (error) {
       console.error("Failed to fetch user communities:", error);
       setError('커뮤니티 정보를 가져오는데 실패했습니다.');
+    }
+  };
+
+  const checkUserIsManager = async () => {
+    try {
+      const response = await userApi.findMy();
+      setIsManager(response.data.isManager); // 사용자 매니저 권한 확인
+    } catch (error) {
+      console.error("Failed to fetch user info:", error);
     }
   };
 
@@ -106,6 +117,7 @@ const ChatComponent: React.FC = () => {
           userId={userId}
           communities={communities}
           onClose={toggleChat}
+          isManager={isManager} // 매니저 권한 전달
         />
       )}
       {error && <div className="error-message">{error}</div>}

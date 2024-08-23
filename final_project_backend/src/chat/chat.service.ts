@@ -1,67 +1,77 @@
-// chat.service.ts
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ChatRoom } from './entities/chat-room.entity';
-import { ChatMessage } from './entities/chat-message.entity';
+
+// 채팅 메시지 인터페이스 정의
+interface ChatMessage {
+  roomId: string;
+  userId: string;
+  message: string;
+  timestamp: Date;
+}
+
+// 채팅 방 인터페이스 정의
+interface ChatRoom {
+  roomId: string;
+  users: string[];
+  messages: ChatMessage[];
+}
 
 @Injectable()
 export class ChatService {
-  constructor(
-    @InjectRepository(ChatRoom)
-    private chatRoomRepository: Repository<ChatRoom>,
-    @InjectRepository(ChatMessage)
-    private chatMessageRepository: Repository<ChatMessage>,
-  ) {}
+  // 채팅 방을 저장할 객체
+  private chatRooms: { [roomId: string]: ChatRoom } = {};
 
-  async createRoom(roomId: string) {
-    const room = await this.chatRoomRepository.findOne({ where: { roomId } });
-    if (!room) {
-      const newRoom = this.chatRoomRepository.create({ roomId, users: [], messages: [] });
-      await this.chatRoomRepository.save(newRoom);
+  // 새로운 채팅 방 생성
+  createRoom(roomId: string) {
+    if (!this.chatRooms[roomId]) {
+      this.chatRooms[roomId] = {
+        roomId,
+        users: [],
+        messages: [],
+      };
     }
   }
 
-  async addUserToRoom(roomId: string, userId: string) {
-    const room = await this.chatRoomRepository.findOne({ where: { roomId } });
+  // 채팅 방에 사용자 추가
+  addUserToRoom(roomId: string, userId: string) {
+    const room = this.chatRooms[roomId];
     if (room && !room.users.includes(userId)) {
       room.users.push(userId);
-      await this.chatRoomRepository.save(room);
     }
   }
 
-  async removeUserFromRoom(roomId: string, userId: string) {
-    const room = await this.chatRoomRepository.findOne({ where: { roomId } });
+  // 채팅 방에서 사용자 제거
+  removeUserFromRoom(roomId: string, userId: string) {
+    const room = this.chatRooms[roomId];
     if (room) {
       room.users = room.users.filter(user => user !== userId);
       if (room.users.length === 0) {
-        await this.chatRoomRepository.remove(room);
-      } else {
-        await this.chatRoomRepository.save(room);
+        delete this.chatRooms[roomId];
       }
     }
   }
 
-  async saveMessage(roomId: string, userId: string, message: string) {
-    const room = await this.chatRoomRepository.findOne({ where: { roomId } });
+  // 메시지 저장
+  saveMessage(roomId: string, userId: string, message: string) {
+    const room = this.chatRooms[roomId];
     if (room) {
-      const chatMessage = this.chatMessageRepository.create({
-        room,
+      const chatMessage: ChatMessage = {
+        roomId,
         userId,
         message,
         timestamp: new Date(),
-      });
-      await this.chatMessageRepository.save(chatMessage);
+      };
+      room.messages.push(chatMessage);
     }
   }
 
-  async getMessages(roomId: string): Promise<ChatMessage[]> {
-    const room = await this.chatRoomRepository.findOne({ where: { roomId }, relations: ['messages'] });
-    return room ? room.messages : [];
+  // 특정 방의 모든 메시지 가져오기
+  getMessages(roomId: string): ChatMessage[] {
+    return this.chatRooms[roomId]?.messages || [];
   }
 
-  async getUsers(roomId: string): Promise<string[]> {
-    const room = await this.chatRoomRepository.findOne({ where: { roomId } });
-    return room ? room.users : [];
+  // 특정 방의 모든 사용자 가져오기
+  getUsers(roomId: string): string[] {
+    return this.chatRooms[roomId]?.users || [];
   }
 }
+

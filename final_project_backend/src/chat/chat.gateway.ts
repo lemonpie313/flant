@@ -1,4 +1,3 @@
-// chat.gateway.ts
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
@@ -11,43 +10,49 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   constructor(private readonly chatService: ChatService) {}
 
+
+  @SubscribeMessage('createRoom')
+  handleCreateRoom(client: Socket, roomId: string): void {
+    this.chatService.createRoom(roomId);
+    this.logger.log(`Room ${roomId} created by client ${client.id}`);
+    client.emit('roomCreated', roomId); // 방 생성 완료 후 클라이언트에게 알림
+  }
+
+  // 클라이언트로부터 'msgToServer' 메시지를 수신했을 때 처리
   @SubscribeMessage('msgToServer')
-  async handleMessage(client: Socket, payload: { roomId: string, userId: string, message: string }) {
-    await this.chatService.saveMessage(payload.roomId, payload.userId, payload.message);
+  handleMessage(client: Socket, payload: { roomId: string, userId: string, message: string }): void {
+    this.chatService.saveMessage(payload.roomId, payload.userId, payload.message);
     this.server.to(payload.roomId).emit('msgToClient', payload);
   }
 
+  // 소켓 서버 초기화
   afterInit(server: Server) {
     this.logger.log('Init');
   }
 
-  async handleDisconnect(client: Socket) {
+  // 클라이언트 연결 해제
+  handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
-    const rooms = this.server.sockets.adapter.rooms;
-    rooms.forEach(async (room, roomId) => {
-      if (room.has(client.id)) {
-        client.leave(roomId);
-        await this.chatService.removeUserFromRoom(roomId, client.id);
-        this.logger.log(`Client ${client.id} left room ${roomId}`);
-      }
-    });
+    // 사용자가 속한 모든 방에서 제거
+    // 이 로직을 위해 사용자의 방 목록을 저장하는 별도의 구조가 필요할 수 있음
   }
 
+  // 클라이언트 연결
   handleConnection(client: Socket, ...args: any[]) {
     this.logger.log(`Client connected: ${client.id}`);
   }
 
+  // 클라이언트를 특정 방에 추가
   @SubscribeMessage('joinRoom')
-  async handleJoinRoom(client: Socket, data: { roomId: string, userId: string }) {
-    client.join(data.roomId);
-    await this.chatService.addUserToRoom(data.roomId, data.userId);
-    this.logger.log(`Client ${client.id} joined room ${data.roomId}`);
+  handleJoinRoom(client: Socket, roomId: string) {
+    client.join(roomId);
+    this.logger.log(`Client ${client.id} joined room ${roomId}`);
   }
 
+  // 클라이언트를 특정 방에서 제거
   @SubscribeMessage('leaveRoom')
-  async handleLeaveRoom(client: Socket, data: { roomId: string, userId: string }) {
-    client.leave(data.roomId);
-    await this.chatService.removeUserFromRoom(data.roomId, data.userId);
-    this.logger.log(`Client ${client.id} left room ${data.roomId}`);
+  handleLeaveRoom(client: Socket, roomId: string) {
+    client.leave(roomId);
+    this.logger.log(`Client ${client.id} left room ${roomId}`);
   }
 }

@@ -4,7 +4,7 @@ import { useChatContext } from '../context/ChatContext';
 import RoomSelector from './RoomSelector';
 import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
-import { X, PaperclipIcon, SendIcon } from 'lucide-react';
+import { X, SendIcon } from 'lucide-react';
 
 interface ChatMessage {
   roomId: string;
@@ -25,9 +25,10 @@ interface ChatWindowProps {
   userId: string | null;
   communities: Community[];
   onClose: () => void;
+  isManager: boolean; // 매니저 권한 확인
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ socket, userId, communities, onClose }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ socket, userId, communities, onClose, isManager }) => {
   const { messages, addMessage } = useChatContext();
   const [inputMessage, setInputMessage] = useState('');
   const [roomId, setRoomId] = useState<string | null>(null);
@@ -40,6 +41,27 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ socket, userId, communities, on
     setRoomId(newRoomId);
     setSelectedCommunity(communityId);
     socket.emit('joinRoom', { roomId: newRoomId, userId });
+  };
+
+  const createRoom = (communityName: string) => {
+    if (!socket || !isManager) return;
+
+    const newCommunityId = communities.length + 1; // 새 커뮤니티 ID 생성
+    const newRoomId = `community_${newCommunityId}`;
+    const newCommunity: Community = {
+      communityId: newCommunityId,
+      communityName,
+    };
+
+    // 서버에 방 생성 요청
+    socket.emit('createRoom', newRoomId, (error: any) => {
+      if (error) {
+        console.error('Failed to create room:', error);
+      } else {
+        communities.push(newCommunity); // 로컬 상태 업데이트
+        joinRoom(newCommunityId); // 생성된 방으로 바로 입장
+      }
+    });
   };
 
   const handleSendMessage = () => {
@@ -73,7 +95,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ socket, userId, communities, on
         <button onClick={onClose}><X /></button>
       </div>
       {!selectedCommunity ? (
-        <RoomSelector communities={communities} onSelectRoom={joinRoom} />
+        <RoomSelector
+          communities={communities}
+          onSelectRoom={joinRoom}
+          onCreateRoom={createRoom}
+          isManager={isManager} // 매니저 권한 전달
+        />
       ) : (
         <>
           <ScrollArea className="chat-messages">
