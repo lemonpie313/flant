@@ -44,6 +44,11 @@ export class Live {
   @Column({ type: 'varchar', length: 255 })
   title: string;
 
+  @IsString()
+  @IsOptional()
+  @Column({ default: null, nullable: true })
+  thumbnailImage: string | null;
+
   @Column({ type: 'varchar', length: 255, unique: true })
   streamKey: string;
 

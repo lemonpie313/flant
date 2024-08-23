@@ -59,11 +59,11 @@ export class LiveService {
         hls: true, // HLS 사용 설정
         allow_origin: '*',
       },
-      https: {
-        port: 8443,
-        key: '/etc/letsencrypt/live/live.flant.club/privkey.pem',
-        cert: '/etc/letsencrypt/live/live.flant.club/fullchain.pem',
-      },
+      // https: {
+      //   port: 8443,
+      //   key: '/etc/letsencrypt/live/live.flant.club/privkey.pem',
+      //   cert: '/etc/letsencrypt/live/live.flant.club/fullchain.pem',
+      // },
       trans: {
         ffmpeg: '/usr/bin/ffmpeg',
         //ffmpeg: '/Users/pc/Downloads/ffmpeg-2024-08-18-git-7e5410eadb-full_build/ffmpeg-2024-08-18-git-7e5410eadb-full_build/bin/ffmpeg.exe',
@@ -286,7 +286,7 @@ export class LiveService {
     }
   }
 
-  async createLive(artistId: number, title: string) {
+  async createLive(artistId: number, title: string, thumbnailImage: string) {
     // userId로 커뮤니티아티인지 확인 + 어느 커뮤니티인지 조회
     const artist = await this.artistsRepository.findOne({
       where: {
@@ -309,6 +309,7 @@ export class LiveService {
       communityId: artist.communityId,
       artistId: artistId,
       title,
+      thumbnailImage,
       streamKey,
     });
     return {

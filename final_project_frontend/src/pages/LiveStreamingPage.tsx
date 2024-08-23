@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
-import { liveApi } from '../services/api';
-import videojs from 'video.js';
-import 'video.js/dist/video-js.css';
-import './LiveStreamingPage.scss';
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { communityApi, liveApi } from "../services/api";
+import videojs from "video.js";
+import "video.js/dist/video-js.css";
+import "./LiveStreamingPage.scss";
 import Header from "../components/communityBoard/Header2";
-import CommunityNavigationHeader from "../components/communityBoard/liveHeader";
+import CommunityNavigationHeader from '../components/communityBoard/CommunityNavigationHeader';
 
 interface LiveData {
   liveId: number;
@@ -18,10 +18,42 @@ const LiveStreamingPage: React.FC = () => {
   const [liveData, setLiveData] = useState<LiveData | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [community, setCommunity] = useState<any>(null);
+  const navigate = useNavigate();
 
-  const { liveId } = useParams<{ liveId: string }>();
+  const { communityId, liveId } = useParams<{
+    communityId: string;
+    liveId: string;
+  }>();
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<any>(null);
+
+  // 로그인 여부 확인
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      const loggedIn = localStorage.getItem("isLoggedIn") === "true"; // localStorage에서 로그인 여부 확인
+      if (!loggedIn) {
+        navigate("/login"); // 로그인하지 않았다면 로그인 페이지로 이동
+      } else {
+        setIsLoggedIn(true); // 로그인 상태 설정
+      }
+    };
+
+    checkLoginStatus();
+  }, [navigate]);
+
+  useEffect(() => {
+    const fetchCommunityData = async () => {
+      try {
+        const response = await communityApi.findOne(Number(communityId)); // communityId로 커뮤니티 정보 가져오기
+        setCommunity(response.data.data); // 커뮤니티 정보를 상태로 설정
+      } catch (error) {
+        console.error("Error fetching community data:", error);
+      }
+    };
+
+    fetchCommunityData();
+  }, [communityId]);
 
   useEffect(() => {
     const checkAuthAndFetchData = async () => {
@@ -43,10 +75,12 @@ const LiveStreamingPage: React.FC = () => {
         controls: true,
         responsive: true,
         fluid: true,
-        sources: [{
-          src: liveData.liveHls,
-          type: 'application/x-mpegURL'
-        }]
+        sources: [
+          {
+            src: liveData.liveHls,
+            type: "application/x-mpegURL",
+          },
+        ],
       };
 
       if (!playerRef.current) {
@@ -55,12 +89,12 @@ const LiveStreamingPage: React.FC = () => {
 
         playerRef.current = videojs(videoElement, videoJsOptions);
 
-        playerRef.current.on('fullscreenchange', () => {
+        playerRef.current.on("fullscreenchange", () => {
           setIsFullscreen(playerRef.current.isFullscreen());
         });
       } else {
         const player = playerRef.current;
-        player.src({ type: 'application/x-mpegURL', src: liveData.liveHls });
+        player.src({ type: "application/x-mpegURL", src: liveData.liveHls });
       }
     }
 
@@ -78,10 +112,13 @@ const LiveStreamingPage: React.FC = () => {
       if (response.data.status === 200) {
         setLiveData(response.data.data);
       } else {
-        console.error('라이브 데이터를 가져오는데 실패했습니다:', response.data.message);
+        console.error(
+          "라이브 데이터를 가져오는데 실패했습니다:",
+          response.data.message
+        );
       }
     } catch (error) {
-      console.error('라이브 데이터를 가져오는데 실패했습니다:', error);
+      console.error("라이브 데이터를 가져오는데 실패했습니다:", error);
     }
   };
 
@@ -109,9 +146,18 @@ const LiveStreamingPage: React.FC = () => {
 
   return (
     <div className="live-streaming-page">
-      <Header communityName={liveData?.title || "Live Streaming"} isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
-      <CommunityNavigationHeader />
+      {community && (
+        <>
+          <Header 
+            communityName={community.communityName} 
+            isLoggedIn={isLoggedIn} 
+            handleLogout={handleLogout} 
+          />
+          <CommunityNavigationHeader />
+        </>
+      )}
       <div className="main-content">
+        <h2 className='live-title'> {liveData?.title }</h2>
         <div className="video-section">
           {liveData?.liveHls && (
             <div className="video-container">
@@ -122,7 +168,7 @@ const LiveStreamingPage: React.FC = () => {
                 ></video>
               </div>
               <button onClick={toggleFullscreen} className="fullscreen-button">
-                {isFullscreen ? '전체화면 종료' : '전체화면'}
+                {isFullscreen ? "전체화면 종료" : "전체화면"}
               </button>
             </div>
           )}
