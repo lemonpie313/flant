@@ -1,20 +1,20 @@
-// 라이브 스트리밍 컨테이너 스타일
+/* 라이브 스트리밍 컨테이너 스타일 */
 .live-streaming-container {
-  width: 75%; // 전체 화면의 75% 사용
+  width: 75%; /* 전체 화면의 75% 사용 */
   max-width: 100vw;
   margin: 0 auto;
-  height: 75vh; // 화면 높이의 75% 사용
+  height: 75vh; /* 화면 높이의 75% 사용 */
 }
 
-// 비디오 컨테이너 스타일
+/* 비디오 컨테이너 스타일 */
 .video-container {
   position: relative;
   width: 100%;
-  height: 100%; // 부모 컨테이너의 높이를 따라감
+  height: 100%; /* 부모 컨테이너의 높이를 따라감 */
   max-width: 1280px;
   margin: 0 auto;
 
-  // 전체화면 버튼 스타일
+  /* 전체화면 버튼 스타일 */
   .fullscreen-button {
     position: absolute;
     bottom: 10px;
@@ -28,7 +28,7 @@
   }
 }
 
-// Video.js 플레이어 스타일
+/* Video.js 플레이어 스타일 */
 .video-js {
   position: absolute;
   top: 0;
@@ -37,9 +37,14 @@
   height: 100% !important;
 }
 
-// 대형 화면 (1200px 이상) 대응 스타일
+/* 대형 화면 (1200px 이상) 대응 스타일 */
 @media (min-width: 1200px) {
   .live-streaming-container {
-    width: 70%; // 큰 화면에서는 70% 너비 사용
+    width: 70%; /* 큰 화면에서는 70% 너비 사용 */
   }
+}
+
+.chat-container {
+  flex: 1;
+  max-width: 400px;
 }

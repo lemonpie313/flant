@@ -6,6 +6,7 @@ import 'video.js/dist/video-js.css';
 import './LiveStreamingPage.scss';
 import Header from "../components/communityBoard/Header2";
 import CommunityNavigationHeader from "../components/communityBoard/liveHeader";
+import ChatComponent from '../components/ChatComponent'; // ChatComponent를 임포트
 
 interface LiveData {
   liveId: number;
@@ -39,7 +40,7 @@ const LiveStreamingPage: React.FC = () => {
   useEffect(() => {
     if (liveData?.liveHls) {
       const videoJsOptions = {
-        autoplay: false, // 자동 실행을 false로 설정
+        autoplay: false,
         controls: true,
         responsive: true,
         fluid: true,
@@ -127,6 +128,7 @@ const LiveStreamingPage: React.FC = () => {
             </div>
           )}
         </div>
+        <ChatComponent /> {/* ChatComponent 추가 */}
       </div>
     </div>
   );
