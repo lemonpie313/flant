@@ -3,7 +3,7 @@ import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { ChatService } from './chat.service';
 
-@WebSocketGateway()
+@WebSocketGateway()  // 여기에서 포트를 설정합니다.
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('ChatGateway');
@@ -26,7 +26,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
     // 사용자가 속한 모든 방에서 제거
-    // 이 로직을 위해 사용자의 방 목록을 저장하는 별도의 구조가 필요할 수 있음
+    const rooms = this.server.sockets.adapter.rooms;
+    rooms.forEach((room, roomId) => {
+      if (room.has(client.id)) {
+        client.leave(roomId);
+        this.logger.log(`Client ${client.id} left room ${roomId}`);
+      }
+    });
   }
 
   // 클라이언트 연결
@@ -36,15 +42,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   // 클라이언트를 특정 방에 추가
   @SubscribeMessage('joinRoom')
-  handleJoinRoom(client: Socket, roomId: string) {
-    client.join(roomId);
-    this.logger.log(`Client ${client.id} joined room ${roomId}`);
+  handleJoinRoom(client: Socket, data: { roomId: string }) {
+    client.join(data.roomId);
+    this.logger.log(`Client ${client.id} joined room ${data.roomId}`);
   }
 
   // 클라이언트를 특정 방에서 제거
   @SubscribeMessage('leaveRoom')
-  handleLeaveRoom(client: Socket, roomId: string) {
-    client.leave(roomId);
-    this.logger.log(`Client ${client.id} left room ${roomId}`);
+  handleLeaveRoom(client: Socket, data: { roomId: string }) {
+    client.leave(data.roomId);
+    this.logger.log(`Client ${client.id} left room ${data.roomId}`);
   }
 }

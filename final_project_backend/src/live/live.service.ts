@@ -56,17 +56,17 @@ export class LiveService {
         port: 8000,
         mediaroot: '../media', // path.join(__dirname, '../../media'),
         webroot: './www',
-        hls: true,  // HLS 사용 설정
+        hls: true, // HLS 사용 설정
         allow_origin: '*',
       },
-      // https: {
-      //   port: 8443,
-      //   key: '/etc/letsencrypt/live/live.flant.club/privkey.pem',
-      //   cert: '/etc/letsencrypt/live/live.flant.club/fullchain.pem',
-      // },
+      https: {
+        port: 8443,
+        key: '/etc/letsencrypt/live/live.flant.club/privkey.pem',
+        cert: '/etc/letsencrypt/live/live.flant.club/fullchain.pem',
+      },
       trans: {
-         ffmpeg:'/usr/bin/ffmpeg',
-         //ffmpeg: '/Users/pc/Downloads/ffmpeg-2024-08-18-git-7e5410eadb-full_build/ffmpeg-2024-08-18-git-7e5410eadb-full_build/bin/ffmpeg.exe',
+        ffmpeg: '/usr/bin/ffmpeg',
+        //ffmpeg: '/Users/pc/Downloads/ffmpeg-2024-08-18-git-7e5410eadb-full_build/ffmpeg-2024-08-18-git-7e5410eadb-full_build/bin/ffmpeg.exe',
         tasks: [
           {
             app: 'live',
@@ -238,8 +238,9 @@ export class LiveService {
             { liveVideoUrl },
           );
         }
-        fs.unlinkSync(file);
-        await this.cleanupStreamFolder(streamKey);
+        fs.unlinkSync(filePath);
+        fs.rmdirSync(liveDirectory);
+        // await this.cleanupStreamFolder(streamKey);
         console.log(
           '----------------------repository 업데이트, 삭제 완-----------------------',
         );
@@ -311,7 +312,7 @@ export class LiveService {
       streamKey,
     });
     return {
-      liveServer: 'rtmp://43.201.107.36/live',
+      liveServer: 'rtmp://52.79.234.150/live',
       title: live.title,
       streamKey: live.streamKey,
     };
@@ -351,7 +352,7 @@ export class LiveService {
       artistId: live.artistId,
       // artistNickname: live.artist.artistNickname,
       title: live.title,
-      liveHls: `https://live.flant.club:8443/live/${live.streamKey}/index.m3u8`,
+      liveHls: `https://live.flant.club/live/${live.streamKey}/index.m3u8`,
       // liveHls: `https://flant.club:8443/live/${live.streamKey}/index.m3u8`,
     };
   }

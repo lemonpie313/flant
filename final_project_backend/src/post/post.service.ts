@@ -81,8 +81,12 @@ export class PostService {
         await this.postImageRepository.save(postImageData);
       }
     }
-    const cacheKey = `posts_community_${createPostDto.communityId}`
+
+    const postType = Boolean(isArtist)? 'artist' : 'community'
+    const cacheKey = `posts_${postType}_${createPostDto.communityId}`
     await this.cacheManager.del(cacheKey)
+    
+
 
     return {
       status: HttpStatus.CREATED,
@@ -92,19 +96,17 @@ export class PostService {
   }
 
   async getCachedData(isArtist: boolean, communityId: number){
-    const cacheKey = `posts_community_${communityId}`
+      const postType = isArtist? 'artist' : 'community'
+      const cacheKey = `posts_${postType}_${communityId}`
+      let cachedPosts = await this.cacheManager.get(cacheKey)
 
-    let cachedPosts = await this.cacheManager.get(cacheKey)
-    console.log(cacheKey, cachedPosts)
+      if(!cachedPosts){
+        cachedPosts = await this.findPosts(isArtist, communityId)
+  
+        await this.cacheManager.set(cacheKey, cachedPosts);
+      }
+      return cachedPosts
     
-    if(!cachedPosts){
-      cachedPosts = await this.findPosts(isArtist, communityId)
-
-      await this.cacheManager.set(cacheKey, cachedPosts);
-      console.log(cacheKey, cachedPosts)
-    }
-
-    return cachedPosts
   }
 
   async findPosts(isArtist: boolean, communityId: number) {
