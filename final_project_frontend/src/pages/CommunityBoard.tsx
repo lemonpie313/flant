@@ -225,7 +225,6 @@ const CommunityBoardTest: React.FC = () => {
   };
   const handleMembershipJoin = async () => {
     try {
-      alert("handleMembershipJoin");
       // 멤버십 가입 요청
       const existedMembership = await membershipApi.existedMembership();
       const existedMembershipInfo = existedMembership.data.data;

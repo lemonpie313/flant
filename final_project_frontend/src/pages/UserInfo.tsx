@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./UserInfo.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { authApi, userApi } from "../services/api";
-import { isValidName } from "../utils/validateName"
+import { isValidName } from "../utils/validateName";
 import { isEmpty } from "../utils/isEmpty";
 import { validatePassword } from "../utils/validatePassword";
 
@@ -36,24 +36,32 @@ const UserInfoPage: React.FC = () => {
   const handleUpdateAccount = async () => {
     try {
       // 값이 모두 비어있는 경우
-      if (isEmpty(newUserName) && isEmpty(newPassword) && isEmpty(newPasswordConfirm)) {
+      if (
+        isEmpty(newUserName) &&
+        isEmpty(newPassword) &&
+        isEmpty(newPasswordConfirm)
+      ) {
         alert("변경할 값을 입력해주세요.");
         return;
       }
 
       // 이름 변경시
-      if(!isEmpty(newUserName) && !isValidName(newUserName)) {
-        alert("변경할 이름을 확인해주세요. 특수 문자 및 공백,'admin'은 사용할 수 없습니다.")
+      if (!isEmpty(newUserName) && !isValidName(newUserName)) {
+        alert(
+          "변경할 이름을 확인해주세요. 특수 문자 및 공백,'admin'은 사용할 수 없습니다."
+        );
         return;
       }
 
       // 비밀번호 변경시
-      if(!isEmpty(newPassword)){
+      if (!isEmpty(newPassword)) {
         if (!validatePassword(newPassword)) {
-          alert("비밀번호는 최소 8자 이상이어야 하며, 대문자, 소문자, 숫자, 특수 문자를 포함해야 합니다.");
+          alert(
+            "비밀번호는 최소 8자 이상이어야 하며, 대문자, 소문자, 숫자, 특수 문자를 포함해야 합니다."
+          );
           return;
         }
-  
+
         if (newPassword !== newPasswordConfirm) {
           alert("비밀번호 확인이 일치하지 않습니다.");
           return;
@@ -66,8 +74,7 @@ const UserInfoPage: React.FC = () => {
       setShowUpdateDialog(false);
       setPassword("");
 
-      
-      clearUpdateUserInputText()
+      clearUpdateUserInputText();
     } catch (error) {
       alert("계정 정보 변경에 실패했습니다.");
     }
@@ -75,10 +82,10 @@ const UserInfoPage: React.FC = () => {
 
   // 내 정보 input창 초기화
   const clearUpdateUserInputText = async () => {
-    setNewUserName('');
-    setNewPassword('');
-    setConfirmNewPassword('');
-  }
+    setNewUserName("");
+    setNewPassword("");
+    setConfirmNewPassword("");
+  };
 
   const handleDeleteAccount = async () => {
     try {
@@ -149,7 +156,7 @@ const UserInfoPage: React.FC = () => {
                 {isDropdownVisible && (
                   <div className="header-user-dropdown">
                     <Link to="/userinfo">내 정보</Link>
-                   {/* <Link to="/membership">멤버십</Link> */}
+                    {/* <Link to="/membership">멤버십</Link> */}
                     <Link to="/payment-history">결제내역</Link>
                     <button onClick={handleLogout}>로그아웃</button>
                   </div>
@@ -225,7 +232,9 @@ const UserInfoPage: React.FC = () => {
           <div className="update-dialog">
             <p className="update-dialog-title">변경할 정보를 입력하세요</p>
             <div className="update-dialog-section">
-              <label htmlFor="newUserName" className="update-dialog-label">변경할 닉네임</label>
+              <label htmlFor="newUserName" className="update-dialog-label">
+                변경할 닉네임
+              </label>
               <input
                 id="newUserName"
                 className="update-dialog-input"
@@ -236,7 +245,9 @@ const UserInfoPage: React.FC = () => {
               />
             </div>
             <div className="update-dialog-section">
-              <label htmlFor="newPassword" className="update-dialog-label">변경할 비밀번호</label>
+              <label htmlFor="newPassword" className="update-dialog-label">
+                변경할 비밀번호
+              </label>
               <input
                 id="newPassword"
                 className="update-dialog-input"
@@ -247,7 +258,12 @@ const UserInfoPage: React.FC = () => {
               />
             </div>
             <div className="update-dialog-section">
-              <label htmlFor="newPasswordConfirm" className="update-dialog-label">비밀번호 확인</label>
+              <label
+                htmlFor="newPasswordConfirm"
+                className="update-dialog-label"
+              >
+                비밀번호 확인
+              </label>
               <input
                 id="newPasswordConfirm"
                 className="update-dialog-input"
@@ -257,13 +273,21 @@ const UserInfoPage: React.FC = () => {
                 onChange={(e) => setConfirmNewPassword(e.target.value)}
               />
             </div>
-            <button onClick={handleUpdateAccount} className="update-dialog-button">확인</button>
-            <button onClick={() => {
-              setShowUpdateDialog(false)
-              clearUpdateUserInputText()
-            }}
-            className="update-dialog-button"
-            >취소</button>
+            <button
+              onClick={handleUpdateAccount}
+              className="update-dialog-button"
+            >
+              확인
+            </button>
+            <button
+              onClick={() => {
+                setShowUpdateDialog(false);
+                clearUpdateUserInputText();
+              }}
+              className="update-dialog-button"
+            >
+              취소
+            </button>
           </div>
         )}
       </main>

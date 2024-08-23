@@ -70,25 +70,29 @@ export class CommentController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, CommentCreationGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a comment' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateCommentDto })
   async update(
+    @UserInfo() user: PartialUser,
     @Param('id', ParseIntPipe) id: number,
     @Body() commentData: UpdateCommentDto,
   ): Promise<void> {
-    return this.commentService.update(id, commentData);
+    return this.commentService.update(user, id, commentData);
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, CommentCreationGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a comment' })
   @ApiParam({ name: 'id', type: Number })
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.commentService.remove(id);
+  async remove(
+    @Param('id', ParseIntPipe) id: number,
+    @UserInfo() user: PartialUser,
+  ) {
+    return this.commentService.remove(user, id);
   }
 
   @Get('post/:postId')
