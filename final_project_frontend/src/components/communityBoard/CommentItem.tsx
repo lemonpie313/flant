@@ -99,8 +99,8 @@ const CommentItem: React.FC<CommentItemProps> = ({
             </div>
           </>
         ) : (
-          <>
-            <p className="comment-content-text">{comment}</p>
+          <div className="comment-container">
+            <div className="comment-text">{comment}</div>
             <div className="comment-actions">
               <button onClick={handleEdit} className="edit-button">
                 수정
@@ -109,7 +109,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 삭제
               </button>
             </div>
-          </>
+          </div>
         )}
       </div>
 
