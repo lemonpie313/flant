@@ -239,6 +239,7 @@ export class LiveService {
           );
         }
         fs.unlinkSync(filePath);
+        fs.rmdirSync(liveDirectory);
         // await this.cleanupStreamFolder(streamKey);
         console.log(
           '----------------------repository 업데이트, 삭제 완-----------------------',
