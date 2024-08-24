@@ -269,7 +269,7 @@ const LiveStreamingPage: React.FC = () => {
                   </div>
                 ))}
               </div>
-              {liveData?.isOnAir && (
+              {/* {liveData?.isOnAir && ( */}
                 <div className="chat-input-container">
                   <input
                     type="text"
@@ -283,7 +283,7 @@ const LiveStreamingPage: React.FC = () => {
                     Send
                   </button>
                 </div>
-              )}
+              {/* )} */}
             </div>
           </div>
         </div>
