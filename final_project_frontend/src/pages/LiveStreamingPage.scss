@@ -4,20 +4,38 @@
   align-items: center;
 }
 
-.content-wrapper {
+.live-title {
+  text-align: center; // 제목을 가운데 정렬
+  margin-bottom: 10px; // 제목 아래 여백 추가
+  margin-top: 10px;
+}
+
+// 이미지 사용을 위한 추가된 부분
+.live-indicator {
+  display: inline-block;
+  width: 50px; // 이미지의 너비
+  height: 50px; // 이미지의 높이
+  margin-left: 10px;
+  vertical-align: middle; // 텍스트와 수직으로 맞춤
+}
+
+.live-chat-section {
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
+  justify-content: space-around;
   width: 100%;
 }
 
 .video-section {
   flex: 1;
-  max-width: 65%; // 비디오 섹션이 전체 너비의 70%를 차지
+  max-width: 68%; // 비디오 섹션의 너비를 68%로 줄임
   margin-left: 5%; // 비디오와 채팅 박스 사이에 간격 추가
+  margin-bottom: 50px;
 }
 
 .chat-container {
-  width: 25%; // 채팅 박스가 전체 너비의 28%를 차지
+  width: 30%; // 채팅 박스의 너비를 27%로 넓힘
+  height: 72vh; // 비디오 섹션과 동일한 높이로 설정
   margin-right: 5%;
   max-width: 300px;
   border: 1px solid #ccc;
@@ -114,8 +132,8 @@
 
 .video-section {
   flex: 1;
-  max-width: 70%; // 비디오 섹션이 전체 너비의 70%를 차지
-  margin-right: 20px; // 비디오와 채팅 박스 사이의 간격을 20px로 설정
+  max-width: 65%; // 비디오 섹션의 너비를 68%로 줄임
+  margin-right: 10px; // 비디오와 채팅 박스 사이의 간격을 20px로 설정
   position: relative;
   height: 75vh; // 비디오 섹션의 높이를 화면의 75%로 고정
 }
@@ -130,75 +148,4 @@
   border: none;
   padding: 5px 10px;
   cursor: pointer;
-}
-
-.chat-container {
-  width: 28%; // 채팅 박스가 전체 너비의 28%를 차지
-  max-width: 300px;
-  height: 75vh; // 비디오 섹션과 동일한 높이로 고정
-  display: flex;
-  flex-direction: column; // 채팅 박스가 텍스트 입력창 아래로 늘어나지 않게 하기 위해
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.chat-box {
-  flex: 1; // 채팅 메시지 영역이 남은 공간을 채우도록
-  background-color: #f9f9f9;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto; // 메시지가 많아지면 스크롤되도록 설정
-}
-
-.messages {
-  flex: 1;
-  padding: 10px;
-  overflow-y: auto;
-}
-
-.chat-input-container {
-  border-top: 1px solid #ccc;
-  padding: 10px;
-  background-color: #fff;
-  display: flex;
-  .live-title {
-    text-align: center; // 제목을 가운데 정렬
-    margin-bottom: 20px; // 제목 아래 여백 추가
-    margin-top: 20px;
-  }
-
-  // 이미지 사용을 위한 추가된 부분
-  .live-indicator {
-    display: inline-block;
-    width: 60px; // 이미지의 너비를 늘림
-    height: 60px; // 이미지의 높이를 늘림
-    margin-left: 10px;
-    vertical-align: middle; // 텍스트와 수직으로 맞춤
-
-    // 이미지 자르기 설정
-    overflow: hidden;
-    position: relative;
-  }
-  // 대형 화면 (1200px 이상) 대응 스타일
-  @media (min-width: 1200px) {
-    .live-streaming-container {
-      width: 70%; // 큰 화면에서는 70% 너비 사용
-    }
-  }
-
-  .video-placeholder {
-    background-color: black;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 75vh; // 부모 컨테이너의 높이를 채움
-    width: 75%;
-    font-size: 2em; // 텍스트 크기 설정
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
-  }
 }
