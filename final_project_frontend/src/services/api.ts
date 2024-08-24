@@ -176,8 +176,8 @@ export const liveApi = {
     api.get(`/live/${liveId}`).catch(handleApiError),
   findLives: (communityId: number) =>
     api.get(`/live?communityId=${communityId}`).catch(handleApiError),
-  findRecordings: (communityId: number) =>
-    api.get(`/live?communityId=${communityId}/recordings`).catch(handleApiError),
+  findRecordings: (liveId: number) =>
+    api.get(`/live/${liveId}/recordings`).catch(handleApiError),
 
 };
 

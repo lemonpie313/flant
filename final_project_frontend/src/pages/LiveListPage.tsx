@@ -83,7 +83,7 @@ const LiveListPage: React.FC = () => {
     if (!(selectedLive?.liveVideoUrl)) {
       navigate(`/communities/${communityId}/live/${liveId}`);
     } else {
-     alert('인코딩 중입니다.')
+      navigate(`/communities/${communityId}/live/${liveId}/recordings`);
     }
   };
 
