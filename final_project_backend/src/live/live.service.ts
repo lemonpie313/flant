@@ -17,6 +17,7 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
 import fs from 'fs';
 import path from 'path';
+import { UpdateLiveDto } from './dtos/update-live.dto';
 
 @Injectable()
 export class LiveService {
@@ -59,11 +60,11 @@ export class LiveService {
         hls: true, // HLS 사용 설정
         allow_origin: '*',
       },
-      https: {
-        port: 8443,
-        key: '/etc/letsencrypt/live/live.flant.club/privkey.pem',
-        cert: '/etc/letsencrypt/live/live.flant.club/fullchain.pem',
-      },
+      // https: {
+      //   port: 8443,
+      //   key: '/etc/letsencrypt/live/live.flant.club/privkey.pem',
+      //   cert: '/etc/letsencrypt/live/live.flant.club/fullchain.pem',
+      // },
       trans: {
         ffmpeg: '/usr/bin/ffmpeg',
         //ffmpeg: '/Users/pc/Downloads/ffmpeg-2024-08-18-git-7e5410eadb-full_build/ffmpeg-2024-08-18-git-7e5410eadb-full_build/bin/ffmpeg.exe',
@@ -325,6 +326,7 @@ export class LiveService {
       where: {
         communityId,
       },
+      order: { createdAt: 'DESC' },
     });
     return lives;
   }
@@ -344,7 +346,7 @@ export class LiveService {
         status: 404,
         message: '해당 라이브가 존재하지 않습니다.',
       });
-    }
+    } 
     return {
       liveId: live.liveId,
       communityId: live.communityId,
@@ -355,6 +357,7 @@ export class LiveService {
       title: live.title,
       liveHls: `https://live.flant.club/live/${live.streamKey}/index.m3u8`,
       // liveHls: `http://54.180.24.150:8000/live/${live.streamKey}/index.m3u8`,
+      isOnAir: !(live.liveVideoUrl),
     };
   }
 
@@ -389,5 +392,46 @@ export class LiveService {
       title: live.title,
       liveVideoUrl: live.liveVideoUrl,
     };
+  }
+
+  async updateLive(liveId: number, updateLiveDto: UpdateLiveDto) {
+    const { title, thumbnailImage } = updateLiveDto;
+    const live = await this.liveRepository.findOne({
+      where: {
+        liveId,
+      },
+      // relations: {
+      //   community: true,
+      //   artist: true,
+      // }
+    });
+    if (_.isNil(live)) {
+      throw new NotFoundException({
+        status: 404,
+        message: '해당 라이브가 존재하지 않습니다.',
+      });
+    }
+
+    await this.liveRepository.update(
+      {
+        liveId,
+      },
+      {
+        title,
+        thumbnailImage,
+      },
+    );
+
+    return {
+      liveId,
+      communityId: live.communityId,
+      // communityName: live.communityId.communityName,
+      // communityLogoImage: live.community.communityLogoImage,
+      artistId: live.artistId,
+      // artistNickname: live.artist.artistNickname,
+      title,
+      thumbnailImage,
+    };
+
   }
 }

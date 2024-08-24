@@ -8,6 +8,7 @@ import {
   Query,
   Param,
   Get,
+  Patch,
 } from '@nestjs/common';
 import { LiveService } from './live.service';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
@@ -21,6 +22,7 @@ import { CommunityUserGuard } from 'src/auth/guards/community-user.guard';
 import { CommunityUserRole } from 'src/community/community-user/types/community-user-role.type';
 import { UserInfo } from 'src/util/decorators/user-info.decorator';
 import { PartialUser } from 'src/user/interfaces/partial-user.entity';
+import { UpdateLiveDto } from './dtos/update-live.dto';
 
 @ApiTags('live')
 @Controller('/v1/live')
@@ -97,8 +99,30 @@ export class LiveController {
   ) {
     const live = await this.liveService.watchRecordedLive(liveId);
     return {
-      status: HttpStatus.CREATED,
+      status: HttpStatus.OK,
       message: '라이브 녹화본 불러오기에 성공했습니다.',
+      data: live,
+    };
+  }
+
+  /**
+   * 라이브 정보 수정
+   *
+   * @returns
+   */
+  @ApiBearerAuth()
+  @CommunityUserRoles(CommunityUserRole.MANAGER)
+  @UseGuards(JwtAuthGuard, CommunityUserGuard)
+  @Patch('/:liveId')
+  async updateLive(
+    @UserInfo() user: PartialUser,
+    @Param('liveId') liveId: number,
+    @Body() updateLiveDto: UpdateLiveDto,
+  ) {
+    const live = await this.liveService.updateLive(liveId, updateLiveDto);
+    return {
+      status: HttpStatus.OK,
+      message: '라이브 수정이 완료되었습니다.',
       data: live,
     };
   }
