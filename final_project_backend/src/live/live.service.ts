@@ -180,7 +180,15 @@ export class LiveService {
         //     console.log(reason);
         //   });
         // }
-        // console.log('------------------------방송시작?------------------');
+        /* else*/ if (live.liveVideoUrl) {
+          console.log('-------------에러------------');
+          console.log('이미 사용 완료된 스트림키입니다.');
+          session.reject((reason: string) => {
+            console.log(reason);
+          });
+        }
+        console.log('------------------------방송시작?------------------');
+      
       },
     );
 
