@@ -6,7 +6,6 @@ import "video.js/dist/video-js.css";
 import "./LiveStreamingPage.scss";
 import Header from "../components/communityBoard/Header2";
 import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
-import CommunityNavigationHeader from '../components/communityBoard/CommunityNavigationHeader';
 import io from 'socket.io-client'
 
 interface LiveData {
