@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { cartApi, paymentApi } from "../services/api"; // orderApi로 주문 API 호출
+import { cartApi, paymentApi } from "../services/api";
 import PaymentPortone from "./payments/paymentPortone";
 import "./UserInfo.scss";
 import "./cart.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { authApi } from "../services/api";
+
 interface CartItem {
   cartItemId: number;
   merchandiseId: number;
@@ -51,6 +52,7 @@ const Cart: React.FC = () => {
         setCartItems((prevItems) =>
           prevItems.filter((item) => item.cartItemId !== cartItemId)
         );
+        setTotalAmount(getTotalPrice(cartItems)); // 가격 업데이트
       }
     } catch (error) {
       console.error("Error removing cart item", error);
@@ -73,37 +75,33 @@ const Cart: React.FC = () => {
         increment ? "INCREMENT" : "DECREMENT"
       );
       if (response.status === 200) {
-        setCartItems((prevItems) =>
-          prevItems.map((item) =>
+        setCartItems((prevItems) => {
+          const updatedItems = prevItems.map((item) =>
             item.cartItemId === cartItemId
               ? {
                   ...item,
                   quantity: response.data.data.updatedCartItem.quantity,
                 }
               : item
-          )
-        );
+          );
+          setTotalAmount(getTotalPrice(updatedItems)); // 가격 업데이트
+          return updatedItems;
+        });
       }
     } catch (error) {
       console.error("Error updating cart item quantity", error);
     }
   };
+
   const handlePaymentSuccess = async () => {
     setShowPayment(false); // 결제 창 표시
-    // 결제 성공 후 처리 로직 (예: 주문 상세 페이지로 이동)
-    console.log("clear");
     await paymentApi.createOrder(); // 주문 생성 API 호출
-
     navigate("/main");
   };
-  // 주문 생성 핸들러
+
   const handleCheckout = async () => {
     try {
-      // response는 단순히 주문 테이블에 데이터를 저장. 실제 주문하는건 아님
       setShowPayment(true); // 결제 창 표시
-
-      //const orderId = response.data.data.orderId; // 주문 ID 추출
-      //navigate(`/order/${orderId}`); // 주문 상세 페이지로 이동
     } catch (error) {
       console.error("주문 생성 실패:", error);
       alert("주문을 처리하는 중 문제가 발생했습니다.");
@@ -113,6 +111,7 @@ const Cart: React.FC = () => {
   if (loading) {
     return <div>Loading...</div>;
   }
+
   const handleLogout = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -126,6 +125,7 @@ const Cart: React.FC = () => {
       alert("LogOut failed.");
     }
   };
+
   return (
     <div className="cart-container">
       <header>
@@ -162,7 +162,6 @@ const Cart: React.FC = () => {
                 {isDropdownVisible && (
                   <div className="header-user-dropdown">
                     <Link to="/userinfo">내 정보</Link>
-                    {/* <Link to="/membership">멤버십</Link> */}
                     <Link to="/cart">장바구니</Link>
                     <button onClick={handleLogout}>로그아웃</button>
                   </div>
