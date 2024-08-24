@@ -5,14 +5,15 @@ import videojs from "video.js";
 import "video.js/dist/video-js.css";
 import "./LiveStreamingPage.scss";
 import Header from "../components/communityBoard/Header2";
-import CommunityNavigationHeader from '../components/communityBoard/CommunityNavigationHeader';
-import io from 'socket.io-client'
+import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
+import io from "socket.io-client";
 
 interface LiveData {
   liveId: number;
   title: string;
   artistId: number;
   liveHls: string;
+  isOnAir: boolean;
 }
 
 const LiveStreamingPage: React.FC = () => {
@@ -31,7 +32,7 @@ const LiveStreamingPage: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<any>(null);
   const socketRef = useRef<any>(null); // 소켓 연결을 참조할 Ref
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [chatMessages, setChatMessages] = useState<string[]>([]);
 
   useEffect(() => {
@@ -125,11 +126,13 @@ const LiveStreamingPage: React.FC = () => {
 
   useEffect(() => {
     // 소켓 연결 설정
-    const socket = io('https://api.flant.club/api/v1/chat', { transports: ['websocket'] }); // 서버 URL 및 네임스페이스 지정
+    const socket = io("https://api.flant.club/api/v1/chat", {
+      transports: ["websocket"],
+    }); // 서버 URL 및 네임스페이스 지정
     socketRef.current = socket;
 
-    socket.on('connect', () => {
-      console.log('Connected to chat server');
+    socket.on("connect", () => {
+      console.log("Connected to chat server");
       // 특정 방에 참여하기
       if (liveId) {
         socket.emit('joinRoom', { roomId: liveId, nickName });
@@ -145,8 +148,8 @@ const LiveStreamingPage: React.FC = () => {
       setChatMessages(prevMessages => [...prevMessages, `${data.nickName}: ${data.text}`]);
     });
 
-    socket.on('disconnect', () => {
-      console.log('Disconnected from chat server');
+    socket.on("disconnect", () => {
+      console.log("Disconnected from chat server");
     });
 
     return () => {
@@ -168,7 +171,7 @@ const LiveStreamingPage: React.FC = () => {
   };
 
   const handleKeyPress = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       sendMessage();
     }
   };
@@ -216,20 +219,29 @@ const LiveStreamingPage: React.FC = () => {
     <div className="live-streaming-page">
       {community && (
         <>
-          <Header 
-            communityName={community.communityName} 
-            isLoggedIn={isLoggedIn} 
-            handleLogout={handleLogout} 
+          <Header
+            communityName={community.communityName}
+            isLoggedIn={isLoggedIn}
+            handleLogout={handleLogout}
           />
           <CommunityNavigationHeader />
         </>
       )}
       <div className="main-content">
-        <h2 className="live-title">{liveData?.title}</h2>
-        <div className="content-wrapper">
+        <h2 className="live-title">
+          {liveData && (
+            <img
+              src="https://png.pngtree.com/png-clipart/20220602/original/pngtree-icon-live-streaming-vector-png-image_7885118.png"
+              alt="Live Indicator"
+              className="live-indicator" // 추가된 부분
+            />
+          )}{" "}
+          {liveData?.title}
+        </h2>
+        <div className="live-chat-section">
           <div className="video-section">
             <div className="video-container">
-              {liveData?.liveHls ? (
+              {liveData?.isOnAir ? (
                 <div data-vjs-player>
                   <video
                     ref={videoRef}
@@ -238,7 +250,7 @@ const LiveStreamingPage: React.FC = () => {
                 </div>
               ) : (
                 <div className="video-placeholder">
-                  <p>비디오가 로드되지 않았습니다. 테스트용 비디오 섹션입니다.</p>
+                  <p>라이브가 종료되었습니다.</p>
                 </div>
               )}
               <button onClick={toggleFullscreen} className="fullscreen-button">
@@ -246,28 +258,32 @@ const LiveStreamingPage: React.FC = () => {
               </button>
             </div>
           </div>
-  
+
           <div className="chat-container">
             <div className="chat-header">Chat box</div>
             <div className="chat-box">
               <div className="messages">
                 {chatMessages.map((msg, index) => (
-                  <div key={index} className="message">{msg}</div>
+                  <div key={index} className="message">
+                    {msg}
+                  </div>
                 ))}
               </div>
-              <div className="chat-input-container">
-                <input
-                  type="text"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="채팅을 시작해보세요."
-                  className="chat-input"
-                />
-                <button onClick={sendMessage} className="send-button">
-                  Send
-                </button>
-              </div>
+              {liveData?.isOnAir && (
+                <div className="chat-input-container">
+                  <input
+                    type="text"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="채팅을 시작해보세요."
+                    className="chat-input"
+                  />
+                  <button onClick={sendMessage} className="send-button">
+                    Send
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
