@@ -2,9 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link, useParams } from "react-router-dom";
 import { liveApi, authApi, communityApi } from "../services/api";
 import Header from "../components/communityBoard/Header";
-import CommunityNavigationHeader from '../components/communityBoard/CommunityNavigationHeader';
-import './liveListPage.scss';
-
+import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
+import "./liveListPage.scss";
 
 interface Live {
   liveId: number;
@@ -12,7 +11,6 @@ interface Live {
   artistId: string;
   thumbnailImage: string;
   liveVideoUrl: string;
-
 }
 
 const LiveListPage: React.FC = () => {
@@ -79,8 +77,8 @@ const LiveListPage: React.FC = () => {
   };
 
   const handleLiveClick = (liveId: number) => {
-    const selectedLive = lives.find((live) => live.liveId==liveId);
-    if (!(selectedLive?.liveVideoUrl)) {
+    const selectedLive = lives.find((live) => live.liveId == liveId);
+    if (!selectedLive?.liveVideoUrl) {
       navigate(`/communities/${communityId}/live/${liveId}`);
     } else {
       navigate(`/communities/${communityId}/live/${liveId}/recordings`);
@@ -91,31 +89,40 @@ const LiveListPage: React.FC = () => {
     <div className="media-container">
       {community && (
         <>
-          <Header 
-            communityName={community.communityName} 
-            isLoggedIn={isLoggedIn} 
-            handleLogout={handleLogout} 
+          <Header
+            communityName={community.communityName}
+            isLoggedIn={isLoggedIn}
+            handleLogout={handleLogout}
           />
           <CommunityNavigationHeader />
         </>
       )}
-        <div className="media-grid">
-            {lives.map((item) => (
-              <div 
-                key={item.liveId} 
-                className="media-item" 
-                onClick={() => handleLiveClick(item.liveId)}
-              >
-                {item.thumbnailImage ? (
-                  <img src={item.thumbnailImage} alt={item.title} />
-                ) : (
-                  <div className="no-thumbnail">No Thumbnail</div>
-                )}
-                <p>{item.title}</p>
-              </div>
-            ))}
+      <div className="media-grid">
+        {lives.map((item) => (
+          <div
+            key={item.liveId}
+            className="media-item"
+            onClick={() => handleLiveClick(item.liveId)}
+          >
+            {item.thumbnailImage ? (
+              <img src={item.thumbnailImage} alt={item.title} />
+            ) : (
+              <div className="no-thumbnail">No Thumbnail</div>
+            )}
+            <div className="live-title">
+              {!(item.liveVideoUrl) && (
+                <img
+                  src="https://png.pngtree.com/png-clipart/20220602/original/pngtree-icon-live-streaming-vector-png-image_7885118.png"
+                  alt="Live Indicator"
+                  className="live-indicator" // 추가된 부분
+                />
+              )}
+              <p>{item.title}</p>
+            </div>
           </div>
+        ))}
       </div>
+    </div>
   );
 };
 

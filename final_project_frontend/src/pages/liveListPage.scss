@@ -24,8 +24,24 @@
         object-fit: cover; /* 부모 요소의 크기에 맞게 잘림 */
       }
 
+      .live-title {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+      }
+
+      .live-indicator {
+        display: inline-block;
+        width: 50px; // 이미지의 너비
+        height: 50px; // 이미지의 높이
+        margin-right: 10px;
+        margin-bottom: 10px;
+        vertical-align: middle; // 텍스트와 수직으로 맞춤
+      }
+
       p {
         margin-top: 8px;
+        padding-top: 3px;
         font-size: 1rem;
         font-weight: bold;
       }
