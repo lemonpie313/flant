@@ -5,7 +5,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div>
       {children}
-      <ChatComponent />
+      {/* < ChatComponent /> */}
     </div>
   );
 };
