@@ -21,9 +21,9 @@ const LiveStreamingPage: React.FC = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [community, setCommunity] = useState<any>(null);
-  const [nickName, setNickname] = useState(null)
+  const [nickName, setNickname] = useState(null);
   const navigate = useNavigate();
-  const [userList, setUserList] = useState(null)
+  const [userList, setUserList] = useState(null);
 
   const { communityId, liveId } = useParams<{
     communityId: string;
@@ -34,18 +34,21 @@ const LiveStreamingPage: React.FC = () => {
   const socketRef = useRef<any>(null); // 소켓 연결을 참조할 Ref
   const [message, setMessage] = useState("");
   const [chatMessages, setChatMessages] = useState<string[]>([]);
+  const messagesEndRef = useRef<HTMLDivElement>(null); // 메시지 컨테이너를 참조할 Ref
 
   useEffect(() => {
     const fetchCommunityUserData = async () => {
       try {
-        const response = await communityUserApi.findCommunityUser(Number(communityId));
-        setNickname(response.data.nickName); 
+        const response = await communityUserApi.findCommunityUser(
+          Number(communityId)
+        );
+        setNickname(response.data.nickName);
       } catch (error) {
         console.error("닉네임 불러오기 실패", error);
       }
     };
     fetchCommunityUserData();
-  }, []);
+  }, [communityId]);
 
   // 로그인 여부 확인
   useEffect(() => {
@@ -135,18 +138,24 @@ const LiveStreamingPage: React.FC = () => {
       console.log("Connected to chat server");
       // 특정 방에 참여하기
       if (liveId) {
-        socket.emit('joinRoom', { roomId: liveId, nickName });
+        socket.emit("joinRoom", { roomId: liveId, nickName });
       }
     });
 
-    socket.on('joinedRoom', (roomId: string, userList) => {
-      setUserList(userList)
+    socket.on("joinedRoom", (roomId: string, userList) => {
+      setUserList(userList);
       console.log(`Joined room: ${roomId}`);
     });
 
-    socket.on('receiveMessage', (data: { clientId: string, nickName: string, text: string }) => {
-      setChatMessages(prevMessages => [...prevMessages, `${data.nickName}: ${data.text}`]);
-    });
+    socket.on(
+      "receiveMessage",
+      (data: { clientId: string; nickName: string; text: string }) => {
+        setChatMessages((prevMessages) => [
+          ...prevMessages,
+          `${data.nickName}: ${data.text}`,
+        ]);
+      }
+    );
 
     socket.on("disconnect", () => {
       console.log("Disconnected from chat server");
@@ -160,13 +169,24 @@ const LiveStreamingPage: React.FC = () => {
     };
   }, [liveId]);
 
+  useEffect(() => {
+    // 채팅 메시지가 업데이트될 때마다 스크롤을 맨 아래로 이동
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatMessages]);
+
   const sendMessage = () => {
     const socket = socketRef.current;
     if (socket && message) {
       // 서버로 메시지 전송
-      socket.emit('sendMessage', { roomId: liveId, nickName: nickName, text: message });
-      setMessage(''); // 메시지 입력 필드 초기화
-      console.log(`sending message: ${message}`)
+      socket.emit("sendMessage", {
+        roomId: liveId,
+        nickName: nickName,
+        text: message,
+      });
+      setMessage(""); // 메시지 입력 필드 초기화
+      console.log(`sending message: ${message}`);
     }
   };
 
@@ -175,7 +195,6 @@ const LiveStreamingPage: React.FC = () => {
       sendMessage();
     }
   };
-
 
   const fetchLiveData = async () => {
     try {
@@ -268,8 +287,10 @@ const LiveStreamingPage: React.FC = () => {
                     {msg}
                   </div>
                 ))}
+                <div ref={messagesEndRef} />{" "}
+                {/* 스크롤을 항상 맨 아래로 유지하기 위한 참조 */}
               </div>
-              {/* {liveData?.isOnAir && ( */}
+              {liveData?.isOnAir && (
                 <div className="chat-input-container">
                   <input
                     type="text"
@@ -283,7 +304,7 @@ const LiveStreamingPage: React.FC = () => {
                     Send
                   </button>
                 </div>
-              {/* )} */}
+              )}
             </div>
           </div>
         </div>
