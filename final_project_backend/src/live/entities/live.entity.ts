@@ -35,9 +35,6 @@ export class Live {
   @Column({ type: 'int', unsigned: true })
   artistId: number;
 
-  @Column({ nullable: true })
-  chatRoomId: number;
-
   /**
    *  라이브 제목
    * @example "라이브 방송 테스트"
@@ -48,9 +45,9 @@ export class Live {
   title: string;
 
   @IsString()
-  @IsOptional()
-  @Column({ default: null, nullable: true })
-  thumbnailImage: string | null;
+  @IsNotEmpty()
+  @Column({ default: 'https://img.freepik.com/free-photo/grunge-black-concrete-textured-background_53876-124541.jpg', nullable: true })
+  thumbnailImage: string;
 
   @Column({ type: 'varchar', length: 255, unique: true })
   streamKey: string;

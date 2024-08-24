@@ -5,7 +5,7 @@ import videojs from "video.js";
 import "video.js/dist/video-js.css";
 import "./LiveStreamingPage.scss";
 import Header from "../components/communityBoard/Header2";
-import CommunityNavigationHeader from '../components/communityBoard/CommunityNavigationHeader';
+import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
 import io from 'socket.io-client'
 
 interface LiveData {
@@ -13,6 +13,7 @@ interface LiveData {
   title: string;
   artistId: number;
   liveHls: string;
+  isOnAir: boolean;
 }
 
 const LiveStreamingPage: React.FC = () => {
@@ -201,18 +202,28 @@ const LiveStreamingPage: React.FC = () => {
     <div className="live-streaming-page">
       {community && (
         <>
-          <Header 
-            communityName={community.communityName} 
-            isLoggedIn={isLoggedIn} 
-            handleLogout={handleLogout} 
+          <Header
+            communityName={community.communityName}
+            isLoggedIn={isLoggedIn}
+            handleLogout={handleLogout}
           />
           <CommunityNavigationHeader />
         </>
       )}
       <div className="main-content">
-        <h2 className="live-title">{liveData?.title}</h2>
-        <div className="content-wrapper">
-          <div className="video-section">
+        <h2 className="live-title">
+          {liveData && (
+            <img
+            src="https://png.pngtree.com/png-clipart/20220602/original/pngtree-icon-live-streaming-vector-png-image_7885118.png"
+            alt="Live Indicator"
+            className="live-indicator" // 추가된 부분
+          />
+          )}
+          {" "}
+          {liveData?.title}
+        </h2>
+        <div className="video-section">
+          {liveData?.isOnAir ? (
             <div className="video-container">
               {liveData?.liveHls ? (
                 <div data-vjs-player>
@@ -230,6 +241,9 @@ const LiveStreamingPage: React.FC = () => {
                 {isFullscreen ? "전체화면 종료" : "전체화면"}
               </button>
             </div>
+          ) : (
+            <div className="video-placeholder"> 라이브가 종료되었습니다. </div> // 검은색 네모박스 표시
+          )}
           </div>
   
           <div className="chat-container">
@@ -257,7 +271,6 @@ const LiveStreamingPage: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 
