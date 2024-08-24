@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { communityApi, liveApi } from "../services/api";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
-import "./LiveStreamingPage.scss";
+import "./LiveRecordingsPage.scss";
 import Header from "../components/communityBoard/Header2";
 import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
 
