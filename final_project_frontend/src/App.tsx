@@ -181,9 +181,9 @@ const App: React.FC = () => {
             <Route path="/" element={<Navigate to="/main" replace />} />
             <Route path="*" element={<Navigate to="/main" replace />} />
           </Routes>
-          {/* {isLoggedIn && (
+           {/* {isLoggedIn && (
            <ChatComponent />
-          )}  */}
+          )} */}
         </div>
       </Router>
     </ChatProvider>
