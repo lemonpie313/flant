@@ -99,28 +99,28 @@ export class ChatService {
     }
   }
 
-  async updateRoomId(roomId: number, liveId: number){
-    const existedLive = await this.liveRepository.findOne({ 
-      where: { liveId: liveId }
-    })
-    if(!existedLive){
-      throw new NotFoundException('라이브 정보를 찾을 수 없습니다.')
-    }
-    await this.liveRepository.update(
-      { liveId: liveId },
-      { chatRoomId: roomId }
-    )
-    const updatedData = await this.liveRepository.findOne({
-      where: { liveId: liveId },
-      select: ['chatRoomId']
-    })
-    return {
-      status: HttpStatus.ACCEPTED,
-      message: '채팅 방 아이디가 등록되었습니다.',
-      data: {
-        chatRoomId: updatedData
-      }
-    }
-  }
+  // async updateRoomId(roomId: number, liveId: number){
+  //   const existedLive = await this.liveRepository.findOne({ 
+  //     where: { liveId: liveId }
+  //   })
+  //   if(!existedLive){
+  //     throw new NotFoundException('라이브 정보를 찾을 수 없습니다.')
+  //   }
+  //   await this.liveRepository.update(
+  //     { liveId: liveId },
+  //     { chatRoomId: roomId }
+  //   )
+  //   const updatedData = await this.liveRepository.findOne({
+  //     where: { liveId: liveId },
+  //     select: ['chatRoomId']
+  //   })
+  //   return {
+  //     status: HttpStatus.ACCEPTED,
+  //     message: '채팅 방 아이디가 등록되었습니다.',
+  //     data: {
+  //       chatRoomId: updatedData
+  //     }
+  //   }
+  // }
 }
 
