@@ -80,7 +80,7 @@ const LiveListPage: React.FC = () => {
 
   const handleLiveClick = (liveId: number) => {
     const selectedLive = lives.find((live) => live.liveId==liveId);
-    if (!selectedLive?.liveVideoUrl) {
+    if (!(selectedLive?.liveVideoUrl)) {
       navigate(`/communities/${communityId}/live/${liveId}`);
     } else {
      alert('인코딩 중입니다.')
