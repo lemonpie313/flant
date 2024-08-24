@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { communityApi, liveApi } from "../services/api";
+import { communityApi, communityUserApi, liveApi } from "../services/api";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
 import "./LiveStreamingPage.scss";
@@ -20,7 +20,9 @@ const LiveStreamingPage: React.FC = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [community, setCommunity] = useState<any>(null);
+  const [nickName, setNickname] = useState(null)
   const navigate = useNavigate();
+  const [userList, setUserList] = useState(null)
 
   const { communityId, liveId } = useParams<{
     communityId: string;
@@ -31,6 +33,18 @@ const LiveStreamingPage: React.FC = () => {
   const socketRef = useRef<any>(null); // 소켓 연결을 참조할 Ref
   const [message, setMessage] = useState('');
   const [chatMessages, setChatMessages] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchCommunityUserData = async () => {
+      try {
+        const response = await communityUserApi.findCommunityUser(Number(communityId));
+        setNickname(response.data.nickName); 
+      } catch (error) {
+        console.error("닉네임 불러오기 실패", error);
+      }
+    };
+    fetchCommunityUserData();
+  }, []);
 
   // 로그인 여부 확인
   useEffect(() => {
@@ -55,7 +69,6 @@ const LiveStreamingPage: React.FC = () => {
         console.error("Error fetching community data:", error);
       }
     };
-
     fetchCommunityData();
   }, [communityId]);
 
@@ -119,16 +132,17 @@ const LiveStreamingPage: React.FC = () => {
       console.log('Connected to chat server');
       // 특정 방에 참여하기
       if (liveId) {
-        socket.emit('joinRoom', { roomId: liveId });
+        socket.emit('joinRoom', { roomId: liveId, nickName });
       }
     });
 
-    socket.on('joinedRoom', (roomId: string) => {
+    socket.on('joinedRoom', (roomId: string, userList) => {
+      setUserList(userList)
       console.log(`Joined room: ${roomId}`);
     });
 
-    socket.on('receiveMessage', (data: { clientId: string, text: string }) => {
-      setChatMessages(prevMessages => [...prevMessages, data.text]);
+    socket.on('receiveMessage', (data: { clientId: string, nickName: string, text: string }) => {
+      setChatMessages(prevMessages => [...prevMessages, `${data.nickName}: ${data.text}`]);
     });
 
     socket.on('disconnect', () => {
@@ -147,7 +161,7 @@ const LiveStreamingPage: React.FC = () => {
     const socket = socketRef.current;
     if (socket && message) {
       // 서버로 메시지 전송
-      socket.emit('sendMessage', { roomId: liveId, text: message });
+      socket.emit('sendMessage', { roomId: liveId, nickName: nickName, text: message });
       setMessage(''); // 메시지 입력 필드 초기화
       console.log(`sending message: ${message}`)
     }
@@ -158,6 +172,7 @@ const LiveStreamingPage: React.FC = () => {
       sendMessage();
     }
   };
+
 
   const fetchLiveData = async () => {
     try {
