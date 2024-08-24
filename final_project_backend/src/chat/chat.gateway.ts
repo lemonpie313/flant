@@ -1,56 +1,56 @@
-import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
-import { Logger } from '@nestjs/common';
-import { Socket, Server } from 'socket.io';
+import {
+  WebSocketGateway,
+  SubscribeMessage,
+  MessageBody,
+  ConnectedSocket,
+  WebSocketServer,
+} from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 
-@WebSocketGateway()  // 여기에서 포트를 설정합니다.
-export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-  @WebSocketServer() server: Server;
-  private logger: Logger = new Logger('ChatGateway');
+@WebSocketGateway({ namespace: '/api/v1/chat', transports: ['websocket'] })
+export class ChatGateway {
+  @WebSocketServer()
+  server: Server;
 
   constructor(private readonly chatService: ChatService) {}
-
-  // 클라이언트로부터 'msgToServer' 메시지를 수신했을 때 처리
-  @SubscribeMessage('msgToServer')
-  handleMessage(client: Socket, payload: { roomId: string, userId: string, message: string }): void {
-    this.chatService.saveMessage(payload.roomId, payload.userId, payload.message);
-    this.server.to(payload.roomId).emit('msgToClient', payload);
+  handleConnection(@ConnectedSocket() client: Socket) {
+    console.log(`Client connected: ${client.id}`);
   }
 
-  // 소켓 서버 초기화
-  afterInit(server: Server) {
-    this.logger.log('Init');
+  handleDisconnect(@ConnectedSocket() client: Socket) {
+    console.log(`Client disconnected: ${client.id}`);
   }
 
-  // 클라이언트 연결 해제
-  handleDisconnect(client: Socket) {
-    this.logger.log(`Client disconnected: ${client.id}`);
-    // 사용자가 속한 모든 방에서 제거
-    const rooms = this.server.sockets.adapter.rooms;
-    rooms.forEach((room, roomId) => {
-      if (room.has(client.id)) {
-        client.leave(roomId);
-        this.logger.log(`Client ${client.id} left room ${roomId}`);
-      }
-    });
-  }
-
-  // 클라이언트 연결
-  handleConnection(client: Socket, ...args: any[]) {
-    this.logger.log(`Client connected: ${client.id}`);
-  }
-
-  // 클라이언트를 특정 방에 추가
   @SubscribeMessage('joinRoom')
-  handleJoinRoom(client: Socket, data: { roomId: string }) {
+  handleJoinRoom(
+    @MessageBody() data: { roomId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
     client.join(data.roomId);
-    this.logger.log(`Client ${client.id} joined room ${data.roomId}`);
+    client.emit('joinedRoom', data.roomId);
   }
 
-  // 클라이언트를 특정 방에서 제거
   @SubscribeMessage('leaveRoom')
-  handleLeaveRoom(client: Socket, data: { roomId: string }) {
+  handleLeaveRoom(
+    @MessageBody() data: { roomId: string, communityUserId },
+    @ConnectedSocket() client: Socket,
+  ) {
+    this.chatService.addUserToRoom(+data.roomId, data.communityUserId)
     client.leave(data.roomId);
-    this.logger.log(`Client ${client.id} left room ${data.roomId}`);
+    client.emit('leftRoom', data.roomId);
   }
+
+  @SubscribeMessage('sendMessage')
+  handleMessage(
+  @MessageBody() message: { roomId: string, text: string },
+  @ConnectedSocket() client: Socket,
+) {
+  console.log(`Received message: ${message.text} from client: ${client.id}`);
+  // 채팅방 내 다른 클라이언트에게 메시지를 브로드캐스트
+  this.server.to(message.roomId).emit('receiveMessage', {
+    clientId: client.id,
+    text: message.text,
+  });
+}
 }
