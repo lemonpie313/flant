@@ -35,9 +35,6 @@ export class Live {
   @Column({ type: 'int', unsigned: true })
   artistId: number;
 
-  @Column({ nullable: true })
-  chatRoomId: number;
-
   /**
    *  라이브 제목
    * @example "라이브 방송 테스트"
