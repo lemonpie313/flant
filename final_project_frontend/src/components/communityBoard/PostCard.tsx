@@ -37,10 +37,8 @@ const PostCard: React.FC<PostCardProps> = ({
   const [hasMoreComments, setHasMoreComments] = useState(true);
   const [loadingComments, setLoadingComments] = useState(false);
   const [popupPostId, setPopupPostId] = useState<number | null>(null);
-  const [popupUserId, setPopupUserId] = useState<number | null>(null);
   const [communityUserId, setCommunityUser] = useState<CommunityUser>();
   const { communityId } = useParams<{ communityId: string }>();
-  const [currentCommunityUserId, setCurrentCommunityUserId] = useState<number | null>(null);
   const [communityUsers, setCommunityUsers] = useState<CommunityUser[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -70,7 +68,6 @@ const PostCard: React.FC<PostCardProps> = ({
   //   };
   // });
 
-  // 로그인된 사용자의 communityUserId 가져오기
   // useEffect(() => {
   //   const fetchCommunityUsers = async () => {
   //     try {
@@ -78,11 +75,11 @@ const PostCard: React.FC<PostCardProps> = ({
   //       setCommunityUsers(response.data);
 
   //       // 현재 로그인 사용자의 communityUserId 찾기
-  //       // 여기서는 현재 로그인 사용자 ID를 사용하는 API 호출을 가정
   //       const currentUserResponse = await userApi.findMy();
-  //       const currentUserId = currentUserResponse.data.id;
-
+  //       const currentUserId = response.data.userId;
+  //       console.log("테스트", currentUserId);
   //       const currentUserCommunityUser = response.data.find((user) => user.userId === currentUserId);
+
   //       setCurrentCommunityUserId(currentUserCommunityUser?.communityUserId || null);
   //     } catch (error) {
   //       console.error("Failed to fetch community users:", error);
@@ -91,10 +88,6 @@ const PostCard: React.FC<PostCardProps> = ({
 
   //   fetchCommunityUsers();
   // }, [communityId]);
-  // // 댓글 작성자와 현재 사용자 비교
-  // const isCommentOwner = (comment: Comment) => {
-  //   return currentCommunityUserId === comment.authorId;
-  // };
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -112,6 +105,7 @@ const PostCard: React.FC<PostCardProps> = ({
       try {
         const response = await userApi.findMy(); // 유저 조회 API 호출
         setUsers(response.data);
+        console.log("테스트2", response.data);
       } catch (error) {
         console.error("Failed to fetch user:", error);
       }
