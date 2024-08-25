@@ -17,6 +17,7 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
 import fs from 'fs';
 import path from 'path';
+import { UpdateLiveDto } from './dtos/update-live.dto';
 
 @Injectable()
 export class LiveService {
@@ -179,11 +180,19 @@ export class LiveService {
         //     console.log(reason);
         //   });
         // }
-        // console.log('------------------------방송시작?------------------');
+        /* else*/ if (live.liveVideoUrl) {
+          console.log('-------------에러------------');
+          console.log('이미 사용 완료된 스트림키입니다.');
+          session.reject((reason: string) => {
+            console.log(reason);
+          });
+        }
+        console.log('------------------------방송시작?------------------');
+      
       },
     );
 
-    // 방송 종료 시 s3에 업로드
+    // 방송 종료
     await this.nodeMediaServer.on(
       'donePublish',
       async (id: string, streamPath: string) => {
@@ -286,7 +295,7 @@ export class LiveService {
     }
   }
 
-  async createLive(artistId: number, title: string) {
+  async createLive(artistId: number, title: string, thumbnailImage: string) {
     // userId로 커뮤니티아티인지 확인 + 어느 커뮤니티인지 조회
     const artist = await this.artistsRepository.findOne({
       where: {
@@ -309,6 +318,7 @@ export class LiveService {
       communityId: artist.communityId,
       artistId: artistId,
       title,
+      thumbnailImage,
       streamKey,
     });
     return {
@@ -324,6 +334,7 @@ export class LiveService {
       where: {
         communityId,
       },
+      order: { createdAt: 'DESC' },
     });
     return lives;
   }
@@ -343,7 +354,7 @@ export class LiveService {
         status: 404,
         message: '해당 라이브가 존재하지 않습니다.',
       });
-    }
+    } 
     return {
       liveId: live.liveId,
       communityId: live.communityId,
@@ -353,7 +364,8 @@ export class LiveService {
       // artistNickname: live.artist.artistNickname,
       title: live.title,
       liveHls: `https://live.flant.club/live/${live.streamKey}/index.m3u8`,
-      // liveHls: `https://flant.club:8443/live/${live.streamKey}/index.m3u8`,
+      // liveHls: `http://54.180.24.150:8000/live/${live.streamKey}/index.m3u8`,
+      isOnAir: !(live.liveVideoUrl),
     };
   }
 
@@ -388,5 +400,46 @@ export class LiveService {
       title: live.title,
       liveVideoUrl: live.liveVideoUrl,
     };
+  }
+
+  async updateLive(liveId: number, updateLiveDto: UpdateLiveDto) {
+    const { title, thumbnailImage } = updateLiveDto;
+    const live = await this.liveRepository.findOne({
+      where: {
+        liveId,
+      },
+      // relations: {
+      //   community: true,
+      //   artist: true,
+      // }
+    });
+    if (_.isNil(live)) {
+      throw new NotFoundException({
+        status: 404,
+        message: '해당 라이브가 존재하지 않습니다.',
+      });
+    }
+
+    await this.liveRepository.update(
+      {
+        liveId,
+      },
+      {
+        title,
+        thumbnailImage,
+      },
+    );
+
+    return {
+      liveId,
+      communityId: live.communityId,
+      // communityName: live.communityId.communityName,
+      // communityLogoImage: live.community.communityLogoImage,
+      artistId: live.artistId,
+      // artistNickname: live.artist.artistNickname,
+      title,
+      thumbnailImage,
+    };
+
   }
 }

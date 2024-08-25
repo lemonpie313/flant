@@ -13,6 +13,7 @@ import UserInfoPage from "./pages/UserInfo";
 import { ChatProvider } from "./context/ChatContext";
 import LiveStreamingPage from "./pages/LiveStreamingPage";
 import LiveListPage from "./pages/LiveListPage";
+import LiveRecordings from "./pages/LiveRecordingsPage";
 import { userApi } from "./services/api";
 import CommunityBoard from "./pages/CommunityBoard";
 import MerchandiseList from "./pages/merchandiseList";
@@ -137,7 +138,7 @@ const App: React.FC = () => {
               }
             />
             <Route
-              path="/live"
+              path="/communities/:communityId/live"
               element={
                 <ProtectedRoute>
                   <LiveListPage />
@@ -145,10 +146,18 @@ const App: React.FC = () => {
               }
             />
             <Route
-              path="/live/:liveId"
+              path="communities/:communityId/live/:liveId"
               element={
                 <ProtectedRoute>
                   <LiveStreamingPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="communities/:communityId/live/:liveId/recordings"
+              element={
+                <ProtectedRoute>
+                  <LiveRecordings />
                 </ProtectedRoute>
               }
             />
@@ -172,9 +181,9 @@ const App: React.FC = () => {
             <Route path="/" element={<Navigate to="/main" replace />} />
             <Route path="*" element={<Navigate to="/main" replace />} />
           </Routes>
-          {/* {isLoggedIn && (
+           {/* {isLoggedIn && (
            <ChatComponent />
-          )}  */}
+          )} */}
         </div>
       </Router>
     </ChatProvider>
