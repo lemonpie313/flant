@@ -369,8 +369,9 @@
 }
 
 .comment-content {
-  margin-top: 10px;
+  margin-top: 15px;
   margin-left: 5;
+  margin-bottom: 5px;
   display: flex;
   flex-direction: column;
   flex: 1; /* 남은 공간을 모두 차지하게 함 */
@@ -475,7 +476,6 @@ button {
   height: 30px;
   font-size: 10px;
   color: black;
-  margin: 0; /* 버튼의 기본 여백 제거 */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
@@ -484,6 +484,7 @@ button {
 
 .edit-button {
   background-color: #ffffff;
+  margin-right: -7px;
 }
 
 .edit-button:hover {
