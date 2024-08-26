@@ -24,7 +24,7 @@
 - 구분 : 팀 프로젝트
 - GitHub : https://github.com/lemonpie313/sparta_final_project
 - 시연 영상 :
-- 배포 : https://flat.club
+- 배포 : https://flant.club
 
 ---
 
