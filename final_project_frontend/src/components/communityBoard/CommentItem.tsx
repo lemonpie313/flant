@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import { Comment } from "./types";
+import React, { useEffect, useState } from "react";
+import { Comment, User } from "./types";
 
 interface CommentItemProps extends Comment {
+  userId: number | null; // 현재 로그인한 사용자의 ID
   onReply: (commentId: number, comment: string) => void;
   onEdit: (commentId: number, updatedComment: string, communityId: number, artistId?: number) => void; // artistId를 선택적으로 받음
   onDelete: (commentId: number) => void; // 댓글 삭제 핸들러
@@ -10,6 +11,8 @@ interface CommentItemProps extends Comment {
 const CommentItem: React.FC<CommentItemProps> = ({
   commentId,
   author,
+  authorId,
+  userId,
   communityId,
   isArtist,
   profileImage,
@@ -23,6 +26,11 @@ const CommentItem: React.FC<CommentItemProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [newComment, setNewComment] = useState(comment);
   const [error, setError] = useState<string | null>(null); // 에러 메시지 상태 추가
+
+  useEffect(() => {}, [userId, authorId]);
+
+  // 작성자 ID와 현재 사용자의 userId를 비교
+  const isAuthor = userId === authorId;
 
   const handleReplySubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,8 +84,8 @@ const CommentItem: React.FC<CommentItemProps> = ({
             e.currentTarget.src = "/default-profile.png";
           }}
         />
-        <strong>{author}</strong>
-        <span>{new Date(createdAt).toLocaleString()}</span>
+        <strong className="author-name">{author}</strong>
+        <span className="comment-time">{new Date(createdAt).toLocaleString()}</span>
       </div>
       <div className="comment-content">
         {isEditing ? (
@@ -101,14 +109,16 @@ const CommentItem: React.FC<CommentItemProps> = ({
         ) : (
           <div className="comment-container">
             <div className="comment-text">{comment}</div>
-            <div className="comment-actions">
-              <button onClick={handleEdit} className="edit-button">
-                수정
-              </button>
-              <button onClick={handleDelete} className="delete-button">
-                삭제
-              </button>
-            </div>
+            {isAuthor && (
+              <div className="comment-actions">
+                <button className="edit-button" onClick={handleEdit}>
+                  수정
+                </button>
+                <button className="delete-button" onClick={handleDelete}>
+                  삭제
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

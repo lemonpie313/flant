@@ -41,7 +41,7 @@ export class PostService {
     private readonly managerRepository: Repository<Manager>,
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
-    @Inject('CACHE_MANAGER') private cacheManager: Cache
+    @Inject('CACHE_MANAGER') private cacheManager: Cache,
   ) {}
 
   async create(
@@ -82,11 +82,9 @@ export class PostService {
       }
     }
 
-    const postType = Boolean(isArtist)? 'artist' : 'community'
-    const cacheKey = `posts_${postType}_${createPostDto.communityId}`
-    await this.cacheManager.del(cacheKey)
-    
-
+    const postType = Boolean(isArtist) ? 'artist' : 'community';
+    const cacheKey = `posts_${postType}_${createPostDto.communityId}`;
+    await this.cacheManager.del(cacheKey);
 
     return {
       status: HttpStatus.CREATED,
@@ -95,18 +93,17 @@ export class PostService {
     };
   }
 
-  async getCachedData(isArtist: boolean, communityId: number){
-      const postType = isArtist? 'artist' : 'community'
-      const cacheKey = `posts_${postType}_${communityId}`
-      let cachedPosts = await this.cacheManager.get(cacheKey)
+  async getCachedData(isArtist: boolean, communityId: number) {
+    const postType = isArtist ? 'artist' : 'community';
+    const cacheKey = `posts_${postType}_${communityId}`;
+    let cachedPosts = await this.cacheManager.get(cacheKey);
 
-      if(!cachedPosts){
-        cachedPosts = await this.findPosts(isArtist, communityId)
-  
-        await this.cacheManager.set(cacheKey, cachedPosts);
-      }
-      return cachedPosts
-    
+    if (!cachedPosts) {
+      cachedPosts = await this.findPosts(isArtist, communityId);
+
+      await this.cacheManager.set(cacheKey, cachedPosts);
+    }
+    return cachedPosts;
   }
 
   async findPosts(isArtist: boolean, communityId: number) {
@@ -186,7 +183,6 @@ export class PostService {
       };
     }
   }
-
 
   async findOne(postId: number) {
     const data = await this.postRepository.findOne({
@@ -361,21 +357,29 @@ export class PostService {
       });
     }
 
-    console.log(comments);
-    const commentList = comments.map((comment) => {
-      console.log(comment.communityUser);
-      return {
-        postId: comment.postId,
-        commentId: comment.commentId,
-        author: comment.communityUser.nickName,
-        authorId: comment.communityUser.userId,
-        profileImage: comment.communityUser.users.profileImage,
-        isArtist: comment.artistId !== null, // artistId가 존재하면 아티스트로 간주
-        comment: comment.comment,
-        createdAt: comment.createdAt,
-        updatedAt: comment.updatedAt,
-      };
-    });
+    console.log('Fetched comments:', comments);
+
+    if (comments.length === 0) {
+      console.log('No comments found for postId:', postId);
+    }
+
+    const commentList = comments.map((comment) => ({
+      postId: comment.postId,
+      commentId: comment.commentId,
+      author: comment.communityUser?.nickName ?? 'Unknown',
+      authorId: comment.communityUser?.userId ?? null,
+      profileImage:
+        comment.communityUser?.users?.profileImage ?? 'default-profile.png',
+      isArtist: comment.artistId !== null,
+      comment: comment.comment,
+      createdAt: comment.createdAt,
+      updatedAt: comment.updatedAt,
+    }));
+
     return commentList;
+  }
+  catch(error) {
+    console.error('Error fetching comments:', error);
+    return [];
   }
 }

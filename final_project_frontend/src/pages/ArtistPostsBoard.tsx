@@ -1,21 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  authApi,
-  communityApi,
-  postApi,
-  commentApi,
-  communityUserApi,
-} from "../services/api";
+import { authApi, communityApi, postApi, commentApi, communityUserApi } from "../services/api";
 import axios from "axios";
 import Header from "../components/communityBoard/Header";
 import PostForm from "../components/communityBoard/PostForm";
 import PostCard from "./../components/communityBoard/PostCard";
-import {
-  Community,
-  Post,
-  CommunityUser,
-} from "../components/communityBoard/types";
+import { Community, Post, CommunityUser } from "../components/communityBoard/types";
 import "./board.scss";
 import CommunityNavigationHeader from "../components/communityBoard/CommunityNavigationHeader";
 
@@ -58,9 +48,7 @@ const ArtistBoard: React.FC = () => {
 
   const fetchCommunityUsers = async () => {
     try {
-      const response = await communityUserApi.findCommunityUser(
-        Number(communityId)
-      );
+      const response = await communityUserApi.findCommunityUser(Number(communityId));
       setCommunityUser(response.data);
     } catch (error) {
       console.error("커뮤니티유저 데이터 가져오기 오류:", error);
@@ -170,9 +158,7 @@ const ArtistBoard: React.FC = () => {
     try {
       const response = await communityApi.findMy();
       const myCommunity = response.data.data;
-      setIsCommunityJoined(
-        myCommunity.some((c: any) => c.communityId === Number(communityId))
-      );
+      setIsCommunityJoined(myCommunity.some((c: any) => c.communityId === Number(communityId)));
     } catch (error) {
       console.error("커뮤니티 가입 여부 확인 오류:", error);
     }
@@ -200,11 +186,7 @@ const ArtistBoard: React.FC = () => {
     <div className="community-board">
       {community && (
         <>
-          <Header
-            communityName={community.communityName}
-            isLoggedIn={isLoggedIn}
-            handleLogout={handleLogout}
-          />
+          <Header communityName={community.communityName} isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
           <CommunityNavigationHeader />
         </>
       )}
@@ -232,9 +214,7 @@ const ArtistBoard: React.FC = () => {
           ) : (
             <div>
               <p>이 페이지를 보려면 로그인이 필요합니다.</p>
-              <button onClick={() => navigate("/login")}>
-                로그인 페이지로 이동
-              </button>
+              <button onClick={() => navigate("/login")}>로그인 페이지로 이동</button>
             </div>
           )}
         </div>
@@ -252,12 +232,9 @@ const ArtistBoard: React.FC = () => {
           </div>
           <div className="right-sidebar-membership">
             {isCommunityJoined
-              ? "자유 멤버십에 가입해서 새로운 스케줄 소식을 받아보세요."
+              ? "멤버십에 가입해서 새로운 스케줄 소식을 받아보세요."
               : "커뮤니티에 가입해 소식을 받아보세요."}
-            <button
-              className="right-sidebar-join-button"
-              onClick={handleJoinButtonClick}
-            >
+            <button className="right-sidebar-join-button" onClick={handleJoinButtonClick}>
               {isCommunityJoined ? "Membership 가입하기" : "커뮤니티 가입하기"}
             </button>
           </div>

@@ -248,6 +248,7 @@
 }
 
 .comment-text {
+  word-wrap: break-word; /* 긴 댓글이 자동으로 줄바꿈되도록 설정 */
   padding-left: 3px;
   padding-right: 25px;
   margin-bottom: 3px;
@@ -358,7 +359,7 @@
 }
 
 .comment-time {
-  font-size: 15px; /* 시간 텍스트의 크기 설정 */
+  font-size: 12px; /* 시간 텍스트의 크기 설정 */
   color: #888; /* 시간 텍스트 색상 설정 */
 }
 
@@ -377,21 +378,17 @@
   flex: 1; /* 남은 공간을 모두 차지하게 함 */
 }
 
-.comment-content-text {
-  margin-right: 10px; /* 버튼과의 간격 설정 */
-  word-wrap: break-word; /* 긴 댓글이 자동으로 줄바꿈되도록 설정 */
-}
-
 .artist-comment-item {
   // 아티스트의 댓글만 따로 상단에 고정
   background-color: rgba(0, 255, 106, 0.274);
   border-radius: 5px;
+
   display: flex;
   flex-direction: column; /* 기본적으로 세로 방향 정렬 */
   position: relative; /* 자식 요소의 위치를 상대적으로 설정할 수 있게 함 */
   padding: 5px; /* 댓글 여백 설정 */
   margin-bottom: 5px; /* 댓글 사이 여백 */
-} 
+}
 
 .artist-comment-author {
   margin-right: 15px; /* 닉네임 오른쪽 간격 추가 */
@@ -400,25 +397,26 @@
 }
 
 .artist-comment-time {
-  font-size: 15px; /* 시간 텍스트의 크기 설정 */
+  font-size: 12px; /* 시간 텍스트의 크기 설정 */
   color: #888; /* 시간 텍스트 색상 설정 */
 }
 
 .artist-comment-content {
+  margin-left: 10px;
+  margin-top: 10px;
   flex: 1; /* 남은 공간을 모두 차지하게 함 */
 }
+.artist-name {
+  font-size: 15px;
+  margin-right: 10px;
+}
+.author-name {
+  font-size: 15px;
+  margin-left: -7px;
+}
 
-/* Modal overlay style */
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.artist-header {
+  margin-bottom: 20px;
 }
 
 /* Modal overlay style */
@@ -444,21 +442,13 @@
   text-align: center;
 }
 
-button {
-  border: none;
-  border-radius: 5px; /* 둥근 모서리 */
-  padding: 10px 15px; /* 버튼 안쪽 여백 */
-  font-size: 16px; /* 글자 크기 */
-  cursor: pointer; /* 포인터 커서 */
-  transition: background-color 0.3s, box-shadow 0.3s; /* 색상 및 그림자 변화에 부드러운 전환 효과 추가 */
-}
-
 /* comment-actions를 오른쪽에 배치 */
 .comment-actions {
   display: flex; /* 버튼을 가로로 배치 */
   gap: 5px; /* 버튼 사이의 간격 */
   align-items: center; /* 버튼을 세로 방향으로 중앙 정렬 */
-  margin-left: 60%;
+  margin-top: 10px;
+  margin-left: 69%;
 }
 
 .comment-actions button {
@@ -472,8 +462,8 @@ button {
 .edit-button,
 .delete-button {
   border-radius: 4px; /* 모서리 둥글게 */
-  width: 50px;
-  height: 30px;
+  width: 40px;
+  height: 25px;
   font-size: 10px;
   color: black;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
