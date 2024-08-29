@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Comment } from "./types";
+import "../../styles/PostCard.scss";
 
 interface CommentItemProps extends Comment {
   onReply: (commentId: number, comment: string) => void;
@@ -27,8 +28,8 @@ const CommentItem: React.FC<CommentItemProps> = ({ commentId, author, comment, c
             e.currentTarget.src = "/default-profile.png";
           }}
         />
-        <strong>{author}</strong>
-        <span>{new Date(createdAt).toLocaleString()}</span>
+        <strong className="artist-name"> {author}</strong>
+        <span className="comment-time">{new Date(createdAt).toLocaleString()}</span>
       </div>
       <p className="artist-comment-content">{comment}</p>
       {/* <button onClick={() => setReplyContent("답글")} className="reply-button">

@@ -199,11 +199,11 @@ export class PostController {
 
   @Get('/:postId/comments')
   @ApiOperation({ summary: 'Get comments by post ID' })
-  //@UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   async findCommentsByPost(
     @Param('postId', ParseIntPipe) postId: number,
     @Query('isArtist') isArtist?: boolean,
   ) {
-    return await this.postService.findCommentsByPost(postId, isArtist?? false);
+    return await this.postService.findCommentsByPost(postId, isArtist ?? false);
   }
 }
