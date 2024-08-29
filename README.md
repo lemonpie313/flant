@@ -1,4 +1,5 @@
 # 🖥️ Team 오물조물 NodeJs 최종 프로젝트
+![Flant-우수상](https://github.com/user-attachments/assets/47ad5fb1-a751-4d03-bcb6-9b5868357a58)
 
 ![TGSrd-removebg-preview](https://github.com/user-attachments/assets/a69e6e9a-2d34-4fca-b52f-e44a5a037626)
 
@@ -273,6 +274,7 @@
 
 - 주문 전체 및 상세 조회
 </details>
+
 
 ## 📌 트러블 슈팅
 
