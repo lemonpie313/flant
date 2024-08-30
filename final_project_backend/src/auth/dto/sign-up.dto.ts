@@ -9,11 +9,11 @@ export class SignUpDto extends PickType(User, ['email', 'password', 'name']) {
    * @example "Example1!"
    */
   @IsNotEmpty({ message: MESSAGES.AUTH.COMMON.PASSWORD.REQUIRED })
-  @IsStrongPassword(
-    { minLength: 8 },
-    {
-      message: MESSAGES.AUTH.COMMON.PASSWORD.INVALID_FORMAT,
-    },
-  )
+  // @IsStrongPassword(
+  //   { minLength: 8 },
+  //   {
+  //     message: MESSAGES.AUTH.COMMON.PASSWORD.INVALID_FORMAT,
+  //   },
+  // )
   passwordConfirm: string;
 }

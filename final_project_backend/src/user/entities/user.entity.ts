@@ -58,12 +58,12 @@ export class User {
    * @example "Example1!"
    */
   @IsOptional()
-  @IsStrongPassword(
-    { minLength: 8 },
-    {
-      message: MESSAGES.AUTH.COMMON.PASSWORD.INVALID_FORMAT,
-    },
-  )
+  // @IsStrongPassword(
+  //   { minLength: 8 },
+  //   {
+  //     message: MESSAGES.AUTH.COMMON.PASSWORD.INVALID_FORMAT,
+  //   },
+  // )
   @Column({ select: false, nullable: true })
   password?: string;
 
@@ -72,7 +72,10 @@ export class User {
    * @example "https://i.namu.wiki/i/egdn5_REUgKuBUNPwkOg3inD6mLWMntHc-kXttvomkvaTMsWISF5sQqpHsfGJ8OUVqWRmV5xkUyRpD2U6g_oO03po08TisY6pAj5PXunSWaOHtGwrvXdHcL3p9_9-ZPryAadFZUE2rAxiK9vo5cv7w.svg"
    */
   @IsString()
-  @Column()
+  @Column({
+    default:
+      'http://thumbnail.10x10.co.kr/webimage/image/basic600/511/B005113308.jpg?cmd=thumb&w=500&h=500&fit=true&ws=false',
+  })
   profileImage?: string;
 
   @CreateDateColumn()

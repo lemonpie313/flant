@@ -61,6 +61,12 @@ export class AuthService {
         MESSAGES.AUTH.COMMON.PASSWORD_CONFIRM.NOT_MATCHED_WITH_PASSWORD,
       );
     }
+    // 비밀번호가 영문자, 숫자, 기호를 포함안할시 에러 반환.
+    let reg = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,15}$/;
+    if (!reg.test(password))
+      throw new BadRequestException(
+        MESSAGES.AUTH.COMMON.PASSWORD.INVALID_FORMAT,
+      );
 
     // 비밀번호 뭉개기
     const hashRounds = this.configService.get<number>('PASSWORD_HASH');
@@ -85,7 +91,7 @@ export class AuthService {
   ) {
     const { accessToken, ...accessOption } = this.createAccessToken(userId);
     const { refreshToken, ...refreshOption } = this.createRefreshToken(userId);
-    console.log("-------------------------------------")
+    console.log('-------------------------------------');
     await this.notUserCartSave(userId, cookies);
     await this.setCurrentRefreshToken(refreshToken, accessToken, userId);
     console.log(accessToken);
@@ -316,7 +322,7 @@ export class AuthService {
       const merchandiseOption = await this.merchandiseOptionRepository.findOne({
         where: { id: item.merchandiseOptionId },
       });
-      console.log("0000000000000000000000000000000")
+      console.log('0000000000000000000000000000000');
       console.log(merchandisePost);
       console.log(merchandiseOption);
       // userCart에 저장

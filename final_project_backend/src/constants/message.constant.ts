@@ -24,7 +24,7 @@ export const MESSAGES = {
       PASSWORD: {
         REQUIRED: '비밀번호을 입력해 주세요.',
         INVALID_FORMAT:
-          '비밀번호는 영문 알파벳 대,소문자, 숫자, 특수문자(!@#$%^&*)를 포함한 8자리 이상이여야 합니다.',
+          '비밀번호는 영문 알파벳, 숫자, 특수문자(!@#$%^&*)를 포함한 8자리 이상이여야 합니다.',
         PASSWORD_MISMATCH: '기존 비밀번호와 일치하지 않습니다.',
       },
       PASSWORD_CONFIRM: {
