@@ -60,11 +60,11 @@ export class LiveService {
         hls: true, // HLS 사용 설정
         allow_origin: '*',
       },
-      // https: {
-      //   port: 8443,
-      //   key: '/etc/letsencrypt/live/live.flant.club/privkey.pem',
-      //   cert: '/etc/letsencrypt/live/live.flant.club/fullchain.pem',
-      // },
+      https: {
+        port: 8443,
+        key: '/etc/letsencrypt/live/live.flant.club/privkey.pem',
+        cert: '/etc/letsencrypt/live/live.flant.club/fullchain.pem',
+      },
       trans: {
         ffmpeg: '/usr/bin/ffmpeg',
         //ffmpeg: '/Users/pc/Downloads/ffmpeg-2024-08-18-git-7e5410eadb-full_build/ffmpeg-2024-08-18-git-7e5410eadb-full_build/bin/ffmpeg.exe',
@@ -188,7 +188,6 @@ export class LiveService {
           });
         }
         console.log('------------------------방송시작?------------------');
-      
       },
     );
 
@@ -354,7 +353,7 @@ export class LiveService {
         status: 404,
         message: '해당 라이브가 존재하지 않습니다.',
       });
-    } 
+    }
     return {
       liveId: live.liveId,
       communityId: live.communityId,
@@ -365,7 +364,7 @@ export class LiveService {
       title: live.title,
       liveHls: `https://live.flant.club/live/${live.streamKey}/index.m3u8`,
       // liveHls: `http://54.180.24.150:8000/live/${live.streamKey}/index.m3u8`,
-      isOnAir: !(live.liveVideoUrl),
+      isOnAir: !live.liveVideoUrl,
     };
   }
 
@@ -440,6 +439,5 @@ export class LiveService {
       title,
       thumbnailImage,
     };
-
   }
 }
