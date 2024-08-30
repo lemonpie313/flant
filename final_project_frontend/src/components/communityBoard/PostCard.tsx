@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Comment, CommunityUser, Post, User } from "./types";
+import { Post } from "./types";
 import CommentItem from "./CommentItem";
 import "../../styles/PostCard.scss";
-import { commentApi, communityUserApi, userApi } from "../../services/api";
+import { commentApi, userApi } from "../../services/api";
 import { useParams } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ArtistCommentItem from "./ArtistCommentItem";
@@ -37,90 +37,45 @@ const PostCard: React.FC<PostCardProps> = ({
   const [hasMoreComments, setHasMoreComments] = useState(true);
   const [loadingComments, setLoadingComments] = useState(false);
   const [popupPostId, setPopupPostId] = useState<number | null>(null);
-  const [popupUserId, setPopupUserId] = useState<number | null>(null);
-  const [communityUserId, setCommunityUser] = useState<CommunityUser>();
+  const [currentUserCommunityUserId, setCurrentUserCommunityUserId] = useState<number | null>(null);
   const { communityId } = useParams<{ communityId: string }>();
-  const [currentCommunityUserId, setCurrentCommunityUserId] = useState<number | null>(null);
-  const [communityUsers, setCommunityUsers] = useState<CommunityUser[]>([]);
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
+  const [userId, setUserId] = useState<number | null>(null); // 단일 유저 ID 상태 추가
 
   const handleLike = () => {
     onLike(postId, !isLiked);
   };
 
-  //정보 가져오기
-  // const fetchCommunityUsers = async () => {
-  //   try {
-  //     const response = await communityUserApi.findCommunityUser(Number(communityId));
-  //     setCommunityUser(response.data);
-  //   } catch (error) {
-  //     console.error("커뮤니티유저 데이터 가져오기 오류:", error);
-  //   }
-  // };
-  // // useEffect(() => {
-  //   const fetchUser = async () => {
-  //     try {
-  //       const response = await userApi.findMy(); // 유저 조회 API 호출
-  //       console.log(response, communityId);
-  //       setUsers(response.data);
-  //     } catch (error) {
-  //       console.error("Failed to fetch user:", error);
-  //     }
-  //   };
-  // });
-
-  // 로그인된 사용자의 communityUserId 가져오기
-  // useEffect(() => {
-  //   const fetchCommunityUsers = async () => {
-  //     try {
-  //       const response = await communityUserApi.findCommunityUser(Number(communityId));
-  //       setCommunityUsers(response.data);
-
-  //       // 현재 로그인 사용자의 communityUserId 찾기
-  //       // 여기서는 현재 로그인 사용자 ID를 사용하는 API 호출을 가정
-  //       const currentUserResponse = await userApi.findMy();
-  //       const currentUserId = currentUserResponse.data.id;
-
-  //       const currentUserCommunityUser = response.data.find((user) => user.userId === currentUserId);
-  //       setCurrentCommunityUserId(currentUserCommunityUser?.communityUserId || null);
-  //     } catch (error) {
-  //       console.error("Failed to fetch community users:", error);
-  //     }
-  //   };
-
-  //   fetchCommunityUsers();
-  // }, [communityId]);
-  // // 댓글 작성자와 현재 사용자 비교
-  // const isCommentOwner = (comment: Comment) => {
-  //   return currentCommunityUserId === comment.authorId;
-  // };
+  const fetchUser = async () => {
+    try {
+      const response = await userApi.findMy();
+      const userData = response.data.data;
+      if (userData && userData.id) {
+        setUserId(userData.id);
+      } else {
+        console.error("User data is invalid:", userData);
+      }
+    } catch (error) {
+      console.error("Failed to fetch user:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchComments = async () => {
-      if (popupPostId !== null) {
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    if (popupPostId !== null) {
+      const fetchComments = async () => {
         try {
-          const response = await commentApi.getComments(popupPostId, true);
+          const response = await commentApi.getComments(popupPostId, false);
           setCommentsList(response.data);
         } catch (error) {
           console.error("Failed to fetch comments:", error);
         }
-      }
-    };
-
-    const fetchUser = async () => {
-      try {
-        const response = await userApi.findMy(); // 유저 조회 API 호출
-        setUsers(response.data);
-      } catch (error) {
-        console.error("Failed to fetch user:", error);
-      }
-    };
-
-    // 두 함수 호출
-    fetchComments();
-    fetchUser();
-  }, [popupPostId]); // popupPostId가 변경될 때마다 이 useEffect가 실행됩니다.
+      };
+      fetchComments();
+    }
+  }, [popupPostId]);
 
   const openAllCommentsPopup = async () => {
     setPopupPostId(postId); // postId를 상태에 저장
@@ -281,16 +236,19 @@ const PostCard: React.FC<PostCardProps> = ({
       {showComments && (
         <div className="comments-section">
           {commentsList.length > 0
-            ? commentsList.map((comment) => (
-                <CommentItem
-                  key={comment.commentId}
-                  {...comment}
-                  commentId={comment.commentId}
-                  onDelete={handleDeleteComment}
-                  onEdit={() => {}}
-                  onReply={() => {}}
-                />
-              ))
+            ? commentsList.map((comment) => {
+                return (
+                  <CommentItem
+                    key={comment.commentId}
+                    {...comment}
+                    userId={userId}
+                    commentId={comment.commentId}
+                    onReply={onReply}
+                    onEdit={handleEditComment}
+                    onDelete={handleDeleteComment}
+                  />
+                );
+              })
             : !loadingComments && <p>댓글이 존재하지 않습니다.</p>}
           <form onSubmit={handleCommentSubmit} className="comment-form">
             <input
@@ -334,16 +292,19 @@ const PostCard: React.FC<PostCardProps> = ({
                       : !loadingComments && <p></p>}
                   </div>
                   {commentsList.length > 0
-                    ? commentsList.map((comment) => (
-                        <CommentItem
-                          key={comment.commentId}
-                          {...comment}
-                          commentId={comment.commentId}
-                          onReply={onReply}
-                          onEdit={handleEditComment}
-                          onDelete={handleDeleteComment}
-                        />
-                      ))
+                    ? commentsList.map((comment) => {
+                        return (
+                          <CommentItem
+                            key={comment.commentId}
+                            {...comment}
+                            userId={userId}
+                            commentId={comment.commentId}
+                            onReply={onReply}
+                            onEdit={handleEditComment}
+                            onDelete={handleDeleteComment}
+                          />
+                        );
+                      })
                     : !loadingComments && <p>댓글이 존재하지 않습니다.</p>}
                 </InfiniteScroll>
                 <form onSubmit={handleCommentSubmit} className="comment-form">
