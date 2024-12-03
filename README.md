@@ -43,12 +43,12 @@
 <table>
   <tbody>
     <tr>
-      <td align="center"><a href="https://github.com/CMINSOO"><img src="https://avatars.githubusercontent.com/u/101718150?v=4" width="100px;" alt="서동현"/><br /><sub><b> 리더 : 서동현 </b></sub></a><br /></td>
-      <td align="center"><a href="https://github.com/ysys29"><img src="https://avatars.githubusercontent.com/u/156773875?v=4" width="100px;" alt="진수현"/><br /><sub><b> 부리더:진수현 </b></sub></a><br /></td>
-      <td align="center"><a href="https://github.com/NohSiHeon"><img src="https://avatars.githubusercontent.com/u/165770132?v=4" width="100px;" alt="김호연"/><br /><sub><b> 팀원 : 김호연 </b></sub></a><br /></td>
-      <td align="center"><a href="https://github.com/gus11als"><img src="https://avatars.githubusercontent.com/u/67359937?v=4" width="100px;" alt="황소은"/><br /><sub><b> 팀원 : 황소은 </b></sub></a><br /></td>
-      <td align="center"><a href="https://github.com/devJaem"><img src="https://avatars.githubusercontent.com/u/166608551?v=4" width="100px;" alt="이성운"/><br /><sub><b> 팀원 : 이성운 </b></sub></a><br /></td>
-      <td align="center"><a href="https://github.com/devJaem"><img src="https://avatars.githubusercontent.com/u/145142726?v=4" width="100px;" alt="이민준"/><br /><sub><b> 팀원 : 이민준 </b></sub></a><br /></td>
+      <td align="center"><a href="https://github.com/lucetaseo"><img src="https://avatars.githubusercontent.com/u/101718150?v=4" width="100px;" alt="서동현"/><br /><sub><b> 리더 : 서동현 </b></sub></a><br /></td>
+      <td align="center"><a href="https://github.com/lemonpie313"><img src="https://avatars.githubusercontent.com/u/156773875?v=4" width="100px;" alt="진수현"/><br /><sub><b> 부리더:진수현 </b></sub></a><br /></td>
+      <td align="center"><a href="https://github.com/blueclorox"><img src="https://avatars.githubusercontent.com/u/165770132?v=4" width="100px;" alt="김호연"/><br /><sub><b> 팀원 : 김호연 </b></sub></a><br /></td>
+      <td align="center"><a href="https://github.com/SooooMm"><img src="https://avatars.githubusercontent.com/u/67359937?v=4" width="100px;" alt="황소은"/><br /><sub><b> 팀원 : 황소은 </b></sub></a><br /></td>
+      <td align="center"><a href="https://github.com/Wooooooni"><img src="https://avatars.githubusercontent.com/u/166608551?v=4" width="100px;" alt="이성운"/><br /><sub><b> 팀원 : 이성운 </b></sub></a><br /></td>
+      <td align="center"><a href="https://github.com/minjun0702"><img src="https://avatars.githubusercontent.com/u/145142726?v=4" width="100px;" alt="이민준"/><br /><sub><b> 팀원 : 이민준 </b></sub></a><br /></td>
     </tr>
   </tbody>
 </table>
