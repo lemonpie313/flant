@@ -27,8 +27,6 @@
 - 배포 : https://flant.club
 - 시연 영상 : https://youtu.be/gs7rK-bdGWw?si=E9zGvCFhiEN1L3s6
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/gs7rK-bdGWw?si=E9zGvCFhiEN1L3s6" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-
 ---
 
 ## 📌 프로젝트 설명
